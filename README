@@ -1,3 +1,10 @@
-This is a developer branch.
-Create a child branch of blynq-dev for any feature developments.
-Until and unless completely tested, don't push changes to this branch.
+Creating README files to differentiate the branches.
+NOTE : Delete all the README files before merging to the parent branch.
+
+This branch should contain the list of features this version will include:
+Branch Name : blynq-dev-v1
+Created By : nipun
+List of Features:
+1. Upload images and display like google drive.
+2. Select images and Select screens and submit
+3. Show the selected images on the screen.
