@@ -1,2 +1,3 @@
-This is a release branch.
-Don't do "git checkout master" followed by "git merge child" unless you are completely sure.
+This is a developer branch.
+Create a child branch of blynq-dev for any feature developments.
+Until and unless completely tested, don't push changes to this branch.
