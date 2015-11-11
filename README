@@ -1,2 +1,4 @@
 This is a release branch.
 Don't do "git checkout master" followed by "git merge child" unless you are completely sure.
+
+This is the Main Branch.
