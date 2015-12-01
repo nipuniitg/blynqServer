@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'blynq.upload',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -73,11 +74,23 @@ WSGI_APPLICATION = 'blynq.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
+"""
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'Blynq_DB_DEV',
+        'USER': 'blynq',
+        'PASSWORD': 'Believe',
+        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
+        'PORT': '3306',
     }
 }
 
@@ -102,3 +115,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# Absolute filesystem path to the directory that will hold user-uploaded files.
+# Example: "/home/nipun/PycharmProjects/blynq/media/"
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# URL that handles the media served from MEDIA_ROOT. Make sure to use a
+# trailing slash.
+# Examples: "http://blynq.com/media/"
+MEDIA_URL = '/media/'
