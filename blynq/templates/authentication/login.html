@@ -1,0 +1,50 @@
+{% extends 'masterLayout.html' %}
+{% load staticfiles %}
+
+{% block title %}Blynq Login Page{% endblock %}
+
+{% block nonAuthenticatedContent %}
+    <div class="well col-sm-8">
+        <div class="container" id="divLoginFields">
+            <h2>Blynq Login</h2>
+
+            {% if user.is_authenticated %}
+                <P>Thanks for logging in. You will be redirected to Home page.</P>
+            {% else %}
+                <form class="form-horizontal" role="form" action="/authentication/login/" method="post">
+
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="txtUsername">Username</label>
+                        <div class="col-sm-5">
+                             <input type="text" name="username" class="form-control" id="txtUsername" placeholder="Enter email">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="txtpassword">Password:</label>
+                        <div class="col-sm-5">
+                            <input type="password" name="password" class="form-control" id="txtpassword" placeholder="Enter password">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <div class="checkbox">
+                                <label><input type="checkbox"> Remember me</label>
+                            </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button type="submit" class="btn btn-default" id="btnSubmit">Submit</button>
+                            <button type="button" class="btn btn-default" id="btnRegister">Register Here</button>
+                            <input type='text' hidden name="next" value="{{ request.REQUEST.next }}">
+                        </div>
+                    </div>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="{% static 'Libraries/jquery-1.11.3.js' %}"></script>
+    <script src="{% static 'CustomScripts/login.js' %}"></script>
+{% endblock nonAuthenticatedContent %}
