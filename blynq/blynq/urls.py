@@ -1,21 +1,28 @@
-"""blynq URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/1.8/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
-Including another URLconf
-    1. Add an import:  from blog import urls as blog_urls
-    2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
-"""
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.conf import settings
+from django.views.static import serve
+from authentication import authentication_urls
+from authentication import views as auth_views
+from screenManagement import screen_urls
+from playlistManagement import playlist_urls
+from contentManagement import content_urls
+from scheduleManagement import schedule_urls
+
 
 urlpatterns = [
+    url(r'^authentication/', include(authentication_urls)),
+    url(r'^schedule/', include(schedule_urls)),
+    url(r'^screen/', include(screen_urls)),
+    url(r'^content/', include(content_urls)),
+    url(r'^playlist/', include(playlist_urls)),
+    url(r'^home/', auth_views.homePage, name='homepage'),
     url(r'^admin/', include(admin.site.urls)),
 ]
+
+if settings.DEBUG:
+    urlpatterns += [
+        url(r'^media/(?P<path>.*)$', serve, {
+            'document_root': settings.MEDIA_ROOT,
+        }),
+   ]

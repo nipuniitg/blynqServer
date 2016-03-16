@@ -31,12 +31,18 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
+    'django_pdb',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'authentication',
+    'screenManagement',
+    'contentManagement',
+    'playlistManagement',
+    'scheduleManagement'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -48,14 +54,17 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'django_pdb.middleware.PdbMiddleware',
 )
 
 ROOT_URLCONF = 'blynq.urls'
 
+TEMPLATE_PATH = os.path.join(BASE_DIR, 'templates')
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATE_PATH],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -102,3 +111,22 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
+# Media files directory takes care of the uploaded pictures
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# The below variables are for registration app
+#REGISTRATION_OPEN = True        # If True, users can register
+#ACCOUNT_ACTIVATION_DAYS = 7     # One-week activation window; you may, of course, use a different value.
+#REGISTRATION_AUTO_LOGIN = True  # If True, the user will be automatically logged in.
+#LOGIN_REDIRECT_URL = '/admin/'  # The page you want users to arrive at after they successful log in
+LOGIN_URL = '/authentication/login/'  # The page users are directed to if they are not logged in,
+
+from django.conf import global_settings
+TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
+    "django.core.context_processors.request",
+)

@@ -1,0 +1,11 @@
+{% extends 'masterLayout.html' %}
+{% load staticfiles %}
+
+{% block title %}Blynq Groups{% endblock %}
+
+{% block content %}
+<div class="items-container" style="width:100%">
+    {% include 'contentManagement/content_holder.html' %}
+</div>
+<script src="{% static 'CustomScripts/ContentManagement.js' %}"></script>
+{% endblock content %}

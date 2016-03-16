@@ -1,0 +1,108 @@
+{% extends 'masterLayout.html' %}
+{% load staticfiles %}
+
+{% block title %}Blynq Playlists{% endblock title %}
+
+{% block content %}
+
+<div id="divPlaylists" data-itemtype="playlist" class="vertical-leftfloat-15 items-container">
+    <div class="div-header">
+        <h4>
+            <stron>Playlists</stron>
+        </h4>
+    </div>
+    <ul class="list-group item-container-list">
+        <li class="list-group-item" style="text-align:right"><a href="#" class="lnk-add-item"><span
+                class="glyphicon glyphicon-plus">Add-Playlist</span></a>
+
+            <div class="div-add-item" style="display:none">
+                <form class="form">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="txtPlaylistName">Name</label>
+
+                        <input type="text" name="playlistName" class="form-control" id="txtPlaylistName"
+                               placeholder="Enter Playlist name" required>
+                    </div>
+                    <button type="button" class="btn btn-success submit-additem">Submit</button>
+                    <button type="button" class="btn btn-danger cancel-additem">Cancel</button>
+                </form>
+            </div>
+        </li>
+        <li class="list-group-item active" data-playlistid="">Playlists
+            <span class="glyphicon glyphicon-trash pull-right edit-mode"></span>
+        </li>
+    </ul>
+</div>
+<div id="divPlaylistItems" data-itemtype="playlistItems" class="vertical-leftfloat-15 items-container">
+    <div class="div-header">
+        <h4>
+            <stron>Playlist Items</stron>
+            <span class="glyphicon glyphicon-pencil pull-right save-mode"></span>
+            <span class="glyphicon glyphicon-remove pull-right edit-mode" title="cancel"></span>
+            <span class="glyphicon glyphicon-ok pull-right edit-mode" title="save"></span>
+        </h4>
+    </div>
+    <ul class="list-group items-container-list list-group-acceptable" id="lst-playlistitems">
+        <li class="list-group-item hover" data-itemid="" data-mins="" data-secs="">Playlist Item1
+            <span class="glyphicon glyphicon-remove pull-right edit-mode"></span>
+            <span class="glyphicon glyphicon-time pull-right edit-mode"></span>
+        </li>
+        <li class="list-group-item" data-itemid="" data-mins="" data-secs="">Playlist Item2
+            <span class="glyphicon glyphicon-remove pull-right edit-mode"></span>
+            <span class="glyphicon glyphicon-time pull-right edit-mode"></span>
+        </li>
+        <li class="list-group-item" data-itemid="" data-mins="" data-secs="">Playlist Item3
+            <span class="glyphicon glyphicon-remove pull-right edit-mode"></span>
+            <span class="glyphicon glyphicon-time pull-right edit-mode"></span>
+        </li>
+    </ul>
+</div>
+
+<div id="divContent" data-itemtype="playlistItems" class="vertical-leftfloat-70 items-container">
+
+{% include 'contentManagement/content_holder.html' %}
+
+</div>
+
+<div id="div-mdl-playlistItem-timeDuration" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Set duration</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-inline">
+                    <div class="form-group">
+
+                        <label for="inpMins">Mins</label>
+                        <input type="number" pattern="^[_0-9]{1,}$" class="form-control" id="inpMins"
+                               data-max="59" data-min="00" placeholder="00"
+                               data-error="Mins should be between 0: 59" required>
+
+                        <span class="help-block with-errors"></span>
+                    </div>
+                    <div class="form-group">
+
+                        <label for="inpMins">Secs</label>
+                        <input type="number" pattern="^[_0-9]{1,}$" class="form-control" id="inpSecs"
+                               placeholder="00"
+                               data-error="Secs should be between 0: 59" required>
+
+                        <span class="help-block with-errors"></span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="submitPlaylistItemTime" class="btn btn-success">Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="{% static 'CustomScripts/PlaylistManagement.js' %}"></script>
+
+{% endblock content %}
