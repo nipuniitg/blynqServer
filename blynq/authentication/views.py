@@ -7,6 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
+from authentication.models import UserDetails
+
 
 def register(request):
     if request.user.is_authenticated():
@@ -17,7 +19,9 @@ def register(request):
     if request.method == 'POST':
         user_form = UserForm(data=request.POST)
         user_details_form = UserDetailsForm(data=request.POST)
-        if user_form.is_valid() and user_details_form.is_valid():
+        # TODO : user_details_form validation
+        # if user_form.is_valid() and user_details_form.is_valid():
+        if user_form.is_valid():
             user = User.objects.create_user(username=user_form.cleaned_data['username'],
                                             password=user_form.cleaned_data['password'],
                                             email = user_form.cleaned_data['email'])
@@ -49,7 +53,7 @@ def login(request):
             username = request.POST.get('username')
             password = request.POST.get('password')
 
-            print username, password
+            #print username, password
             user = authenticate(username = username, password = password)
 
             if user:

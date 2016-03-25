@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'^screen/', include(screen_urls)),
     url(r'^content/', include(content_urls)),
     url(r'^playlist/', include(playlist_urls)),
+    url(r'^$', auth_views.homePage),
     url(r'^home/', auth_views.homePage, name='homepage'),
     url(r'^admin/', include(admin.site.urls)),
 ]

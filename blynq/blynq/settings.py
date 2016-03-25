@@ -68,6 +68,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.core.context_processors.request',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -85,8 +86,12 @@ WSGI_APPLICATION = 'blynq.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'Blynq_DB_DEV',
+        'USER': 'blynq',
+        'PASSWORD': 'Believe',
+        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
+        'PORT': '3306',
     }
 }
 
@@ -125,8 +130,3 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 #REGISTRATION_AUTO_LOGIN = True  # If True, the user will be automatically logged in.
 #LOGIN_REDIRECT_URL = '/admin/'  # The page you want users to arrive at after they successful log in
 LOGIN_URL = '/authentication/login/'  # The page users are directed to if they are not logged in,
-
-from django.conf import global_settings
-TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
-    "django.core.context_processors.request",
-)

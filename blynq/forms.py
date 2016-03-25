@@ -4,6 +4,7 @@ from django import forms
 from authentication.models import UserDetails
 from django.core.exceptions import ValidationError
 
+
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
     password2 = forms.CharField(widget=forms.PasswordInput())
@@ -35,7 +36,7 @@ class UserDetailsForm(forms.ModelForm):
     mobileNumber = forms.IntegerField()
     class Meta:
         model = UserDetails
-        fields = ('companyName', 'mobileNumber')
+        fields = ('organization', 'mobile_number')
 
 
 # Field Validators

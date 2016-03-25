@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import migrations, models
+from django.db import models, migrations
 
 
 class Migration(migrations.Migration):
@@ -11,9 +11,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='userdetails',
-            name='mobileNumber',
-            field=models.IntegerField(),
+        migrations.RemoveField(
+            model_name='organization',
+            name='vid',
         ),
     ]
