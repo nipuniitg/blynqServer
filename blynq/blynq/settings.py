@@ -90,7 +90,7 @@ DATABASES = {
         'NAME': 'Blynq_DB_DEV',
         'USER': 'blynq',
         'PASSWORD': 'Believe',
-        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
+        'HOST': '127.0.0.1',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
     }
 }
@@ -130,3 +130,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 #REGISTRATION_AUTO_LOGIN = True  # If True, the user will be automatically logged in.
 #LOGIN_REDIRECT_URL = '/admin/'  # The page you want users to arrive at after they successful log in
 LOGIN_URL = '/authentication/login/'  # The page users are directed to if they are not logged in,
+
+CONTENT_IS_PUBLIC_DEFAULT = True
+DEFAULT_DISPLAY_TIME = 10

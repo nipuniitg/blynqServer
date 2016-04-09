@@ -45,3 +45,8 @@ def valMobileNumber(mobileNumber):
     if mobileNumber/ 1000000000 < 1 :
         raise ValidationError('%s is not a valid mobile Number' % mobileNumber)
         '''
+
+
+class UploadFileForm(forms.Form):
+    title = forms.CharField(max_length=50)
+    file = forms.FileField()

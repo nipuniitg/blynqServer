@@ -4,12 +4,25 @@ from authentication.models import Organization, UserDetails
 # Create your models here.
 
 
+class ScreenStatus(models.Model):
+    name = models.CharField(max_length=50)
+    description = models.TextField()
+
+
+class BusinessType(models.Model):
+    name = models.CharField(max_length=50)
+    description = models.TextField()
+
+
 class Group(models.Model):
     name = models.CharField(max_length=100,null= False)
     description = models.TextField()
     created_on = models.DateField()
     created_by = models.ForeignKey(UserDetails, on_delete=models.PROTECT)
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
+    # For each entry in the Screen table, we add an entry in the Group table and
+    # set the flag dummy_screen_group to True. So that it would be easy in the scheduleManagement
+    dummy_screen_group = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('-created_on', 'name')
@@ -48,16 +61,6 @@ class ScreenSpecs(models.Model):
     contrast_ratio = models.CharField(max_length=20, null=True)
     wattage = models.IntegerField(null=True)  # 55 in watts
     additional_details = models.TextField(null=True)
-
-
-class ScreenStatus(models.Model):
-    name = models.CharField(max_length=50)
-    description = models.TextField()
-
-
-class BusinessType(models.Model):
-    name = models.CharField(max_length=50)
-    description = models.TextField()
 
 
 class OrganizationScreen(models.Model):

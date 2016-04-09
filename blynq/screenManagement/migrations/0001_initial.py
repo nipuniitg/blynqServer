@@ -47,6 +47,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=100)),
                 ('description', models.TextField()),
                 ('created_on', models.DateField()),
+                ('dummy_screen_group', models.BooleanField(default=False)),
                 ('created_by', models.ForeignKey(to='authentication.UserDetails', on_delete=django.db.models.deletion.PROTECT)),
                 ('organization', models.ForeignKey(to='authentication.Organization', on_delete=django.db.models.deletion.PROTECT)),
             ],
