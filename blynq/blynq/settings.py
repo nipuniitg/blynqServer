@@ -42,7 +42,8 @@ INSTALLED_APPS = (
     'screenManagement',
     'contentManagement',
     'playlistManagement',
-    'scheduleManagement'
+    'scheduleManagement',
+    'django_js_reverse'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -120,6 +121,8 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
+#STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
 # Media files directory takes care of the uploaded pictures
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -131,5 +134,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 #LOGIN_REDIRECT_URL = '/admin/'  # The page you want users to arrive at after they successful log in
 LOGIN_URL = '/authentication/login/'  # The page users are directed to if they are not logged in,
 
+
 CONTENT_IS_PUBLIC_DEFAULT = True
 DEFAULT_DISPLAY_TIME = 10
+
+from django.conf import global_settings
+TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
+    "django.core.context_processors.request",)
+

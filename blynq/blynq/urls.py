@@ -4,6 +4,7 @@ from django.conf import settings
 from django.views.static import serve
 from authentication import authentication_urls
 from authentication import views as auth_views
+from screenManagement import views as screen_views
 from screenManagement import screen_urls
 from playlistManagement import playlist_urls
 from contentManagement import content_urls
@@ -18,6 +19,7 @@ urlpatterns = [
     url(r'^playlist/', include(playlist_urls)),
     url(r'^$', auth_views.homePage),
     url(r'^home/', auth_views.homePage, name='homepage'),
+    url(r'^home/', screen_views.routeToHome, name='homepage'),
     url(r'^admin/', include(admin.site.urls)),
 ]
 

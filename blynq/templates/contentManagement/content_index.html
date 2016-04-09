@@ -1,0 +1,12 @@
+{% extends 'masterLayout.html' %}
+{% load staticfiles %}
+
+{% block content %}
+<section class="wrapper" ng-app="" ng-controller="">
+    <div class="row">
+            <div class="col-md-12 col-fluid" >
+                {% include 'contentManagement/content_holder.html' %}
+            </div>
+    </div>
+</section>
+{% endblock content %}

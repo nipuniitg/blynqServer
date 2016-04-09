@@ -1,0 +1,57 @@
+{% load staticfiles %}
+<script src="{% static 'CustomScripts/ContentManagement-ang.js' %}"></script>
+<section ng-controller="ctCtrl">
+    <div class="row">
+        <div class="col-md-12">
+            <ol class="breadcrumb">
+                <li><i class="fa fa-home"></i><a href="index.html">Home</a></li>
+                <li><i class="fa fa-laptop"></i>Dashboard</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12" style="min-height:400px; overflow-y: scroll">
+            <div class="panel panel-default" style="border-right:1px solid grey">
+                <div class="panel-heading">
+                    Content
+                    <button class="btn btn-primary pull-right">Upload</button>
+                </div>
+                <div class="panel-body">
+                    <!-- Folders -->
+                    <div class="item-container-wrap" ng-repeat="folder in contentObj.folders">
+                        <div class="item-container-header">
+                            <p>{[ folder.folderName ]}</p>
+                        </div>
+                        <div class="folder-container">
+                            <img src="{% static 'images/folder-icon.png' %}">
+                        </div>
+                        <div class="item-container-footer">
+                            <div class="input-group">
+                                <i class="fa fa-trash-o pull-right pointer" ng-click="deleteFolder($index)"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Items -->
+                    <div class="item-container-wrap"
+                         ng-repeat="item in contentObj.items"
+                         >
+                        <div class="div-draggable-wrap" draggable data-index="{[$index]}">
+                            <div class="item-container-header">
+                                {[ item.itemName + $index ]}
+                            </div>
+                            <div class="item-container">
+                                <img src="{[ item.url ]}">
+                            </div>
+                        </div>
+                        <div class="item-container-footer">
+                            <div class="input-group">
+                                <i class="fa fa-trash-o pointer pull-right" ng-click="deleteItem($index)"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

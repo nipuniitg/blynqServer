@@ -1,0 +1,146 @@
+{% extends 'masterLayout2.html' %}
+{% load staticfiles %}
+
+{% block content%}
+
+
+<section class="wrapper wrapper-fluid" ng-app="sagApp" ng-controller="screenCtrl">
+
+    <div id="div-screensList-wrapper" class="col-md-3 portlets col-fluid">
+        <!-- Screen -->
+        <div class="panel panel-default">
+            <div class="panel-heading panel-heading-custom">
+                <div class="pull-left">Screen</div>
+                <div class="widget-icons pull-right">
+                    <a href="#" class="wminimize"><i class="fa fa-plus"></i></a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+
+            <div class="panel-body absolute-fluid">
+                <div class="item-search-row row">
+                    <form class="navbar-form">
+                        <input class="form-control" placeholder="Search" type="text">
+                    </form>
+                </div>
+                <div class="row absolute-fluid" style="padding-top:10px;">
+                    <div class="list-group">
+                        <a class="list-group-item " href="#" ng-click="clickedScreen()">
+                            Lorem ipsum dolor sit amet
+                        </a>
+                        <a class="list-group-item active" href="javascript:;">Praesent tempus eleifend risus <i
+                                class="pull-right fa fa-circle online"></i></a>
+                        <a class="list-group-item" href="javascript:;">Praesent tempus eleifend risus<i
+                                class="pull-right fa fa-circle offline"></i></a>
+                        <a class="list-group-item" href="javascript:;">Porta ac consectetur ac</a>
+                        <a class="list-group-item" href="javascript:;">Vestibulum at eros</a>
+                        <a class="list-group-item" href="javascript:;">Vestibulum at eros</a>
+                        <a class="list-group-item" href="javascript:;">Porta ac consectetur ac</a>
+                        <a class="list-group-item" href="javascript:;">Vestibulum at eros</a>
+                        <a class="list-group-item" href="javascript:;">Vestibulum at eros</a>
+                        <a class="list-group-item" href="javascript:;">Porta ac consectetur ac</a>
+                        <a class="list-group-item" href="javascript:;">Vestibulum at eros</a>
+                        <a class="list-group-item" href="javascript:;">Vestibulum at eros</a>
+                        <a class="list-group-item" href="javascript:;">Porta ac consectetur ac</a>
+                        <a class="list-group-item" href="javascript:;">Vestibulum at eros</a>
+                        <a class="list-group-item" href="javascript:;">Vestibulum at eros</a>
+                        <a class="list-group-item" href="javascript:;">Porta ac consectetur ac</a>
+                        <a class="list-group-item" href="javascript:;">Vestibulum at eros</a>
+                        <a class="list-group-item" href="javascript:;">Vestibulum at eros</a>
+                        <a class="list-group-item" href="javascript:;">Porta ac consectetur ac</a>
+                        <a class="list-group-item" href="javascript:;">Vestibulum at eros</a>
+                        <a class="list-group-item" href="javascript:;">Vestibulum at eros</a>
+                        <a class="list-group-item" href="javascript:;">Porta ac consectetur ac</a>
+                        <a class="list-group-item" href="javascript:;">Vestibulum at eros</a>
+                        <a class="list-group-item" href="javascript:;">Vestibulum at eros</a>
+                        <a class="list-group-item" href="javascript:;">Porta ac consectetur ac</a>
+                        <a class="list-group-item" href="javascript:;">Vestibulum at eros</a>
+                        <a class="list-group-item" href="javascript:;">Vestibulum at eros</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="div-screenDetails" class="col-md-4 portlets col-fluid" ng-show="showScreenDetailsBool">
+        <!-- Screen Details -->
+        <div class="panel panel-default">
+            <div class="panel-heading panel-heading-custom">
+                <div class="pull-left">Screen Details</div>
+                <div class="widget-icons pull-right" ng-show="!editScreenDetailsBool">
+                    <a href="#" ng-click="clickedScreenDetailsEdit()"><i class="fa fa-pencil"></i></a>
+                </div>
+                <div class="widget-icons pull-right" ng-show="editScreenDetailsBool">
+                    <a href="#" ng-click="clickedScreenDetailsSave()" ><i class="fa fa-check"></i></a>
+                    <a href="#" ng-click="clickedCancelScreenDetailsEdit()"><i class="fa fa-times"></i></a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="panel-body absolute-fluid">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="inputEmail1" class="col-lg-3 control-label">Screen</label>
+                        <div class="col-lg-9">
+                            <div class="form-control-static div-underline" ng-show="!editScreenDetailsBool">
+                                {[ screenDetailsObj.screenName ]}
+                                <!--<span class="pull-right tooltips" data-placement="bottom" title="Edit"><i
+                                        class="fa fa-pencil"></i></span>-->
+                            </div>
+
+                            <div class="" ng-show="editScreenDetailsBool">
+                                <input type="text"
+                                       class="form-control" placeholder="Screen Name"
+                                       ng-model="screenDetailsObj.screenName">
+                                <!--<span class="input-group-addon tooltips" data-placement="bottom" title="Save"><i
+                                        class="fa fa-check"></i></span>
+                                <span class="input-group-addon tooltips" data-placement="bottom" title="Cancel"><i
+                                        class="fa fa-times"></i></span>-->
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">Resolution</label>
+                        <div class="col-lg-9">
+                            <div class="form-control-static div-underline" ng-show="!editScreenDetailsBool">
+                                {[ screenDetailsObj.screenResolution ]}
+
+                            </div>
+                            <div class="" ng-show="editScreenDetailsBool">
+                                <input type="text"
+                                       class="form-control" id="inputEmail1" placeholder="Screen Name"
+                                       ng-model="screenDetailsObj.screenResolution">
+                                <!--<span class="input-group-addon tooltips" data-placement="bottom" title="Save"><i
+                                        class="fa fa-check"></i></span>
+                                <span class="input-group-addon tooltips" data-placement="bottom" title="Cancel"><i
+                                        class="fa fa-times"></i></span>-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputPassword1" class="col-lg-3 control-label">Groups</label>
+                        <div class="col-lg-9">
+                            <div id="tagsinput_tagsinput" class="tagsinput " style="height: 100%;">
+                                <span class="tag" ng-repeat="group in screenDetailsObj.groups">
+                                    <span> {[ group.groupName ]} &nbsp;&nbsp;</span>
+                                    <a class="tagsinput-remove-link"></a>
+                                </span>
+                                <div class="tagsinput-add-container" id="tagsinput_addTag">
+                                    <div class="tagsinput-add"></div>
+                                    <input id="tagsinput_tag" value="" data-default=""
+                                           style="color: rgb(102, 102, 102); width: 7px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<script src="{% static 'CustomScripts/ScreenManagement-ng.js' %}"></script>
+
+{% endblock content %}

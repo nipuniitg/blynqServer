@@ -51,10 +51,10 @@ text-align: left;
 cursor: pointer
 }
 
-.list-group-item:hover{
+/*.list-group-item:hover{
 background-color : #5C6B77;
 color : #fff;
-}
+}*/
 
 .item-container-wrap{
 height: 150px;
@@ -144,4 +144,88 @@ margin: 0 auto;
 .ms-list-container .selected{
 background-color : #2E6DA4;
 color : #fff;
+}
+
+
+/*after template */
+.panel .panel-heading.panel-heading-custom{
+font-size : 20px;
+min-height : 50px;
+line-height : 50px;
+}
+
+
+.wrapper.wrapper-fluid{
+padding: 0px;
+min-height : 500px;
+
+}
+
+div[class^="col-"].col-fluid{
+padding: 0px;
+}
+
+.col-fluid .panel.panel-default{
+height : 100%
+}
+
+html, body{
+height : 100%;
+padding: 0px;
+margin : 0px;
+}
+
+.list-group .list-group-item:first-child,.list-group .list-group-item:last-child {
+    border-radius:0px;
+}
+
+.online{color:#00FF00;}
+
+.offline{color:#CCC }
+
+.item-search-row{
+height : 50px;
+padding: 5px;
+}
+
+.absolute-fluid{
+    position: absolute;
+    width: 100%;
+    bottom: 0px;
+    top:50px;
+}
+
+.absolute-fluid .list-group
+{
+overflow-y:scroll;
+height : 100%
+}
+
+div.div-underline{
+border-bottom: 1px solid #c7c7cc;
+padding: 2px,0px
+}
+
+.input-group .input-group-addon.tooltips, .div-underline .fa{
+cursor: pointer;
+}
+
+.table-responsive{
+    width: 100%;
+    margin-bottom: 15px;
+    overflow-x: scroll;
+    overflow-y:scroll;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+    border: 1px solid #DDD;
+    -webkit-overflow-scrolling: touch;
+    }
+
+
+.table-responsive .table td.fix,
+.table-responsive .table th.fix{
+min-width : 200px;
+}
+
+.fa.pointer{
+cursor:pointer
 }
