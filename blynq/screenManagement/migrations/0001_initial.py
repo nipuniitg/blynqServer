@@ -13,31 +13,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Address',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('building_name', models.CharField(max_length=100)),
-                ('line1', models.CharField(max_length=100)),
-                ('line2', models.CharField(max_length=100)),
-                ('area', models.CharField(max_length=100)),
-                ('landmark', models.CharField(max_length=100)),
-                ('pincode', models.IntegerField()),
-            ],
-        ),
-        migrations.CreateModel(
             name='BusinessType',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=50)),
                 ('description', models.TextField()),
-            ],
-        ),
-        migrations.CreateModel(
-            name='City',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(max_length=50)),
-                ('state', models.CharField(max_length=50)),
             ],
         ),
         migrations.CreateModel(
@@ -75,7 +55,7 @@ class Migration(migrations.Migration):
                 ('activated_on', models.DateField()),
                 ('business_type', models.ForeignKey(to='screenManagement.BusinessType', on_delete=django.db.models.deletion.PROTECT)),
                 ('groups', models.ManyToManyField(to='screenManagement.Group')),
-                ('location', models.ForeignKey(to='screenManagement.Address', on_delete=django.db.models.deletion.PROTECT)),
+                ('location', models.ForeignKey(to='authentication.Address', on_delete=django.db.models.deletion.PROTECT)),
                 ('owned_by', models.ManyToManyField(to='authentication.Organization', through='screenManagement.OrganizationScreen')),
                 ('placed_by', models.ForeignKey(related_name='screen_placed_by', on_delete=django.db.models.deletion.PROTECT, to='authentication.Organization')),
             ],
@@ -119,10 +99,5 @@ class Migration(migrations.Migration):
             model_name='organizationscreen',
             name='screen',
             field=models.ForeignKey(to='screenManagement.Screen', on_delete=django.db.models.deletion.PROTECT),
-        ),
-        migrations.AddField(
-            model_name='address',
-            name='city',
-            field=models.ForeignKey(to='screenManagement.City', on_delete=django.db.models.deletion.PROTECT),
         ),
     ]

@@ -1,5 +1,5 @@
 from django.db import models
-from authentication.models import Organization, UserDetails
+from authentication.models import Organization, UserDetails, Address
 
 # Create your models here.
 
@@ -32,21 +32,6 @@ class Group(models.Model):
 
     def get_screens(id):
         return Screen.Objects.all(group_id = id)
-
-
-class City(models.Model):
-    name = models.CharField(max_length=50)
-    state = models.CharField(max_length=50)
-
-
-class Address(models.Model):
-    building_name = models.CharField(max_length=100)
-    line1 = models.CharField(max_length=100)
-    line2 = models.CharField(max_length=100)
-    area = models.CharField(max_length=100)
-    landmark = models.CharField(max_length=100)
-    city = models.ForeignKey(City, on_delete=models.PROTECT)
-    pincode = models.IntegerField()
 
 
 class ScreenSpecs(models.Model):

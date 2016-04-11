@@ -2,9 +2,9 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
+import django.contrib.auth.models
 import django.db.models.deletion
 from django.conf import settings
-import django.contrib.auth.models
 
 
 class Migration(migrations.Migration):
@@ -15,10 +15,33 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
+            name='Address',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('building_name', models.CharField(max_length=100)),
+                ('line1', models.CharField(max_length=100)),
+                ('line2', models.CharField(max_length=100)),
+                ('area', models.CharField(max_length=100)),
+                ('landmark', models.CharField(max_length=100)),
+                ('pincode', models.IntegerField()),
+            ],
+        ),
+        migrations.CreateModel(
+            name='City',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=50)),
+                ('state', models.CharField(max_length=50)),
+            ],
+        ),
+        migrations.CreateModel(
             name='Organization',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(unique=True, max_length=100)),
+                ('website', models.CharField(max_length=100)),
+                ('contact', models.CharField(max_length=15, null=True, blank=True)),
+                ('address', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, blank=True, to='authentication.Address', null=True)),
             ],
         ),
         migrations.CreateModel(
@@ -46,5 +69,10 @@ class Migration(migrations.Migration):
             managers=[
                 ('objects', django.contrib.auth.models.UserManager()),
             ],
+        ),
+        migrations.AddField(
+            model_name='address',
+            name='city',
+            field=models.ForeignKey(to='authentication.City', on_delete=django.db.models.deletion.PROTECT),
         ),
     ]

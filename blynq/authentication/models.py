@@ -1,18 +1,37 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, UserManager
 from django.db.models.signals import post_save
 from django.core.exceptions import ValidationError
 
 # See https://docs.djangoproject.com/en/1.8/ref/contrib/auth/ for User model details
 
 
+class City(models.Model):
+    name = models.CharField(max_length=50)
+    state = models.CharField(max_length=50)
+
+
+class Address(models.Model):
+    building_name = models.CharField(max_length=100)
+    line1 = models.CharField(max_length=100)
+    line2 = models.CharField(max_length=100)
+    area = models.CharField(max_length=100)
+    landmark = models.CharField(max_length=100)
+    city = models.ForeignKey(City, on_delete=models.PROTECT)
+    pincode = models.IntegerField()
+
+
 '''
-First organization should be Blynq, which we assign to UserDetails by default.
+One organization should be Blynq
 '''
 
 
 class Organization(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    website = models.CharField(max_length=100)
+    address = models.ForeignKey(Address, on_delete=models.PROTECT, blank=True, null=True)
+    contact = models.CharField(max_length=12, blank=True, null=True)
+
 
     def __unicode__(self):
         return self.name
@@ -37,11 +56,14 @@ class Role(models.Model):
 
 class UserDetails(User):
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
-    mobile_number = models.IntegerField()
+    mobile_number = models.CharField(max_length=12)
     role = models.ForeignKey(Role)
 
+    # Use UserManager to get the create_user method, etc.
+    objects = UserManager()
+
     def __unicode__(self):
-        return self.User.username
+        return self.username
 
 
 '''
