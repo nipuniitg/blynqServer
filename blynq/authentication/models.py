@@ -10,15 +10,22 @@ class City(models.Model):
     name = models.CharField(max_length=50)
     state = models.CharField(max_length=50)
 
+    def __unicode__(self):
+        return self.name + ', ' + self.state
+
 
 class Address(models.Model):
     building_name = models.CharField(max_length=100)
-    line1 = models.CharField(max_length=100)
-    line2 = models.CharField(max_length=100)
+    address_line1 = models.CharField(max_length=100, blank=True)
+    address_line2 = models.CharField(max_length=100, blank=True)
     area = models.CharField(max_length=100)
     landmark = models.CharField(max_length=100)
     city = models.ForeignKey(City, on_delete=models.PROTECT)
-    pincode = models.IntegerField()
+    pincode = models.IntegerField(blank=True)
+    added_by = models.ForeignKey('UserDetails', on_delete=models.PROTECT)
+
+    def __unicode__(self):
+        return self.building_name + ', ' + self.area + ', ' + self.city.name
 
 
 '''

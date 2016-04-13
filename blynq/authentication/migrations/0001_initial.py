@@ -19,11 +19,11 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('building_name', models.CharField(max_length=100)),
-                ('line1', models.CharField(max_length=100)),
-                ('line2', models.CharField(max_length=100)),
+                ('address_line1', models.CharField(max_length=100, blank=True)),
+                ('address_line2', models.CharField(max_length=100, blank=True)),
                 ('area', models.CharField(max_length=100)),
                 ('landmark', models.CharField(max_length=100)),
-                ('pincode', models.IntegerField()),
+                ('pincode', models.IntegerField(blank=True)),
             ],
         ),
         migrations.CreateModel(
@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(unique=True, max_length=100)),
                 ('website', models.CharField(max_length=100)),
-                ('contact', models.CharField(max_length=15, null=True, blank=True)),
+                ('contact', models.CharField(max_length=12, null=True, blank=True)),
                 ('address', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, blank=True, to='authentication.Address', null=True)),
             ],
         ),
@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
             name='UserDetails',
             fields=[
                 ('user_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL)),
-                ('mobile_number', models.IntegerField()),
+                ('mobile_number', models.CharField(max_length=12)),
                 ('organization', models.ForeignKey(to='authentication.Organization', on_delete=django.db.models.deletion.PROTECT)),
                 ('role', models.ForeignKey(to='authentication.Role')),
             ],
@@ -69,6 +69,11 @@ class Migration(migrations.Migration):
             managers=[
                 ('objects', django.contrib.auth.models.UserManager()),
             ],
+        ),
+        migrations.AddField(
+            model_name='address',
+            name='added_by',
+            field=models.ForeignKey(to='authentication.UserDetails', on_delete=django.db.models.deletion.PROTECT),
         ),
         migrations.AddField(
             model_name='address',

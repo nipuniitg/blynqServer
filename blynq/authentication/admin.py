@@ -1,8 +1,12 @@
 from django.contrib import admin
-from authentication.models import Organization, Role, UserDetails
+from django.apps import apps
+from django.contrib.admin.sites import AlreadyRegistered
 
-# Register your models here.
-admin.site.register(Organization)
-admin.site.register(Role)
-admin.site.register(UserDetails)
+# Register all the models in the authentication app
+app = apps.get_app_config('authentication')
 
+for model_name, model in app.models.items():
+    try:
+        admin.site.register(model)
+    except AlreadyRegistered:
+        pass

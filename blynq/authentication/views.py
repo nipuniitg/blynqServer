@@ -1,12 +1,11 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
-from forms import UserDetailsForm
+from authentication.forms import UserDetailsForm
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-
 from authentication.models import UserDetails, Organization, Role
 
 
@@ -57,8 +56,6 @@ def login(request):
             else:
                 return HttpResponse('Invalid Login Details')
 
-
-    print 'Iam in login view'
     return render(request, 'authentication/login.html', context_dic)
 
 @login_required
