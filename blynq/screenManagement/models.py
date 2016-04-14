@@ -12,10 +12,13 @@ import random, string
 # Idle - The device is on but not displayng advertisements
 # Offline - The device is down or not connected to internet
 class ScreenStatus(models.Model):
-    status_name = models.CharField(max_length=50)
+    status_name = models.CharField(max_length=50, unique=True)
     description = models.TextField()
 
     def __unicode__(self):
+        return self.status_name
+
+    def natural_key(self):
         return self.status_name
 
 
@@ -43,6 +46,9 @@ class Group(models.Model):
     def __unicode__(self):
         return self.group_name
 
+    def natural_key(self):
+        return self.group_name
+
     # def get_screens(id):
     #     return Screen.Objects.all(group_id = id)
 
@@ -62,6 +68,12 @@ class ScreenSpecs(models.Model):
 
     def __unicode__(self):
         return self.brand + ' ' + self.model_num + ' ' + str(self.screen_size)
+
+    class Meta:
+        unique_together = (('brand', 'model_num'))
+
+    def natural_key(self):
+        return ((self.brand, self.model_num, self.screen_size, self.display_type))
 
 
 class OrganizationScreen(models.Model):

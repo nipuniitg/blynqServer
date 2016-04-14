@@ -13,6 +13,9 @@ class City(models.Model):
     def __unicode__(self):
         return self.name + ', ' + self.state
 
+    def natural_key(self):
+        return ((self.name, self.state))
+
 
 class Address(models.Model):
     building_name = models.CharField(max_length=100)
@@ -26,6 +29,12 @@ class Address(models.Model):
 
     def __unicode__(self):
         return self.building_name + ', ' + self.area + ', ' + self.city.name
+
+    def natural_key(self):
+        return ((self.building_name, self.area, self.city.name, self.pincode))
+
+    class Meta:
+        unique_together = (('building_name', 'added_by'))
 
 
 '''
@@ -41,6 +50,9 @@ class Organization(models.Model):
 
 
     def __unicode__(self):
+        return self.name
+
+    def natural_key(self):
         return self.name
 
 
@@ -60,6 +72,9 @@ class Role(models.Model):
     def __unicode__(self):
         return self.role_name
 
+    def natural_key(self):
+        return self.role_name
+
 
 class UserDetails(User):
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
@@ -70,6 +85,9 @@ class UserDetails(User):
     objects = UserManager()
 
     def __unicode__(self):
+        return self.username
+
+    def natural_key(self):
         return self.username
 
 

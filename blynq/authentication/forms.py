@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django import forms
 from authentication.models import UserDetails
+from djng.forms import NgModelForm, NgFormValidationMixin
 from django.core.exceptions import ValidationError
 
 

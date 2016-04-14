@@ -196,8 +196,10 @@ def screen_index(request):
 def group_index(request):
     return render(request, 'screen/groups.html')
 
+
 def routeToHome(request):
     return render(request, 'Home.html')
+
 
 def testScreen(request):
     return render(request,'testTemplate.html')
@@ -216,17 +218,13 @@ def getGroupsJson(request):
     return JsonResponse(groups,safe=False)
 
 
-def get_groups_json(request, group_id):
-    if group_id is not None:
-        data = serializers.serialize("json", Group.objects.filter(id=group_id))
-        print data
-    else:
-        data = serializers.serialize("json", Group.objects.all())
-        print data
-    return data
+# TODO: Understand the difference between natural_key method and get_by_natural_key method in
+# https://docs.djangoproject.com/en/1.9/topics/serialization/
+def get_groups_json(request):
+    data = serializers.serialize("json", Group.objects.all(), fields=('group_name', 'description'))
+    return HttpResponse(data, content_type='application/json')
 
 
 def get_screens_json(request):
-    data = serializers.serialize("json", Screen.objects.all())
-    return data
-
+    data = serializers.serialize("json", Screen.objects.all(), use_natural_foreign_keys=True, use_natural_primary_keys=True)
+    return HttpResponse(data, content_type='application/json')
