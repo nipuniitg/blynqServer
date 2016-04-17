@@ -21,7 +21,7 @@
                             </ul>
                         </p>
                     {% endif %}
-                    <form id="display_form" method="post" class="form-horizontal" action={{target}}>
+                    <form id="display_form" method="post" class="form-horizontal" action={{target}} enctype="multipart/form-data">
                         {% csrf_token %}
                         {% for field in form %}
                             <div class="form-group">

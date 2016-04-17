@@ -19,13 +19,13 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('title', models.CharField(max_length=100, verbose_name='name')),
                 ('description', models.TextField(null=True, verbose_name='description', blank=True)),
-                ('document', models.FileField(upload_to=contentManagement.models.upload_to_dir)),
-                ('_file_size', models.IntegerField(null=True, verbose_name='file size', blank=True)),
+                ('document', models.FileField(null=True, upload_to=contentManagement.models.upload_to_dir)),
                 ('sha1_hash', models.CharField(default=b'', max_length=40, verbose_name='sha1', blank=True)),
                 ('original_filename', models.CharField(max_length=100, null=True, verbose_name='original filename', blank=True)),
                 ('uploaded_time', models.DateTimeField(auto_now_add=True, verbose_name='uploaded time')),
                 ('last_modified_time', models.DateTimeField(auto_now=True, verbose_name='modified at')),
                 ('is_public', models.BooleanField(default=True)),
+                ('is_folder', models.BooleanField(default=False)),
             ],
         ),
         migrations.CreateModel(
@@ -36,19 +36,6 @@ class Migration(migrations.Migration):
                 ('fileExtension', models.CharField(max_length=5)),
             ],
         ),
-        migrations.CreateModel(
-            name='Folder',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(max_length=100, verbose_name='name')),
-                ('uploaded_at', models.DateTimeField(auto_now_add=True, verbose_name='uploaded at')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='created at')),
-                ('modified_at', models.DateTimeField(auto_now=True, verbose_name='modified at')),
-                ('dummy_content_folder', models.BooleanField(default=False)),
-                ('owner', models.ForeignKey(related_name='filer_owned_folders', verbose_name=b'owner', blank=True, to='authentication.UserDetails', null=True)),
-                ('parent', models.ForeignKey(related_name='children', verbose_name=b'parent', blank=True, to='contentManagement.Folder', null=True)),
-            ],
-        ),
         migrations.AddField(
             model_name='content',
             name='file_type',
@@ -56,8 +43,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='content',
-            name='folder',
-            field=models.ForeignKey(related_name='all_files', verbose_name='folder', blank=True, to='contentManagement.Folder', null=True),
+            name='is_inside',
+            field=models.ForeignKey(to='contentManagement.Content'),
         ),
         migrations.AddField(
             model_name='content',
@@ -68,5 +55,9 @@ class Migration(migrations.Migration):
             model_name='content',
             name='uploaded_by',
             field=models.ForeignKey(related_name='content_uploaded_by', on_delete=django.db.models.deletion.PROTECT, to='authentication.UserDetails'),
+        ),
+        migrations.AlterUniqueTogether(
+            name='content',
+            unique_together=set([('title', 'is_inside', 'uploaded_by')]),
         ),
     ]

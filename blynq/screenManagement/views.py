@@ -228,3 +228,9 @@ def get_groups_json(request):
 def get_screens_json(request):
     data = serializers.serialize("json", Screen.objects.all(), use_natural_foreign_keys=True, use_natural_primary_keys=True)
     return HttpResponse(data, content_type='application/json')
+
+
+def get_screen(request, screen_id=1):
+    print screen_id
+    data = serializers.serialize("json", Screen.objects.filter(pk=screen_id), use_natural_foreign_keys=True, use_natural_primary_keys=True)
+    return HttpResponse(data, content_type='application/json')

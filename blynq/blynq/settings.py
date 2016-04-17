@@ -39,6 +39,9 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'djng', # django-angular http://django-angular.readthedocs.org/en/latest/installation.html
+    # 'easy_thumbnails', # https://django-filer.readthedocs.org/en/latest/installation.html for easy_thumbnails, filer and mptt
+    # 'filer',
+    # 'mptt',
     'authentication',
     'screenManagement',
     'contentManagement',
@@ -135,8 +138,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 #LOGIN_REDIRECT_URL = '/admin/'  # The page you want users to arrive at after they successful log in
 LOGIN_URL = '/authentication/login/'  # The page users are directed to if they are not logged in,
 
-
+# Content related settings
 CONTENT_IS_PUBLIC_DEFAULT = True
 DEFAULT_DISPLAY_TIME = 10
+
+# Filer related settings
+THUMBNAIL_HIGH_RESOLUTION = True
+FILER_ENABLE_LOGGING = True
+FILER_DEBUG = False # Set this to True to show errors if file or thumbnail doesn't exist
+
 
 

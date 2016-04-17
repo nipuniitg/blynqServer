@@ -5,12 +5,12 @@ from django.conf import settings
 
 # Create your models here.
 from authentication.models import UserDetails
-from contentManagement.models import Content, Folder
+from contentManagement.models import Content
 
 
 class PlaylistItems(models.Model):
     playlist = models.ForeignKey('Playlist', on_delete=models.PROTECT)
-    folder = models.ForeignKey(Folder, on_delete=models.PROTECT)
+    content = models.ForeignKey(Content, on_delete=models.PROTECT)
     # index signifies the position of content in the playlist
     index = models.IntegerField()
     # display_time is the time for which the content should be displayed
@@ -19,7 +19,7 @@ class PlaylistItems(models.Model):
 
 class Playlist(models.Model):
     name = models.CharField(max_length=100)
-    playlist_items = models.ManyToManyField(Folder, through=PlaylistItems)
+    playlist_items = models.ManyToManyField(Content, through=PlaylistItems)
 
     created_by = models.ForeignKey(UserDetails, on_delete=models.PROTECT, related_name='%(class)s_created_by')
     created_time = models.DateTimeField(_('created time'), auto_now_add=True)

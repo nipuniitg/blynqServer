@@ -80,4 +80,8 @@ class Migration(migrations.Migration):
             name='city',
             field=models.ForeignKey(to='authentication.City', on_delete=django.db.models.deletion.PROTECT),
         ),
+        migrations.AlterUniqueTogether(
+            name='address',
+            unique_together=set([('building_name', 'added_by')]),
+        ),
     ]

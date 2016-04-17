@@ -30,13 +30,13 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('index', models.IntegerField()),
                 ('display_time', models.IntegerField(default=10)),
-                ('folder', models.ForeignKey(to='contentManagement.Folder', on_delete=django.db.models.deletion.PROTECT)),
+                ('content', models.ForeignKey(to='contentManagement.Content', on_delete=django.db.models.deletion.PROTECT)),
                 ('playlist', models.ForeignKey(to='playlistManagement.Playlist', on_delete=django.db.models.deletion.PROTECT)),
             ],
         ),
         migrations.AddField(
             model_name='playlist',
             name='playlist_items',
-            field=models.ManyToManyField(to='contentManagement.Folder', through='playlistManagement.PlaylistItems'),
+            field=models.ManyToManyField(to='contentManagement.Content', through='playlistManagement.PlaylistItems'),
         ),
     ]

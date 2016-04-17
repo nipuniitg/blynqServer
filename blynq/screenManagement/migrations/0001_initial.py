@@ -17,8 +17,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('group_name', models.CharField(max_length=100)),
-                ('description', models.TextField()),
-                ('created_on', models.DateField()),
+                ('description', models.TextField(null=True, blank=True)),
+                ('created_on', models.DateField(auto_now_add=True)),
                 ('dummy_screen_group', models.BooleanField(default=False)),
                 ('created_by', models.ForeignKey(to='authentication.UserDetails', on_delete=django.db.models.deletion.PROTECT)),
                 ('organization', models.ForeignKey(to='authentication.Organization', on_delete=django.db.models.deletion.PROTECT)),
@@ -46,6 +46,7 @@ class Migration(migrations.Migration):
                 ('activation_key', models.CharField(max_length=16)),
                 ('activated_on', models.DateField(null=True, blank=True)),
                 ('business_type', models.CharField(default=b'PRIVATE', max_length=20, choices=[(b'PRIVATE', b'The screens is bought for private use.'), (b'PUBLIC-SINGLE', b'Only one organization can display advertisement on this screen.'), (b'PUBLIC-SHARED', b'Multiple organization can display advertisement on this screen in slots.')])),
+                ('activated_by', models.ForeignKey(blank=True, to='authentication.UserDetails', null=True)),
                 ('groups', models.ManyToManyField(to='screenManagement.Group', blank=True)),
                 ('location', models.ForeignKey(to='authentication.Address', on_delete=django.db.models.deletion.PROTECT)),
                 ('owned_by', models.ManyToManyField(to='authentication.Organization', through='screenManagement.OrganizationScreen')),
@@ -73,9 +74,13 @@ class Migration(migrations.Migration):
             name='ScreenStatus',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('status_name', models.CharField(max_length=50)),
+                ('status_name', models.CharField(unique=True, max_length=50)),
                 ('description', models.TextField()),
             ],
+        ),
+        migrations.AlterUniqueTogether(
+            name='screenspecs',
+            unique_together=set([('brand', 'model_num')]),
         ),
         migrations.AddField(
             model_name='screen',
