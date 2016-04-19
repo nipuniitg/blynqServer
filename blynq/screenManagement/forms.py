@@ -9,7 +9,7 @@ class AddScreenForm(forms.ModelForm):
 
     class Meta:
         model = Screen
-        fields = ('screen_name', 'location', 'activation_key', 'specifications', 'groups')
+        fields = ('screen_name', 'address', 'activation_key', 'screen_size', 'aspect_ratio', 'resolution') # Add specifications if needed
 
     def clean_screen_name(self):
         screen_name = self.cleaned_data['screen_name']
@@ -33,8 +33,7 @@ class AddScreenSpecs(forms.ModelForm):
 
     class Meta:
         model = ScreenSpecs
-        fields = ('brand', 'model_num', 'weight', 'dimensions', 'resolution', 'display_type', 'screen_size',
-                  'aspect_ratio', 'contrast_ratio', 'wattage', 'additional_details')
+        fields = ('brand', 'model_num', 'weight', 'dimensions', 'display_type', 'contrast_ratio', 'wattage', 'additional_details')
     # TODO: Field validation
 
 

@@ -23,6 +23,18 @@ def default_userdetails():
     return UserDetails.objects.all()[0]
 
 
+def default_screen_status():
+    return ScreenStatus.objects.get(status_name__icontains='offline')
+
+
+def user_and_organization(request):
+    user_details = UserDetails.objects.get(username=request.user.username)
+    organization = user_details.organization
+     # user_details = default_userdetails()
+    # organization = default_organization()
+    return user_details, organization
+
+
 @login_required
 def add_screen(request):
     context_dic = {}
@@ -37,17 +49,16 @@ def add_screen(request):
                 organization = default_organization()
             form_data = add_screen_form.cleaned_data
             try:
-                status = ScreenStatus.objects.get(status_name__icontains='unactivated')
+                status = default_screen_status()
                 screen = Screen.objects.create(screen_name=form_data.get('screen_name'),
                                                specifications=form_data.get('specifications'),
                                                location=form_data.get('location'),
-                                               placed_by=organization,
+                                               owned_by=organization,
                                                status=status,
                                                )
                 for group in form_data.get('groups'):
                     screen.groups.add(group)
-                # TODO: Add an entry of the above screen in the OrganizationScreen
-                # TODO: The above case only handles the PRIVATE businessType
+                # TODO: The above case only handles the PRIVATE businessType, add a check
                 # OrganizationScreen.objects.create(organization=organization,
                 #                                   screen=screen,
                 #                                   )
@@ -66,6 +77,7 @@ def add_screen(request):
     context_dic['submitButton'] = "Submit"
     context_dic['success'] = success
     context_dic['target'] = reverse('add_screen')
+    print context_dic
     return render(request,'Shared/displayForm.html', context_dic)
 
 
@@ -161,12 +173,7 @@ def add_group(request):
         if add_group_form.is_valid():
             form_data = add_group_form.cleaned_data
             try:
-                try:
-                    user_details = UserDetails.objects.get(username=request.user.username)
-                    organization = user_details.organization
-                except:
-                    user_details = default_userdetails()
-                    organization = default_organization()
+                user_details, organization = user_and_organization(request)
                 group = Group.objects.create(group_name=form_data.get('group_name'),
                                              description=form_data.get('description'),
                                              created_by=user_details,
@@ -226,7 +233,8 @@ def get_groups_json(request):
 
 
 def get_screens_json(request):
-    data = serializers.serialize("json", Screen.objects.all(), use_natural_foreign_keys=True, use_natural_primary_keys=True)
+    user_details, organization = user_and_organization(request)
+    data = serializers.serialize("json", Screen.objects.filter( owned_by=organization ), fields=('screen_id', 'screen_name', 'address', 'status', 'groups', 'screen_size', 'resolution'), use_natural_foreign_keys=True, use_natural_primary_keys=True)
     return HttpResponse(data, content_type='application/json')
 
 

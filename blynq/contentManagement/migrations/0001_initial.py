@@ -26,6 +26,7 @@ class Migration(migrations.Migration):
                 ('last_modified_time', models.DateTimeField(auto_now=True, verbose_name='modified at')),
                 ('is_public', models.BooleanField(default=True)),
                 ('is_folder', models.BooleanField(default=False)),
+                ('relative_path', models.CharField(default=b'/', max_length=1025)),
             ],
         ),
         migrations.CreateModel(
@@ -44,7 +45,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='content',
             name='is_inside',
-            field=models.ForeignKey(to='contentManagement.Content'),
+            field=models.ForeignKey(to='contentManagement.Content', null=True),
         ),
         migrations.AddField(
             model_name='content',
