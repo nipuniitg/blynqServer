@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from screenManagement.serializers import FlatJsonSerializer as json_serializer
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -198,7 +198,7 @@ def add_group(request):
 
 @login_required
 def screen_index(request):
-    context_dic ={}
+    context_dic = {}
     context_dic['form'] = AddScreenForm(form_name='formAddScreen', scope_prefix='modalScreenDetailsObj')
     return render(request,'screen/screens.html', context_dic)
 
@@ -232,17 +232,31 @@ def getGroupsJson(request):
 # https://docs.djangoproject.com/en/1.9/topics/serialization/
 def get_groups_json(request):
     user_details, organization = user_and_organization(request)
-    data = serializers.serialize("json", Group.objects.filter(created_by__organization=organization), fields=('group_id','group_name', 'description'))
-    return HttpResponse(data, content_type='application/json')
-
-
-def get_screens_json(request, group_id=None):
-    user_details, organization = user_and_organization(request)
-    screen_data = Screen.objects.filter(owned_by=organization)
-    if group_id is not None:
-        screen_data = screen_data.filter(groups__pk=group_id)
-    json_data = serializers.serialize("json", screen_data,
-                                      fields=('screen_id', 'screen_name', 'address', 'status', 'groups', 'screen_size', 'resolution'),
-                                      use_natural_foreign_keys=True, use_natural_primary_keys=True)
+    groups_data = Group.objects.filter(created_by__organization=organization)
+    # json_data = serializers.serialize("json", groups_data, fields=('group_id','group_name', 'description', 'screen'))
+    json_data = json_serializer().serialize(groups_data, fields=('group_id','group_name', 'description', 'screen'))
     return HttpResponse(json_data, content_type='application/json')
 
+
+def get_screens_json(request):
+    user_details, organization = user_and_organization(request)
+    screen_data = Screen.objects.filter(owned_by=organization)
+    json_data = json_serializer().serialize(screen_data, fields=('screen_id', 'screen_name', 'address', 'status',
+                                                                 'groups', 'screen_size', 'resolution'))
+    return HttpResponse(json_data, content_type='application/json')
+
+
+def get_selectable_screens_json(request, group_id=-1):
+    user_details, organization = user_and_organization(request)
+    screen_data = Screen.objects.filter(owned_by=organization).exclude(groups__pk=group_id)
+    json_data = json_serializer().serialize(screen_data, fields=('screen_id', 'screen_name', 'address', 'status',
+                                                                 'groups', 'screen_size', 'resolution'))
+    return HttpResponse(json_data, content_type='application/json')
+
+
+def get_selectable_groups_json(request, screen_id=-1):
+    user_details, organization = user_and_organization(request)
+    groups_data = Group.objects.filter(created_by__organization=organization).exclude(screen__pk=screen_id)
+    # json_data = serializers.serialize("json", groups_data, fields=('group_id', 'group_name'))
+    json_data = json_serializer().serialize(groups_data, fields=('group_id', 'group_name'))
+    return HttpResponse(json_data, content_type='application/json')
