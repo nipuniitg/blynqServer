@@ -23,9 +23,22 @@ def default_userdetails():
     return UserDetails.objects.all()[0]
 
 
+def default_screen_status():
+    return ScreenStatus.objects.get(status_name__icontains='offline')
+
+
+def user_and_organization(request):
+    user_details = UserDetails.objects.get(username=request.user.username)
+    organization = user_details.organization
+     # user_details = default_userdetails()
+    # organization = default_organization()
+    return user_details, organization
+
+
 @login_required
-def add_screen(request):
+def upsertScreen(request):
     context_dic = {}
+    print request
     success = False
     if request.method == 'POST':
         add_screen_form = AddScreenForm(data=request.POST)
@@ -37,17 +50,16 @@ def add_screen(request):
                 organization = default_organization()
             form_data = add_screen_form.cleaned_data
             try:
-                status = ScreenStatus.objects.get(status_name__icontains='unactivated')
+                status = default_screen_status()
                 screen = Screen.objects.create(screen_name=form_data.get('screen_name'),
                                                specifications=form_data.get('specifications'),
                                                location=form_data.get('location'),
-                                               placed_by=organization,
+                                               owned_by=organization,
                                                status=status,
                                                )
                 for group in form_data.get('groups'):
                     screen.groups.add(group)
-                # TODO: Add an entry of the above screen in the OrganizationScreen
-                # TODO: The above case only handles the PRIVATE businessType
+                # TODO: The above case only handles the PRIVATE businessType, add a check
                 # OrganizationScreen.objects.create(organization=organization,
                 #                                   screen=screen,
                 #                                   )
@@ -60,12 +72,13 @@ def add_screen(request):
             print 'Add Screen Form is not valid'
             print add_screen_form.errors
     else:
-        context_dic['form'] = AddScreenForm()
+        context_dic['form'] = AddScreenForm(form_name='formAddScreen', scope_prefix='modalScreenDetailsObj')
         # TODO: Not able to unselect the Group field once selected, fix this issue in the frontend.
     context_dic['title'] = "Add Screen"
     context_dic['submitButton'] = "Submit"
     context_dic['success'] = success
-    context_dic['target'] = reverse('add_screen')
+    # context_dic['target'] = reverse('add_screen')
+    print context_dic
     return render(request,'Shared/displayForm.html', context_dic)
 
 
@@ -161,12 +174,7 @@ def add_group(request):
         if add_group_form.is_valid():
             form_data = add_group_form.cleaned_data
             try:
-                try:
-                    user_details = UserDetails.objects.get(username=request.user.username)
-                    organization = user_details.organization
-                except:
-                    user_details = default_userdetails()
-                    organization = default_organization()
+                user_details, organization = user_and_organization(request)
                 group = Group.objects.create(group_name=form_data.get('group_name'),
                                              description=form_data.get('description'),
                                              created_by=user_details,
@@ -190,7 +198,9 @@ def add_group(request):
 
 @login_required
 def screen_index(request):
-    return render(request,'screen/screens.html')
+    context_dic ={}
+    context_dic['form'] = AddScreenForm(form_name='formAddScreen', scope_prefix='modalScreenDetailsObj')
+    return render(request,'screen/screens.html', context_dic)
 
 
 def group_index(request):
@@ -221,16 +231,18 @@ def getGroupsJson(request):
 # TODO: Understand the difference between natural_key method and get_by_natural_key method in
 # https://docs.djangoproject.com/en/1.9/topics/serialization/
 def get_groups_json(request):
-    data = serializers.serialize("json", Group.objects.all(), fields=('group_name', 'description'))
+    user_details, organization = user_and_organization(request)
+    data = serializers.serialize("json", Group.objects.filter(created_by__organization=organization), fields=('group_id','group_name', 'description'))
     return HttpResponse(data, content_type='application/json')
 
 
-def get_screens_json(request):
-    data = serializers.serialize("json", Screen.objects.all(), use_natural_foreign_keys=True, use_natural_primary_keys=True)
-    return HttpResponse(data, content_type='application/json')
+def get_screens_json(request, group_id=None):
+    user_details, organization = user_and_organization(request)
+    screen_data = Screen.objects.filter(owned_by=organization)
+    if group_id is not None:
+        screen_data = screen_data.filter(groups__pk=group_id)
+    json_data = serializers.serialize("json", screen_data,
+                                      fields=('screen_id', 'screen_name', 'address', 'status', 'groups', 'screen_size', 'resolution'),
+                                      use_natural_foreign_keys=True, use_natural_primary_keys=True)
+    return HttpResponse(json_data, content_type='application/json')
 
-
-def get_screen(request, screen_id=1):
-    print screen_id
-    data = serializers.serialize("json", Screen.objects.filter(pk=screen_id), use_natural_foreign_keys=True, use_natural_primary_keys=True)
-    return HttpResponse(data, content_type='application/json')

@@ -49,7 +49,8 @@ def upload_content(request):
                                    description=form_data.get('description'),
                                    document=form_data.get('document'),
                                    uploaded_by=user_details,
-                                   last_modified_by=user_details)
+                                   last_modified_by=user_details,
+                                   is_inside=None)
             success = True
             success_message = "The Screen has been successfully Added."
             context_dic['success_message'] = success_message

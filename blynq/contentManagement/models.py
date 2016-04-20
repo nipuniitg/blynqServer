@@ -124,7 +124,7 @@ class Content(models.Model):
     is_public = models.BooleanField( default=settings.CONTENT_IS_PUBLIC_DEFAULT, )
 
     # is_inside = null implies the files are in the home directory of the user
-    is_inside = models.ForeignKey('self', on_delete=models.CASCADE)
+    is_inside = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
     is_folder = models.BooleanField(default=False)
 
     # TODO: call logical_path to update this relative_path when a Content object is created or modified

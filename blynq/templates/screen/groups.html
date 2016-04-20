@@ -29,7 +29,7 @@
 
                 <ul class="list-group" style="height:490px;overflow-y:scroll">
                     <li ng-repeat="group in groups" class="list-group-item" ng-class="{active: $index === selectedIndex }" ng-click="clickedOnGroup(group, $index)">
-                        {[ group.groupName ]}
+                        {[ group.group_name ]}
                         <i class="pull-right fa fa-pencil pointer" data-toggle="modal" data-target="#mdl-upsertGroup" ng-click="editGroupDetails(group, $index)"></i>
                     </li>
 
@@ -49,11 +49,11 @@
                         <thead style="overflow-y:scroll">
                         <tr>
                             <th class="fix">Screen Name</th>
-                            <th class="fix">City</th>
+                            <th class="fix">Address</th>
                             <th class="fix">Resolution</th>
-                            <th class="fix">Accessible Users</th>
-                            <th class="fix">Company name</th>
-                            <th class="fix">DeviceId</th>
+                            <th class="fix">Groups</th>
+                            <th class="fix">Screen Size</th>
+
                         </tr>
                         <tr>
                             <th></th>
@@ -61,66 +61,24 @@
                             <th><input type="form-control" placeholder="search"></th>
                             <th><input type="form-control" placeholder="search"></th>
                             <th><input type="form-control" placeholder="search"></th>
-                            <th><input type="form-control" placeholder="search"></th>
-                            <th><input type="form-control" placeholder="search"></th>
                         </tr>
                         </thead>
                         <tbody style=" height: 230px;overflow-y: auto;width: 100%;">
-                        <tr>
-                            <td class="fix">Some Screen Name This is and this is some text to test</td>
-                            <td class="fix">Hyderabad</td>
-                            <td class="fix">42*34</td>
-                            <td class="fix">
-                                <div class="btn-group">
-                                    <a class="btn btn-primary" href="#"><i class="icon_plus_alt2"></i></a>
-                                    <a class="btn btn-success" href="#"><i class="icon_check_alt2"></i></a>
-                                    <a class="btn btn-danger" href="#"><i class="icon_close_alt2"></i></a>
+                        <tr ng-repeat="screen in screensInSelectedGroup">
+                            <td class="fix">{[ screen.screen_name ]}</td>
+                            <td class="fix">{[ screen.address]}</td>
+                            <td class="">{[ screen.resolution ]}</td>
+                            <td class="">
+                                <div  class="tagsinput " style="height: 100%;">
+                                    <span class="tag" ng-repeat="group in screen.groups">
+                                    <span> {[group.group_name]} &nbsp;&nbsp;</span>
+                                    <!--<a class="tagsinput-remove-link"></a>-->
+                                    </span>
+
+                                </span>
                                 </div>
                             </td>
-                            <td class="fix">Blynq</td>
-                            <td class="fix">ID0098749</td>
-                        </tr>
-                        <tr>
-                            <td class="fix">Some Screen Name This is and this is some text to test</td>
-                            <td class="fix">Hyderabad</td>
-                            <td class="fix">42*34</td>
-                            <td class="fix">
-                                <div class="btn-group">
-                                    <a class="btn btn-primary" href="#"><i class="icon_plus_alt2"></i></a>
-                                    <a class="btn btn-success" href="#"><i class="icon_check_alt2"></i></a>
-                                    <a class="btn btn-danger" href="#"><i class="icon_close_alt2"></i></a>
-                                </div>
-                            </td>
-                            <td class="fix">Blynq</td>
-                            <td class="fix">ID0098749</td>
-                        </tr>
-                        <tr>
-                            <td class="fix">Some Screen Name This is and this is some text to test</td>
-                            <td class="fix">Hyderabad</td>
-                            <td class="fix">42*34</td>
-                            <td class="fix">
-                                <div class="btn-group">
-                                    <a class="btn btn-primary" href="#"><i class="icon_plus_alt2"></i></a>
-                                    <a class="btn btn-success" href="#"><i class="icon_check_alt2"></i></a>
-                                    <a class="btn btn-danger" href="#"><i class="icon_close_alt2"></i></a>
-                                </div>
-                            </td>
-                            <td class="fix">Blynq</td>
-                            <td class="fix">ID0098749</td>
-                        </tr>
-                        <tr>
-                            <td class="fix">Some Screen Name This is and this is some text to test</td>
-                            <td class="fix">Hyderabad</td>
-                            <td class="fix">42*34</td>
-                            <td class="fix">
-                                <div class="btn-group">
-                                    <a class="btn btn-primary" href="#"><i class="icon_plus_alt2"></i></a>
-                                    <a class="btn btn-success" href="#"><i class="icon_check_alt2"></i></a>
-                                    <a class="btn btn-danger" href="#"><i class="icon_close_alt2"></i></a>
-                                </div>
-                            </td>
-                            <td class="fix">Blynq</td>
-                            <td class="fix">ID0098749</td>
+                            <td class="">{[ screen.screen_size ]}</td>
                         </tr>
                         </tbody>
                     </table>
@@ -299,29 +257,21 @@
                         <h4 class="modal-title">Group Details</h4>
                     </div>
                     <div class="modal-body" style="height:500px;overflow-y:scroll">
-                        <div class="row">
-                            <form class="form-horizontal" role="form">
-                                <div class="form-group">
-                                    <label for="inputEmail1" class="col-md-3 control-label">Group Name</label>
-                                    <div class="col-md-9">
-                                        <div class="">
-                                            <input type="text"
-                                                   class="form-control" placeholder="Group Name" ng-model="modalGroupDetailsObj.groupName">
-                                        </div>
-                                    </div>
+                        <form id="display_form" method="post" class="form-horizontal"
+                              name="{{ form.form_name }}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% for field in form %}
+                            <div class="form-group">
+                                <div class="col-sm-2">{{ field.label_tag }}</div>
+                                <div class="col-sm-5">
+                                    {{ field }}
                                 </div>
-                                <div class="form-group">
-                                    <label class="col-md-3 control-label">Group description</label>
-                                    <div class="col-md-9">
-                                        <textarea type="text"
-                                                  class="form-control" id="inputEmail1" placeholder="This group consists of screens placed in the top floor."
-                                                  ng-model="modalGroupDetailsObj.Description"></textarea>
-
-                                    </div>
+                                <div class="help-block with-errors col-sm-3">
+                                    {{ field.errors }}
                                 </div>
-                            </form>
-                        </div>
-
+                            </div>
+                            {% endfor %}
+                        </form>
 
                         <div class="row" style="margin:10px">
                             <!--selected Screens-->

@@ -20,11 +20,10 @@
                             <th>Edit</th>
                             <th>Status</th>
                             <th class="fix">Screen Name</th>
-                            <th class="fix">City</th>
+                            <th class="fix">Address</th>
                             <th class="fix">Resolution</th>
-                            <th class="fix">Available Tags</th>
-                            <th class="fix">Company name</th>
-                            <th class="fix">DeviceId</th>
+                            <th class="fix">Groups</th>
+                            <th class="fix">Screen Size</th>
                         </tr>
                             <tr>
                             <th></th>
@@ -34,28 +33,26 @@
                             <th><input type="form-control" ng-model="searchScreens.resolution" placeholder="search"></th>
                             <th><input type="form-control" ng-model="searchScreens.groups.groupName" placeholder="search"></th>
                             <th><input type="form-control" ng-model="searchScreens.comapny" placeholder="search"></th>
-                            <th><input type="form-control" ng-model="searchScreens.Id" placeholder="search"></th>
                         </tr>
                         </thead>
                         <tbody style=" height: 230px;overflow-y: auto;width: 100%;">
                         <tr ng-repeat="screen in screens | filter: searchScreens">
                             <td><a href="#" data-toggle="modal" data-target="#myModal" ng-click="editScreenDetails($index)"><i class="fa fa-pencil pointer"></i> </a></td>
-                            <td><i class="fa fa-circle online"></i> </td>
-                            <td class="fix">{[ screen.screenName ]}</td>
-                            <td class="fix">{[screen.city ]}</td>
+                            <td><i class="fa fa-circle online"></i>{[ screen.status ]} </td>
+                            <td class="fix">{[ screen.screen_name ]}</td>
+                            <td class="fix">{[ screen.address ]}</td>
                             <td class="fix">{[screen.resolution]}</td>
                             <td class="fix">
                                 <div  class="tagsinput " style="height: 100%;">
                                     <span class="tag" ng-repeat="group in screen.groups">
-                                    <span> {[group.groupName]} &nbsp;&nbsp;</span>
-                                    <a class="tagsinput-remove-link"></a>
+                                    <span> {[group.group_name]} &nbsp;&nbsp;</span>
+                                    <!--<a class="tagsinput-remove-link"></a>-->
                                     </span>
 
                                 </span>
                                 </div>
                             </td>
-                            <td class="fix">{[ screen.company ]}</td>
-                            <td class="fix">{[ screen.screenId]}</td>
+                            <td class="fix">{[ screen.screen_size ]}</td>
                         </tr>
 
                         </tbody>
@@ -237,62 +234,27 @@
                         <h4 class="modal-title">Screen Details</h4>
                     </div>
                     <div class="modal-body">
-                        <form class="form-horizontal" role="form" style="height: 400px;overflow-y:scroll">
+                        <form id="display_form" method="post" class="form-horizontal"
+                              name="{{ form.form_name }}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% for field in form %}
                             <div class="form-group">
-                                <label class="col-md-3 control-label">Screen Id</label>
-                                <div class="col-md-9">
-                                    <div class="form-control-static">
-                                        {[ modalScreenDetailsObj.screenId]}
-                                    </div>
+                                <div class="col-sm-2">{{ field.label_tag }}</div>
+                                <div class="col-sm-5">
+                                    {{ field }}
+                                </div>
+                                <div class="help-block with-errors col-sm-3">
+                                    {{ field.errors }}
                                 </div>
                             </div>
+                            {% endfor %}
                             <div class="form-group">
-                                <label for="inputEmail1" class="col-md-3 control-label">Screen Name</label>
-                                <div class="col-md-9">
-                                    <div class="">
-                                        <input type="text"
-                                               class="form-control" placeholder="Screen Name"
-                                               ng-model="modalScreenDetailsObj.screenName">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group" ng-show="isNewScreenModal">
-                                <label for="inputEmail1" class="col-md-3 control-label">Activation-Key</label>
-                                <div class="col-md-9">
-                                    <div class="">
-                                        <input type="text"
-                                               class="form-control" placeholder="0970-9283-8347-1239"
-                                               ng-model="newScreenValidationKey">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-md-3 control-label">Resolution</label>
-                                <div class="col-md-9">
-                                    <div class="">
-                                        <input type="text"
-                                               class="form-control" id="inputEmail1" placeholder="42 *32"
-                                               ng-model="modalScreenDetailsObj.resolution">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-md-3 control-label">City</label>
-                                <div class="col-md-9">
-                                    <div class="">
-                                        <input type="text"
-                                               class="form-control" placeholder="Hyderabad"
-                                               ng-model="modalScreenDetailsObj.city">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="inputPassword1" class="col-md-3 control-label">Groups</label>
+                                <label class="col-md-3 control-label">Groups</label>
                                 <div class="col-md-9">
                                     <div id="tagsinput_tagsinput1" class="tagsinput " style="height: 100%;">
                                         <span class="tag" ng-repeat="group in modalScreenDetailsObj.groups">
-                                            <span> {[ group.groupName ]} &nbsp;&nbsp;</span>
-                                            <a class="tagsinput-remove-link"></a>
+                                            <span> {[ group.group_name ]} &nbsp;&nbsp;</span>
+                                            <a class="tagsinput-remove-link" ng-click="removeGroupTagforScreen($index)"></a>
                                         </span>
                                         <div class="tagsinput-add-container">
                                             <div class="tagsinput-add" data-toggle="modal" data-target="#mdl-AddGroups"
@@ -303,7 +265,6 @@
                                     </div>
                                 </div>
                             </div>
-
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -313,6 +274,7 @@
                 </div>
             </div>
         </div>
+
         <!-- Modal-Add groups to screen -->
         <div id="mdl-AddGroups" class="modal fade" role="dialog" data-backdrop="static">
                     <div class="modal-dialog">
@@ -329,7 +291,7 @@
                                             <header class="panel-heading">Selectable Groups</header>
                                             <ul class="list-group">
                                                 <li class="list-group-item" ng-repeat="group in selectableGroups">
-                                                    <a href="" ng-click="moveGroupToSelected(group)"><i class="fa fa-plus-circle"></i> </a> {[ group.groupName ]}
+                                                    <a href="" ng-click="moveGroupToSelected(group)"><i class="fa fa-plus-circle"></i> </a> {[ group.group_name ]}
                                                 </li>
                                             </ul>
                                         </section>
@@ -339,7 +301,7 @@
                                             <header class="panel-heading">Selected Groups</header>
                                             <ul class="list-group">
                                                 <li class="list-group-item" ng-repeat="group in modalScreenDetailsObj.groups ">
-                                                    <a href="#" ng-click="moveGroupToSelectable(group)"><i class="fa fa-minus-circle"></i> </a> {[ group.groupName ]}
+                                                    <a href="#" ng-click="moveGroupToSelectable(group)"><i class="fa fa-minus-circle"></i> </a> {[ group.group_name ]}
                                                 </li>
                                             </ul>
                                         </section>

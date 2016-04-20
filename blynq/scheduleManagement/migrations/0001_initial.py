@@ -32,8 +32,21 @@ class Migration(migrations.Migration):
                 ('created_by', models.ForeignKey(related_name='schedule_created_by', on_delete=django.db.models.deletion.PROTECT, to='authentication.UserDetails')),
                 ('last_updated_by', models.ForeignKey(related_name='schedule_last_updated_by', on_delete=django.db.models.deletion.PROTECT, to='authentication.UserDetails')),
                 ('playlist', models.ForeignKey(to='playlistManagement.Playlist', on_delete=django.db.models.deletion.PROTECT)),
-                ('screens', models.ManyToManyField(to='screenManagement.Group')),
             ],
+        ),
+        migrations.CreateModel(
+            name='ScreenSchedule',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('group', models.ForeignKey(to='screenManagement.Group', null=True)),
+                ('schedule', models.ForeignKey(to='scheduleManagement.Schedule')),
+                ('screen', models.ForeignKey(to='screenManagement.Screen', on_delete=django.db.models.deletion.PROTECT)),
+            ],
+        ),
+        migrations.AddField(
+            model_name='schedule',
+            name='screens',
+            field=models.ManyToManyField(to='screenManagement.Screen', through='scheduleManagement.ScreenSchedule'),
         ),
         migrations.AddField(
             model_name='event',
