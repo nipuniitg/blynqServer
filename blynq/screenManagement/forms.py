@@ -3,9 +3,11 @@ from django import forms
 
 from authentication.models import Address
 from screenManagement.models import Screen, ScreenSpecs, Group
+from djng.forms import NgModelFormMixin, NgModelForm, NgFormValidationMixin
 
 
-class AddScreenForm(forms.ModelForm):
+
+class AddScreenForm(NgModelFormMixin, NgFormValidationMixin, NgModelForm, forms.ModelForm):
 
     class Meta:
         model = Screen
@@ -19,6 +21,9 @@ class AddScreenForm(forms.ModelForm):
         except:
             return screen_name
         raise forms.ValidationError('Screen name already exists')
+
+    def __init__(self, *args, **kwargs):
+        super(AddScreenForm, self).__init__(*args, **kwargs)
 
 
 class AddScreenLocation(forms.ModelForm):
@@ -37,7 +42,7 @@ class AddScreenSpecs(forms.ModelForm):
     # TODO: Field validation
 
 
-class AddGroup(forms.ModelForm):
+class AddGroup(NgModelFormMixin, NgFormValidationMixin, NgModelForm, forms.ModelForm):
 
     class Meta:
         model = Group

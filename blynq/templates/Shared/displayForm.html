@@ -21,7 +21,7 @@
                             </ul>
                         </p>
                     {% endif %}
-                    <form id="display_form" method="post" class="form-horizontal" action={{target}} enctype="multipart/form-data">
+                    <form id="display_form" name="{{ form.form_name }}" method="post" class="form-horizontal" enctype="multipart/form-data" novalidate>
                         {% csrf_token %}
                         {% for field in form %}
                             <div class="form-group">
@@ -42,3 +42,72 @@
      </div>
 </section>
 {% endblock content %}
+
+<!--<form class="form-horizontal" role="form" style="height: 400px;overflow-y:scroll">-->
+                            <!--<div class="form-group">-->
+                                <!--<label class="col-md-3 control-label">Screen Id</label>-->
+                                <!--<div class="col-md-9">-->
+                                    <!--<div class="form-control-static">-->
+                                        <!--{[ modalScreenDetailsObj.screenId]}-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                            <!--<div class="form-group">-->
+                                <!--<label for="inputEmail1" class="col-md-3 control-label">Screen Name</label>-->
+                                <!--<div class="col-md-9">-->
+                                    <!--<div class="">-->
+                                        <!--<input type="text"-->
+                                               <!--class="form-control" placeholder="Screen Name"-->
+                                               <!--ng-model="modalScreenDetailsObj.screenName">-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                            <!--<div class="form-group" ng-show="isNewScreenModal">-->
+                                <!--<label for="inputEmail1" class="col-md-3 control-label">Activation-Key</label>-->
+                                <!--<div class="col-md-9">-->
+                                    <!--<div class="">-->
+                                        <!--<input type="text"-->
+                                               <!--class="form-control" placeholder="0970-9283-8347-1239"-->
+                                               <!--ng-model="newScreenValidationKey">-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                            <!--<div class="form-group">-->
+                                <!--<label class="col-md-3 control-label">Resolution</label>-->
+                                <!--<div class="col-md-9">-->
+                                    <!--<div class="">-->
+                                        <!--<input type="text"-->
+                                               <!--class="form-control" id="inputEmail1" placeholder="42 *32"-->
+                                               <!--ng-model="modalScreenDetailsObj.resolution">-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                            <!--<div class="form-group">-->
+                                <!--<label class="col-md-3 control-label">City</label>-->
+                                <!--<div class="col-md-9">-->
+                                    <!--<div class="">-->
+                                        <!--<input type="text"-->
+                                               <!--class="form-control" placeholder="Hyderabad"-->
+                                               <!--ng-model="modalScreenDetailsObj.city">-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                            <!--<div class="form-group">-->
+                                <!--<label for="inputPassword1" class="col-md-3 control-label">Groups</label>-->
+                                <!--<div class="col-md-9">-->
+                                    <!--<div id="tagsinput_tagsinput1" class="tagsinput " style="height: 100%;">-->
+                                        <!--<span class="tag" ng-repeat="group in modalScreenDetailsObj.groups">-->
+                                            <!--<span> {[ group.groupName ]} &nbsp;&nbsp;</span>-->
+                                            <!--<a class="tagsinput-remove-link"></a>-->
+                                        <!--</span>-->
+                                        <!--<div class="tagsinput-add-container">-->
+                                            <!--<div class="tagsinput-add" data-toggle="modal" data-target="#mdl-AddGroups"-->
+                                                 <!--ng-click="addGroupsToScreen()"></div>-->
+                                            <!--<input value="" data-default=""-->
+                                                   <!--style="color: rgb(102, 102, 102); width: 7px;">-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                            <!--</div>-->
+
+                        <!--</form>-->

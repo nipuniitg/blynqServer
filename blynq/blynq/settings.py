@@ -139,7 +139,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGIN_URL = '/authentication/login/'  # The page users are directed to if they are not logged in,
 
 # Content related settings
-CONTENT_IS_PUBLIC_DEFAULT = True
 DEFAULT_DISPLAY_TIME = 10
 
 # Filer related settings

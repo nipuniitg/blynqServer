@@ -973,7 +973,7 @@ CREATE TABLE `scheduleManagement_schedule_screens` (
   UNIQUE KEY `schedule_id` (`schedule_id`,`group_id`),
   KEY `scheduleMa_group_id_46d317ee2af5323_fk_screenManagement_group_id` (`group_id`),
   CONSTRAINT `sc_schedule_id_a2ba00561d3af8e_fk_scheduleManagement_schedule_id` FOREIGN KEY (`schedule_id`) REFERENCES `scheduleManagement_schedule` (`id`),
-  CONSTRAINT `scheduleMa_group_id_46d317ee2af5323_fk_screenManagement_group_id` FOREIGN KEY (`group_id`) REFERENCES `screenManagement_group` (`id`)
+  CONSTRAINT `scheduleMa_group_id_46d317ee2af5323_fk_screenManagement_group_id` FOREIGN KEY (`group_id`) REFERENCES `screenManagement_group` (`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1018,13 +1018,12 @@ DROP TABLE IF EXISTS `screenManagement_group`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `screenManagement_group` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `group_id` int(11) NOT NULL AUTO_INCREMENT,
   `group_name` varchar(100) NOT NULL,
   `description` longtext,
   `created_on` date NOT NULL,
   `created_by_id` int(11) NOT NULL,
-  `group_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`group_id`),
   KEY `f4d416adc879a6e27bc401a773527249` (`created_by_id`),
   CONSTRAINT `f4d416adc879a6e27bc401a773527249` FOREIGN KEY (`created_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
@@ -1036,7 +1035,7 @@ CREATE TABLE `screenManagement_group` (
 
 LOCK TABLES `screenManagement_group` WRITE;
 /*!40000 ALTER TABLE `screenManagement_group` DISABLE KEYS */;
-INSERT INTO `screenManagement_group` VALUES (1,'shopping malls','This group has all the screens placed in shopping malls.','2016-04-13',3,1),(2,'9th floor','Screen placed on 9th floor','2016-04-13',3,2),(3,'Hyderabad_inorbit','all screens in inorbit','2016-04-19',6,3),(4,'hyderabad_forum','all screens in forum mall','2016-04-19',6,4);
+INSERT INTO `screenManagement_group` VALUES (1,'shopping malls','This group has all the screens placed in shopping malls.','2016-04-13',3),(2,'9th floor','Screen placed on 9th floor','2016-04-13',3),(3,'Hyderabad_inorbit','all screens in inorbit','2016-04-19',6),(4,'hyderabad_forum','all screens in forum mall','2016-04-19',6);
 /*!40000 ALTER TABLE `screenManagement_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1048,7 +1047,7 @@ DROP TABLE IF EXISTS `screenManagement_screen`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `screenManagement_screen` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `screen_id` int(11) NOT NULL AUTO_INCREMENT,
   `screen_name` varchar(100) NOT NULL,
   `activation_key` varchar(16) NOT NULL,
   `activated_on` date DEFAULT NULL,
@@ -1062,8 +1061,7 @@ CREATE TABLE `screenManagement_screen` (
   `address` varchar(100) NOT NULL,
   `device_identification_id` varchar(16),
   `owned_by_id` int(11),
-  `screen_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`screen_id`),
   KEY `screenManagement_screen_e0be6253` (`specifications_id`),
   KEY `screenManagement_screen_dc91ed4b` (`status_id`),
   KEY `screenManagement_screen_d5b8d1c2` (`activated_by_id`),
@@ -1081,7 +1079,7 @@ CREATE TABLE `screenManagement_screen` (
 
 LOCK TABLES `screenManagement_screen` WRITE;
 /*!40000 ALTER TABLE `screenManagement_screen` DISABLE KEYS */;
-INSERT INTO `screenManagement_screen` VALUES (1,'screen 1','ASDF1234','2016-04-11','PRIVATE',1,3,NULL,'','',32,'','',1,1),(2,'screen 2','asdf123333','2016-04-11','PRIVATE',1,3,NULL,'','',32,'','',1,2),(3,'screen abc','123456',NULL,'PRIVATE',1,3,NULL,'','',32,'','',1,3),(4,'Screen 22','123456',NULL,'PRIVATE',1,3,NULL,'','1024*768',22,'','',1,4),(5,'nipun','1234567',NULL,'PRIVATE',1,3,NULL,'','',32,'','',1,5),(6,'shopping 9th floor','1234567',NULL,'PRIVATE',2,3,NULL,'','1024*768',32,'','',1,6),(7,'dominos forum','1234567',NULL,'PRIVATE',2,3,NULL,'','1466*768',32,'','',2,7),(8,'dominos test','1234567',NULL,'PRIVATE',2,3,NULL,'','',32,'','',2,8);
+INSERT INTO `screenManagement_screen` VALUES (1,'screen 1','ASDF1234','2016-04-11','PRIVATE',1,3,NULL,'','',32,'','',1),(2,'screen 2','asdf123333','2016-04-11','PRIVATE',1,3,NULL,'','',32,'','',1),(3,'screen abc','123456',NULL,'PRIVATE',1,3,NULL,'','',32,'','',1),(4,'Screen 22','123456',NULL,'PRIVATE',1,3,NULL,'','1024*768',22,'','',1),(5,'nipun','1234567',NULL,'PRIVATE',1,3,NULL,'','',32,'','',1),(6,'shopping 9th floor','1234567',NULL,'PRIVATE',2,3,NULL,'','1024*768',32,'','',1),(7,'dominos forum','1234567',NULL,'PRIVATE',2,3,NULL,'','1466*768',32,'','',2),(8,'dominos test','1234567',NULL,'PRIVATE',2,3,NULL,'','',32,'','',2);
 /*!40000 ALTER TABLE `screenManagement_screen` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1099,8 +1097,8 @@ CREATE TABLE `screenManagement_screen_groups` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `screen_id` (`screen_id`,`group_id`),
   KEY `screenMan_group_id_4dc0b1699266de69_fk_screenManagement_group_id` (`group_id`),
-  CONSTRAINT `screenM_screen_id_113a154b52f5ae05_fk_screenManagement_screen_id` FOREIGN KEY (`screen_id`) REFERENCES `screenManagement_screen` (`id`),
-  CONSTRAINT `screenMan_group_id_4dc0b1699266de69_fk_screenManagement_group_id` FOREIGN KEY (`group_id`) REFERENCES `screenManagement_group` (`id`)
+  CONSTRAINT `screenM_screen_id_113a154b52f5ae05_fk_screenManagement_screen_id` FOREIGN KEY (`screen_id`) REFERENCES `screenManagement_screen` (`screen_id`),
+  CONSTRAINT `screenMan_group_id_4dc0b1699266de69_fk_screenManagement_group_id` FOREIGN KEY (`group_id`) REFERENCES `screenManagement_group` (`group_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1181,4 +1179,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-04-19 16:31:18
+-- Dump completed on 2016-04-19 20:38:43

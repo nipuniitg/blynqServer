@@ -48,7 +48,7 @@ class Group(models.Model):
         return self.group_name
 
     def natural_key(self):
-        return ((self.group_id, self.group_name))
+        return ({'group_id': self.group_id, 'group_name': self.group_name } )
 
     # def get_screens(id):
     #     return Screen.Objects.all(group_id = id)

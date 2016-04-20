@@ -36,8 +36,9 @@ def user_and_organization(request):
 
 
 @login_required
-def add_screen(request):
+def upsertScreen(request):
     context_dic = {}
+    print request
     success = False
     if request.method == 'POST':
         add_screen_form = AddScreenForm(data=request.POST)
@@ -71,12 +72,12 @@ def add_screen(request):
             print 'Add Screen Form is not valid'
             print add_screen_form.errors
     else:
-        context_dic['form'] = AddScreenForm()
+        context_dic['form'] = AddScreenForm(form_name='formAddScreen', scope_prefix='modalScreenDetailsObj')
         # TODO: Not able to unselect the Group field once selected, fix this issue in the frontend.
     context_dic['title'] = "Add Screen"
     context_dic['submitButton'] = "Submit"
     context_dic['success'] = success
-    context_dic['target'] = reverse('add_screen')
+    # context_dic['target'] = reverse('add_screen')
     print context_dic
     return render(request,'Shared/displayForm.html', context_dic)
 
@@ -197,7 +198,9 @@ def add_group(request):
 
 @login_required
 def screen_index(request):
-    return render(request,'screen/screens.html')
+    context_dic ={}
+    context_dic['form'] = AddScreenForm(form_name='formAddScreen', scope_prefix='modalScreenDetailsObj')
+    return render(request,'screen/screens.html', context_dic)
 
 
 def group_index(request):
@@ -228,17 +231,18 @@ def getGroupsJson(request):
 # TODO: Understand the difference between natural_key method and get_by_natural_key method in
 # https://docs.djangoproject.com/en/1.9/topics/serialization/
 def get_groups_json(request):
-    data = serializers.serialize("json", Group.objects.all(), fields=('group_name', 'description'))
-    return HttpResponse(data, content_type='application/json')
-
-
-def get_screens_json(request):
     user_details, organization = user_and_organization(request)
-    data = serializers.serialize("json", Screen.objects.filter( owned_by=organization ), fields=('screen_id', 'screen_name', 'address', 'status', 'groups', 'screen_size', 'resolution'), use_natural_foreign_keys=True, use_natural_primary_keys=True)
+    data = serializers.serialize("json", Group.objects.filter(created_by__organization=organization), fields=('group_id','group_name', 'description'))
     return HttpResponse(data, content_type='application/json')
 
 
-def get_screen(request, screen_id=1):
-    print screen_id
-    data = serializers.serialize("json", Screen.objects.filter(pk=screen_id), use_natural_foreign_keys=True, use_natural_primary_keys=True)
-    return HttpResponse(data, content_type='application/json')
+def get_screens_json(request, group_id=None):
+    user_details, organization = user_and_organization(request)
+    screen_data = Screen.objects.filter(owned_by=organization)
+    if group_id is not None:
+        screen_data = screen_data.filter(groups__pk=group_id)
+    json_data = serializers.serialize("json", screen_data,
+                                      fields=('screen_id', 'screen_name', 'address', 'status', 'groups', 'screen_size', 'resolution'),
+                                      use_natural_foreign_keys=True, use_natural_primary_keys=True)
+    return HttpResponse(json_data, content_type='application/json')
+
