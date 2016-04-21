@@ -48,7 +48,6 @@ class Organization(models.Model):
     address = models.ForeignKey(Address, on_delete=models.PROTECT, blank=True, null=True)
     contact = models.CharField(max_length=12, blank=True, null=True)
 
-
     def __unicode__(self):
         return self.name
 

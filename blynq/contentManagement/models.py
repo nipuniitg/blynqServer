@@ -8,7 +8,7 @@ import os
 import hashlib
 
 # Create your models here.
-from authentication.models import UserDetails
+from authentication.models import UserDetails, Organization
 
 
 class ContentType(models.Model):
@@ -121,10 +121,10 @@ class Content(models.Model):
     last_modified_by = models.ForeignKey(UserDetails, on_delete=models.PROTECT, related_name='%(class)s_modified_by')
     last_modified_time = models.DateTimeField(_('modified at'), auto_now=True)
 
-    is_public = models.BooleanField( default=settings.CONTENT_IS_PUBLIC_DEFAULT, )
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
 
     # is_inside = null implies the files are in the home directory of the user
-    is_inside = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
+    parent_folder = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
     is_folder = models.BooleanField(default=False)
 
     # TODO: call logical_path to update this relative_path when a Content object is created or modified
@@ -133,15 +133,14 @@ class Content(models.Model):
     def logical_path(self):
         path = '/'
         instance = self
-        while instance.is_inside:
-            path = [instance.is_inside.title] + '/' + path
-            instance = instance.is_inside
+        while instance.parent_folder:
+            path = [instance.parent_folder.title] + '/' + path
+            instance = instance.parent_folder
         return path
-
 
     class Meta:
         # unique_together = (('title', 'folder', 'uploaded_by'))
-        unique_together = (('title', 'is_inside', 'uploaded_by'))
+        unique_together = (('title', 'parent_folder', 'uploaded_by'))
 
 
     # def _move_file(self, dst_file_name ):

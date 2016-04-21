@@ -24,7 +24,6 @@ class Migration(migrations.Migration):
                 ('original_filename', models.CharField(max_length=100, null=True, verbose_name='original filename', blank=True)),
                 ('uploaded_time', models.DateTimeField(auto_now_add=True, verbose_name='uploaded time')),
                 ('last_modified_time', models.DateTimeField(auto_now=True, verbose_name='modified at')),
-                ('is_public', models.BooleanField(default=True)),
                 ('is_folder', models.BooleanField(default=False)),
                 ('relative_path', models.CharField(default=b'/', max_length=1025)),
             ],
@@ -44,13 +43,18 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='content',
-            name='is_inside',
-            field=models.ForeignKey(to='contentManagement.Content', null=True),
+            name='last_modified_by',
+            field=models.ForeignKey(related_name='content_modified_by', on_delete=django.db.models.deletion.PROTECT, to='authentication.UserDetails'),
         ),
         migrations.AddField(
             model_name='content',
-            name='last_modified_by',
-            field=models.ForeignKey(related_name='content_modified_by', on_delete=django.db.models.deletion.PROTECT, to='authentication.UserDetails'),
+            name='organization',
+            field=models.ForeignKey(to='authentication.Organization', null=True),
+        ),
+        migrations.AddField(
+            model_name='content',
+            name='parent_folder',
+            field=models.ForeignKey(to='contentManagement.Content', null=True),
         ),
         migrations.AddField(
             model_name='content',
@@ -59,6 +63,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='content',
-            unique_together=set([('title', 'is_inside', 'uploaded_by')]),
+            unique_together=set([('title', 'parent_folder', 'uploaded_by')]),
         ),
     ]
