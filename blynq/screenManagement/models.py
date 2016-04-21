@@ -90,7 +90,7 @@ class Screen(models.Model):
     screen_size = models.IntegerField(blank=True)    # in inches
     aspect_ratio = models.CharField(max_length=20, null=True, blank=True)
     resolution = models.CharField(max_length=20, null=True, blank=True)    # 1366*768
-    specifications = models.ForeignKey(ScreenSpecs, on_delete=models.PROTECT)
+    specifications = models.ForeignKey(ScreenSpecs, on_delete=models.PROTECT, null=True)
 
     # TODO: change this location to a foreign key to authentication.Address
     #location = models.ForeignKey(Address, on_delete=models.PROTECT)

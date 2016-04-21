@@ -7,6 +7,7 @@ from django.core import serializers
 from django.contrib.auth.decorators import login_required
 from JsonTestData import TestDataClass
 from django.http import JsonResponse
+import json
 
 from authentication.models import UserDetails, Organization, Address
 from screenManagement.forms import AddScreenForm, AddScreenLocation, AddScreenSpecs, AddGroup
@@ -38,48 +39,45 @@ def user_and_organization(request):
 @login_required
 def upsertScreen(request):
     context_dic = {}
-    print request
+    json_obj = json.loads(request.body)
     success = False
+    errors = []
     if request.method == 'POST':
-        add_screen_form = AddScreenForm(data=request.POST)
+        add_screen_form = AddScreenForm(data=json_obj)
         if add_screen_form.is_valid():
-            try:
-                user_details = UserDetails.objects.get(username=request.user.username)
-                organization = user_details.organization
-            except:
-                organization = default_organization()
+            user_details, organization = user_and_organization(request)
             form_data = add_screen_form.cleaned_data
             try:
                 status = default_screen_status()
+                # TODO: The logic for activation key is pending and update the fields activated_by and activated_on
                 screen = Screen.objects.create(screen_name=form_data.get('screen_name'),
-                                               specifications=form_data.get('specifications'),
-                                               location=form_data.get('location'),
+                                               screen_size=form_data.get('screen_size'),
+                                               activation_key=form_data.get('activation_key'),
+                                               address=form_data.get('address'),
+                                               aspect_ratio=form_data.get('aspect_ratio'),
+                                               resolution=form_data.get('resolution'),
                                                owned_by=organization,
                                                status=status,
                                                )
-                for group in form_data.get('groups'):
-                    screen.groups.add(group)
+                for group in json_obj.get('groups'):
+                    group_entry = Group.objects.get(group_id=group.get('group_id'))
+                    screen.groups.add(group_entry)
                 # TODO: The above case only handles the PRIVATE businessType, add a check
                 # OrganizationScreen.objects.create(organization=organization,
                 #                                   screen=screen,
                 #                                   )
+                screen.save()
                 success = True
-                success_message = "The Screen has been successfully Added."
-                context_dic['success_message'] = success_message
             except:
+                errors = ['Error while adding the screen to database']
                 print 'Error while adding the screen to database'
         else:
             print 'Add Screen Form is not valid'
             print add_screen_form.errors
-    else:
-        context_dic['form'] = AddScreenForm(form_name='formAddScreen', scope_prefix='modalScreenDetailsObj')
-        # TODO: Not able to unselect the Group field once selected, fix this issue in the frontend.
-    context_dic['title'] = "Add Screen"
-    context_dic['submitButton'] = "Submit"
+            errors = add_screen_form.errors
     context_dic['success'] = success
-    # context_dic['target'] = reverse('add_screen')
-    print context_dic
-    return render(request,'Shared/displayForm.html', context_dic)
+    context_dic['errors'] = errors
+    return context_dic
 
 
 @login_required
@@ -189,7 +187,7 @@ def add_group(request):
             print 'Add Group Form is not valid'
             print add_group_form.errors
     else:
-        context_dic['form'] = AddGroup()
+        context_dic['form'] = AddGroup(form_name='form', scope_prefix='modalGroupDetailsObj')
     context_dic['title'] = "Create Group"
     context_dic['submitButton'] = "Submit"
     context_dic['success'] = success
@@ -204,15 +202,13 @@ def screen_index(request):
 
 
 def group_index(request):
-    return render(request, 'screen/groups.html')
+    context_dic ={}
+    context_dic['form'] = AddGroup(form_name='formGroup', scope_prefix='modalGroupDetailsObj')
+    return render(request, 'screen/groups.html', context_dic)
 
 
 def routeToHome(request):
     return render(request, 'Home.html')
-
-
-def testScreen(request):
-    return render(request,'testTemplate.html')
 
 
 def getScreensJson(request):

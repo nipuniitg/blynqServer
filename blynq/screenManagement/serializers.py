@@ -11,7 +11,9 @@ class FlatJsonSerializer(Serializer):
         values = obj.screen_set.all()
         screens = []
         for value in values:
-            screens.append({'screen_id': value.screen_id, 'screen_name': value.screen_name})
+            screens.append({'screen_id': value.screen_id, 'screen_name': value.screen_name,
+                            'screen_size': value.screen_size, 'resolution': value.resolution,
+                            'aspect_ratio':value.aspect_ratio, 'address': value.address})
         return screens
 
     def get_groups(self, obj):
