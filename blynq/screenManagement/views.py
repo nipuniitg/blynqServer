@@ -1,4 +1,3 @@
-from screenManagement.serializers import FlatJsonSerializer as json_serializer
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -12,9 +11,10 @@ import json
 from authentication.models import UserDetails, Organization, Address
 from screenManagement.forms import AddScreenForm, AddScreenLocation, AddScreenSpecs, AddGroup
 from screenManagement.models import Screen, ScreenStatus, ScreenSpecs, Group
-
+from screenManagement.serializers import FlatJsonSerializer as json_serializer
 
 # Create your views here.
+
 
 def default_organization():
     return Organization.objects.all()[0]
@@ -31,13 +31,77 @@ def default_screen_status():
 def user_and_organization(request):
     user_details = UserDetails.objects.get(username=request.user.username)
     organization = user_details.organization
-     # user_details = default_userdetails()
+    # user_details = default_userdetails()
     # organization = default_organization()
     return user_details, organization
 
 
 @login_required
-def upsertScreen(request):
+def add_group(request):
+    context_dic = {}
+    success = False
+    if request.method == 'POST':
+        add_group_form = AddGroup(data=request.POST)
+        if add_group_form.is_valid():
+            form_data = add_group_form.cleaned_data
+            try:
+                user_details, organization = user_and_organization(request)
+                group = Group.objects.create(group_name=form_data.get('group_name'),
+                                             description=form_data.get('description'),
+                                             created_by=user_details,
+                                             )
+                success = True
+                success_message = "Group %s have been successfully Added." % form_data.get('group_name')
+                context_dic['success_message'] = success_message
+            except:
+                print 'Error while adding the new group to database'
+        else:
+            print 'Add Group Form is not valid'
+            print add_group_form.errors
+    else:
+        context_dic['form'] = AddGroup(form_name='form', scope_prefix='modalGroupDetailsObj')
+    context_dic['title'] = "Create Group"
+    context_dic['submitButton'] = "Submit"
+    context_dic['success'] = success
+    context_dic['target'] = reverse('add_group')
+    return render(request,'Shared/displayForm.html', context_dic)
+
+
+@login_required
+def upsert_group(request):
+    context_dic = {}
+    json_obj = json.loads(request.body)
+    success = False
+    errors = []
+    if request.method == 'POST':
+        add_group_form = AddGroup(data=json_obj)
+        if add_group_form.is_valid():
+            user_details, organization = user_and_organization(request)
+            form_data = add_group_form.cleaned_data
+            try:
+                group_id = json_obj['group_id']
+                if group_id == -1:
+                    group = Group(group_name=form_data.get('group_name'), created_by=user_details)
+                else:
+                    group = Group.objects.get(group_id=group_id)
+                    group.group_name = form_data.get('group_name')
+                group.description = form_data.get('description')
+                group.save()
+                success = True
+            except:
+                errors = ['Error while adding the group details to database']
+                print errors[0]
+        else:
+            print 'Add/Edit Group Form is not valid'
+            print add_group_form.errors
+            errors = add_group_form.errors
+    context_dic['success'] = success
+    context_dic['errors'] = errors
+    return JsonResponse(context_dic, safe=False)
+
+
+@login_required
+def upsert_screen(request):
     context_dic = {}
     json_obj = json.loads(request.body)
     success = False
@@ -48,37 +112,37 @@ def upsertScreen(request):
             user_details, organization = user_and_organization(request)
             form_data = add_screen_form.cleaned_data
             try:
+                # TODO: The logic for activation_key is pending and update the fields activated_by and activated_on
                 status = default_screen_status()
-                # TODO: The logic for activation key is pending and update the fields activated_by and activated_on
-                screen = Screen.objects.create(screen_name=form_data.get('screen_name'),
-                                               screen_size=form_data.get('screen_size'),
-                                               activation_key=form_data.get('activation_key'),
-                                               address=form_data.get('address'),
-                                               aspect_ratio=form_data.get('aspect_ratio'),
-                                               resolution=form_data.get('resolution'),
-                                               owned_by=organization,
-                                               status=status,
-                                               )
+                screen_id = json_obj['screen_id']
+                if screen_id == -1:
+                    screen = Screen(screen_name=form_data.get('screen_name'))
+                else:
+                    screen = Screen.objects.get(screen_id=screen_id)
+                    screen.screen_name = form_data.get('screen_name')
+                screen.screen_size = form_data.get('screen_size')
+                screen.activation_key=form_data.get('activation_key')
+                screen.address=form_data.get('address')
+                screen.aspect_ratio=form_data.get('aspect_ratio')
+                screen.resolution=form_data.get('resolution')
+                screen.owned_by=organization
+                screen.status=status
+                screen.save()
                 for group in json_obj.get('groups'):
                     group_entry = Group.objects.get(group_id=group.get('group_id'))
                     screen.groups.add(group_entry)
                 # TODO: The above case only handles the PRIVATE businessType, add a check
-                # OrganizationScreen.objects.create(organization=organization,
-                #                                   screen=screen,
-                #                                   )
-                screen.save()
                 success = True
             except:
-                errors = ['Error while adding the screen to database']
-                print 'Error while adding the screen to database'
+                errors = ['Error while adding the screen details to database']
+                print errors[0]
         else:
-            print 'Add Screen Form is not valid'
+            print 'Add/Edit Screen Form is not valid'
             print add_screen_form.errors
             errors = add_screen_form.errors
     context_dic['success'] = success
     context_dic['errors'] = errors
-    return context_dic
-
+    return JsonResponse(context_dic, safe=False)
 
 @login_required
 def add_screen_location(request):
@@ -164,37 +228,6 @@ def add_screen_specs(request):
 
 
 @login_required
-def add_group(request):
-    context_dic = {}
-    success = False
-    if request.method == 'POST':
-        add_group_form = AddGroup(data=request.POST)
-        if add_group_form.is_valid():
-            form_data = add_group_form.cleaned_data
-            try:
-                user_details, organization = user_and_organization(request)
-                group = Group.objects.create(group_name=form_data.get('group_name'),
-                                             description=form_data.get('description'),
-                                             created_by=user_details,
-                                             organization=organization
-                                             )
-                success = True
-                success_message = "Group %s have been successfully Added." % form_data.get('group_name')
-                context_dic['success_message'] = success_message
-            except:
-                print 'Error while adding the new group to database'
-        else:
-            print 'Add Group Form is not valid'
-            print add_group_form.errors
-    else:
-        context_dic['form'] = AddGroup(form_name='form', scope_prefix='modalGroupDetailsObj')
-    context_dic['title'] = "Create Group"
-    context_dic['submitButton'] = "Submit"
-    context_dic['success'] = success
-    context_dic['target'] = reverse('add_group')
-    return render(request,'Shared/displayForm.html', context_dic)
-
-@login_required
 def screen_index(request):
     context_dic = {}
     context_dic['form'] = AddScreenForm(form_name='formAddScreen', scope_prefix='modalScreenDetailsObj')
@@ -253,6 +286,5 @@ def get_selectable_screens_json(request, group_id=-1):
 def get_selectable_groups_json(request, screen_id=-1):
     user_details, organization = user_and_organization(request)
     groups_data = Group.objects.filter(created_by__organization=organization).exclude(screen__pk=screen_id)
-    # json_data = serializers.serialize("json", groups_data, fields=('group_id', 'group_name'))
     json_data = json_serializer().serialize(groups_data, fields=('group_id', 'group_name'))
     return HttpResponse(json_data, content_type='application/json')

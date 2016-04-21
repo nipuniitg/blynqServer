@@ -125,7 +125,7 @@ CREATE TABLE `auth_user` (
 
 LOCK TABLES `auth_user` WRITE;
 /*!40000 ALTER TABLE `auth_user` DISABLE KEYS */;
-INSERT INTO `auth_user` VALUES (1,'pbkdf2_sha256$20000$OheAYidGFVmh$kndpFbifnw+QFpe/OiNHrs1Z/SS2Ou9VWhp8N8qbFaM=','2016-04-19 10:36:12.059473',1,'blynq','','','blynq@googlegroups.com',1,1,'2016-04-10 04:52:08.102966'),(3,'pbkdf2_sha256$20000$hYRk2vw3Qd3S$pHjgXCJR3iWlij2WE8d+/CnptH7CaInF846DLDQqpM8=','2016-04-19 10:37:32.094031',1,'nipun','nipun','edara','iitg.nipun@gmail.com',1,1,'2016-04-10 05:38:49.315257'),(5,'nishtnath',NULL,0,'sahruj','nipun','edara','sahrujviru@gmail.com',0,1,'2016-04-10 06:08:35.951219'),(6,'pbkdf2_sha256$20000$N1BFEkGoH8EU$6+L/gDHleXtO+GGzoWPG5J8EC01FCNy0bTK9ntmdHRw=','2016-04-10 11:21:51.000000',0,'kmpk123','kmpk','123','kmpk123@gmail.com',0,1,'2016-04-10 06:31:28.000000'),(7,'pbkdf2_sha256$20000$Rg2DKHFh7G02$6mX00ecYg93T9smWxLTJA9CxIOvuYMSYK85TfD8p+d0=',NULL,0,'abc','','','abc@gmail.com',0,1,'2016-04-10 11:21:13.164579'),(8,'pbkdf2_sha256$20000$MDZMFdo5ZvzY$9k9JPGWoWxzeX1k0fSdWFzsquqjKAnsphfW9JMP4QJc=',NULL,0,'jaydev','jaydev','k','jaydev@gmail.com',0,1,'2016-04-11 04:59:18.320907'),(9,'pbkdf2_sha256$20000$dYlFPgv7szhh$LqVEyiFoSwYOvSyyXfMIPEDECXBBM8IhUwxQhP/i8aA=','2016-04-11 06:21:59.456249',0,'abcdef','abc','def','abcdef@gmail.com',0,1,'2016-04-11 06:20:14.285474'),(10,'pbkdf2_sha256$20000$gPRDFHIFkPBn$tIPWd+vzNrDuYap41GNymzc6TWZJOi7sxSU3g4Spuqw=','2016-04-11 07:28:19.167752',0,'asdf','asdf','123','asdf@gmail.com',0,1,'2016-04-11 07:28:04.071170');
+INSERT INTO `auth_user` VALUES (1,'pbkdf2_sha256$20000$OheAYidGFVmh$kndpFbifnw+QFpe/OiNHrs1Z/SS2Ou9VWhp8N8qbFaM=','2016-04-19 10:36:12.059473',1,'blynq','','','blynq@googlegroups.com',1,1,'2016-04-10 04:52:08.102966'),(3,'pbkdf2_sha256$20000$hYRk2vw3Qd3S$pHjgXCJR3iWlij2WE8d+/CnptH7CaInF846DLDQqpM8=','2016-04-20 18:16:03.321498',1,'nipun','nipun','edara','iitg.nipun@gmail.com',1,1,'2016-04-10 05:38:49.315257'),(5,'nishtnath',NULL,0,'sahruj','nipun','edara','sahrujviru@gmail.com',0,1,'2016-04-10 06:08:35.951219'),(6,'pbkdf2_sha256$20000$N1BFEkGoH8EU$6+L/gDHleXtO+GGzoWPG5J8EC01FCNy0bTK9ntmdHRw=','2016-04-20 16:52:00.566557',0,'kmpk123','kmpk','123','kmpk123@gmail.com',0,1,'2016-04-10 06:31:28.000000'),(7,'pbkdf2_sha256$20000$Rg2DKHFh7G02$6mX00ecYg93T9smWxLTJA9CxIOvuYMSYK85TfD8p+d0=',NULL,0,'abc','','','abc@gmail.com',0,1,'2016-04-10 11:21:13.164579'),(8,'pbkdf2_sha256$20000$MDZMFdo5ZvzY$9k9JPGWoWxzeX1k0fSdWFzsquqjKAnsphfW9JMP4QJc=',NULL,0,'jaydev','jaydev','k','jaydev@gmail.com',0,1,'2016-04-11 04:59:18.320907'),(9,'pbkdf2_sha256$20000$dYlFPgv7szhh$LqVEyiFoSwYOvSyyXfMIPEDECXBBM8IhUwxQhP/i8aA=','2016-04-11 06:21:59.456249',0,'abcdef','abc','def','abcdef@gmail.com',0,1,'2016-04-11 06:20:14.285474'),(10,'pbkdf2_sha256$20000$gPRDFHIFkPBn$tIPWd+vzNrDuYap41GNymzc6TWZJOi7sxSU3g4Spuqw=','2016-04-11 07:28:19.167752',0,'asdf','asdf','123','asdf@gmail.com',0,1,'2016-04-11 07:28:04.071170');
 /*!40000 ALTER TABLE `auth_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -350,21 +350,24 @@ CREATE TABLE `contentManagement_content` (
   `last_modified_time` datetime(6) NOT NULL,
   `is_public` tinyint(1) NOT NULL,
   `is_folder` tinyint(1) NOT NULL,
-  `file_type_id` int(11),
-  `is_inside_id` int(11) DEFAULT NULL,
+  `file_type_id` int(11) DEFAULT NULL,
   `last_modified_by_id` int(11) NOT NULL,
   `uploaded_by_id` int(11) NOT NULL,
   `relative_path` varchar(1025) NOT NULL,
+  `organization_id` int(11),
+  `parent_folder_id` int(11),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `contentManagement_content_title_71e8eb2eaab1c29a_uniq` (`title`,`is_inside_id`,`uploaded_by_id`),
+  UNIQUE KEY `contentManagement_content_title_10c11f0e7bd2d9e_uniq` (`title`,`parent_folder_id`,`uploaded_by_id`),
   KEY `contentManagement_content_4cc23034` (`file_type_id`),
-  KEY `contentManagement_content_98a8dc0d` (`is_inside_id`),
   KEY `contentManagement_content_7fa85557` (`last_modified_by_id`),
   KEY `contentManagement_content_4095e96b` (`uploaded_by_id`),
+  KEY `contentManagement_content_26b2345e` (`organization_id`),
+  KEY `contentManagement_content_ce25f862` (`parent_folder_id`),
   CONSTRAINT `D4fefcd379e53b14288cdd718a20b7b5` FOREIGN KEY (`last_modified_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`),
+  CONSTRAINT `D60b572979d5731613128d3d383567f8` FOREIGN KEY (`parent_folder_id`) REFERENCES `contentManagement_content` (`id`),
+  CONSTRAINT `D9356767f020d9909e7d3a74b8a4b749` FOREIGN KEY (`organization_id`) REFERENCES `authentication_organization` (`id`),
   CONSTRAINT `a4652993b4665036cee91bc59709d44d` FOREIGN KEY (`uploaded_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`),
-  CONSTRAINT `a8597441706f144025ba4d2230958de4` FOREIGN KEY (`file_type_id`) REFERENCES `contentManagement_contenttype` (`id`),
-  CONSTRAINT `co_is_inside_id_6fc4b9699131c01d_fk_contentManagement_content_id` FOREIGN KEY (`is_inside_id`) REFERENCES `contentManagement_content` (`id`)
+  CONSTRAINT `a8597441706f144025ba4d2230958de4` FOREIGN KEY (`file_type_id`) REFERENCES `contentManagement_contenttype` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -374,7 +377,7 @@ CREATE TABLE `contentManagement_content` (
 
 LOCK TABLES `contentManagement_content` WRITE;
 /*!40000 ALTER TABLE `contentManagement_content` DISABLE KEYS */;
-INSERT INTO `contentManagement_content` VALUES (1,'think_and_grow','think and grow rich book','usercontent/3/Napoleon Hill - Think And Grow Rich_uu1HUhX.mobi','',NULL,'2016-04-17 18:30:31.897031','2016-04-17 18:30:31.897213',1,0,NULL,NULL,3,3,'/');
+INSERT INTO `contentManagement_content` VALUES (1,'think_and_grow','think and grow rich book','usercontent/3/Napoleon Hill - Think And Grow Rich_uu1HUhX.mobi','',NULL,'2016-04-17 18:30:31.897031','2016-04-20 18:18:05.514301',1,0,NULL,3,3,'/',1,NULL);
 /*!40000 ALTER TABLE `contentManagement_content` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -456,7 +459,7 @@ CREATE TABLE `django_admin_log` (
   KEY `django_admin_log_user_id_52fdd58701c5f563_fk_auth_user_id` (`user_id`),
   CONSTRAINT `djang_content_type_id_697914295151027a_fk_django_content_type_id` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`),
   CONSTRAINT `django_admin_log_user_id_52fdd58701c5f563_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -465,7 +468,7 @@ CREATE TABLE `django_admin_log` (
 
 LOCK TABLES `django_admin_log` WRITE;
 /*!40000 ALTER TABLE `django_admin_log` DISABLE KEYS */;
-INSERT INTO `django_admin_log` VALUES (1,'2016-04-10 04:54:44.624773','1','viewer',1,'',10,1),(2,'2016-04-10 04:54:52.374826','2','scheduler',1,'',10,1),(3,'2016-04-10 04:54:59.029471','3','uploader',1,'',10,1),(4,'2016-04-10 04:55:06.892614','4','manager',1,'',10,1),(5,'2016-04-10 04:55:37.059045','1','Blynq Pvt Ltd',1,'',9,1),(6,'2016-04-11 09:23:26.798518','1','ScreenSpecs object',1,'',15,1),(7,'2016-04-11 09:51:40.085932','1','City object',1,'',7,1),(8,'2016-04-11 09:52:19.645464','1','Address object',1,'',8,1),(10,'2016-04-11 10:03:37.504580','1','active',1,'',12,1),(11,'2016-04-11 10:05:06.279278','2','abc, bellandur, Bengaluru',1,'',8,1),(13,'2016-04-11 10:05:52.158022','2','active',1,'',12,1),(14,'2016-04-11 10:09:04.243012','1','screen 1',1,'',17,1),(15,'2016-04-11 10:11:31.290590','2','screen 2',1,'',17,1),(16,'2016-04-11 10:12:44.433362','2','screen 2',2,'Changed status.',17,1),(17,'2016-04-11 10:13:07.813934','1','active',3,'',12,1),(18,'2016-04-11 10:13:50.074993','1','screen 1',2,'Changed business_type.',17,1),(20,'2016-04-12 11:52:21.246651','3','Unactivated',1,'',12,1),(21,'2016-04-12 11:52:40.362468','4','Online',1,'',12,1),(22,'2016-04-12 11:53:06.409097','5','Offline',1,'',12,1),(23,'2016-04-12 11:53:35.598468','6','Idle',1,'',12,1),(24,'2016-04-12 11:54:51.052972','1','screen 1',2,'Changed business_type and status.',17,1),(25,'2016-04-12 11:55:04.538215','2','screen 2',2,'Changed business_type and status.',17,1),(26,'2016-04-12 11:55:26.273660','2','active',3,'',12,1),(27,'2016-04-19 08:22:24.190292','2','TestOrganization2',1,'',9,1),(28,'2016-04-19 08:22:30.281668','6','kmpk123',2,'Changed organization.',11,1),(29,'2016-04-19 08:22:39.644052','6','kmpk123',2,'No fields changed.',11,1),(30,'2016-04-19 08:23:05.256168','3','Hyderabad_inorbit',1,'',14,1),(31,'2016-04-19 08:23:26.546219','4','hyderabad_forum',1,'',14,1),(32,'2016-04-19 08:25:55.366085','8','dominos test',2,'Changed screen_name, activation_key, placed_by and groups.',17,1),(33,'2016-04-19 08:26:17.002314','7','dominos forum',2,'Changed screen_name, activation_key, placed_by and groups.',17,1),(34,'2016-04-19 09:36:32.387912','6','shopping 9th floor',2,'Changed activation_key and owned_by.',17,1),(35,'2016-04-19 09:37:03.102815','5','nipun',2,'Changed activation_key and owned_by.',17,1),(36,'2016-04-19 09:40:29.632002','6','shopping 9th floor',2,'Changed groups.',17,1),(37,'2016-04-19 10:08:53.436661','1','shopping malls',2,'Changed group_id.',14,1),(38,'2016-04-19 10:09:00.590340','2','9th floor',2,'Changed group_id.',14,1),(39,'2016-04-19 10:09:06.781908','3','Hyderabad_inorbit',2,'Changed group_id.',14,1),(40,'2016-04-19 10:09:13.520668','4','hyderabad_forum',2,'Changed group_id.',14,1),(41,'2016-04-19 10:11:53.052584','1','screen 1',2,'Changed screen_id and owned_by.',17,1),(42,'2016-04-19 10:12:07.099593','2','screen 2',2,'Changed screen_id and owned_by.',17,1),(43,'2016-04-19 10:12:25.047356','3','screen abc',2,'Changed screen_id, activation_key and owned_by.',17,1),(44,'2016-04-19 10:12:49.673683','4','Screen 22',2,'Changed screen_id, activation_key and owned_by.',17,1),(45,'2016-04-19 10:12:59.606667','5','nipun',2,'Changed screen_id.',17,1),(46,'2016-04-19 10:13:19.327233','6','shopping 9th floor',2,'Changed screen_id.',17,1),(47,'2016-04-19 10:13:40.246729','7','dominos forum',2,'Changed screen_id and owned_by.',17,1),(48,'2016-04-19 10:13:52.455156','8','dominos test',2,'Changed screen_id and owned_by.',17,1),(49,'2016-04-19 10:36:25.615754','6','shopping 9th floor',2,'Changed owned_by.',17,1),(50,'2016-04-19 10:36:37.808651','6','shopping 9th floor',2,'Changed owned_by.',17,1),(51,'2016-04-19 10:36:50.825759','8','dominos test',2,'Changed owned_by.',17,1),(52,'2016-04-19 10:36:57.800667','8','dominos test',2,'No fields changed.',17,1),(53,'2016-04-19 10:50:49.630010','7','dominos forum',2,'Changed owned_by.',17,3),(54,'2016-04-19 10:55:50.948838','7','dominos forum',2,'Changed resolution.',17,3),(55,'2016-04-19 10:56:29.010359','6','shopping 9th floor',2,'Changed resolution.',17,3),(56,'2016-04-19 10:56:40.406495','4','Screen 22',2,'Changed resolution.',17,3),(57,'2016-04-19 10:56:47.710465','6','shopping 9th floor',2,'No fields changed.',17,3),(58,'2016-04-19 10:56:54.913646','4','Screen 22',2,'Changed screen_size.',17,3);
+INSERT INTO `django_admin_log` VALUES (1,'2016-04-10 04:54:44.624773','1','viewer',1,'',10,1),(2,'2016-04-10 04:54:52.374826','2','scheduler',1,'',10,1),(3,'2016-04-10 04:54:59.029471','3','uploader',1,'',10,1),(4,'2016-04-10 04:55:06.892614','4','manager',1,'',10,1),(5,'2016-04-10 04:55:37.059045','1','Blynq Pvt Ltd',1,'',9,1),(6,'2016-04-11 09:23:26.798518','1','ScreenSpecs object',1,'',15,1),(7,'2016-04-11 09:51:40.085932','1','City object',1,'',7,1),(8,'2016-04-11 09:52:19.645464','1','Address object',1,'',8,1),(10,'2016-04-11 10:03:37.504580','1','active',1,'',12,1),(11,'2016-04-11 10:05:06.279278','2','abc, bellandur, Bengaluru',1,'',8,1),(13,'2016-04-11 10:05:52.158022','2','active',1,'',12,1),(14,'2016-04-11 10:09:04.243012','1','screen 1',1,'',17,1),(15,'2016-04-11 10:11:31.290590','2','screen 2',1,'',17,1),(16,'2016-04-11 10:12:44.433362','2','screen 2',2,'Changed status.',17,1),(17,'2016-04-11 10:13:07.813934','1','active',3,'',12,1),(18,'2016-04-11 10:13:50.074993','1','screen 1',2,'Changed business_type.',17,1),(20,'2016-04-12 11:52:21.246651','3','Unactivated',1,'',12,1),(21,'2016-04-12 11:52:40.362468','4','Online',1,'',12,1),(22,'2016-04-12 11:53:06.409097','5','Offline',1,'',12,1),(23,'2016-04-12 11:53:35.598468','6','Idle',1,'',12,1),(24,'2016-04-12 11:54:51.052972','1','screen 1',2,'Changed business_type and status.',17,1),(25,'2016-04-12 11:55:04.538215','2','screen 2',2,'Changed business_type and status.',17,1),(26,'2016-04-12 11:55:26.273660','2','active',3,'',12,1),(27,'2016-04-19 08:22:24.190292','2','TestOrganization2',1,'',9,1),(28,'2016-04-19 08:22:30.281668','6','kmpk123',2,'Changed organization.',11,1),(29,'2016-04-19 08:22:39.644052','6','kmpk123',2,'No fields changed.',11,1),(30,'2016-04-19 08:23:05.256168','3','Hyderabad_inorbit',1,'',14,1),(31,'2016-04-19 08:23:26.546219','4','hyderabad_forum',1,'',14,1),(32,'2016-04-19 08:25:55.366085','8','dominos test',2,'Changed screen_name, activation_key, placed_by and groups.',17,1),(33,'2016-04-19 08:26:17.002314','7','dominos forum',2,'Changed screen_name, activation_key, placed_by and groups.',17,1),(34,'2016-04-19 09:36:32.387912','6','shopping 9th floor',2,'Changed activation_key and owned_by.',17,1),(35,'2016-04-19 09:37:03.102815','5','nipun',2,'Changed activation_key and owned_by.',17,1),(36,'2016-04-19 09:40:29.632002','6','shopping 9th floor',2,'Changed groups.',17,1),(37,'2016-04-19 10:08:53.436661','1','shopping malls',2,'Changed group_id.',14,1),(38,'2016-04-19 10:09:00.590340','2','9th floor',2,'Changed group_id.',14,1),(39,'2016-04-19 10:09:06.781908','3','Hyderabad_inorbit',2,'Changed group_id.',14,1),(40,'2016-04-19 10:09:13.520668','4','hyderabad_forum',2,'Changed group_id.',14,1),(41,'2016-04-19 10:11:53.052584','1','screen 1',2,'Changed screen_id and owned_by.',17,1),(42,'2016-04-19 10:12:07.099593','2','screen 2',2,'Changed screen_id and owned_by.',17,1),(43,'2016-04-19 10:12:25.047356','3','screen abc',2,'Changed screen_id, activation_key and owned_by.',17,1),(44,'2016-04-19 10:12:49.673683','4','Screen 22',2,'Changed screen_id, activation_key and owned_by.',17,1),(45,'2016-04-19 10:12:59.606667','5','nipun',2,'Changed screen_id.',17,1),(46,'2016-04-19 10:13:19.327233','6','shopping 9th floor',2,'Changed screen_id.',17,1),(47,'2016-04-19 10:13:40.246729','7','dominos forum',2,'Changed screen_id and owned_by.',17,1),(48,'2016-04-19 10:13:52.455156','8','dominos test',2,'Changed screen_id and owned_by.',17,1),(49,'2016-04-19 10:36:25.615754','6','shopping 9th floor',2,'Changed owned_by.',17,1),(50,'2016-04-19 10:36:37.808651','6','shopping 9th floor',2,'Changed owned_by.',17,1),(51,'2016-04-19 10:36:50.825759','8','dominos test',2,'Changed owned_by.',17,1),(52,'2016-04-19 10:36:57.800667','8','dominos test',2,'No fields changed.',17,1),(53,'2016-04-19 10:50:49.630010','7','dominos forum',2,'Changed owned_by.',17,3),(54,'2016-04-19 10:55:50.948838','7','dominos forum',2,'Changed resolution.',17,3),(55,'2016-04-19 10:56:29.010359','6','shopping 9th floor',2,'Changed resolution.',17,3),(56,'2016-04-19 10:56:40.406495','4','Screen 22',2,'Changed resolution.',17,3),(57,'2016-04-19 10:56:47.710465','6','shopping 9th floor',2,'No fields changed.',17,3),(58,'2016-04-19 10:56:54.913646','4','Screen 22',2,'Changed screen_size.',17,3),(59,'2016-04-20 14:12:48.897949','4','Screen 22',2,'Changed groups.',17,3);
 /*!40000 ALTER TABLE `django_admin_log` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -508,7 +511,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -517,7 +520,7 @@ CREATE TABLE `django_migrations` (
 
 LOCK TABLES `django_migrations` WRITE;
 /*!40000 ALTER TABLE `django_migrations` DISABLE KEYS */;
-INSERT INTO `django_migrations` VALUES (1,'contenttypes','0001_initial','2016-04-10 04:51:37.188744'),(2,'auth','0001_initial','2016-04-10 04:51:37.758972'),(3,'admin','0001_initial','2016-04-10 04:51:37.915210'),(4,'contenttypes','0002_remove_content_type_name','2016-04-10 04:51:38.031647'),(5,'auth','0002_alter_permission_name_max_length','2016-04-10 04:51:38.092351'),(6,'auth','0003_alter_user_email_max_length','2016-04-10 04:51:38.176661'),(7,'auth','0004_alter_user_username_opts','2016-04-10 04:51:38.193122'),(8,'auth','0005_alter_user_last_login_null','2016-04-10 04:51:38.254328'),(9,'auth','0006_require_contenttypes_0002','2016-04-10 04:51:38.260170'),(10,'sessions','0001_initial','2016-04-10 04:51:38.315816'),(11,'authentication','0001_initial','2016-04-10 04:54:05.126916'),(12,'contentManagement','0001_initial','2016-04-10 04:54:06.003701'),(13,'playlistManagement','0001_initial','2016-04-10 04:54:06.387775'),(14,'screenManagement','0001_initial','2016-04-10 04:54:07.704416'),(15,'scheduleManagement','0001_initial','2016-04-10 04:54:08.267686'),(16,'authentication','0002_auto_20160411_0427','2016-04-11 04:27:32.707883'),(17,'authentication','0003_auto_20160412_0344','2016-04-12 03:45:08.144452'),(18,'screenManagement','0002_auto_20160412_0344','2016-04-12 03:45:09.715110'),(19,'screenManagement','0003_auto_20160412_0409','2016-04-12 04:09:41.245378'),(20,'screenManagement','0004_auto_20160412_0850','2016-04-12 08:50:08.302403'),(21,'screenManagement','0005_auto_20160412_1055','2016-04-12 10:56:05.655861'),(22,'authentication','0004_auto_20160412_1349','2016-04-12 13:49:19.857183'),(23,'screenManagement','0002_screen_activated_by','2016-04-13 10:07:00.535854'),(24,'screenManagement','0003_auto_20160413_1116','2016-04-13 11:16:46.926098'),(25,'screenManagement','0004_auto_20160414_0953','2016-04-14 09:54:02.682464'),(26,'screenManagement','0005_auto_20160414_1331','2016-04-14 13:31:27.748029'),(27,'easy_thumbnails','0001_initial','2016-04-15 03:48:57.018678'),(28,'easy_thumbnails','0002_thumbnaildimensions','2016-04-15 03:48:57.122555'),(29,'filer','0001_initial','2016-04-15 03:48:58.837148'),(30,'filer','0002_auto_20150606_2003','2016-04-15 03:48:58.965404'),(31,'authentication','0002_auto_20160415_0935','2016-04-15 09:40:34.041531'),(32,'contentManagement','0002_auto_20160415_0935','2016-04-15 09:40:34.180698'),(33,'contentManagement','0003_auto_20160415_1130','2016-04-15 11:30:30.794995'),(34,'contentManagement','0002_content_is_folder','2016-04-15 18:06:13.108479'),(35,'contentManagement','0003_auto_20160415_1813','2016-04-15 18:13:04.415756'),(36,'contentManagement','0002_auto_20160415_1833','2016-04-15 18:33:42.223813'),(37,'contentManagement','0002_auto_20160417_1830','2016-04-17 18:30:22.434022'),(38,'screenManagement','0002_auto_20160419_0519','2016-04-19 06:56:02.820413'),(39,'screenManagement','0003_auto_20160419_0526','2016-04-19 06:56:03.141011'),(40,'screenManagement','0004_auto_20160419_0530','2016-04-19 06:56:03.196551'),(41,'screenManagement','0005_remove_group_organization','2016-04-19 06:56:03.347362'),(42,'screenManagement','0006_remove_group_dummy_screen_group','2016-04-19 06:56:03.467807'),(43,'screenManagement','0002_auto_20160419_0932','2016-04-19 09:32:39.625026'),(44,'screenManagement','0002_group_group_id','2016-04-19 10:08:17.385019'),(45,'screenManagement','0002_screen_screen_id','2016-04-19 10:11:29.236381'),(46,'scheduleManagement','0002_remove_screenschedule_group','2016-04-19 10:15:47.176243');
+INSERT INTO `django_migrations` VALUES (1,'contenttypes','0001_initial','2016-04-10 04:51:37.188744'),(2,'auth','0001_initial','2016-04-10 04:51:37.758972'),(3,'admin','0001_initial','2016-04-10 04:51:37.915210'),(4,'contenttypes','0002_remove_content_type_name','2016-04-10 04:51:38.031647'),(5,'auth','0002_alter_permission_name_max_length','2016-04-10 04:51:38.092351'),(6,'auth','0003_alter_user_email_max_length','2016-04-10 04:51:38.176661'),(7,'auth','0004_alter_user_username_opts','2016-04-10 04:51:38.193122'),(8,'auth','0005_alter_user_last_login_null','2016-04-10 04:51:38.254328'),(9,'auth','0006_require_contenttypes_0002','2016-04-10 04:51:38.260170'),(10,'sessions','0001_initial','2016-04-10 04:51:38.315816'),(11,'authentication','0001_initial','2016-04-10 04:54:05.126916'),(12,'contentManagement','0001_initial','2016-04-10 04:54:06.003701'),(13,'playlistManagement','0001_initial','2016-04-10 04:54:06.387775'),(14,'screenManagement','0001_initial','2016-04-10 04:54:07.704416'),(15,'scheduleManagement','0001_initial','2016-04-10 04:54:08.267686'),(16,'authentication','0002_auto_20160411_0427','2016-04-11 04:27:32.707883'),(17,'authentication','0003_auto_20160412_0344','2016-04-12 03:45:08.144452'),(18,'screenManagement','0002_auto_20160412_0344','2016-04-12 03:45:09.715110'),(19,'screenManagement','0003_auto_20160412_0409','2016-04-12 04:09:41.245378'),(20,'screenManagement','0004_auto_20160412_0850','2016-04-12 08:50:08.302403'),(21,'screenManagement','0005_auto_20160412_1055','2016-04-12 10:56:05.655861'),(22,'authentication','0004_auto_20160412_1349','2016-04-12 13:49:19.857183'),(23,'screenManagement','0002_screen_activated_by','2016-04-13 10:07:00.535854'),(24,'screenManagement','0003_auto_20160413_1116','2016-04-13 11:16:46.926098'),(25,'screenManagement','0004_auto_20160414_0953','2016-04-14 09:54:02.682464'),(26,'screenManagement','0005_auto_20160414_1331','2016-04-14 13:31:27.748029'),(27,'easy_thumbnails','0001_initial','2016-04-15 03:48:57.018678'),(28,'easy_thumbnails','0002_thumbnaildimensions','2016-04-15 03:48:57.122555'),(29,'filer','0001_initial','2016-04-15 03:48:58.837148'),(30,'filer','0002_auto_20150606_2003','2016-04-15 03:48:58.965404'),(31,'authentication','0002_auto_20160415_0935','2016-04-15 09:40:34.041531'),(32,'contentManagement','0002_auto_20160415_0935','2016-04-15 09:40:34.180698'),(33,'contentManagement','0003_auto_20160415_1130','2016-04-15 11:30:30.794995'),(34,'contentManagement','0002_content_is_folder','2016-04-15 18:06:13.108479'),(35,'contentManagement','0003_auto_20160415_1813','2016-04-15 18:13:04.415756'),(36,'contentManagement','0002_auto_20160415_1833','2016-04-15 18:33:42.223813'),(37,'contentManagement','0002_auto_20160417_1830','2016-04-17 18:30:22.434022'),(38,'screenManagement','0002_auto_20160419_0519','2016-04-19 06:56:02.820413'),(39,'screenManagement','0003_auto_20160419_0526','2016-04-19 06:56:03.141011'),(40,'screenManagement','0004_auto_20160419_0530','2016-04-19 06:56:03.196551'),(41,'screenManagement','0005_remove_group_organization','2016-04-19 06:56:03.347362'),(42,'screenManagement','0006_remove_group_dummy_screen_group','2016-04-19 06:56:03.467807'),(43,'screenManagement','0002_auto_20160419_0932','2016-04-19 09:32:39.625026'),(44,'screenManagement','0002_group_group_id','2016-04-19 10:08:17.385019'),(45,'screenManagement','0002_screen_screen_id','2016-04-19 10:11:29.236381'),(46,'scheduleManagement','0002_remove_screenschedule_group','2016-04-19 10:15:47.176243'),(47,'contentManagement','0002_content_organization','2016-04-20 10:43:01.328571'),(48,'contentManagement','0003_auto_20160420_1807','2016-04-20 18:08:32.102995'),(49,'contentManagement','0004_auto_20160420_1808','2016-04-20 18:08:32.253538'),(50,'playlistManagement','0002_playlist_organization','2016-04-20 18:08:32.468572'),(51,'contentManagement','0005_auto_20160420_1841','2016-04-20 18:41:40.452034'),(52,'contentManagement','0006_auto_20160420_1856','2016-04-20 18:56:38.844610'),(53,'screenManagement','0002_auto_20160421_1020','2016-04-21 10:20:09.896057'),(54,'screenManagement','0003_auto_20160421_1043','2016-04-21 10:43:58.153504'),(55,'screenManagement','0004_auto_20160421_1046','2016-04-21 10:47:03.413193'),(56,'screenManagement','0005_remove_screen_specifications','2016-04-21 10:49:42.707788');
 /*!40000 ALTER TABLE `django_migrations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -543,7 +546,7 @@ CREATE TABLE `django_session` (
 
 LOCK TABLES `django_session` WRITE;
 /*!40000 ALTER TABLE `django_session` DISABLE KEYS */;
-INSERT INTO `django_session` VALUES ('340q2qugsocf74dhf669nd6ri4x5kl2l','MzJjN2Y0ZWFiOTAwMmM1MjQ2YzVhMjkyYTljMDIzYWJiNDdmMjk3Nzp7Il9hdXRoX3VzZXJfaGFzaCI6IjIxNTdmNTJmNTM1ZmJiZDIyNzM3YjEzNzE3MmIxM2Y3NjVlOWRmYzEiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIzIn0=','2016-05-03 10:37:32.099386'),('8b0j2wtkiu87i6k8406qjp88lpmliqiz','YmNiZDAwZTBlYmIyY2U0YmE5YzY0ODY3OGIyNTljZTBjYzg2MGJiNDp7Il9hdXRoX3VzZXJfaGFzaCI6IjZmOTA3MDZmZTA1N2ExYTVkYzViMTBhMWFhYTA5N2Q3Zjg1MGFmMzciLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=','2016-05-02 04:38:46.379878'),('9x7h3jl9i6emfh8ll1p54ke4j1ahzbtn','ZTZjNmI0NThlNjdhNDcyNGZlNzA4NTIxM2ZlMTNiZTc0MmVhMjQ0Mjp7Il9hdXRoX3VzZXJfaGFzaCI6IjZmOTA3MDZmZTA1N2ExYTVkYzViMTBhMWFhYTA5N2Q3Zjg1MGFmMzciLCJmaWxlcl9sYXN0X2ZvbGRlcl9pZCI6bnVsbCwiX2F1dGhfdXNlcl9pZCI6IjEiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCJ9','2016-04-29 11:56:34.407007');
+INSERT INTO `django_session` VALUES ('7syc8d78ui303xkzhljr1lbphihlewz5','MzJjN2Y0ZWFiOTAwMmM1MjQ2YzVhMjkyYTljMDIzYWJiNDdmMjk3Nzp7Il9hdXRoX3VzZXJfaGFzaCI6IjIxNTdmNTJmNTM1ZmJiZDIyNzM3YjEzNzE3MmIxM2Y3NjVlOWRmYzEiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIzIn0=','2016-05-04 18:16:03.327779'),('8b0j2wtkiu87i6k8406qjp88lpmliqiz','YmNiZDAwZTBlYmIyY2U0YmE5YzY0ODY3OGIyNTljZTBjYzg2MGJiNDp7Il9hdXRoX3VzZXJfaGFzaCI6IjZmOTA3MDZmZTA1N2ExYTVkYzViMTBhMWFhYTA5N2Q3Zjg1MGFmMzciLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=','2016-05-02 04:38:46.379878'),('9x7h3jl9i6emfh8ll1p54ke4j1ahzbtn','ZTZjNmI0NThlNjdhNDcyNGZlNzA4NTIxM2ZlMTNiZTc0MmVhMjQ0Mjp7Il9hdXRoX3VzZXJfaGFzaCI6IjZmOTA3MDZmZTA1N2ExYTVkYzViMTBhMWFhYTA5N2Q3Zjg1MGFmMzciLCJmaWxlcl9sYXN0X2ZvbGRlcl9pZCI6bnVsbCwiX2F1dGhfdXNlcl9pZCI6IjEiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCJ9','2016-04-29 11:56:34.407007');
 /*!40000 ALTER TABLE `django_session` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -850,9 +853,12 @@ CREATE TABLE `playlistManagement_playlist` (
   `last_updated_time` datetime(6) NOT NULL,
   `created_by_id` int(11) NOT NULL,
   `last_updated_by_id` int(11) NOT NULL,
+  `organization_id` int(11),
   PRIMARY KEY (`id`),
   KEY `D50229839cd0cf7d84abc44588a9db0d` (`created_by_id`),
   KEY `c98e25b8402d78f8544a252ae221ba89` (`last_updated_by_id`),
+  KEY `playlistManagement_playlist_26b2345e` (`organization_id`),
+  CONSTRAINT `D3c5f6ad9960553023f1f759870f6c26` FOREIGN KEY (`organization_id`) REFERENCES `authentication_organization` (`id`),
   CONSTRAINT `D50229839cd0cf7d84abc44588a9db0d` FOREIGN KEY (`created_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`),
   CONSTRAINT `c98e25b8402d78f8544a252ae221ba89` FOREIGN KEY (`last_updated_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -995,7 +1001,7 @@ DROP TABLE IF EXISTS `scheduleManagement_screenschedule`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `scheduleManagement_screenschedule` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `group_id` int(11),
+  `group_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `scheduleManagement_screenschedule_0e939a4f` (`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1049,28 +1055,25 @@ DROP TABLE IF EXISTS `screenManagement_screen`;
 CREATE TABLE `screenManagement_screen` (
   `screen_id` int(11) NOT NULL AUTO_INCREMENT,
   `screen_name` varchar(100) NOT NULL,
-  `activation_key` varchar(16) NOT NULL,
+  `activation_key` varchar(16) DEFAULT NULL,
   `activated_on` date DEFAULT NULL,
   `business_type` varchar(20) NOT NULL,
-  `specifications_id` int(11) NOT NULL,
   `status_id` int(11) NOT NULL,
   `activated_by_id` int(11) DEFAULT NULL,
-  `aspect_ratio` varchar(20),
-  `resolution` varchar(20),
-  `screen_size` int(11) NOT NULL,
-  `address` varchar(100) NOT NULL,
-  `device_identification_id` varchar(16),
-  `owned_by_id` int(11),
+  `aspect_ratio` varchar(20) DEFAULT NULL,
+  `resolution` varchar(20) DEFAULT NULL,
+  `screen_size` int(11) DEFAULT NULL,
+  `address` varchar(100) DEFAULT NULL,
+  `device_identification_id` varchar(16) DEFAULT NULL,
+  `owned_by_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`screen_id`),
-  KEY `screenManagement_screen_e0be6253` (`specifications_id`),
   KEY `screenManagement_screen_dc91ed4b` (`status_id`),
   KEY `screenManagement_screen_d5b8d1c2` (`activated_by_id`),
   KEY `screenManagement_screen_441f3d33` (`owned_by_id`),
-  CONSTRAINT `D88c12cf584bd9ec0769c0e380dd6d95` FOREIGN KEY (`specifications_id`) REFERENCES `screenManagement_screenspecs` (`id`),
   CONSTRAINT `ebc63bdd0f179da0d15ee30f124ea0e0` FOREIGN KEY (`activated_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`),
   CONSTRAINT `s_owned_by_id_6646cd8255acdae8_fk_authentication_organization_id` FOREIGN KEY (`owned_by_id`) REFERENCES `authentication_organization` (`id`),
   CONSTRAINT `s_status_id_7e5335d768560aa1_fk_screenManagement_screenstatus_id` FOREIGN KEY (`status_id`) REFERENCES `screenManagement_screenstatus` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1079,7 +1082,7 @@ CREATE TABLE `screenManagement_screen` (
 
 LOCK TABLES `screenManagement_screen` WRITE;
 /*!40000 ALTER TABLE `screenManagement_screen` DISABLE KEYS */;
-INSERT INTO `screenManagement_screen` VALUES (1,'screen 1','ASDF1234','2016-04-11','PRIVATE',1,3,NULL,'','',32,'','',1),(2,'screen 2','asdf123333','2016-04-11','PRIVATE',1,3,NULL,'','',32,'','',1),(3,'screen abc','123456',NULL,'PRIVATE',1,3,NULL,'','',32,'','',1),(4,'Screen 22','123456',NULL,'PRIVATE',1,3,NULL,'','1024*768',22,'','',1),(5,'nipun','1234567',NULL,'PRIVATE',1,3,NULL,'','',32,'','',1),(6,'shopping 9th floor','1234567',NULL,'PRIVATE',2,3,NULL,'','1024*768',32,'','',1),(7,'dominos forum','1234567',NULL,'PRIVATE',2,3,NULL,'','1466*768',32,'','',2),(8,'dominos test','1234567',NULL,'PRIVATE',2,3,NULL,'','',32,'','',2);
+INSERT INTO `screenManagement_screen` VALUES (1,'screen 1','','2016-04-11','PRIVATE',5,NULL,'','',34,'asdfff','',1),(2,'screen 2','asdf123333','2016-04-11','PRIVATE',5,NULL,'','',32,'','',1),(3,'screen abc','123456',NULL,'PRIVATE',5,NULL,'','',32,'','',1),(4,'Screen 22','123456',NULL,'PRIVATE',5,NULL,'','1024*768',22,'','',1),(5,'nipun','1234567',NULL,'PRIVATE',5,NULL,'','',32,'','',1),(6,'shopping 9th floor','1234567',NULL,'PRIVATE',5,NULL,'','1024*768',32,'','',1),(7,'dominos forum','1234567',NULL,'PRIVATE',5,NULL,'','1466*768',32,'','',2),(8,'dominos test','1234567',NULL,'PRIVATE',5,NULL,'','',32,'','',2),(9,'screen nipun','',NULL,'PRIVATE',5,NULL,'','',NULL,'nipun\'s house',NULL,1),(10,'jaydev\'s house','',NULL,'PRIVATE',5,NULL,'','',NULL,'',NULL,1),(11,'prasanth','',NULL,'PRIVATE',5,NULL,'','',NULL,'aa',NULL,1);
 /*!40000 ALTER TABLE `screenManagement_screen` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1099,7 +1102,7 @@ CREATE TABLE `screenManagement_screen_groups` (
   KEY `screenMan_group_id_4dc0b1699266de69_fk_screenManagement_group_id` (`group_id`),
   CONSTRAINT `screenM_screen_id_113a154b52f5ae05_fk_screenManagement_screen_id` FOREIGN KEY (`screen_id`) REFERENCES `screenManagement_screen` (`screen_id`),
   CONSTRAINT `screenMan_group_id_4dc0b1699266de69_fk_screenManagement_group_id` FOREIGN KEY (`group_id`) REFERENCES `screenManagement_group` (`group_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1108,7 +1111,7 @@ CREATE TABLE `screenManagement_screen_groups` (
 
 LOCK TABLES `screenManagement_screen_groups` WRITE;
 /*!40000 ALTER TABLE `screenManagement_screen_groups` DISABLE KEYS */;
-INSERT INTO `screenManagement_screen_groups` VALUES (20,6,1),(21,6,2),(17,7,4),(15,8,3);
+INSERT INTO `screenManagement_screen_groups` VALUES (23,1,2),(22,4,2),(20,6,1),(21,6,2),(17,7,4),(15,8,3),(24,11,1);
 /*!40000 ALTER TABLE `screenManagement_screen_groups` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1179,4 +1182,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-04-19 20:38:43
+-- Dump completed on 2016-04-22  0:53:36

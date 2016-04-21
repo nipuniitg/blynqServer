@@ -6,21 +6,12 @@ from screenManagement.models import Screen, ScreenSpecs, Group
 from djng.forms import NgModelFormMixin, NgModelForm, NgFormValidationMixin
 
 
-
 class AddScreenForm(NgModelFormMixin, NgFormValidationMixin, NgModelForm, forms.ModelForm):
 
     class Meta:
         model = Screen
         fields = ('screen_name', 'address', 'activation_key', 'screen_size', 'aspect_ratio', 'resolution') # Add specifications if needed
 
-    def clean_screen_name(self):
-        screen_name = self.cleaned_data['screen_name']
-        try:
-            # TODO: Get organization details here to validate unique screen_name in an organization instead of globally.
-            Screen.objects.get(screen_name=screen_name)
-        except:
-            return screen_name
-        raise forms.ValidationError('Screen name already exists')
 
     def __init__(self, *args, **kwargs):
         super(AddScreenForm, self).__init__(*args, **kwargs)

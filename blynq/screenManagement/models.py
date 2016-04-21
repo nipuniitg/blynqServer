@@ -87,17 +87,17 @@ class ScreenSpecs(models.Model):
 class Screen(models.Model):
     screen_id = models.AutoField(primary_key=True)
     screen_name = models.CharField(max_length=100)
-    screen_size = models.IntegerField(blank=True)    # in inches
+    screen_size = models.IntegerField(blank=True, null=True)    # in inches
     aspect_ratio = models.CharField(max_length=20, null=True, blank=True)
     resolution = models.CharField(max_length=20, null=True, blank=True)    # 1366*768
-    specifications = models.ForeignKey(ScreenSpecs, on_delete=models.PROTECT, null=True)
+    # specifications = models.ForeignKey(ScreenSpecs, on_delete=models.PROTECT, null=True, blank=True)
 
     # TODO: change this location to a foreign key to authentication.Address
     #location = models.ForeignKey(Address, on_delete=models.PROTECT)
     address = models.CharField(max_length=100, blank=True)
 
     device_identification_id = models.CharField(max_length=16, blank=True, null=True)
-    activation_key = models.CharField(max_length=16)
+    activation_key = models.CharField(max_length=16, blank=True, null=True)
     activated_on = models.DateField(null=True, blank=True)
     activated_by = models.ForeignKey(UserDetails, null=True, blank=True)
     # related_name - The name to use for the relation from the related object back to this one
