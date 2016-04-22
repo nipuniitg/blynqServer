@@ -48,9 +48,9 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
     var upsertScreen = function(screenDetails, callback){
         // var screenDetailsJson = JSON.stringify(screenDetails);
         $http({
-            method : "POST",
-            url : "upsertScreen",
-            data : screenDetails,
+            method : "POST"
+            ,url : "upsertScreen"
+            ,data : screenDetails
 //            data : {
 //                screenDetailsName : screenDetailsJson
 //            }
@@ -67,11 +67,12 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
 
     var upsertGroup = function(groupDetails, callback){
         $http({
-            method : "POST",
-            url : "upsertGroup",
-            data : {
+            method : "POST"
+            ,url : "upsertGroup"
+            ,data : groupDetails
+            /*data : {
                 groupDetails : groupDetails
-            }
+            }*/
         }).then(function mySucces(response) {
             if(callback)
             {
