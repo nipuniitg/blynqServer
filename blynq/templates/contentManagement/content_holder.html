@@ -19,37 +19,88 @@
                 </div>
                 <div class="panel-body">
                     <!-- Folders -->
-                    <div class="item-container-wrap" ng-repeat="folder in contentObj.folders">
+                    <div class="item-container-wrap" ng-repeat="folder in folders">
                         <div class="item-container-header">
-                            <p>{[ folder.folderName ]}</p>
+                            <p>{[ folder.title ]}</p>
                         </div>
                         <div class="folder-container">
                             <img src="{% static 'images/folder-icon.png' %}">
                         </div>
                         <div class="item-container-footer">
                             <div class="input-group">
-                                <i class="fa fa-trash-o pull-right pointer" ng-click="deleteFolder($index)"></i>
+                                <i class="fa fa-trash-o pull-right pointer" ng-click="delete(folder.content_id)"></i>
                             </div>
                         </div>
                     </div>
-                    <!-- Items -->
+                    <!-- Files -->
                     <div class="item-container-wrap"
-                         ng-repeat="item in contentObj.items"
+                         ng-repeat="file in files"
                          >
                         <div class="div-draggable-wrap" draggable data-index="{[$index]}">
                             <div class="item-container-header">
-                                {[ item.itemName + $index ]}
+                                {[ file.title ]}
                             </div>
                             <div class="item-container">
-                                <img src="{[ item.url ]}">
+                                <img src="{[ file.document.url ]}">
                             </div>
                         </div>
                         <div class="item-container-footer">
                             <div class="input-group">
-                                <i class="fa fa-trash-o pointer pull-right" ng-click="deleteItem($index)"></i>
+                                <i class="fa fa-trash-o pointer pull-right" ng-click="delete(file.conten_id)"></i>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal-upload content -->
+    <div id="mdlUploadContent" class="modal fade" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Upload Content</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="display_form" method="post" class="form-horizontal"
+                          name="{{ form.form_name }}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <div class="form-group">
+                            <div class="col-sm-2">{{ field.label_tag }}</div>
+                            <div class="col-sm-5">
+                                {{ field }}
+                            </div>
+                            <div class="help-block with-errors col-sm-3">
+                                {{ field.errors }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Groups</label>
+                            <div class="col-md-9">
+                                <div id="tagsinput_tagsinput1" class="tagsinput " style="height: 100%;">
+                                    <span class="tag" ng-repeat="group in modalScreenDetailsObj.groups">
+                                        <span> {[ group.group_name ]} &nbsp;&nbsp;</span>
+                                        <a class="tagsinput-remove-link" ng-click="removeGroupTagforScreen($index)"></a>
+                                    </span>
+                                    <div class="tagsinput-add-container">
+                                        <div class="tagsinput-add" data-toggle="modal" data-target="#mdl-AddGroups"
+                                             ng-click="addGroupsToScreen()"></div>
+                                        <input value="" data-default=""
+                                               style="color: rgb(102, 102, 102); width: 7px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="cancelUpload">Cancel</button>
+                    <button type="button" class="btn btn-success" data-dismiss="modal" ng-click="upload()">Upload</button>
                 </div>
             </div>
         </div>

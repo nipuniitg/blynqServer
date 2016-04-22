@@ -219,6 +219,7 @@ sagApp.factory('groupsFactory',['$http','dataAccessFactory', function($http, dat
 
 sagApp.controller('groupCtrl',['groupsFactory', 'dataAccessFactory', '$scope', function(groupsFactory, dataAccessFactory, $scope){
 
+
    var onLoad = function(){
           refreshGroups();
           $scope.selectedIndex = 0;
@@ -231,23 +232,25 @@ sagApp.controller('groupCtrl',['groupsFactory', 'dataAccessFactory', '$scope', f
           });
    };
 
+   var getSelectableGroups = function(){
+        groupsFactory.getSelectableScreens($scope.modalGroupDetailsObj.group_id, function(data){
+            $scope.selectableScreens = data;
+        });
+   }
+
 
    //add group;
    $scope.addNewGroup = function()
    {
         $scope.modalGroupDetailsObj = angular.copy(groupsFactory.groupBluePrint);
         $scope.isNewGroupModal = true;
-        groupsFactory.getSelectableScreens($scope.modalGroupDetailsObj.screens, function(data){
-            $scope.selectableScreens = data;
-        });
+        getSelectableGroups();
    };
 
    $scope.editGroupDetails = function(group, index){
         $scope.modalGroupDetailsObj = angular.copy(group);
         $scope.editModelGroupIndex = index;
-        dataAccessFactory.getSelectableScreens(group.group_id, function(data){
-            $scope.selectableScreens = data;
-        });
+        getSelectableGroups();
    };
 
    $scope.saveGroupDetails = function(){
@@ -317,6 +320,7 @@ sagApp.controller('groupCtrl',['groupsFactory', 'dataAccessFactory', '$scope', f
 
 sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope',  function(screensFactory,dataAccessFactory, $scope){
 
+    //private functions
     var onLoad = function(){
         screensFactory.getAllScreens(function(allScreens)
         {
@@ -325,28 +329,43 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope', 
         $scope.isNewScreenModal = false;
     };
 
+    var addGroupsToScreen = function(){
+      dataAccessFactory.getSelectableGroups($scope.modalScreenDetailsObj.screen_id, function(selectableGroups)
+      {
+        $scope.selectableGroups = angular.copy(selectableGroups);
+      });
+    };
+
+    //public functions
     //screen Details
     $scope.addNewScreen = function(){
         $scope.isNewScreenModal = true;
         $scope.modalScreenDetailsObj = angular.copy(screensFactory.screenBluePrint);
         $scope.newScreenValidationKey = '';
+        addGroupsToScreen();
     };
 
     $scope.editScreenDetails = function(index){
         //copy the object
         $scope.modalScreenDetailsObj = angular.copy($scope.screens[index]);
         $scope.editModeScreenIndex = index;
+        addGroupsToScreen();
     };
 
     $scope.saveScreenDetails = function(){
-        dataAccessFactory.upsertScreen($scope.modalScreenDetailsObj, function successFN(upsertStatus){
-            if(upsertStatus =='success')
+        dataAccessFactory.upsertScreen($scope.modalScreenDetailsObj, function successFN(data){
+            if(data.success)
             {
                 screensFactory.getAllScreens(function(allScreens)
                 {
                     $scope.screens = allScreens;
                 });
-                toastr.success('Screens details saved');
+                if(isNewScreenModal){
+                    toastr.success('New Screen Added');
+                }
+                else{
+                    toastr.success('Screens details updated');
+                }
             }
             else{
                 toastr.warning('Error occured while saving screen. Please try again.');
@@ -367,12 +386,6 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope', 
     }
 
     //groups
-    $scope.addGroupsToScreen = function(){
-          dataAccessFactory.getSelectableGroups($scope.modalScreenDetailsObj.screen_id, function(selectableGroups)
-          {
-            $scope.selectableGroups = angular.copy(selectableGroups);
-          });
-    };
 
     $scope.moveGroupToSelectable = function(group){
         $scope.selectableGroups.push(group);

@@ -144,6 +144,7 @@ def upsert_screen(request):
     context_dic['errors'] = errors
     return JsonResponse(context_dic, safe=False)
 
+
 @login_required
 def add_screen_location(request):
     context_dic = {}

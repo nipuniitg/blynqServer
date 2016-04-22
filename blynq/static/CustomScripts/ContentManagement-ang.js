@@ -16,13 +16,12 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
                 {
                     callback(returnData);
                 }
-                return returnData
             }, function myError(response) {
                 console.log(response.statusText);
             });
     };
 
-    //How to send data to views throug ajax in django
+    //How to send data to views through ajax in django
     var deleteItem = function(itemId, callback){
         $http({
              method : "GET"
@@ -69,10 +68,45 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
             });
     };
 
+    var getFilesJson = function(folderId, callback){
+        var URL = '/content/getFilesJson/'+ folderId;
+        $http({
+             method : "GET",
+             url : URL
+         }).then(function mySuccess(response){
+                returnData = angular.copy(response.data);
+                if(callback)
+                {
+                    callback(returnData);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
+    };
+
+    var getFoldersJson = function(folderId, callback){
+        var URL = '/content/getFoldersJson/'+ folderId;
+        $http({
+             method : "GET",
+             url : URL
+         }).then(function mySuccess(response){
+                returnData = angular.copy(response.data);
+                if(callback)
+                {
+                    callback(returnData);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
+    };
+
+
     return{
         getContentJson : getContentJson,
         deleteItem : deleteItem,
-        deleteFolder : deleteFolder
+        deleteFolder : deleteFolder,
+        getFiles : getFilesJson,
+        getFolders : getFoldersJson
     }
 
 }]);
@@ -102,10 +136,29 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
         allowDuplicates: false //optional param allows duplicates to be dropped.
     };*/
 
-    ctFactory.getContent(function(data){
-        $scope.contentObj = data;
-    });
+    //private functions
+    var onLoad = function(){
+        $scope.currentFolderId = -1  //-1 represents root folder. And hence fetches the data in root folder.
+        refreshContent($scope.currentFolderId);
+    };
 
+    var refreshContent = function(folderId){
+        /*ctFactory.getContent(function(data){
+            $scope.contentObj = data;
+        });*/
+
+        ctDataAccessFactory.getFolders(folderId, function(data)
+        {
+            $scope.folders = data;
+        });
+
+        ctDataAccessFactory.getFiles(folderId, function(data)
+        {
+            $scope.files = data;
+        });
+    };
+
+    //public or Scope releated functions
     $scope.deleteItem = function(index){
         ctDataAccessFactory.deleteItem($scope.contentObj.items[index].itemId,  function(){
             $scope.contentObj.items.splice(index, 1);
@@ -118,6 +171,7 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
         });
     }
 
+    onLoad();
 }]);
 
 plApp.directive('draggable', function(){

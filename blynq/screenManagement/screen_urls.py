@@ -14,6 +14,6 @@ urlpatterns = [
     url(r'^addLocation$', views.add_screen_location, name='add_screen_location'),
     url(r'^addScreenSpecs$', views.add_screen_specs, name='add_screen_specs'),
     url(r'^addGroup$', views.add_group, name='add_group'),
-    url(r'getSelectableScreens/', views.get_selectable_screens_json, name='selectable_screens_json'),
-    url(r'getSelectableGroups/', views.get_selectable_groups_json, name='selectable_groups_json'),
+    url(r'^getSelectableScreens/(?P<group_id>-?\d+)', views.get_selectable_screens_json, name='selectable_screens_json'),
+    url(r'^getSelectableGroups/(?P<screen_id>-?\d+)', views.get_selectable_groups_json, name='selectable_groups_json'),
 ]

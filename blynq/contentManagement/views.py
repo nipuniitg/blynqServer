@@ -1,3 +1,5 @@
+import json
+
 from django.core import serializers
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -15,6 +17,8 @@ from django.db.models import Q
 
 @login_required
 def index(request):
+    context_dic = {}
+    context_dic['form'] = UploadContentForm(form_name='formUpload', scope_prefix='mdlNewFileObj')
     return render(request,'contentManagement/content_index.html')
 
 
@@ -78,7 +82,33 @@ def get_user_content(request, folder_id=-1):
         user_content = user_content.filter(parent_folder__isnull=True)
     else:
         user_content = user_content.filter(parent_folder__pk=folder_id)
-    json_data = json_serializer().serialize(user_content,
-                                            fields=('title', 'description', 'document', 'is_folder'))
-    return HttpResponse(json_data, content_type='application/json')
+    folders = user_content.filter(is_folder=True)
+    files = user_content.filter(is_folder=False)
+    json_folders_data = json_serializer().serialize(folders,
+                                            fields=('title', 'description', 'document'))
+    json_files_data = json_serializer().serialize(files,
+                                            fields=('title', 'description', 'document'))
+    json_data = {'folders' : json_folders_data, 'files' : json_files_data}
+    #json_data = json.dumps(json_data)
+    #print json_data
+    return JsonResponse(json_data, safe=False)
 
+def get_folders_json(request, folder_id=-1):
+    user_details, organization = user_and_organization(request)
+    folders_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
+    if folder_id == -1:
+        folders_content = folders_content.filter(parent_folder__isnull=True)
+    else:
+        folders_content = folders_content.filter(parent_folder__pk=folder_id)
+    json_folders = json_serializer().serialize(folders_content, fields=('title', 'description', 'document'))
+    return HttpResponse(json_folders, content_type='application/json')
+
+def get_files_json(request, folder_id=-1):
+    user_details, organization = user_and_organization(request)
+    files_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
+    if folder_id == -1:
+        files_content = files_content.filter(parent_folder__isnull=True)
+    else:
+        files_content = files_content.filter(parent_folder__pk=folder_id)
+    json_files = json_serializer().serialize(files_content, fields=('title', 'description', 'document'))
+    return HttpResponse(json_files, content_type='application/json')
