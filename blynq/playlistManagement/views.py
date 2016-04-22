@@ -15,3 +15,7 @@ def getPlaylistsJson(request):
     classObj = TestDataClass()
     playlists = classObj.getPlaylistsTestData()
     return JsonResponse(playlists, safe=False)
+
+
+def add_playlist(request):
+    return render(request, '')

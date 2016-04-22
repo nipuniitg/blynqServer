@@ -43,7 +43,8 @@ class FlatJsonSerializer(Serializer):
                 data['status'] = obj.status.status_name
             if field == 'document':
                 data['url'] = obj.document.url
-                data['content_id'] = obj.pk
+            if field == 'content_id':
+                data['content_id'] = obj.content_id
         return data
 
     def end_object(self, obj):

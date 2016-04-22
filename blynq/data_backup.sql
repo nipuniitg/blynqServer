@@ -82,7 +82,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `content_type_id` (`content_type_id`,`codename`),
   CONSTRAINT `auth__content_type_id_508cf46651277a81_fk_django_content_type_id` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=104 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -91,7 +91,7 @@ CREATE TABLE `auth_permission` (
 
 LOCK TABLES `auth_permission` WRITE;
 /*!40000 ALTER TABLE `auth_permission` DISABLE KEYS */;
-INSERT INTO `auth_permission` VALUES (1,'Can add log entry',1,'add_logentry'),(2,'Can change log entry',1,'change_logentry'),(3,'Can delete log entry',1,'delete_logentry'),(4,'Can add permission',2,'add_permission'),(5,'Can change permission',2,'change_permission'),(6,'Can delete permission',2,'delete_permission'),(7,'Can add group',3,'add_group'),(8,'Can change group',3,'change_group'),(9,'Can delete group',3,'delete_group'),(10,'Can add user',4,'add_user'),(11,'Can change user',4,'change_user'),(12,'Can delete user',4,'delete_user'),(13,'Can add content type',5,'add_contenttype'),(14,'Can change content type',5,'change_contenttype'),(15,'Can delete content type',5,'delete_contenttype'),(16,'Can add session',6,'add_session'),(17,'Can change session',6,'change_session'),(18,'Can delete session',6,'delete_session'),(19,'Can add city',7,'add_city'),(20,'Can change city',7,'change_city'),(21,'Can delete city',7,'delete_city'),(22,'Can add address',8,'add_address'),(23,'Can change address',8,'change_address'),(24,'Can delete address',8,'delete_address'),(25,'Can add organization',9,'add_organization'),(26,'Can change organization',9,'change_organization'),(27,'Can delete organization',9,'delete_organization'),(28,'Can add role',10,'add_role'),(29,'Can change role',10,'change_role'),(30,'Can delete role',10,'delete_role'),(31,'Can add user',11,'add_userdetails'),(32,'Can change user',11,'change_userdetails'),(33,'Can delete user',11,'delete_userdetails'),(34,'Can add screen status',12,'add_screenstatus'),(35,'Can change screen status',12,'change_screenstatus'),(36,'Can delete screen status',12,'delete_screenstatus'),(40,'Can add group',14,'add_group'),(41,'Can change group',14,'change_group'),(42,'Can delete group',14,'delete_group'),(43,'Can add screen specs',15,'add_screenspecs'),(44,'Can change screen specs',15,'change_screenspecs'),(45,'Can delete screen specs',15,'delete_screenspecs'),(49,'Can add screen',17,'add_screen'),(50,'Can change screen',17,'change_screen'),(51,'Can delete screen',17,'delete_screen'),(52,'Can add content type',18,'add_contenttype'),(53,'Can change content type',18,'change_contenttype'),(54,'Can delete content type',18,'delete_contenttype'),(58,'Can add content',20,'add_content'),(59,'Can change content',20,'change_content'),(60,'Can delete content',20,'delete_content'),(61,'Can add playlist items',21,'add_playlistitems'),(62,'Can change playlist items',21,'change_playlistitems'),(63,'Can delete playlist items',21,'delete_playlistitems'),(64,'Can add playlist',22,'add_playlist'),(65,'Can change playlist',22,'change_playlist'),(66,'Can delete playlist',22,'delete_playlist'),(67,'Can add schedule',23,'add_schedule'),(68,'Can change schedule',23,'change_schedule'),(69,'Can delete schedule',23,'delete_schedule'),(70,'Can add event',24,'add_event'),(71,'Can change event',24,'change_event'),(72,'Can delete event',24,'delete_event'),(73,'Can add source',25,'add_source'),(74,'Can change source',25,'change_source'),(75,'Can delete source',25,'delete_source'),(76,'Can add thumbnail',26,'add_thumbnail'),(77,'Can change thumbnail',26,'change_thumbnail'),(78,'Can delete thumbnail',26,'delete_thumbnail'),(79,'Can add thumbnail dimensions',27,'add_thumbnaildimensions'),(80,'Can change thumbnail dimensions',27,'change_thumbnaildimensions'),(81,'Can delete thumbnail dimensions',27,'delete_thumbnaildimensions'),(82,'Can add Folder',28,'add_folder'),(83,'Can change Folder',28,'change_folder'),(84,'Can delete Folder',28,'delete_folder'),(85,'Can use directory listing',28,'can_use_directory_listing'),(86,'Can add folder permission',29,'add_folderpermission'),(87,'Can change folder permission',29,'change_folderpermission'),(88,'Can delete folder permission',29,'delete_folderpermission'),(89,'Can add file',30,'add_file'),(90,'Can change file',30,'change_file'),(91,'Can delete file',30,'delete_file'),(92,'Can add clipboard',31,'add_clipboard'),(93,'Can change clipboard',31,'change_clipboard'),(94,'Can delete clipboard',31,'delete_clipboard'),(95,'Can add clipboard item',32,'add_clipboarditem'),(96,'Can change clipboard item',32,'change_clipboarditem'),(97,'Can delete clipboard item',32,'delete_clipboarditem'),(98,'Can add image',33,'add_image'),(99,'Can change image',33,'change_image'),(100,'Can delete image',33,'delete_image'),(101,'Can add screen schedule',34,'add_screenschedule'),(102,'Can change screen schedule',34,'change_screenschedule'),(103,'Can delete screen schedule',34,'delete_screenschedule');
+INSERT INTO `auth_permission` VALUES (1,'Can add log entry',1,'add_logentry'),(2,'Can change log entry',1,'change_logentry'),(3,'Can delete log entry',1,'delete_logentry'),(4,'Can add permission',2,'add_permission'),(5,'Can change permission',2,'change_permission'),(6,'Can delete permission',2,'delete_permission'),(7,'Can add group',3,'add_group'),(8,'Can change group',3,'change_group'),(9,'Can delete group',3,'delete_group'),(10,'Can add user',4,'add_user'),(11,'Can change user',4,'change_user'),(12,'Can delete user',4,'delete_user'),(13,'Can add content type',5,'add_contenttype'),(14,'Can change content type',5,'change_contenttype'),(15,'Can delete content type',5,'delete_contenttype'),(16,'Can add session',6,'add_session'),(17,'Can change session',6,'change_session'),(18,'Can delete session',6,'delete_session'),(19,'Can add city',7,'add_city'),(20,'Can change city',7,'change_city'),(21,'Can delete city',7,'delete_city'),(22,'Can add address',8,'add_address'),(23,'Can change address',8,'change_address'),(24,'Can delete address',8,'delete_address'),(25,'Can add organization',9,'add_organization'),(26,'Can change organization',9,'change_organization'),(27,'Can delete organization',9,'delete_organization'),(28,'Can add role',10,'add_role'),(29,'Can change role',10,'change_role'),(30,'Can delete role',10,'delete_role'),(31,'Can add user',11,'add_userdetails'),(32,'Can change user',11,'change_userdetails'),(33,'Can delete user',11,'delete_userdetails'),(34,'Can add screen status',12,'add_screenstatus'),(35,'Can change screen status',12,'change_screenstatus'),(36,'Can delete screen status',12,'delete_screenstatus'),(37,'Can add group',13,'add_group'),(38,'Can change group',13,'change_group'),(39,'Can delete group',13,'delete_group'),(40,'Can add screen specs',14,'add_screenspecs'),(41,'Can change screen specs',14,'change_screenspecs'),(42,'Can delete screen specs',14,'delete_screenspecs'),(43,'Can add screen',15,'add_screen'),(44,'Can change screen',15,'change_screen'),(45,'Can delete screen',15,'delete_screen'),(46,'Can add content type',16,'add_contenttype'),(47,'Can change content type',16,'change_contenttype'),(48,'Can delete content type',16,'delete_contenttype'),(49,'Can add content',17,'add_content'),(50,'Can change content',17,'change_content'),(51,'Can delete content',17,'delete_content'),(52,'Can add playlist items',18,'add_playlistitems'),(53,'Can change playlist items',18,'change_playlistitems'),(54,'Can delete playlist items',18,'delete_playlistitems'),(55,'Can add playlist',19,'add_playlist'),(56,'Can change playlist',19,'change_playlist'),(57,'Can delete playlist',19,'delete_playlist'),(58,'Can add screen schedule',20,'add_screenschedule'),(59,'Can change screen schedule',20,'change_screenschedule'),(60,'Can delete screen schedule',20,'delete_screenschedule'),(61,'Can add schedule',21,'add_schedule'),(62,'Can change schedule',21,'change_schedule'),(63,'Can delete schedule',21,'delete_schedule'),(64,'Can add event',22,'add_event'),(65,'Can change event',22,'change_event'),(66,'Can delete event',22,'delete_event');
 /*!40000 ALTER TABLE `auth_permission` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -116,7 +116,7 @@ CREATE TABLE `auth_user` (
   `date_joined` datetime(6) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -125,7 +125,7 @@ CREATE TABLE `auth_user` (
 
 LOCK TABLES `auth_user` WRITE;
 /*!40000 ALTER TABLE `auth_user` DISABLE KEYS */;
-INSERT INTO `auth_user` VALUES (1,'pbkdf2_sha256$20000$OheAYidGFVmh$kndpFbifnw+QFpe/OiNHrs1Z/SS2Ou9VWhp8N8qbFaM=','2016-04-19 10:36:12.059473',1,'blynq','','','blynq@googlegroups.com',1,1,'2016-04-10 04:52:08.102966'),(3,'pbkdf2_sha256$20000$hYRk2vw3Qd3S$pHjgXCJR3iWlij2WE8d+/CnptH7CaInF846DLDQqpM8=','2016-04-20 18:16:03.321498',1,'nipun','nipun','edara','iitg.nipun@gmail.com',1,1,'2016-04-10 05:38:49.315257'),(5,'nishtnath',NULL,0,'sahruj','nipun','edara','sahrujviru@gmail.com',0,1,'2016-04-10 06:08:35.951219'),(6,'pbkdf2_sha256$20000$N1BFEkGoH8EU$6+L/gDHleXtO+GGzoWPG5J8EC01FCNy0bTK9ntmdHRw=','2016-04-20 16:52:00.566557',0,'kmpk123','kmpk','123','kmpk123@gmail.com',0,1,'2016-04-10 06:31:28.000000'),(7,'pbkdf2_sha256$20000$Rg2DKHFh7G02$6mX00ecYg93T9smWxLTJA9CxIOvuYMSYK85TfD8p+d0=',NULL,0,'abc','','','abc@gmail.com',0,1,'2016-04-10 11:21:13.164579'),(8,'pbkdf2_sha256$20000$MDZMFdo5ZvzY$9k9JPGWoWxzeX1k0fSdWFzsquqjKAnsphfW9JMP4QJc=',NULL,0,'jaydev','jaydev','k','jaydev@gmail.com',0,1,'2016-04-11 04:59:18.320907'),(9,'pbkdf2_sha256$20000$dYlFPgv7szhh$LqVEyiFoSwYOvSyyXfMIPEDECXBBM8IhUwxQhP/i8aA=','2016-04-11 06:21:59.456249',0,'abcdef','abc','def','abcdef@gmail.com',0,1,'2016-04-11 06:20:14.285474'),(10,'pbkdf2_sha256$20000$gPRDFHIFkPBn$tIPWd+vzNrDuYap41GNymzc6TWZJOi7sxSU3g4Spuqw=','2016-04-11 07:28:19.167752',0,'asdf','asdf','123','asdf@gmail.com',0,1,'2016-04-11 07:28:04.071170');
+INSERT INTO `auth_user` VALUES (1,'pbkdf2_sha256$20000$SqQofbBFt1mm$CsDDuv+oh4QcrJvMeadmQ+hiXsj6ofeBePlEgfEPU9s=','2016-04-22 11:13:24.236184',1,'admin','','','admin@gmail.com',1,1,'2016-04-22 06:32:39.913688'),(5,'pbkdf2_sha256$20000$5MobmJBtYQzj$ZXSERJnNNZ2AQbqewdHrPecqC2A2PLVu/SK6/rYp3t0=','2016-04-22 07:26:11.047069',0,'jaydev','jaydev','kalivarapu','jaydev@gmail.com',0,1,'2016-04-22 07:25:49.122709'),(7,'pbkdf2_sha256$20000$PUxTJLrDbayP$AHpHYc6EmoZrPrCoWKYEan9LxHF/lyzr+wtk2xUZC5M=','2016-04-22 11:11:54.410590',0,'blynq','blynq','technologies','blynq@gmail.com',0,1,'2016-04-22 11:11:38.974145'),(8,'pbkdf2_sha256$20000$Mv4AbkbrBl55$iWTc/A7Thc64f3uU5TifJJmVyZyZajadB5r1QsnKrEc=','2016-04-22 11:16:00.632981',0,'nipun','Nipun','Edara','nipun425@gmail.com',0,1,'2016-04-22 11:12:38.176576'),(9,'pbkdf2_sha256$20000$R0ktrto3ZsYb$sS27znxrpJPEmSZZXacdS6fx6Ekp0wA9LpiCWpdmUDE=','2016-04-22 11:15:34.224634',0,'kmpk123','prasanth','kuriseti','kmpk123@gmail.com',0,1,'2016-04-22 11:13:09.428652');
 /*!40000 ALTER TABLE `auth_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -193,21 +193,22 @@ DROP TABLE IF EXISTS `authentication_address`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `authentication_address` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `address_id` int(11) NOT NULL AUTO_INCREMENT,
   `building_name` varchar(100) NOT NULL,
   `address_line1` varchar(100) NOT NULL,
   `address_line2` varchar(100) NOT NULL,
   `area` varchar(100) NOT NULL,
   `landmark` varchar(100) NOT NULL,
   `pincode` int(11) NOT NULL,
+  `added_by_id` int(11) NOT NULL,
   `city_id` int(11) NOT NULL,
-  `added_by_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`address_id`),
   UNIQUE KEY `authentication_address_building_name_307a710555774b15_uniq` (`building_name`,`added_by_id`),
-  KEY `authentication_address_c7141997` (`city_id`),
   KEY `authentication_address_0c5d7d4e` (`added_by_id`),
-  CONSTRAINT `authenticatio_city_id_392ccb660d3eb8f0_fk_authentication_city_id` FOREIGN KEY (`city_id`) REFERENCES `authentication_city` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+  KEY `authentication_address_c7141997` (`city_id`),
+  CONSTRAINT `D25140194e265ed788a324faa846663b` FOREIGN KEY (`added_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`),
+  CONSTRAINT `authenti_city_id_392ccb660d3eb8f0_fk_authentication_city_city_id` FOREIGN KEY (`city_id`) REFERENCES `authentication_city` (`city_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -216,7 +217,6 @@ CREATE TABLE `authentication_address` (
 
 LOCK TABLES `authentication_address` WRITE;
 /*!40000 ALTER TABLE `authentication_address` DISABLE KEYS */;
-INSERT INTO `authentication_address` VALUES (1,'bangalore central mall','near flyover','beside outer ring road','bellandur','Flyover',560103,1,NULL),(2,'abc','def','def','bellandur','ORR',560103,1,NULL),(3,'oceanus freesia enclave','asdf','bellandur main road','bellandur','Ramdev medicals',560103,1,3);
 /*!40000 ALTER TABLE `authentication_address` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -228,11 +228,12 @@ DROP TABLE IF EXISTS `authentication_city`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `authentication_city` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `city_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   `state` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`city_id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -241,7 +242,6 @@ CREATE TABLE `authentication_city` (
 
 LOCK TABLES `authentication_city` WRITE;
 /*!40000 ALTER TABLE `authentication_city` DISABLE KEYS */;
-INSERT INTO `authentication_city` VALUES (1,'Bengaluru','karnataka');
 /*!40000 ALTER TABLE `authentication_city` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -253,15 +253,13 @@ DROP TABLE IF EXISTS `authentication_organization`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `authentication_organization` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `organization_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `website` varchar(100) NOT NULL,
   `contact` varchar(12) DEFAULT NULL,
-  `address_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`),
-  KEY `authenti_address_id_6ad93a85dcf06e8_fk_authentication_address_id` (`address_id`),
-  CONSTRAINT `authenti_address_id_6ad93a85dcf06e8_fk_authentication_address_id` FOREIGN KEY (`address_id`) REFERENCES `authentication_address` (`id`)
+  `address` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`organization_id`),
+  UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -271,7 +269,7 @@ CREATE TABLE `authentication_organization` (
 
 LOCK TABLES `authentication_organization` WRITE;
 /*!40000 ALTER TABLE `authentication_organization` DISABLE KEYS */;
-INSERT INTO `authentication_organization` VALUES (1,'Blynq Pvt Ltd','www.blynq.in','8277121319',NULL),(2,'TestOrganization2','www.google.com','1234567890',1);
+INSERT INTO `authentication_organization` VALUES (1,'Blynq Pvt Ltd','http://www.blynq.in','8277121319','Sastry house, pragathi nagar, hyderabad'),(2,'TestOrganization2','www.google.com','9440806969','sanath nagar, hyderabad');
 /*!40000 ALTER TABLE `authentication_organization` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -283,12 +281,12 @@ DROP TABLE IF EXISTS `authentication_role`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `authentication_role` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `role_id` int(11) NOT NULL AUTO_INCREMENT,
   `role_name` varchar(50) NOT NULL,
   `role_description` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`role_id`),
   UNIQUE KEY `role_name` (`role_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -297,7 +295,7 @@ CREATE TABLE `authentication_role` (
 
 LOCK TABLES `authentication_role` WRITE;
 /*!40000 ALTER TABLE `authentication_role` DISABLE KEYS */;
-INSERT INTO `authentication_role` VALUES (1,'viewer','User who can just view content'),(2,'scheduler','User who can view as well as schedule content on the screens'),(3,'uploader','User who can view, schedule as well as upload new content'),(4,'manager','User who can upload+schedule+ modify user roles for that company');
+INSERT INTO `authentication_role` VALUES (1,'viewer','User who can just view content and schedules.'),(2,'scheduler','User who can view as well as schedule content on the screens'),(3,'manager','User who can schedule+ modify user roles for that company');
 /*!40000 ALTER TABLE `authentication_role` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -314,11 +312,11 @@ CREATE TABLE `authentication_userdetails` (
   `organization_id` int(11) NOT NULL,
   `role_id` int(11) NOT NULL,
   PRIMARY KEY (`user_ptr_id`),
-  KEY `D346c2a9c17d9d15bfde61c10156cf02` (`organization_id`),
-  KEY `authenticatio_role_id_44612207d2201d34_fk_authentication_role_id` (`role_id`),
-  CONSTRAINT `D346c2a9c17d9d15bfde61c10156cf02` FOREIGN KEY (`organization_id`) REFERENCES `authentication_organization` (`id`),
-  CONSTRAINT `authenticatio_role_id_44612207d2201d34_fk_authentication_role_id` FOREIGN KEY (`role_id`) REFERENCES `authentication_role` (`id`),
-  CONSTRAINT `authentication_user_user_ptr_id_70f39c7da29ecb96_fk_auth_user_id` FOREIGN KEY (`user_ptr_id`) REFERENCES `auth_user` (`id`)
+  KEY `f6a950242aa695a19cf9a8637c2378a7` (`organization_id`),
+  KEY `authenti_role_id_44612207d2201d34_fk_authentication_role_role_id` (`role_id`),
+  CONSTRAINT `authenti_role_id_44612207d2201d34_fk_authentication_role_role_id` FOREIGN KEY (`role_id`) REFERENCES `authentication_role` (`role_id`),
+  CONSTRAINT `authentication_user_user_ptr_id_70f39c7da29ecb96_fk_auth_user_id` FOREIGN KEY (`user_ptr_id`) REFERENCES `auth_user` (`id`),
+  CONSTRAINT `f6a950242aa695a19cf9a8637c2378a7` FOREIGN KEY (`organization_id`) REFERENCES `authentication_organization` (`organization_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -328,7 +326,7 @@ CREATE TABLE `authentication_userdetails` (
 
 LOCK TABLES `authentication_userdetails` WRITE;
 /*!40000 ALTER TABLE `authentication_userdetails` DISABLE KEYS */;
-INSERT INTO `authentication_userdetails` VALUES (3,'944080',1,4),(5,'944080',1,4),(6,'944080',2,4),(8,'1234567890',1,3),(9,'1234567890',1,1),(10,'1345678',1,1);
+INSERT INTO `authentication_userdetails` VALUES (5,'1234567890',1,2),(7,'8277121319',1,3),(8,'+91827712131',1,2),(9,'1234567890',2,3);
 /*!40000 ALTER TABLE `authentication_userdetails` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -340,7 +338,7 @@ DROP TABLE IF EXISTS `contentManagement_content`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `contentManagement_content` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `content_id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(100) NOT NULL,
   `description` longtext,
   `document` varchar(100) DEFAULT NULL,
@@ -348,26 +346,25 @@ CREATE TABLE `contentManagement_content` (
   `original_filename` varchar(100) DEFAULT NULL,
   `uploaded_time` datetime(6) NOT NULL,
   `last_modified_time` datetime(6) NOT NULL,
-  `is_public` tinyint(1) NOT NULL,
   `is_folder` tinyint(1) NOT NULL,
-  `file_type_id` int(11) DEFAULT NULL,
-  `last_modified_by_id` int(11) NOT NULL,
-  `uploaded_by_id` int(11) NOT NULL,
   `relative_path` varchar(1025) NOT NULL,
+  `file_type_id` int(11),
+  `last_modified_by_id` int(11) NOT NULL,
   `organization_id` int(11),
   `parent_folder_id` int(11),
-  PRIMARY KEY (`id`),
+  `uploaded_by_id` int(11) NOT NULL,
+  PRIMARY KEY (`content_id`),
   UNIQUE KEY `contentManagement_content_title_10c11f0e7bd2d9e_uniq` (`title`,`parent_folder_id`,`uploaded_by_id`),
   KEY `contentManagement_content_4cc23034` (`file_type_id`),
   KEY `contentManagement_content_7fa85557` (`last_modified_by_id`),
-  KEY `contentManagement_content_4095e96b` (`uploaded_by_id`),
   KEY `contentManagement_content_26b2345e` (`organization_id`),
   KEY `contentManagement_content_ce25f862` (`parent_folder_id`),
+  KEY `contentManagement_content_4095e96b` (`uploaded_by_id`),
+  CONSTRAINT `D030273c9e61c272ad95472f688031ac` FOREIGN KEY (`organization_id`) REFERENCES `authentication_organization` (`organization_id`),
   CONSTRAINT `D4fefcd379e53b14288cdd718a20b7b5` FOREIGN KEY (`last_modified_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`),
-  CONSTRAINT `D60b572979d5731613128d3d383567f8` FOREIGN KEY (`parent_folder_id`) REFERENCES `contentManagement_content` (`id`),
-  CONSTRAINT `D9356767f020d9909e7d3a74b8a4b749` FOREIGN KEY (`organization_id`) REFERENCES `authentication_organization` (`id`),
   CONSTRAINT `a4652993b4665036cee91bc59709d44d` FOREIGN KEY (`uploaded_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`),
-  CONSTRAINT `a8597441706f144025ba4d2230958de4` FOREIGN KEY (`file_type_id`) REFERENCES `contentManagement_contenttype` (`id`)
+  CONSTRAINT `c28200b62fd5064ce5f884826faee3c7` FOREIGN KEY (`parent_folder_id`) REFERENCES `contentManagement_content` (`content_id`),
+  CONSTRAINT `c2eecc547f70ea071d71762c8e998420` FOREIGN KEY (`file_type_id`) REFERENCES `contentManagement_contenttype` (`content_type_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -377,7 +374,6 @@ CREATE TABLE `contentManagement_content` (
 
 LOCK TABLES `contentManagement_content` WRITE;
 /*!40000 ALTER TABLE `contentManagement_content` DISABLE KEYS */;
-INSERT INTO `contentManagement_content` VALUES (1,'think_and_grow','think and grow rich book','usercontent/3/Napoleon Hill - Think And Grow Rich_uu1HUhX.mobi','',NULL,'2016-04-17 18:30:31.897031','2016-04-20 18:18:05.514301',1,0,NULL,3,3,'/',1,NULL);
 /*!40000 ALTER TABLE `contentManagement_content` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -389,10 +385,10 @@ DROP TABLE IF EXISTS `contentManagement_contenttype`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `contentManagement_contenttype` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `content_type_id` int(11) NOT NULL AUTO_INCREMENT,
   `type` varchar(3) NOT NULL,
   `fileExtension` varchar(5) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`content_type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -403,39 +399,6 @@ CREATE TABLE `contentManagement_contenttype` (
 LOCK TABLES `contentManagement_contenttype` WRITE;
 /*!40000 ALTER TABLE `contentManagement_contenttype` DISABLE KEYS */;
 /*!40000 ALTER TABLE `contentManagement_contenttype` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `contentManagement_folder`
---
-
-DROP TABLE IF EXISTS `contentManagement_folder`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `contentManagement_folder` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `uploaded_at` datetime(6) NOT NULL,
-  `created_at` datetime(6) NOT NULL,
-  `modified_at` datetime(6) NOT NULL,
-  `dummy_content_folder` tinyint(1) NOT NULL,
-  `owner_id` int(11) DEFAULT NULL,
-  `parent_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `conten_parent_id_27da606267c6f79f_fk_contentManagement_folder_id` (`parent_id`),
-  KEY `D81490e4ba595b4c795e8cff1f4d11eb` (`owner_id`),
-  CONSTRAINT `D81490e4ba595b4c795e8cff1f4d11eb` FOREIGN KEY (`owner_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`),
-  CONSTRAINT `conten_parent_id_27da606267c6f79f_fk_contentManagement_folder_id` FOREIGN KEY (`parent_id`) REFERENCES `contentManagement_folder` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `contentManagement_folder`
---
-
-LOCK TABLES `contentManagement_folder` WRITE;
-/*!40000 ALTER TABLE `contentManagement_folder` DISABLE KEYS */;
-/*!40000 ALTER TABLE `contentManagement_folder` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -459,7 +422,7 @@ CREATE TABLE `django_admin_log` (
   KEY `django_admin_log_user_id_52fdd58701c5f563_fk_auth_user_id` (`user_id`),
   CONSTRAINT `djang_content_type_id_697914295151027a_fk_django_content_type_id` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`),
   CONSTRAINT `django_admin_log_user_id_52fdd58701c5f563_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -468,7 +431,7 @@ CREATE TABLE `django_admin_log` (
 
 LOCK TABLES `django_admin_log` WRITE;
 /*!40000 ALTER TABLE `django_admin_log` DISABLE KEYS */;
-INSERT INTO `django_admin_log` VALUES (1,'2016-04-10 04:54:44.624773','1','viewer',1,'',10,1),(2,'2016-04-10 04:54:52.374826','2','scheduler',1,'',10,1),(3,'2016-04-10 04:54:59.029471','3','uploader',1,'',10,1),(4,'2016-04-10 04:55:06.892614','4','manager',1,'',10,1),(5,'2016-04-10 04:55:37.059045','1','Blynq Pvt Ltd',1,'',9,1),(6,'2016-04-11 09:23:26.798518','1','ScreenSpecs object',1,'',15,1),(7,'2016-04-11 09:51:40.085932','1','City object',1,'',7,1),(8,'2016-04-11 09:52:19.645464','1','Address object',1,'',8,1),(10,'2016-04-11 10:03:37.504580','1','active',1,'',12,1),(11,'2016-04-11 10:05:06.279278','2','abc, bellandur, Bengaluru',1,'',8,1),(13,'2016-04-11 10:05:52.158022','2','active',1,'',12,1),(14,'2016-04-11 10:09:04.243012','1','screen 1',1,'',17,1),(15,'2016-04-11 10:11:31.290590','2','screen 2',1,'',17,1),(16,'2016-04-11 10:12:44.433362','2','screen 2',2,'Changed status.',17,1),(17,'2016-04-11 10:13:07.813934','1','active',3,'',12,1),(18,'2016-04-11 10:13:50.074993','1','screen 1',2,'Changed business_type.',17,1),(20,'2016-04-12 11:52:21.246651','3','Unactivated',1,'',12,1),(21,'2016-04-12 11:52:40.362468','4','Online',1,'',12,1),(22,'2016-04-12 11:53:06.409097','5','Offline',1,'',12,1),(23,'2016-04-12 11:53:35.598468','6','Idle',1,'',12,1),(24,'2016-04-12 11:54:51.052972','1','screen 1',2,'Changed business_type and status.',17,1),(25,'2016-04-12 11:55:04.538215','2','screen 2',2,'Changed business_type and status.',17,1),(26,'2016-04-12 11:55:26.273660','2','active',3,'',12,1),(27,'2016-04-19 08:22:24.190292','2','TestOrganization2',1,'',9,1),(28,'2016-04-19 08:22:30.281668','6','kmpk123',2,'Changed organization.',11,1),(29,'2016-04-19 08:22:39.644052','6','kmpk123',2,'No fields changed.',11,1),(30,'2016-04-19 08:23:05.256168','3','Hyderabad_inorbit',1,'',14,1),(31,'2016-04-19 08:23:26.546219','4','hyderabad_forum',1,'',14,1),(32,'2016-04-19 08:25:55.366085','8','dominos test',2,'Changed screen_name, activation_key, placed_by and groups.',17,1),(33,'2016-04-19 08:26:17.002314','7','dominos forum',2,'Changed screen_name, activation_key, placed_by and groups.',17,1),(34,'2016-04-19 09:36:32.387912','6','shopping 9th floor',2,'Changed activation_key and owned_by.',17,1),(35,'2016-04-19 09:37:03.102815','5','nipun',2,'Changed activation_key and owned_by.',17,1),(36,'2016-04-19 09:40:29.632002','6','shopping 9th floor',2,'Changed groups.',17,1),(37,'2016-04-19 10:08:53.436661','1','shopping malls',2,'Changed group_id.',14,1),(38,'2016-04-19 10:09:00.590340','2','9th floor',2,'Changed group_id.',14,1),(39,'2016-04-19 10:09:06.781908','3','Hyderabad_inorbit',2,'Changed group_id.',14,1),(40,'2016-04-19 10:09:13.520668','4','hyderabad_forum',2,'Changed group_id.',14,1),(41,'2016-04-19 10:11:53.052584','1','screen 1',2,'Changed screen_id and owned_by.',17,1),(42,'2016-04-19 10:12:07.099593','2','screen 2',2,'Changed screen_id and owned_by.',17,1),(43,'2016-04-19 10:12:25.047356','3','screen abc',2,'Changed screen_id, activation_key and owned_by.',17,1),(44,'2016-04-19 10:12:49.673683','4','Screen 22',2,'Changed screen_id, activation_key and owned_by.',17,1),(45,'2016-04-19 10:12:59.606667','5','nipun',2,'Changed screen_id.',17,1),(46,'2016-04-19 10:13:19.327233','6','shopping 9th floor',2,'Changed screen_id.',17,1),(47,'2016-04-19 10:13:40.246729','7','dominos forum',2,'Changed screen_id and owned_by.',17,1),(48,'2016-04-19 10:13:52.455156','8','dominos test',2,'Changed screen_id and owned_by.',17,1),(49,'2016-04-19 10:36:25.615754','6','shopping 9th floor',2,'Changed owned_by.',17,1),(50,'2016-04-19 10:36:37.808651','6','shopping 9th floor',2,'Changed owned_by.',17,1),(51,'2016-04-19 10:36:50.825759','8','dominos test',2,'Changed owned_by.',17,1),(52,'2016-04-19 10:36:57.800667','8','dominos test',2,'No fields changed.',17,1),(53,'2016-04-19 10:50:49.630010','7','dominos forum',2,'Changed owned_by.',17,3),(54,'2016-04-19 10:55:50.948838','7','dominos forum',2,'Changed resolution.',17,3),(55,'2016-04-19 10:56:29.010359','6','shopping 9th floor',2,'Changed resolution.',17,3),(56,'2016-04-19 10:56:40.406495','4','Screen 22',2,'Changed resolution.',17,3),(57,'2016-04-19 10:56:47.710465','6','shopping 9th floor',2,'No fields changed.',17,3),(58,'2016-04-19 10:56:54.913646','4','Screen 22',2,'Changed screen_size.',17,3),(59,'2016-04-20 14:12:48.897949','4','Screen 22',2,'Changed groups.',17,3);
+INSERT INTO `django_admin_log` VALUES (1,'2016-04-22 06:35:31.975476','1','Blynq Pvt Ltd',1,'',9,1),(2,'2016-04-22 06:36:11.974841','2','TestOrganization2',1,'',9,1),(3,'2016-04-22 06:38:52.231767','1','viewer',1,'',10,1),(4,'2016-04-22 06:40:11.592123','2','scheduler',1,'',10,1),(5,'2016-04-22 06:40:28.895113','3','manager',1,'',10,1),(6,'2016-04-22 06:41:33.028602','2','blynq',1,'',11,1),(7,'2016-04-22 06:42:18.224503','3','nipun',1,'',11,1),(8,'2016-04-22 06:44:44.936902','4','kmpk123',1,'',11,1),(9,'2016-04-22 06:45:48.884127','1','bangalore 1',1,'',13,1),(10,'2016-04-22 06:46:07.432807','2','bangalore 2',1,'',13,1),(11,'2016-04-22 06:46:49.857408','3','hyderabad 1',1,'',13,1),(12,'2016-04-22 06:47:12.344962','4','hyderabad 2',1,'',13,1),(13,'2016-04-22 06:48:20.261650','1','Unactivated',1,'',12,1),(14,'2016-04-22 06:49:05.785756','2','Online',1,'',12,1),(15,'2016-04-22 06:49:27.786467','3','Offline',1,'',12,1),(16,'2016-04-22 06:50:10.900914','4','Idle',1,'',12,1),(17,'2016-04-22 06:52:30.969449','1','bellandur 1',1,'',15,1),(18,'2016-04-22 06:53:44.641054','2','screen 2',1,'',15,1),(19,'2016-04-22 06:55:29.817983','3','hyd orbit 1',1,'',15,1),(20,'2016-04-22 06:56:23.957961','4','hyd orbit 2',1,'',15,1),(21,'2016-04-22 07:45:55.555679','1','bangalore 1',2,'Changed created_by.',13,1),(22,'2016-04-22 07:46:02.105668','2','bangalore 2',2,'Changed created_by.',13,1),(23,'2016-04-22 07:46:08.198043','3','hyderabad 1',2,'Changed created_by.',13,1),(24,'2016-04-22 07:46:14.458728','4','hyderabad 2',2,'Changed created_by.',13,1),(25,'2016-04-22 07:46:40.090793','4','hyd orbit 2',2,'Changed activated_by.',15,1),(26,'2016-04-22 07:46:47.868025','3','hyd orbit 1',2,'Changed activated_by.',15,1),(27,'2016-04-22 07:46:55.836043','2','screen 2',2,'Changed activated_by.',15,1),(28,'2016-04-22 07:47:02.991106','1','bellandur 1',2,'Changed activated_by.',15,1),(29,'2016-04-22 07:50:32.715096','6','sastry',1,'',4,1),(30,'2016-04-22 11:10:18.408622','2','blynq',3,'',4,1),(31,'2016-04-22 11:10:18.416316','4','kmpk123',3,'',4,1),(32,'2016-04-22 11:10:18.420189','3','nipun',3,'',4,1),(33,'2016-04-22 11:10:18.428245','6','sastry',3,'',4,1),(34,'2016-04-22 11:14:09.474238','1','bangalore 1',2,'Changed created_by.',13,1),(35,'2016-04-22 11:14:16.915189','1','bangalore 1',2,'Changed created_by.',13,1),(36,'2016-04-22 11:14:23.466001','2','bangalore 2',2,'Changed created_by.',13,1),(37,'2016-04-22 11:14:28.964783','3','hyderabad 1',2,'Changed created_by.',13,1),(38,'2016-04-22 11:14:34.116173','4','hyderabad 2',2,'Changed created_by.',13,1),(39,'2016-04-22 11:14:46.390893','2','screen 2',2,'Changed activated_by.',15,1),(40,'2016-04-22 11:14:52.282249','1','bellandur 1',2,'Changed activated_by.',15,1),(41,'2016-04-22 11:14:58.780257','4','hyd orbit 2',2,'Changed activated_by.',15,1),(42,'2016-04-22 11:15:12.617404','3','hyd orbit 1',2,'Changed activated_by.',15,1);
 /*!40000 ALTER TABLE `django_admin_log` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -485,7 +448,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_45f3b1d93ec8c61c_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -494,7 +457,7 @@ CREATE TABLE `django_content_type` (
 
 LOCK TABLES `django_content_type` WRITE;
 /*!40000 ALTER TABLE `django_content_type` DISABLE KEYS */;
-INSERT INTO `django_content_type` VALUES (1,'admin','logentry'),(3,'auth','group'),(2,'auth','permission'),(4,'auth','user'),(8,'authentication','address'),(7,'authentication','city'),(9,'authentication','organization'),(10,'authentication','role'),(11,'authentication','userdetails'),(20,'contentManagement','content'),(18,'contentManagement','contenttype'),(5,'contenttypes','contenttype'),(25,'easy_thumbnails','source'),(26,'easy_thumbnails','thumbnail'),(27,'easy_thumbnails','thumbnaildimensions'),(31,'filer','clipboard'),(32,'filer','clipboarditem'),(30,'filer','file'),(28,'filer','folder'),(29,'filer','folderpermission'),(33,'filer','image'),(22,'playlistManagement','playlist'),(21,'playlistManagement','playlistitems'),(24,'scheduleManagement','event'),(23,'scheduleManagement','schedule'),(34,'scheduleManagement','screenschedule'),(14,'screenManagement','group'),(17,'screenManagement','screen'),(15,'screenManagement','screenspecs'),(12,'screenManagement','screenstatus'),(6,'sessions','session');
+INSERT INTO `django_content_type` VALUES (1,'admin','logentry'),(3,'auth','group'),(2,'auth','permission'),(4,'auth','user'),(8,'authentication','address'),(7,'authentication','city'),(9,'authentication','organization'),(10,'authentication','role'),(11,'authentication','userdetails'),(17,'contentManagement','content'),(16,'contentManagement','contenttype'),(5,'contenttypes','contenttype'),(19,'playlistManagement','playlist'),(18,'playlistManagement','playlistitems'),(22,'scheduleManagement','event'),(21,'scheduleManagement','schedule'),(20,'scheduleManagement','screenschedule'),(13,'screenManagement','group'),(15,'screenManagement','screen'),(14,'screenManagement','screenspecs'),(12,'screenManagement','screenstatus'),(6,'sessions','session');
 /*!40000 ALTER TABLE `django_content_type` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -511,7 +474,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -520,7 +483,7 @@ CREATE TABLE `django_migrations` (
 
 LOCK TABLES `django_migrations` WRITE;
 /*!40000 ALTER TABLE `django_migrations` DISABLE KEYS */;
-INSERT INTO `django_migrations` VALUES (1,'contenttypes','0001_initial','2016-04-10 04:51:37.188744'),(2,'auth','0001_initial','2016-04-10 04:51:37.758972'),(3,'admin','0001_initial','2016-04-10 04:51:37.915210'),(4,'contenttypes','0002_remove_content_type_name','2016-04-10 04:51:38.031647'),(5,'auth','0002_alter_permission_name_max_length','2016-04-10 04:51:38.092351'),(6,'auth','0003_alter_user_email_max_length','2016-04-10 04:51:38.176661'),(7,'auth','0004_alter_user_username_opts','2016-04-10 04:51:38.193122'),(8,'auth','0005_alter_user_last_login_null','2016-04-10 04:51:38.254328'),(9,'auth','0006_require_contenttypes_0002','2016-04-10 04:51:38.260170'),(10,'sessions','0001_initial','2016-04-10 04:51:38.315816'),(11,'authentication','0001_initial','2016-04-10 04:54:05.126916'),(12,'contentManagement','0001_initial','2016-04-10 04:54:06.003701'),(13,'playlistManagement','0001_initial','2016-04-10 04:54:06.387775'),(14,'screenManagement','0001_initial','2016-04-10 04:54:07.704416'),(15,'scheduleManagement','0001_initial','2016-04-10 04:54:08.267686'),(16,'authentication','0002_auto_20160411_0427','2016-04-11 04:27:32.707883'),(17,'authentication','0003_auto_20160412_0344','2016-04-12 03:45:08.144452'),(18,'screenManagement','0002_auto_20160412_0344','2016-04-12 03:45:09.715110'),(19,'screenManagement','0003_auto_20160412_0409','2016-04-12 04:09:41.245378'),(20,'screenManagement','0004_auto_20160412_0850','2016-04-12 08:50:08.302403'),(21,'screenManagement','0005_auto_20160412_1055','2016-04-12 10:56:05.655861'),(22,'authentication','0004_auto_20160412_1349','2016-04-12 13:49:19.857183'),(23,'screenManagement','0002_screen_activated_by','2016-04-13 10:07:00.535854'),(24,'screenManagement','0003_auto_20160413_1116','2016-04-13 11:16:46.926098'),(25,'screenManagement','0004_auto_20160414_0953','2016-04-14 09:54:02.682464'),(26,'screenManagement','0005_auto_20160414_1331','2016-04-14 13:31:27.748029'),(27,'easy_thumbnails','0001_initial','2016-04-15 03:48:57.018678'),(28,'easy_thumbnails','0002_thumbnaildimensions','2016-04-15 03:48:57.122555'),(29,'filer','0001_initial','2016-04-15 03:48:58.837148'),(30,'filer','0002_auto_20150606_2003','2016-04-15 03:48:58.965404'),(31,'authentication','0002_auto_20160415_0935','2016-04-15 09:40:34.041531'),(32,'contentManagement','0002_auto_20160415_0935','2016-04-15 09:40:34.180698'),(33,'contentManagement','0003_auto_20160415_1130','2016-04-15 11:30:30.794995'),(34,'contentManagement','0002_content_is_folder','2016-04-15 18:06:13.108479'),(35,'contentManagement','0003_auto_20160415_1813','2016-04-15 18:13:04.415756'),(36,'contentManagement','0002_auto_20160415_1833','2016-04-15 18:33:42.223813'),(37,'contentManagement','0002_auto_20160417_1830','2016-04-17 18:30:22.434022'),(38,'screenManagement','0002_auto_20160419_0519','2016-04-19 06:56:02.820413'),(39,'screenManagement','0003_auto_20160419_0526','2016-04-19 06:56:03.141011'),(40,'screenManagement','0004_auto_20160419_0530','2016-04-19 06:56:03.196551'),(41,'screenManagement','0005_remove_group_organization','2016-04-19 06:56:03.347362'),(42,'screenManagement','0006_remove_group_dummy_screen_group','2016-04-19 06:56:03.467807'),(43,'screenManagement','0002_auto_20160419_0932','2016-04-19 09:32:39.625026'),(44,'screenManagement','0002_group_group_id','2016-04-19 10:08:17.385019'),(45,'screenManagement','0002_screen_screen_id','2016-04-19 10:11:29.236381'),(46,'scheduleManagement','0002_remove_screenschedule_group','2016-04-19 10:15:47.176243'),(47,'contentManagement','0002_content_organization','2016-04-20 10:43:01.328571'),(48,'contentManagement','0003_auto_20160420_1807','2016-04-20 18:08:32.102995'),(49,'contentManagement','0004_auto_20160420_1808','2016-04-20 18:08:32.253538'),(50,'playlistManagement','0002_playlist_organization','2016-04-20 18:08:32.468572'),(51,'contentManagement','0005_auto_20160420_1841','2016-04-20 18:41:40.452034'),(52,'contentManagement','0006_auto_20160420_1856','2016-04-20 18:56:38.844610'),(53,'screenManagement','0002_auto_20160421_1020','2016-04-21 10:20:09.896057'),(54,'screenManagement','0003_auto_20160421_1043','2016-04-21 10:43:58.153504'),(55,'screenManagement','0004_auto_20160421_1046','2016-04-21 10:47:03.413193'),(56,'screenManagement','0005_remove_screen_specifications','2016-04-21 10:49:42.707788');
+INSERT INTO `django_migrations` VALUES (1,'contenttypes','0001_initial','2016-04-22 06:14:27.142432'),(2,'auth','0001_initial','2016-04-22 06:14:27.672152'),(3,'admin','0001_initial','2016-04-22 06:14:27.799562'),(4,'contenttypes','0002_remove_content_type_name','2016-04-22 06:14:27.953275'),(5,'auth','0002_alter_permission_name_max_length','2016-04-22 06:14:28.012227'),(6,'auth','0003_alter_user_email_max_length','2016-04-22 06:14:28.064646'),(7,'auth','0004_alter_user_username_opts','2016-04-22 06:14:28.082069'),(8,'auth','0005_alter_user_last_login_null','2016-04-22 06:14:28.146214'),(9,'auth','0006_require_contenttypes_0002','2016-04-22 06:14:28.152336'),(10,'authentication','0001_initial','2016-04-22 06:14:28.896733'),(11,'contentManagement','0001_initial','2016-04-22 06:14:29.782199'),(12,'playlistManagement','0001_initial','2016-04-22 06:14:30.174308'),(13,'screenManagement','0001_initial','2016-04-22 06:14:30.803252'),(14,'scheduleManagement','0001_initial','2016-04-22 06:14:31.419035'),(15,'sessions','0001_initial','2016-04-22 06:14:31.478635'),(16,'authentication','0002_auto_20160422_0634','2016-04-22 06:34:45.369440');
 /*!40000 ALTER TABLE `django_migrations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -546,297 +509,8 @@ CREATE TABLE `django_session` (
 
 LOCK TABLES `django_session` WRITE;
 /*!40000 ALTER TABLE `django_session` DISABLE KEYS */;
-INSERT INTO `django_session` VALUES ('7syc8d78ui303xkzhljr1lbphihlewz5','MzJjN2Y0ZWFiOTAwMmM1MjQ2YzVhMjkyYTljMDIzYWJiNDdmMjk3Nzp7Il9hdXRoX3VzZXJfaGFzaCI6IjIxNTdmNTJmNTM1ZmJiZDIyNzM3YjEzNzE3MmIxM2Y3NjVlOWRmYzEiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIzIn0=','2016-05-04 18:16:03.327779'),('8b0j2wtkiu87i6k8406qjp88lpmliqiz','YmNiZDAwZTBlYmIyY2U0YmE5YzY0ODY3OGIyNTljZTBjYzg2MGJiNDp7Il9hdXRoX3VzZXJfaGFzaCI6IjZmOTA3MDZmZTA1N2ExYTVkYzViMTBhMWFhYTA5N2Q3Zjg1MGFmMzciLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=','2016-05-02 04:38:46.379878'),('9x7h3jl9i6emfh8ll1p54ke4j1ahzbtn','ZTZjNmI0NThlNjdhNDcyNGZlNzA4NTIxM2ZlMTNiZTc0MmVhMjQ0Mjp7Il9hdXRoX3VzZXJfaGFzaCI6IjZmOTA3MDZmZTA1N2ExYTVkYzViMTBhMWFhYTA5N2Q3Zjg1MGFmMzciLCJmaWxlcl9sYXN0X2ZvbGRlcl9pZCI6bnVsbCwiX2F1dGhfdXNlcl9pZCI6IjEiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCJ9','2016-04-29 11:56:34.407007');
+INSERT INTO `django_session` VALUES ('nh8cxoipe9tt7i9hnbxh8i998pf0azdp','NGUyMDdiZWQ2ZDRjZjEyZTc5MGMyYTExN2E5ZTc0ZjJlZDg2NmQ2Nzp7Il9hdXRoX3VzZXJfaGFzaCI6IjE2ZGYzMzU5Mjk1ZGQ3Y2JlOTU5MmEwYmRmNzg1NDE3ZDQwYzcwYzgiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiI4In0=','2016-05-06 11:16:00.638027');
 /*!40000 ALTER TABLE `django_session` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `easy_thumbnails_source`
---
-
-DROP TABLE IF EXISTS `easy_thumbnails_source`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `easy_thumbnails_source` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `storage_hash` varchar(40) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `modified` datetime(6) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `easy_thumbnails_source_storage_hash_40116450c1e4f2ed_uniq` (`storage_hash`,`name`),
-  KEY `easy_thumbnails_source_b454e115` (`storage_hash`),
-  KEY `easy_thumbnails_source_b068931c` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `easy_thumbnails_source`
---
-
-LOCK TABLES `easy_thumbnails_source` WRITE;
-/*!40000 ALTER TABLE `easy_thumbnails_source` DISABLE KEYS */;
-/*!40000 ALTER TABLE `easy_thumbnails_source` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `easy_thumbnails_thumbnail`
---
-
-DROP TABLE IF EXISTS `easy_thumbnails_thumbnail`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `easy_thumbnails_thumbnail` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `storage_hash` varchar(40) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `modified` datetime(6) NOT NULL,
-  `source_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `easy_thumbnails_thumbnail_storage_hash_66cc758d07ef9fce_uniq` (`storage_hash`,`name`,`source_id`),
-  KEY `easy_thu_source_id_50b260de7106e1b7_fk_easy_thumbnails_source_id` (`source_id`),
-  KEY `easy_thumbnails_thumbnail_b454e115` (`storage_hash`),
-  KEY `easy_thumbnails_thumbnail_b068931c` (`name`),
-  CONSTRAINT `easy_thu_source_id_50b260de7106e1b7_fk_easy_thumbnails_source_id` FOREIGN KEY (`source_id`) REFERENCES `easy_thumbnails_source` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `easy_thumbnails_thumbnail`
---
-
-LOCK TABLES `easy_thumbnails_thumbnail` WRITE;
-/*!40000 ALTER TABLE `easy_thumbnails_thumbnail` DISABLE KEYS */;
-/*!40000 ALTER TABLE `easy_thumbnails_thumbnail` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `easy_thumbnails_thumbnaildimensions`
---
-
-DROP TABLE IF EXISTS `easy_thumbnails_thumbnaildimensions`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `easy_thumbnails_thumbnaildimensions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `thumbnail_id` int(11) NOT NULL,
-  `width` int(10) unsigned DEFAULT NULL,
-  `height` int(10) unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `thumbnail_id` (`thumbnail_id`),
-  CONSTRAINT `ea_thumbnail_id_29ad34faceb3c17c_fk_easy_thumbnails_thumbnail_id` FOREIGN KEY (`thumbnail_id`) REFERENCES `easy_thumbnails_thumbnail` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `easy_thumbnails_thumbnaildimensions`
---
-
-LOCK TABLES `easy_thumbnails_thumbnaildimensions` WRITE;
-/*!40000 ALTER TABLE `easy_thumbnails_thumbnaildimensions` DISABLE KEYS */;
-/*!40000 ALTER TABLE `easy_thumbnails_thumbnaildimensions` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `filer_clipboard`
---
-
-DROP TABLE IF EXISTS `filer_clipboard`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `filer_clipboard` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `filer_clipboard_e8701ad4` (`user_id`),
-  CONSTRAINT `filer_clipboard_user_id_2b30c76f2cd235df_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `filer_clipboard`
---
-
-LOCK TABLES `filer_clipboard` WRITE;
-/*!40000 ALTER TABLE `filer_clipboard` DISABLE KEYS */;
-INSERT INTO `filer_clipboard` VALUES (1,1);
-/*!40000 ALTER TABLE `filer_clipboard` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `filer_clipboarditem`
---
-
-DROP TABLE IF EXISTS `filer_clipboarditem`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `filer_clipboarditem` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `clipboard_id` int(11) NOT NULL,
-  `file_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `filer_clipbo_clipboard_id_335d159e1aea2cdc_fk_filer_clipboard_id` (`clipboard_id`),
-  KEY `filer_clipboarditem_814552b9` (`file_id`),
-  CONSTRAINT `filer_clipbo_clipboard_id_335d159e1aea2cdc_fk_filer_clipboard_id` FOREIGN KEY (`clipboard_id`) REFERENCES `filer_clipboard` (`id`),
-  CONSTRAINT `filer_clipboarditem_file_id_7b1b6a14b5a3f2b1_fk_filer_file_id` FOREIGN KEY (`file_id`) REFERENCES `filer_file` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `filer_clipboarditem`
---
-
-LOCK TABLES `filer_clipboarditem` WRITE;
-/*!40000 ALTER TABLE `filer_clipboarditem` DISABLE KEYS */;
-/*!40000 ALTER TABLE `filer_clipboarditem` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `filer_file`
---
-
-DROP TABLE IF EXISTS `filer_file`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `filer_file` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `file` varchar(255) DEFAULT NULL,
-  `_file_size` int(11) DEFAULT NULL,
-  `sha1` varchar(40) NOT NULL,
-  `has_all_mandatory_data` tinyint(1) NOT NULL,
-  `original_filename` varchar(255) DEFAULT NULL,
-  `name` varchar(255) NOT NULL,
-  `description` longtext,
-  `uploaded_at` datetime(6) NOT NULL,
-  `modified_at` datetime(6) NOT NULL,
-  `is_public` tinyint(1) NOT NULL,
-  `folder_id` int(11) DEFAULT NULL,
-  `owner_id` int(11) DEFAULT NULL,
-  `polymorphic_ctype_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `filer_file_a8a44dbb` (`folder_id`),
-  KEY `filer_file_5e7b1936` (`owner_id`),
-  KEY `filer_file_d3e32c49` (`polymorphic_ctype_id`),
-  CONSTRAINT `filer_file_folder_id_24318dda71f59785_fk_filer_folder_id` FOREIGN KEY (`folder_id`) REFERENCES `filer_folder` (`id`),
-  CONSTRAINT `filer_file_owner_id_67317c663ea33283_fk_auth_user_id` FOREIGN KEY (`owner_id`) REFERENCES `auth_user` (`id`),
-  CONSTRAINT `polymorphic_ctype_id_37b6c9e9cb7a323a_fk_django_content_type_id` FOREIGN KEY (`polymorphic_ctype_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `filer_file`
---
-
-LOCK TABLES `filer_file` WRITE;
-/*!40000 ALTER TABLE `filer_file` DISABLE KEYS */;
-/*!40000 ALTER TABLE `filer_file` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `filer_folder`
---
-
-DROP TABLE IF EXISTS `filer_folder`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `filer_folder` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `uploaded_at` datetime(6) NOT NULL,
-  `created_at` datetime(6) NOT NULL,
-  `modified_at` datetime(6) NOT NULL,
-  `lft` int(10) unsigned NOT NULL,
-  `rght` int(10) unsigned NOT NULL,
-  `tree_id` int(10) unsigned NOT NULL,
-  `level` int(10) unsigned NOT NULL,
-  `owner_id` int(11) DEFAULT NULL,
-  `parent_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `filer_folder_parent_id_30ad83e34d901e49_uniq` (`parent_id`,`name`),
-  KEY `filer_folder_owner_id_6527f5f13a76f3ed_fk_auth_user_id` (`owner_id`),
-  KEY `filer_folder_caf7cc51` (`lft`),
-  KEY `filer_folder_3cfbd988` (`rght`),
-  KEY `filer_folder_656442a0` (`tree_id`),
-  KEY `filer_folder_c9e9a848` (`level`),
-  CONSTRAINT `filer_folder_owner_id_6527f5f13a76f3ed_fk_auth_user_id` FOREIGN KEY (`owner_id`) REFERENCES `auth_user` (`id`),
-  CONSTRAINT `filer_folder_parent_id_4170098ac31c2cbf_fk_filer_folder_id` FOREIGN KEY (`parent_id`) REFERENCES `filer_folder` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `filer_folder`
---
-
-LOCK TABLES `filer_folder` WRITE;
-/*!40000 ALTER TABLE `filer_folder` DISABLE KEYS */;
-/*!40000 ALTER TABLE `filer_folder` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `filer_folderpermission`
---
-
-DROP TABLE IF EXISTS `filer_folderpermission`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `filer_folderpermission` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `type` smallint(6) NOT NULL,
-  `everybody` tinyint(1) NOT NULL,
-  `can_edit` smallint(6) DEFAULT NULL,
-  `can_read` smallint(6) DEFAULT NULL,
-  `can_add_children` smallint(6) DEFAULT NULL,
-  `folder_id` int(11) DEFAULT NULL,
-  `group_id` int(11) DEFAULT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `filer_folderpermis_folder_id_442a5347ee209a98_fk_filer_folder_id` (`folder_id`),
-  KEY `filer_folderpermissio_group_id_7c2389ac07ebbde2_fk_auth_group_id` (`group_id`),
-  KEY `filer_folderpermission_user_id_7c6e1a7187a0f15b_fk_auth_user_id` (`user_id`),
-  CONSTRAINT `filer_folderpermis_folder_id_442a5347ee209a98_fk_filer_folder_id` FOREIGN KEY (`folder_id`) REFERENCES `filer_folder` (`id`),
-  CONSTRAINT `filer_folderpermissio_group_id_7c2389ac07ebbde2_fk_auth_group_id` FOREIGN KEY (`group_id`) REFERENCES `auth_group` (`id`),
-  CONSTRAINT `filer_folderpermission_user_id_7c6e1a7187a0f15b_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `filer_folderpermission`
---
-
-LOCK TABLES `filer_folderpermission` WRITE;
-/*!40000 ALTER TABLE `filer_folderpermission` DISABLE KEYS */;
-/*!40000 ALTER TABLE `filer_folderpermission` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `filer_image`
---
-
-DROP TABLE IF EXISTS `filer_image`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `filer_image` (
-  `file_ptr_id` int(11) NOT NULL,
-  `_height` int(11) DEFAULT NULL,
-  `_width` int(11) DEFAULT NULL,
-  `date_taken` datetime(6) DEFAULT NULL,
-  `default_alt_text` varchar(255) DEFAULT NULL,
-  `default_caption` varchar(255) DEFAULT NULL,
-  `author` varchar(255) DEFAULT NULL,
-  `must_always_publish_author_credit` tinyint(1) NOT NULL,
-  `must_always_publish_copyright` tinyint(1) NOT NULL,
-  `subject_location` varchar(64) DEFAULT NULL,
-  PRIMARY KEY (`file_ptr_id`),
-  CONSTRAINT `filer_image_file_ptr_id_1dde9ad32bce39a6_fk_filer_file_id` FOREIGN KEY (`file_ptr_id`) REFERENCES `filer_file` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `filer_image`
---
-
-LOCK TABLES `filer_image` WRITE;
-/*!40000 ALTER TABLE `filer_image` DISABLE KEYS */;
-/*!40000 ALTER TABLE `filer_image` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -847,19 +521,19 @@ DROP TABLE IF EXISTS `playlistManagement_playlist`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `playlistManagement_playlist` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `playlist_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `created_time` datetime(6) NOT NULL,
   `last_updated_time` datetime(6) NOT NULL,
   `created_by_id` int(11) NOT NULL,
   `last_updated_by_id` int(11) NOT NULL,
-  `organization_id` int(11),
-  PRIMARY KEY (`id`),
+  `organization_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`playlist_id`),
   KEY `D50229839cd0cf7d84abc44588a9db0d` (`created_by_id`),
   KEY `c98e25b8402d78f8544a252ae221ba89` (`last_updated_by_id`),
-  KEY `playlistManagement_playlist_26b2345e` (`organization_id`),
-  CONSTRAINT `D3c5f6ad9960553023f1f759870f6c26` FOREIGN KEY (`organization_id`) REFERENCES `authentication_organization` (`id`),
+  KEY `D9f916f791b6ae8d4fd6a9f347b63d4b` (`organization_id`),
   CONSTRAINT `D50229839cd0cf7d84abc44588a9db0d` FOREIGN KEY (`created_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`),
+  CONSTRAINT `D9f916f791b6ae8d4fd6a9f347b63d4b` FOREIGN KEY (`organization_id`) REFERENCES `authentication_organization` (`organization_id`),
   CONSTRAINT `c98e25b8402d78f8544a252ae221ba89` FOREIGN KEY (`last_updated_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -881,16 +555,16 @@ DROP TABLE IF EXISTS `playlistManagement_playlistitems`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `playlistManagement_playlistitems` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `playlist_items_id` int(11) NOT NULL AUTO_INCREMENT,
   `index` int(11) NOT NULL,
   `display_time` int(11) NOT NULL,
-  `folder_id` int(11) NOT NULL,
+  `content_id` int(11) NOT NULL,
   `playlist_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `playli_folder_id_369bb9a40f627f48_fk_contentManagement_folder_id` (`folder_id`),
-  KEY `p_playlist_id_21a128d242be2db4_fk_playlistManagement_playlist_id` (`playlist_id`),
-  CONSTRAINT `p_playlist_id_21a128d242be2db4_fk_playlistManagement_playlist_id` FOREIGN KEY (`playlist_id`) REFERENCES `playlistManagement_playlist` (`id`),
-  CONSTRAINT `playli_folder_id_369bb9a40f627f48_fk_contentManagement_folder_id` FOREIGN KEY (`folder_id`) REFERENCES `contentManagement_folder` (`id`)
+  PRIMARY KEY (`playlist_items_id`),
+  KEY `a5995af3c9ed21aaf6196289c9204d16` (`content_id`),
+  KEY `D6f7b6973df14ff8936bc055e5fdcc7f` (`playlist_id`),
+  CONSTRAINT `D6f7b6973df14ff8936bc055e5fdcc7f` FOREIGN KEY (`playlist_id`) REFERENCES `playlistManagement_playlist` (`playlist_id`),
+  CONSTRAINT `a5995af3c9ed21aaf6196289c9204d16` FOREIGN KEY (`content_id`) REFERENCES `contentManagement_content` (`content_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -911,13 +585,13 @@ DROP TABLE IF EXISTS `scheduleManagement_event`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `scheduleManagement_event` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `event_id` int(11) NOT NULL AUTO_INCREMENT,
   `start_time` datetime(6) NOT NULL,
   `end_time` datetime(6) NOT NULL,
   `schedule_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`event_id`),
   KEY `scheduleManagement_event_9bc70bb9` (`schedule_id`),
-  CONSTRAINT `s_schedule_id_2e6322707b09983e_fk_scheduleManagement_schedule_id` FOREIGN KEY (`schedule_id`) REFERENCES `scheduleManagement_schedule` (`id`)
+  CONSTRAINT `a1a924657a931712b6b8feba3c85b92b` FOREIGN KEY (`schedule_id`) REFERENCES `scheduleManagement_schedule` (`schedule_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -938,20 +612,20 @@ DROP TABLE IF EXISTS `scheduleManagement_schedule`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `scheduleManagement_schedule` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `schedule_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `created_time` datetime(6) NOT NULL,
   `last_updated_time` datetime(6) NOT NULL,
   `created_by_id` int(11) NOT NULL,
   `last_updated_by_id` int(11) NOT NULL,
   `playlist_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`schedule_id`),
   KEY `b405690da41b1b8e66ba521e8f2675f6` (`created_by_id`),
   KEY `D0008ec854458223fc0440e7f59934e8` (`last_updated_by_id`),
-  KEY `s_playlist_id_27974a8b8ad55599_fk_playlistManagement_playlist_id` (`playlist_id`),
+  KEY `add2a9f106fb1c03fac51eaadf12f0e2` (`playlist_id`),
   CONSTRAINT `D0008ec854458223fc0440e7f59934e8` FOREIGN KEY (`last_updated_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`),
-  CONSTRAINT `b405690da41b1b8e66ba521e8f2675f6` FOREIGN KEY (`created_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`),
-  CONSTRAINT `s_playlist_id_27974a8b8ad55599_fk_playlistManagement_playlist_id` FOREIGN KEY (`playlist_id`) REFERENCES `playlistManagement_playlist` (`id`)
+  CONSTRAINT `add2a9f106fb1c03fac51eaadf12f0e2` FOREIGN KEY (`playlist_id`) REFERENCES `playlistManagement_playlist` (`playlist_id`),
+  CONSTRAINT `b405690da41b1b8e66ba521e8f2675f6` FOREIGN KEY (`created_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -965,34 +639,6 @@ LOCK TABLES `scheduleManagement_schedule` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `scheduleManagement_schedule_screens`
---
-
-DROP TABLE IF EXISTS `scheduleManagement_schedule_screens`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `scheduleManagement_schedule_screens` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `schedule_id` int(11) NOT NULL,
-  `group_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `schedule_id` (`schedule_id`,`group_id`),
-  KEY `scheduleMa_group_id_46d317ee2af5323_fk_screenManagement_group_id` (`group_id`),
-  CONSTRAINT `sc_schedule_id_a2ba00561d3af8e_fk_scheduleManagement_schedule_id` FOREIGN KEY (`schedule_id`) REFERENCES `scheduleManagement_schedule` (`id`),
-  CONSTRAINT `scheduleMa_group_id_46d317ee2af5323_fk_screenManagement_group_id` FOREIGN KEY (`group_id`) REFERENCES `screenManagement_group` (`group_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `scheduleManagement_schedule_screens`
---
-
-LOCK TABLES `scheduleManagement_schedule_screens` WRITE;
-/*!40000 ALTER TABLE `scheduleManagement_schedule_screens` DISABLE KEYS */;
-/*!40000 ALTER TABLE `scheduleManagement_schedule_screens` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `scheduleManagement_screenschedule`
 --
 
@@ -1000,10 +646,14 @@ DROP TABLE IF EXISTS `scheduleManagement_screenschedule`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `scheduleManagement_screenschedule` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `group_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `scheduleManagement_screenschedule_0e939a4f` (`group_id`)
+  `screen_schedule_id` int(11) NOT NULL AUTO_INCREMENT,
+  `schedule_id` int(11) NOT NULL,
+  `screen_id` int(11) NOT NULL,
+  PRIMARY KEY (`screen_schedule_id`),
+  KEY `D8aad8cf02e766892e297a7809befaf3` (`schedule_id`),
+  KEY `screen_id_74a226f26c9094d9_fk_screenManagement_screen_screen_id` (`screen_id`),
+  CONSTRAINT `D8aad8cf02e766892e297a7809befaf3` FOREIGN KEY (`schedule_id`) REFERENCES `scheduleManagement_schedule` (`schedule_id`),
+  CONSTRAINT `screen_id_74a226f26c9094d9_fk_screenManagement_screen_screen_id` FOREIGN KEY (`screen_id`) REFERENCES `screenManagement_screen` (`screen_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1041,7 +691,7 @@ CREATE TABLE `screenManagement_group` (
 
 LOCK TABLES `screenManagement_group` WRITE;
 /*!40000 ALTER TABLE `screenManagement_group` DISABLE KEYS */;
-INSERT INTO `screenManagement_group` VALUES (1,'shopping malls','This group has all the screens placed in shopping malls.','2016-04-13',3),(2,'9th floor','Screen placed on 9th floor','2016-04-13',3),(3,'Hyderabad_inorbit','all screens in inorbit','2016-04-19',6),(4,'hyderabad_forum','all screens in forum mall','2016-04-19',6);
+INSERT INTO `screenManagement_group` VALUES (1,'bangalore 1','group created in bangalore by nipun','2016-04-22',8),(2,'bangalore 2','group created by nipun in bangalore 2','2016-04-22',8),(3,'hyderabad 1','Group created by kmpk123 in hyderabad','2016-04-22',9),(4,'hyderabad 2','Group created by kmpk123 in hyderabad 2','2016-04-22',9);
 /*!40000 ALTER TABLE `screenManagement_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1055,25 +705,25 @@ DROP TABLE IF EXISTS `screenManagement_screen`;
 CREATE TABLE `screenManagement_screen` (
   `screen_id` int(11) NOT NULL AUTO_INCREMENT,
   `screen_name` varchar(100) NOT NULL,
+  `screen_size` int(11) DEFAULT NULL,
+  `aspect_ratio` varchar(20) DEFAULT NULL,
+  `resolution` varchar(20) DEFAULT NULL,
+  `address` varchar(100) NOT NULL,
+  `device_identification_id` varchar(16) DEFAULT NULL,
   `activation_key` varchar(16) DEFAULT NULL,
   `activated_on` date DEFAULT NULL,
   `business_type` varchar(20) NOT NULL,
-  `status_id` int(11) NOT NULL,
   `activated_by_id` int(11) DEFAULT NULL,
-  `aspect_ratio` varchar(20) DEFAULT NULL,
-  `resolution` varchar(20) DEFAULT NULL,
-  `screen_size` int(11) DEFAULT NULL,
-  `address` varchar(100) DEFAULT NULL,
-  `device_identification_id` varchar(16) DEFAULT NULL,
   `owned_by_id` int(11) DEFAULT NULL,
+  `status_id` int(11) NOT NULL,
   PRIMARY KEY (`screen_id`),
+  KEY `ebc63bdd0f179da0d15ee30f124ea0e0` (`activated_by_id`),
+  KEY `a7c1ba1e3d46eee1df95a619a8c2f227` (`owned_by_id`),
   KEY `screenManagement_screen_dc91ed4b` (`status_id`),
-  KEY `screenManagement_screen_d5b8d1c2` (`activated_by_id`),
-  KEY `screenManagement_screen_441f3d33` (`owned_by_id`),
-  CONSTRAINT `ebc63bdd0f179da0d15ee30f124ea0e0` FOREIGN KEY (`activated_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`),
-  CONSTRAINT `s_owned_by_id_6646cd8255acdae8_fk_authentication_organization_id` FOREIGN KEY (`owned_by_id`) REFERENCES `authentication_organization` (`id`),
-  CONSTRAINT `s_status_id_7e5335d768560aa1_fk_screenManagement_screenstatus_id` FOREIGN KEY (`status_id`) REFERENCES `screenManagement_screenstatus` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+  CONSTRAINT `D23b29036e98defa308670106fdeab4f` FOREIGN KEY (`status_id`) REFERENCES `screenManagement_screenstatus` (`screen_status_id`),
+  CONSTRAINT `a7c1ba1e3d46eee1df95a619a8c2f227` FOREIGN KEY (`owned_by_id`) REFERENCES `authentication_organization` (`organization_id`),
+  CONSTRAINT `ebc63bdd0f179da0d15ee30f124ea0e0` FOREIGN KEY (`activated_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1082,7 +732,7 @@ CREATE TABLE `screenManagement_screen` (
 
 LOCK TABLES `screenManagement_screen` WRITE;
 /*!40000 ALTER TABLE `screenManagement_screen` DISABLE KEYS */;
-INSERT INTO `screenManagement_screen` VALUES (1,'screen 1','','2016-04-11','PRIVATE',5,NULL,'','',34,'asdfff','',1),(2,'screen 2','asdf123333','2016-04-11','PRIVATE',5,NULL,'','',32,'','',1),(3,'screen abc','123456',NULL,'PRIVATE',5,NULL,'','',32,'','',1),(4,'Screen 22','123456',NULL,'PRIVATE',5,NULL,'','1024*768',22,'','',1),(5,'nipun','1234567',NULL,'PRIVATE',5,NULL,'','',32,'','',1),(6,'shopping 9th floor','1234567',NULL,'PRIVATE',5,NULL,'','1024*768',32,'','',1),(7,'dominos forum','1234567',NULL,'PRIVATE',5,NULL,'','1466*768',32,'','',2),(8,'dominos test','1234567',NULL,'PRIVATE',5,NULL,'','',32,'','',2),(9,'screen nipun','',NULL,'PRIVATE',5,NULL,'','',NULL,'nipun\'s house',NULL,1),(10,'jaydev\'s house','',NULL,'PRIVATE',5,NULL,'','',NULL,'',NULL,1),(11,'prasanth','',NULL,'PRIVATE',5,NULL,'','',NULL,'aa',NULL,1);
+INSERT INTO `screenManagement_screen` VALUES (1,'bellandur 1',32,'4:3','1024*768','bangalore central mall, bellandur','ASDF1234','12345678','2016-04-22','PRIVATE',8,1,3),(2,'screen 2',50,'4:3','1744*899','bangalore central mall, bellandur','ASDF6789','0987654','2016-04-22','PRIVATE',8,1,3),(3,'hyd orbit 1',50,'16:9','1024*768','11th floor, inorbit mall, hyderabad','QWER1234','qwertyui','2016-04-22','PRIVATE',9,2,2),(4,'hyd orbit 2',47,'16:9','1024*768','12th floor, inorbit mall, hyderabad','QWER0987','asdfghjk','2016-04-22','PRIVATE',9,2,2),(5,'screen 3',33,'16:9','1024*768','marathalli 7th main',NULL,'aassddff',NULL,'PRIVATE',NULL,1,3);
 /*!40000 ALTER TABLE `screenManagement_screen` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1099,10 +749,10 @@ CREATE TABLE `screenManagement_screen_groups` (
   `group_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `screen_id` (`screen_id`,`group_id`),
-  KEY `screenMan_group_id_4dc0b1699266de69_fk_screenManagement_group_id` (`group_id`),
-  CONSTRAINT `screenM_screen_id_113a154b52f5ae05_fk_screenManagement_screen_id` FOREIGN KEY (`screen_id`) REFERENCES `screenManagement_screen` (`screen_id`),
-  CONSTRAINT `screenMan_group_id_4dc0b1699266de69_fk_screenManagement_group_id` FOREIGN KEY (`group_id`) REFERENCES `screenManagement_group` (`group_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
+  KEY `scr_group_id_4dc0b1699266de69_fk_screenManagement_group_group_id` (`group_id`),
+  CONSTRAINT `scr_group_id_4dc0b1699266de69_fk_screenManagement_group_group_id` FOREIGN KEY (`group_id`) REFERENCES `screenManagement_group` (`group_id`),
+  CONSTRAINT `screen_id_113a154b52f5ae05_fk_screenManagement_screen_screen_id` FOREIGN KEY (`screen_id`) REFERENCES `screenManagement_screen` (`screen_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1111,7 +761,7 @@ CREATE TABLE `screenManagement_screen_groups` (
 
 LOCK TABLES `screenManagement_screen_groups` WRITE;
 /*!40000 ALTER TABLE `screenManagement_screen_groups` DISABLE KEYS */;
-INSERT INTO `screenManagement_screen_groups` VALUES (23,1,2),(22,4,2),(20,6,1),(21,6,2),(17,7,4),(15,8,3),(24,11,1);
+INSERT INTO `screenManagement_screen_groups` VALUES (15,1,1),(13,2,1),(14,2,2),(17,3,3),(18,3,4),(16,4,4),(19,5,1);
 /*!40000 ALTER TABLE `screenManagement_screen_groups` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1123,7 +773,7 @@ DROP TABLE IF EXISTS `screenManagement_screenspecs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `screenManagement_screenspecs` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `screen_specs_id` int(11) NOT NULL AUTO_INCREMENT,
   `brand` varchar(50) NOT NULL,
   `model_num` varchar(50) DEFAULT NULL,
   `weight` double DEFAULT NULL,
@@ -1132,9 +782,9 @@ CREATE TABLE `screenManagement_screenspecs` (
   `contrast_ratio` varchar(20) DEFAULT NULL,
   `wattage` int(11) DEFAULT NULL,
   `additional_details` longtext,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`screen_specs_id`),
   UNIQUE KEY `screenManagement_screenspecs_brand_3dc574781c54ace9_uniq` (`brand`,`model_num`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1143,7 +793,6 @@ CREATE TABLE `screenManagement_screenspecs` (
 
 LOCK TABLES `screenManagement_screenspecs` WRITE;
 /*!40000 ALTER TABLE `screenManagement_screenspecs` DISABLE KEYS */;
-INSERT INTO `screenManagement_screenspecs` VALUES (1,'Samsung','ABCDEF',12,'100*25*25','LED','null',65,'null'),(2,'AOC','AOC23445',10,'177*177*177','LED','25:4',100,'No more details');
 /*!40000 ALTER TABLE `screenManagement_screenspecs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1155,12 +804,12 @@ DROP TABLE IF EXISTS `screenManagement_screenstatus`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `screenManagement_screenstatus` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `screen_status_id` int(11) NOT NULL AUTO_INCREMENT,
   `status_name` varchar(50) NOT NULL,
   `description` longtext NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `screenManagement_screenstatus_status_name_2008e8e81bd1bcf3_uniq` (`status_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`screen_status_id`),
+  UNIQUE KEY `status_name` (`status_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1169,7 +818,7 @@ CREATE TABLE `screenManagement_screenstatus` (
 
 LOCK TABLES `screenManagement_screenstatus` WRITE;
 /*!40000 ALTER TABLE `screenManagement_screenstatus` DISABLE KEYS */;
-INSERT INTO `screenManagement_screenstatus` VALUES (3,'Unactivated','The screen is not activated using the activation key.'),(4,'Online','The screen is online and is displaying content.'),(5,'Offline','The screen is either down or not connected to the internet.'),(6,'Idle','The screen is on but there is no active schedule being displayed right now.');
+INSERT INTO `screenManagement_screenstatus` VALUES (1,'Unactivated','The screen is not activated yet.'),(2,'Online','The screen is on and is currently scheduling content.'),(3,'Offline','The screen is either off or doesn\'t have the internet connectivity.'),(4,'Idle','The screen is on and has internet connectivity but there is no content scheduled.');
 /*!40000 ALTER TABLE `screenManagement_screenstatus` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -1182,4 +831,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-04-22  0:53:36
+-- Dump completed on 2016-04-22 18:48:12

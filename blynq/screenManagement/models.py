@@ -12,6 +12,7 @@ import random, string
 # Idle - The device is on but not displayng advertisements
 # Offline - The device is down or not connected to internet
 class ScreenStatus(models.Model):
+    screen_status_id = models.AutoField(primary_key=True)
     status_name = models.CharField(max_length=50, unique=True)
     description = models.TextField()
 
@@ -55,6 +56,7 @@ class Group(models.Model):
 
 
 class ScreenSpecs(models.Model):
+    screen_specs_id = models.AutoField(primary_key=True)
     brand = models.CharField(max_length=50)
     model_num = models.CharField(max_length=50, null=True, blank=True)
     weight = models.FloatField(null=True, blank=True)    # in kgs

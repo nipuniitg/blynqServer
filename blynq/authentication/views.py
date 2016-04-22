@@ -45,8 +45,7 @@ def login(request):
         if request.POST:
             username = request.POST.get('username')
             password = request.POST.get('password')
-
-            print username, password
+            # print username, password
             user = authenticate(username = username, password = password)
 
             if user:

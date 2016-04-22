@@ -1,17 +1,18 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
-from django.core import serializers
-from django.contrib.auth.decorators import login_required
-from JsonTestData import TestDataClass
-from django.http import JsonResponse
 import json
 
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse
+from django.http import JsonResponse
+from django.shortcuts import render
+
+from JsonTestData import TestDataClass
 from authentication.models import UserDetails, Organization, Address
+from customLibrary.serializers import FlatJsonSerializer as json_serializer
+from customLibrary.views_lib import ajax_response
 from screenManagement.forms import AddScreenForm, AddScreenLocation, AddScreenSpecs, AddGroup
 from screenManagement.models import Screen, ScreenStatus, ScreenSpecs, Group
-from screenManagement.serializers import FlatJsonSerializer as json_serializer
+
 
 # Create your views here.
 
@@ -69,7 +70,6 @@ def add_group(request):
 
 @login_required
 def upsert_group(request):
-    context_dic = {}
     json_obj = json.loads(request.body)
     success = False
     errors = []
@@ -95,14 +95,11 @@ def upsert_group(request):
             print 'Add/Edit Group Form is not valid'
             print add_group_form.errors
             errors = add_group_form.errors
-    context_dic['success'] = success
-    context_dic['errors'] = errors
-    return JsonResponse(context_dic, safe=False)
+    return ajax_response(success=success, errors=errors)
 
 
 @login_required
 def upsert_screen(request):
-    context_dic = {}
     json_obj = json.loads(request.body)
     success = False
     errors = []
@@ -140,9 +137,7 @@ def upsert_screen(request):
             print 'Add/Edit Screen Form is not valid'
             print add_screen_form.errors
             errors = add_screen_form.errors
-    context_dic['success'] = success
-    context_dic['errors'] = errors
-    return JsonResponse(context_dic, safe=False)
+    return ajax_response(success=success, errors=errors)
 
 
 @login_required
@@ -243,19 +238,6 @@ def group_index(request):
 
 def routeToHome(request):
     return render(request, 'Home.html')
-
-
-def getScreensJson(request):
-    print('I m in view')
-    classObj = TestDataClass()
-    screens = classObj.getScreenTestData()
-    return JsonResponse(screens, safe=False)
-
-
-def getGroupsJson(request):
-    classObj = TestDataClass()
-    groups = classObj.getGroupsTestData()
-    return JsonResponse(groups,safe=False)
 
 
 # TODO: Understand the difference between natural_key method and get_by_natural_key method in

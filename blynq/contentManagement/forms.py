@@ -8,4 +8,4 @@ class UploadContentForm(NgModelFormMixin, NgFormValidationMixin, NgModelForm, fo
     #organization_visible = forms.BooleanField()
     class Meta:
         model = Content
-        fields = ('title', 'description', 'document')
+        fields = ('title', 'document')

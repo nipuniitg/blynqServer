@@ -12,6 +12,7 @@ from authentication.models import UserDetails, Organization
 
 
 class ContentType(models.Model):
+    content_type_id = models.AutoField(primary_key=True)
     CONTENT_TYPE_CHOICES = (
         ('IMG', 'Image'),
         # Uncomment below types when we add support
@@ -103,8 +104,9 @@ def move_file(instance, new_file_path):
 
 class Content(models.Model):
     # This class includes both files and folders as Content
+    content_id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100, verbose_name=_('name'))
-    description = models.TextField(null=True, blank=True, verbose_name=_('description'))
+    # description = models.TextField(null=True, blank=True, verbose_name=_('description'))
 
     document = models.FileField(upload_to=upload_to_dir, null=True)
 
