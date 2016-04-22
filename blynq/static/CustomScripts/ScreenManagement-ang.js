@@ -116,6 +116,7 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
         getAllScreens : getAllScreens,
         getAllGroups : getAllGroups,
         upsertScreen : upsertScreen,
+        upsertGroup : upsertGroup,
         getSelectableScreens : getSelectableScreens,
         getSelectableGroups : getSelectableGroups
     }
@@ -141,30 +142,6 @@ sagApp.factory('screensFactory',['$http', 'dataAccessFactory', function($http, d
         groups : [],
     }
 
-    /*var getSelectableGroups = function(selectedGroups, callback){
-        var selectedGroupIds = [];
-        for(var i=0; i<selectedGroups.length; i++)
-        {
-            selectedGroupIds.push(selectedGroups[i].groupId);
-        }
-
-        var allGroups = [];
-        dataAccessFactory.getAllGroups(function(groups){
-            allGroups = groups;
-
-        var selectableGroups = angular.copy(allGroups);
-            for(var i = selectableGroups.length-1; i>-1; i--)
-            {
-                var obj = selectableGroups[i];
-                if(selectedGroupIds.indexOf(obj.groupId) > -1)
-                {
-                    selectableGroups.splice(i,1);
-                }
-            }
-            callback(selectableGroups);
-        });
-    };*/
-
     return{
     screenBluePrint : screenBluePrint
     ,getAllScreens : getAllScreens
@@ -177,7 +154,7 @@ sagApp.factory('groupsFactory',['$http','dataAccessFactory', function($http, dat
     var groupBluePrint = {
         group_id : -1,
         group_name : "",
-        Description : "",
+        description : "",
         screens : []
     };
 
@@ -186,30 +163,6 @@ sagApp.factory('groupsFactory',['$http','dataAccessFactory', function($http, dat
     var getAllGroups = function(callback){
         dataAccessFactory.getAllGroups(callback);
     };
-
-    /*var getSelectableScreens = function(selectedScreens, callback){
-        var selectedScreenIds = [];
-        for(var i=0; i<selectedScreen.length; i++)
-        {
-            selectedScreenIds.push(selectedScreenIds[i].screenId);
-        }
-
-        var allScreens = [];
-        dataAccessFactory.getAllScreens(function(screens){
-            allScreens = screens;
-
-        var selectableScreens = angular.copy(allScreens);
-        for(var i = selectableScreens.length; i>-1; i--)
-        {
-            var obj = selectableScreens[i];
-            if(selectedScreenIds.indexOf(obj.screenId) > -1)
-            {
-                selectableScreens.splice(i,1);
-            }
-        }
-        callback(selectableGroups);
-        });
-    };*/
 
     return{
         groupBluePrint: groupBluePrint
@@ -233,7 +186,7 @@ sagApp.controller('groupCtrl',['groupsFactory', 'dataAccessFactory', '$scope', f
    };
 
    var getSelectableGroups = function(){
-        groupsFactory.getSelectableScreens($scope.modalGroupDetailsObj.group_id, function(data){
+        dataAccessFactory.getSelectableScreens($scope.modalGroupDetailsObj.group_id, function(data){
             $scope.selectableScreens = data;
         });
    }
@@ -255,8 +208,8 @@ sagApp.controller('groupCtrl',['groupsFactory', 'dataAccessFactory', '$scope', f
 
    $scope.saveGroupDetails = function(){
 
-        dataAccessFactory.upsertGroup($scope.modalGroupDetailsObj, function successFN(upsertStatus){
-            if(upsertStatus == 'success')
+        dataAccessFactory.upsertGroup($scope.modalGroupDetailsObj, function successFN(data){
+            if(data.success)
             {
                 refreshGroups();
                 if($scope.isNewGroupModal)
@@ -266,7 +219,10 @@ sagApp.controller('groupCtrl',['groupsFactory', 'dataAccessFactory', '$scope', f
                 else{
                     toastr.success('Group updated successfully');
                 }
-            };
+            }
+            else{
+                toastr.warning("There was some error while adding group. Please try again after sometime.");
+            }
             $scope.isNewGroupModal = false;
         });
    };
