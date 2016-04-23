@@ -221,17 +221,17 @@ return{
 plApp.directive('droppable', function($compile){
 return{
     restrict : 'A'
-/*    ,scope : {
-        queueItems : '='
-    }*/
+    ,scope : {
+        queueItems : '=data-ng-model'
+    }
     ,link: function(scope, element, attrs) {
             element.droppable({
               accept : '.div-draggable-wrap'
               ,hoverClass : '.highlight-acceptable'
               ,drop: function(event, ui){
                    var dragIndex = angular.element(ui.draggable).data('index');
-                   console.log(scope);
-                   console.log(scope.contentObj);
+                   console.log();
+                   console.log();
                 }
             });
 
