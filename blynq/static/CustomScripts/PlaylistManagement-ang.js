@@ -3,6 +3,12 @@ var plApp = angular.module("plApp",['as.sortable']).config(function($interpolate
     $interpolateProvider.endSymbol(']}');
     });
 
+plApp.config(function($httpProvider) {
+    $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+});
+
 plApp.factory('dataAccessFactory',['$http','$window', function($http,$window){
 
     var getPlaylistsJson = function(callback){
