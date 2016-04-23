@@ -17,10 +17,10 @@ from contentManagement.models import Content
 
 @login_required
 def index(request):
-    context_dic = {}
-    context_dic['form'] = UploadContentForm(form_name='formUpload', scope_prefix='mdlNewFileDetailsObj')
-    print context_dic
-    return render(request,'contentManagement/content_index.html', context_dic)
+    # context_dic = {}
+    # context_dic['form'] = UploadContentForm(form_name='formUpload', scope_prefix='mdlNewFileDetailsObj')
+    # print context_dic
+    return render(request,'contentManagement/content_index.html')
 
 
 @login_required
