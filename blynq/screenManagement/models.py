@@ -36,11 +36,13 @@ class Group(models.Model):
     group_name = models.CharField(max_length=100,null= False)
     description = models.TextField(blank=True, null=True)
     created_on = models.DateField(auto_now_add=True)
-    created_by = models.ForeignKey(UserDetails, on_delete=models.PROTECT)
+    # TODO: When a manager deletes the below user, set his info here
+    created_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True)
     # Below logic not required
     # For each entry in the Screen table, we add an entry in the Group table and
     # set the flag dummy_screen_group to True. So that it would be easy in the scheduleManagement
     # dummy_screen_group = models.BooleanField(default=False)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ('-created_on', 'group_name')
