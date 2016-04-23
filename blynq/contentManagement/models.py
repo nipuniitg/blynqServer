@@ -117,10 +117,10 @@ class Content(models.Model):
     # folder = models.ForeignKey(Folder, verbose_name=_('folder'), related_name='all_files',
     #                            null=True, blank=True)
 
-    uploaded_by = models.ForeignKey(UserDetails, on_delete=models.PROTECT, related_name='%(class)s_uploaded_by')
+    uploaded_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_uploaded_by')
     uploaded_time = models.DateTimeField(_('uploaded time'), auto_now_add=True)
 
-    last_modified_by = models.ForeignKey(UserDetails, on_delete=models.PROTECT, related_name='%(class)s_modified_by')
+    last_modified_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_modified_by')
     last_modified_time = models.DateTimeField(_('modified at'), auto_now=True)
 
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)

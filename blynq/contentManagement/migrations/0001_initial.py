@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Content',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('content_id', models.AutoField(serialize=False, primary_key=True)),
                 ('title', models.CharField(max_length=100, verbose_name='name')),
                 ('description', models.TextField(null=True, verbose_name='description', blank=True)),
                 ('document', models.FileField(null=True, upload_to=contentManagement.models.upload_to_dir)),
@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ContentType',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('content_type_id', models.AutoField(serialize=False, primary_key=True)),
                 ('type', models.CharField(max_length=3, choices=[(b'IMG', b'Image'), (b'VID', b'Video'), (b'PPT', b'Presentation'), (b'PDF', b'Pdf'), (b'GIF', b'Gif')])),
                 ('fileExtension', models.CharField(max_length=5)),
             ],

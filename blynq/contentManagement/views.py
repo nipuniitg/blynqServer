@@ -1,15 +1,18 @@
+import os
+import shutil
+
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.db.models import Q
 
+from blynq.settings import BASE_DIR
 from contentManagement.forms import UploadContentForm
 # Create your views here.
-from customLibrary.views_lib import ajax_response
-from screenManagement.views import user_and_organization
+from customLibrary.views_lib import ajax_response, user_and_organization
 from customLibrary.serializers import FlatJsonSerializer as json_serializer
 from contentManagement.models import Content
-from django.db.models import Q
 
 
 @login_required
@@ -53,16 +56,38 @@ def upload_content(request):
     return render(request,'Shared/displayForm.html', context_dic)
 
 
+# Helper function
+def delete_folder(req_content, user_content):
+    user_content = user_content.filter(parent_folder__pk=req_content.content_id)
+    for content in user_content:
+        if content.is_folder:
+            delete_folder(req_content=content, user_content=user_content)
+        else:
+            delete_file(content)
+    req_content.delete()
+
+
+# Helper function
+def delete_file(content):
+    os.remove(BASE_DIR+content.document.url)
+    content.delete()
+
+
+@login_required
 def delete_content(request, content_id):
     user_details, organization = user_and_organization(request)
     user_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
     try:
         required_content = user_content.get(content_id=content_id)
-        required_content.delete()
+        if required_content.is_folder:
+            delete_folder(req_content=required_content, user_content=user_content)
+        else:
+            delete_file(required_content)
         success=True
     except:
         success=False
     return ajax_response(success=success)
+
 
 def get_tree_view(request, folder_id=-1):
     tree_view = []

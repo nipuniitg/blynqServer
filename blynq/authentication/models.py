@@ -27,7 +27,7 @@ class Address(models.Model):
     landmark = models.CharField(max_length=100)
     city = models.ForeignKey(City, on_delete=models.PROTECT)
     pincode = models.IntegerField(blank=True)
-    added_by = models.ForeignKey('UserDetails', on_delete=models.PROTECT)
+    added_by = models.ForeignKey('UserDetails', on_delete=models.SET_NULL)
 
     def __unicode__(self):
         return self.building_name + ', ' + self.area + ', ' + self.city.name

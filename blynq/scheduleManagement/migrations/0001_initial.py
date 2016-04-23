@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Event',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('event_id', models.AutoField(serialize=False, primary_key=True)),
                 ('start_time', models.DateTimeField()),
                 ('end_time', models.DateTimeField()),
             ],
@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Schedule',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('schedule_id', models.AutoField(serialize=False, primary_key=True)),
                 ('name', models.CharField(max_length=100)),
                 ('created_time', models.DateTimeField(auto_now_add=True, verbose_name='created time')),
                 ('last_updated_time', models.DateTimeField(auto_now=True, verbose_name='updated time')),
@@ -37,16 +37,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ScreenSchedule',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('group', models.ForeignKey(to='screenManagement.Group', null=True)),
+                ('screen_schedule_id', models.AutoField(serialize=False, primary_key=True)),
                 ('schedule', models.ForeignKey(to='scheduleManagement.Schedule')),
                 ('screen', models.ForeignKey(to='screenManagement.Screen', on_delete=django.db.models.deletion.PROTECT)),
             ],
-        ),
-        migrations.AddField(
-            model_name='schedule',
-            name='screens',
-            field=models.ManyToManyField(to='screenManagement.Screen', through='scheduleManagement.ScreenSchedule'),
         ),
         migrations.AddField(
             model_name='event',

@@ -9,7 +9,7 @@ from django.shortcuts import render
 from JsonTestData import TestDataClass
 from authentication.models import UserDetails, Organization, Address
 from customLibrary.serializers import FlatJsonSerializer as json_serializer
-from customLibrary.views_lib import ajax_response
+from customLibrary.views_lib import ajax_response, user_and_organization
 from screenManagement.forms import AddScreenForm, AddScreenLocation, AddScreenSpecs, AddGroup
 from screenManagement.models import Screen, ScreenStatus, ScreenSpecs, Group
 
@@ -28,13 +28,6 @@ def default_userdetails():
 def default_screen_status():
     return ScreenStatus.objects.get(status_name__icontains='offline')
 
-
-def user_and_organization(request):
-    user_details = UserDetails.objects.get(username=request.user.username)
-    organization = user_details.organization
-    # user_details = default_userdetails()
-    # organization = default_organization()
-    return user_details, organization
 
 
 @login_required

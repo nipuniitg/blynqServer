@@ -16,18 +16,19 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Playlist',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('playlist_id', models.AutoField(serialize=False, primary_key=True)),
                 ('name', models.CharField(max_length=100)),
                 ('created_time', models.DateTimeField(auto_now_add=True, verbose_name='created time')),
                 ('last_updated_time', models.DateTimeField(auto_now=True, verbose_name='updated time')),
                 ('created_by', models.ForeignKey(related_name='playlist_created_by', on_delete=django.db.models.deletion.PROTECT, to='authentication.UserDetails')),
                 ('last_updated_by', models.ForeignKey(related_name='playlist_last_updated_by', on_delete=django.db.models.deletion.PROTECT, to='authentication.UserDetails')),
+                ('organization', models.ForeignKey(to='authentication.Organization', null=True)),
             ],
         ),
         migrations.CreateModel(
             name='PlaylistItems',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('playlist_items_id', models.AutoField(serialize=False, primary_key=True)),
                 ('index', models.IntegerField()),
                 ('display_time', models.IntegerField(default=10)),
                 ('content', models.ForeignKey(to='contentManagement.Content', on_delete=django.db.models.deletion.PROTECT)),
