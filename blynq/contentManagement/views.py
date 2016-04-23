@@ -15,14 +15,17 @@ from django.db.models import Q
 @login_required
 def index(request):
     context_dic = {}
-    context_dic['form'] = UploadContentForm(form_name='formUpload', scope_prefix='mdlNewFileObj')
-    return render(request,'contentManagement/content_index.html')
+    context_dic['form'] = UploadContentForm(form_name='formUpload', scope_prefix='mdlNewFileDetailsObj')
+    print context_dic
+    return render(request,'contentManagement/content_index.html', context_dic)
 
 
 @login_required
 def upload_content(request):
     context_dic = {}
     success = False
+    import pdb; pdb.set_trace()
+    print request.FILES
     if request.method == 'POST':
         upload_content_form = UploadContentForm(request.POST, request.FILES)
         if upload_content_form.is_valid():

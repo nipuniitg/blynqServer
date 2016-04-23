@@ -22,10 +22,10 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
     };
 
     //How to send data to views through ajax in django
-    var deleteItem = function(itemId, callback){
+    var deleteContent = function(contentId, callback){
         $http({
              method : "GET"
-             ,url : '/content/deleteItem'
+             ,url : '/content/deleteContent'+ contentId
              /*,data:{
                 itemId : itemId
              }*/
@@ -34,30 +34,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
                 {
                     if(callback)
                     {callback();}
-                    toastr.success('Item deleted successfully.');
-                }
-                else
-                {
-                    toastr.warning("Oops!!There was some network error. Please try later.");
-                }
-            }, function myError(response) {
-                console.log(response.statusText);
-            });
-    };
 
-    var deleteFolder = function(folderId, callback){
-        $http({
-             method : "POST"
-             ,url : '/content/deleteFolder'
-             /*,data:{
-                folderId : folderId
-             }*/
-         }).then(function mySuccess(response){
-                if(response.data.actionStatus =="success")
-                {
-                    if(callback)
-                    {callback();}
-                    toastr.success('Folder deleted successfully.');
                 }
                 else
                 {
@@ -100,13 +77,42 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
             });
     };
 
+    var uploadContent = function(file, newContentObj, callback){
+        var fd = new FormData();
+        fd.append('file', file);
+        fd.append('title', newContentObj.title);
+        /*$http({
+            method : "POST"
+            ,url : "uploadContent"
+            ,data : fd
+            ,headers: {'Content-Type': undefined}
+        }).then(function mySucces(response) {
+            if(callback)
+            {
+                callback(response.data);
+            }
+        }, function myError(response) {
+            console.log(response.statusText);
+        });*/
+        uploadUrl ='uploadContent'
+        $http.post(uploadUrl, fd, {
+            transformRequest: angular.identity,
+            headers: {'Content-Type': undefined}
+        })
+        .success(function(){
+            alert('upload success');
+        })
+        .error(function(){
+            alert('upload failed');
+        });
+    }
 
     return{
-        getContentJson : getContentJson,
-        deleteItem : deleteItem,
-        deleteFolder : deleteFolder,
-        getFiles : getFilesJson,
-        getFolders : getFoldersJson
+        getContentJson : getContentJson
+        ,deleteContent : deleteContent
+        ,getFiles : getFilesJson
+        ,getFolders : getFoldersJson
+        ,uploadContent : uploadContent
     }
 
 }]);
@@ -143,9 +149,6 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
     };
 
     var refreshContent = function(folderId){
-        /*ctFactory.getContent(function(data){
-            $scope.contentObj = data;
-        });*/
 
         ctDataAccessFactory.getFolders(folderId, function(data)
         {
@@ -156,19 +159,41 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
         {
             $scope.files = data;
         });
+
+        $scope.currentFolderId = folderId;
     };
 
     //public or Scope releated functions
-    $scope.deleteItem = function(index){
-        ctDataAccessFactory.deleteItem($scope.contentObj.items[index].itemId,  function(){
-            $scope.contentObj.items.splice(index, 1);
+    $scope.deleteContent = function(content){
+        ctDataAccessFactory.deleteContent(content.content_id,  function(data){
+            if(data.success)
+            {
+                refreshContent($scope.currentFolderId);
+                toastr.success('Item deleted successfully.');
+            }
+            else{
+                toastr.warning("Oops!!There was some error. Please try later.");
+            }
         });
     }
 
-    $scope.deleteFolder = function(index){
-        ctDataAccessFactory.deleteFolder($scope.contentObj.folders[index].folderId,  function(){
-            $scope.contentObj.folders.splice(index, 1);
+    $scope.upload = function(){
+        var file = $scope.myFile;
+        console.log('file is ' );
+        console.dir(file);
+        ctDataAccessFactory.uploadContent(file, $scope.mdlNewFileDetailsObj, function(data){
+            if(data.success){
+                refreshContent($scope.currentFolderId);
+                toastr.success('Upload successful');
+            }
+            else{
+                toastr.warning('Upload failed. Please try after some time.');
+            }
         });
+    }
+
+    $scope.navigateToFolder = function(contentId){
+        refreshContent(contentId);
     }
 
     onLoad();
@@ -212,3 +237,19 @@ return{
 
         }
 }});
+
+plApp.directive('fileModel', ['$parse', function ($parse) {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs) {
+            var model = $parse(attrs.fileModel);
+            var modelSetter = model.assign;
+
+            element.bind('change', function(){
+                scope.$apply(function(){
+                    modelSetter(scope, element[0].files[0]);
+                });
+            });
+        }
+    };
+}]);
