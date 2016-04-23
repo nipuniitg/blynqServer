@@ -1,0 +1,49 @@
+    <!-- Modal-upload content -->
+    <div id="mdlUploadContent" class="modal fade" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Upload Content</h4>
+                </div>
+                <div class="modal-body">
+
+                    <!--<form id="display_form" method="post" class="form-horizontal"
+                          name="{{ form.form_name }}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="form-group">
+                                <div class="col-sm-2">{{ field.label_tag }}</div>
+                                <div class="col-sm-5">
+                                    {{ field }}
+                                </div>
+                                <div class="help-block with-errors col-sm-3">
+                                    {{ field.errors }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </form>-->
+
+                    <form class="form-horizontal">
+                          <!--<div class="form-group">
+                            <label class="col-sm-2 control-label">Title</label>
+                            <div class="col-sm-10">
+                              <input type="text" class="form-control" id="title" placeholder="title" ng-model="mdlNewFileDetailsObj.title">
+                            </div>
+                          </div>-->
+                          <div class="form-group">
+                            <label  class="col-sm-2 control-label">File Upload</label>
+                            <div class="col-sm-10">
+                              <input type="file" file-model="myFile" class="form-control">
+                            </div>
+                          </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="cancelUpload">Cancel</button>
+                    <button type="button" class="btn btn-success" data-dismiss="modal" ng-click="upload()">Upload</button>
+                </div>
+            </div>
+        </div>
+    </div>
