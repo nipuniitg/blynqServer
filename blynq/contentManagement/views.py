@@ -10,7 +10,7 @@ from django.db.models import Q
 from blynq.settings import BASE_DIR
 from contentManagement.forms import UploadContentForm
 # Create your views here.
-from customLibrary.views_lib import ajax_response, user_and_organization
+from customLibrary.views_lib import ajax_response, user_and_organization, string_to_dict
 from customLibrary.serializers import FlatJsonSerializer as json_serializer
 from contentManagement.models import Content
 
@@ -25,50 +25,45 @@ def index(request):
 
 @login_required
 def upload_content(request):
-    context_dic = {}
+    errors = []
     success = False
-    import pdb; pdb.set_trace()
-    print request.FILES
-    if request.method == 'POST':
-        upload_content_form = UploadContentForm(request.POST, request.FILES)
-        if upload_content_form.is_valid():
-            user_details, organization = user_and_organization(request)
-            form_data = upload_content_form.cleaned_data
-            Content.objects.create(title=form_data.get('title'),
-                                   document=form_data.get('document'),
-                                   uploaded_by=user_details,
-                                   last_modified_by=user_details,
-                                   organization=organization,
-                                   parent_folder=None)
-            success = True
-            success_message = "File upload successful."
-            context_dic['success_message'] = success_message
+    user_details, organization = user_and_organization(request)
+    try:
+        import pdb;pdb.set_trace()
+        document = request.FILES['file']
+        # posted_data = string_to_dict(request.body)
+        title = 'hello' #posted_data.get('title')
+        parent_folder_id = -1 # posted_data.get('currentFolderId')
+        if parent_folder_id == -1:
+            parent_folder = None
         else:
-            print 'Upload Content Form is not valid'
-            print upload_content_form.errors
-    else:
-        context_dic['form'] = UploadContentForm()
-        # TODO: Not able to unselect the Group field once selected, fix this issue in the frontend.
-    context_dic['title'] = "Upload File"
-    context_dic['submitButton'] = "Submit"
-    context_dic['success'] = success
-    context_dic['target'] = reverse('upload_content')
-    return render(request,'Shared/displayForm.html', context_dic)
+            parent_folder = Content.objects.get(content_id=parent_folder_id)
+        Content.objects.create(title=title,
+                               document=document,
+                               uploaded_by=user_details,
+                               last_modified_by=user_details,
+                               organization=organization,
+                               parent_folder=parent_folder,
+                               is_folder=False)
+        success = True
+    except:
+        error = 'Error while uploading the file'
+        print error
+        errors.append(error)
+    return ajax_response(success=success, errors=errors)
 
 
-# Helper function
-def delete_folder(req_content, user_content):
+def delete_folder_helper(req_content, user_content):
     user_content = user_content.filter(parent_folder__pk=req_content.content_id)
     for content in user_content:
         if content.is_folder:
-            delete_folder(req_content=content, user_content=user_content)
+            delete_folder_helper(req_content=content, user_content=user_content)
         else:
-            delete_file(content)
+            delete_file_helper(content)
     req_content.delete()
 
 
-# Helper function
-def delete_file(content):
+def delete_file_helper(content):
     os.remove(BASE_DIR+content.document.url)
     content.delete()
 
@@ -78,26 +73,48 @@ def delete_content(request, content_id):
     user_details, organization = user_and_organization(request)
     user_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
     try:
-        required_content = user_content.get(content_id=content_id)
+        required_content = user_content.get(content_id=int(content_id))
         if required_content.is_folder:
-            delete_folder(req_content=required_content, user_content=user_content)
+            delete_folder_helper(req_content=required_content, user_content=user_content)
         else:
-            delete_file(required_content)
+            delete_file_helper(required_content)
         success=True
     except:
         success=False
     return ajax_response(success=success)
 
+
 @login_required
 def create_folder(request):
     #data in request.body- components passes "currentFolderId", "title"
-    success = True
+    errors = []
+    success = False
     user_details, organization = user_and_organization(request)
-    print request.POST
-    return ajax_response(success=success)
+    try:
+        posted_data = string_to_dict(request.body)
+        parent_folder_id = posted_data.get('currentFolderId')
+        if parent_folder_id == -1:
+            parent_folder = None
+        else:
+            parent_folder = Content.objects.get(content_id=parent_folder_id)
+        title = posted_data.get('title')
+        Content.objects.create(title=title,
+                               document=None,
+                               uploaded_by=user_details,
+                               last_modified_by=user_details,
+                               organization=organization,
+                               parent_folder=parent_folder,
+                               is_folder=True)
+        success = True
+    except:
+        error = 'Error with the submitted data in create folder'
+        print error
+        errors.append(error)
+    return ajax_response(success=success, errors=errors)
 
 
 def get_tree_view(request, folder_id=-1):
+    folder_id = int(folder_id)
     tree_view = []
     json_folders = get_folders_json(request, folder_id)
     for folder in json_folders:
@@ -106,23 +123,22 @@ def get_tree_view(request, folder_id=-1):
     return tree_view
 
 
-def get_folders_json(request, folder_id=-1):
+def get_content_helper(request, parent_folder_id=-1, is_folder=False):
     user_details, organization = user_and_organization(request)
-    folders_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
-    if folder_id == -1:
-        folders_content = folders_content.filter(parent_folder__isnull=True)
+    user_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization)).filter(is_folder=is_folder)
+    parent_folder_id = int(parent_folder_id)
+    if parent_folder_id == -1:
+        user_content = user_content.filter(parent_folder=None)
     else:
-        folders_content = folders_content.filter(parent_folder__pk=folder_id)
-    json_folders = json_serializer().serialize(folders_content, fields=('title', 'description', 'document', 'content_id'))
-    return HttpResponse(json_folders, content_type='application/json')
+        parent_folder = Content.objects.get(parent_folder_id)
+        user_content = user_content.filter(parent_folder=parent_folder)
+    json_content = json_serializer().serialize(user_content, fields=('title', 'description', 'document', 'content_id'))
+    return HttpResponse(json_content, content_type='application/json')
 
 
-def get_files_json(request, folder_id=-1):
-    user_details, organization = user_and_organization(request)
-    files_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
-    if folder_id == -1:
-        files_content = files_content.filter(parent_folder__isnull=True)
-    else:
-        files_content = files_content.filter(parent_folder__pk=folder_id)
-    json_files = json_serializer().serialize(files_content, fields=('title', 'description', 'document', 'content_id'))
-    return HttpResponse(json_files, content_type='application/json')
+def get_folders_json(request, parent_folder_id=-1):
+    return get_content_helper(request, parent_folder_id=parent_folder_id, is_folder=True)
+
+
+def get_files_json(request, parent_folder_id=-1):
+    return get_content_helper(request, parent_folder_id=parent_folder_id, is_folder=False)

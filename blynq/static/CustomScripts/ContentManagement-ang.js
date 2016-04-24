@@ -25,7 +25,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
     var deleteContent = function(contentId, callback){
         $http({
              method : "GET"
-             ,url : '/content/deleteContent'+ contentId
+             ,url : '/content/deleteContent/'+ contentId
              /*,data:{
                 itemId : itemId
              }*/
@@ -77,10 +77,11 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
             });
     };
 
-    var uploadContent = function(file, newContentObj, callback){
+    var uploadContent = function(file, currentFolderId, newContentObj, callback){
         var fd = new FormData();
         fd.append('file', file);
         fd.append('title', newContentObj.title);
+        fd.append('currentFolderId', currentFolderId);
         uploadUrl ='uploadContent'
         $http.post(uploadUrl, fd, {
             transformRequest: angular.identity,
@@ -171,8 +172,8 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
     };
 
     //public or Scope releated functions
-    $scope.deleteContent = function(content){
-        ctDataAccessFactory.deleteContent(content.content_id,  function(data){
+    $scope.deleteContent = function(contentId){
+        ctDataAccessFactory.deleteContent(contentId,  function(data){
             if(data.success)
             {
                 refreshContent($scope.currentFolderId);
@@ -188,7 +189,7 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
         var file = $scope.myFile;
         console.log('file is ' );
         console.dir(file);
-        ctDataAccessFactory.uploadContent(file, $scope.mdlNewFileDetailsObj, function(data){
+        ctDataAccessFactory.uploadContent(file, $scope.currentFolderId, $scope.mdlNewFileDetailsObj, function(data){
             if(data.success){
                 refreshContent($scope.currentFolderId);
                 toastr.success('Upload successful');

@@ -42,7 +42,11 @@ class FlatJsonSerializer(Serializer):
             if field == 'status':
                 data['status'] = obj.status.status_name
             if field == 'document':
-                data['url'] = obj.document.url
+                if obj.is_folder:
+                    # TODO: Keep the url as the path to the default folder icon
+                    data['url'] = ''
+                else:
+                    data['url'] = obj.document.url
             if field == 'content_id':
                 data['content_id'] = obj.content_id
         return data
