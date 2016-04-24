@@ -26,19 +26,11 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
         $http({
              method : "GET"
              ,url : '/content/deleteContent/'+ contentId
-             /*,data:{
-                itemId : itemId
-             }*/
          }).then(function mySuccess(response){
-                if(response.data.actionStatus =="success")
+                var returnData = response.data;
+                if(callback)
                 {
-                    if(callback)
-                    {callback();}
-
-                }
-                else
-                {
-                    toastr.warning("Oops!!There was some network error. Please try later.");
+                    callback(returnData);
                 }
             }, function myError(response) {
                 console.log(response.statusText);
@@ -87,11 +79,15 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
             transformRequest: angular.identity,
             headers: {'Content-Type': undefined}
         })
-        .success(function(){
-            alert('upload success');
+        .success(function(response){
+            var data = response.data
+            if(callback)
+            {
+                callback(data);
+            }
         })
         .error(function(){
-            alert('upload failed');
+            console.log(response.statusText);
         });
     }
 
@@ -114,6 +110,22 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
             });
     }
 
+    var updateContentTitle = function(contentObj, callback){
+        $http({
+             method : "POST",
+             url : 'updateContentTitle',
+             data : contentObj
+         }).then(function mySuccess(response){
+                returnData = angular.copy(response.data);
+                if(callback)
+                {
+                    callback(returnData);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
+    }
+
     return{
         getContentJson : getContentJson
         ,deleteContent : deleteContent
@@ -121,6 +133,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
         ,getFolders : getFoldersJson
         ,uploadContent : uploadContent
         ,createFolder : createFolder
+        ,updateContentTitle : updateContentTitle
     }
 
 }]);
@@ -204,7 +217,7 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
         refreshContent(contentId);
     }
 
-    //>>>>>createFolderfunctions
+    //----createFolderfunctions
     var clearCreateFolderModalObj = function(){
         $scope.mdlNewFolderObj.title = '';
     }
@@ -227,7 +240,33 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
             clearCreateFolderModalObj();
         });
     }
-    //<<<<createFolderfunctions
+    //----createFolderfunctions
+
+
+    //>>>>editContentTitle
+
+    $scope.editTitle= function(content){
+        $scope.mdlEditContentObj = angular.copy(content);
+    }
+
+    $scope.updateContentTitle= function(){
+        ctDataAccessFactory.updateContentTitle($scope.mdlEditContentObj, function(data){
+            if(data.success)
+            {
+                refreshContent($scope.currentFolderId);
+                toastr.success('Title Modified successfully');
+            }
+            else{
+                toastr.warning('Oops!! Some error occured while updating the template');
+            }
+        });
+    }
+
+    $scope.cancelupdateContentTitle = function(){
+        $scope.mdlEditContentObj = null;
+    }
+
+    //<<<<
 
     onLoad();
 }]);
@@ -263,7 +302,6 @@ return{
               ,hoverClass : '.highlight-acceptable'
               ,drop: function(event, ui){
                    var dragIndex = angular.element(ui.draggable).data('index');
-                   console.log();
                    console.log();
                 }
             });
