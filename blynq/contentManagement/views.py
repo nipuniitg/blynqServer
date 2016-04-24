@@ -88,6 +88,14 @@ def delete_content(request, content_id):
         success=False
     return ajax_response(success=success)
 
+@login_required
+def create_folder(request):
+    #data in request.body- components passes "currentFolderId", "title"
+    success = True
+    user_details, organization = user_and_organization(request)
+    print request.POST
+    return ajax_response(success=success)
+
 
 def get_tree_view(request, folder_id=-1):
     tree_view = []

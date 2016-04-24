@@ -8,4 +8,5 @@ urlpatterns = [
      url(r'^deleteContent/(?P<folder_id>\d+)', views.delete_content, name='delete_item'),
      url(r'^getFoldersJson/(?P<folder_id>-?\d+)', views.get_folders_json, name='get_folders_json'),
      url(r'^getFilesJson/(?P<folder_id>-?\d+)', views.get_files_json, name='get_files_json'),
+     url(r'^createFolder', views.create_folder, name='create_folder'),
 ]

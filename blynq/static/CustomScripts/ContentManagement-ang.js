@@ -81,19 +81,6 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
         var fd = new FormData();
         fd.append('file', file);
         fd.append('title', newContentObj.title);
-        /*$http({
-            method : "POST"
-            ,url : "uploadContent"
-            ,data : fd
-            ,headers: {'Content-Type': undefined}
-        }).then(function mySucces(response) {
-            if(callback)
-            {
-                callback(response.data);
-            }
-        }, function myError(response) {
-            console.log(response.statusText);
-        });*/
         uploadUrl ='uploadContent'
         $http.post(uploadUrl, fd, {
             transformRequest: angular.identity,
@@ -107,12 +94,32 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
         });
     }
 
+    var createFolder = function(currentFolderId, mdlObj, callback){
+        postData ={};
+        postData.currentFolderId = currentFolderId;
+        postData.title = mdlObj.title;
+        $http({
+             method : "POST",
+             url : 'createFolder',
+             data : postData
+         }).then(function mySuccess(response){
+                returnData = angular.copy(response.data);
+                if(callback)
+                {
+                    callback(returnData);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
+    }
+
     return{
         getContentJson : getContentJson
         ,deleteContent : deleteContent
         ,getFiles : getFilesJson
         ,getFolders : getFoldersJson
         ,uploadContent : uploadContent
+        ,createFolder : createFolder
     }
 
 }]);
@@ -195,6 +202,31 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
     $scope.navigateToFolder = function(contentId){
         refreshContent(contentId);
     }
+
+    //>>>>>createFolderfunctions
+    var clearCreateFolderModalObj = function(){
+        $scope.mdlNewFolderObj.title = '';
+    }
+
+    $scope.cancelCreateFolder = function()
+    {
+        clearCreateFolderModalObj();
+    }
+
+    $scope.createFolder = function(){
+        ctDataAccessFactory.createFolder($scope.currentFolderId, $scope.mdlNewFolderObj, function(data){
+            if(data.success)
+            {
+                refreshContent($scope.currentFolderId);
+                toastr.success('Folder created Successfully');
+            }
+            else{
+                toastr.warning('Oops!!There was some error while creating folder. Please try again.');
+            }
+            clearCreateFolderModalObj();
+        });
+    }
+    //<<<<createFolderfunctions
 
     onLoad();
 }]);

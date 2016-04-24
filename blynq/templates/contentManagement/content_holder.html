@@ -16,7 +16,8 @@
             <div class="panel panel-default" style="border-right:1px solid grey">
                 <div class="panel-heading">
                     Content
-                    <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#mdlUploadContent">Upload</button>
+                        <button class="btn  btn-primary pull-right" style="margin-left:5px; height: 30px;width:100px" data-toggle="modal" data-target="#mdlUploadContent">Upload</button>
+                        <button class="btn btn-sm  btn-primary pull-right" data-toggle="modal" data-target="#mdlCreateFolder">create Folder</button>
                 </div>
                 <div class="panel-body">
                     <!-- Folders -->
@@ -58,4 +59,9 @@
 
     <!-- Modal-upload content -->
     {% include "contentManagement/_contentUploadForm.html" %}
+
+    <!-- Modal-create folder -->
+    {% include "contentManagement/_createFolderForm.html" %}
+
+
 </section>
