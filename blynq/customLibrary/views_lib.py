@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+import json
 
 from authentication.models import UserDetails
 
@@ -16,3 +17,8 @@ def user_and_organization(request):
     # user_details = default_userdetails()
     # organization = default_organization()
     return user_details, organization
+
+
+def string_to_dict(str):
+    #json_acceptable_string = str.replace("'", "\"")
+    return json.loads(str)
