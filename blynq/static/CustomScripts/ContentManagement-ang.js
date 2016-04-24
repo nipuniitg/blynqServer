@@ -78,17 +78,15 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
         $http.post(uploadUrl, fd, {
             transformRequest: angular.identity,
             headers: {'Content-Type': undefined}
-        })
-        .success(function(response){
-            var data = response.data
-            if(callback)
-            {
-                callback(data);
-            }
-        })
-        .error(function(){
-            console.log(response.statusText);
-        });
+        }).then(function mySuccess(response){
+                var returnData = response.data;
+                if(callback)
+                {
+                    callback(returnData);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
     }
 
     var createFolder = function(currentFolderId, mdlObj, callback){
@@ -243,7 +241,7 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
     //----createFolderfunctions
 
 
-    //>>>>editContentTitle
+    //----editContentTitle
 
     $scope.editTitle= function(content){
         $scope.mdlEditContentObj = angular.copy(content);
@@ -266,7 +264,7 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
         $scope.mdlEditContentObj = null;
     }
 
-    //<<<<
+    //----
 
     onLoad();
 }]);
