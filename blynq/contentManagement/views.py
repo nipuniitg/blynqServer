@@ -27,6 +27,7 @@ def index(request):
 def upload_content(request):
     errors = []
     success = False
+    import pdb; pdb.set_trace()
     user_details, organization = user_and_organization(request)
     try:
         import pdb;pdb.set_trace()
@@ -142,3 +143,14 @@ def get_folders_json(request, parent_folder_id=-1):
 
 def get_files_json(request, parent_folder_id=-1):
     return get_content_helper(request, parent_folder_id=parent_folder_id, is_folder=False)
+
+
+# TODO: Move files across folders
+
+def update_content_title(request):
+    success = True
+    user_details, organization = user_and_organization(request)
+    print request.POST
+    files_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
+    return ajax_response(success=success)
+

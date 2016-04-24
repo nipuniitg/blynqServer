@@ -9,4 +9,5 @@ urlpatterns = [
      url(r'^getFoldersJson/(?P<parent_folder_id>-?\d+)', views.get_folders_json, name='get_folders_json'),
      url(r'^getFilesJson/(?P<parent_folder_id>-?\d+)', views.get_files_json, name='get_files_json'),
      url(r'^createFolder', views.create_folder, name='create_folder'),
+     url(r'^updateContentTitle', views.update_content_title, name='update_content_title'),
 ]
