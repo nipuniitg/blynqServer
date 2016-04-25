@@ -145,10 +145,13 @@ class Content(models.Model):
     def logical_path_list(self):
         path = []
         instance = self
-        path.append()
-        path.append({'content_id' : -1, 'title': 'Home'})
-        while instance.parent_folder:
-            path.append({'content_id' : instance.content_id, 'title': instance.title})
+        current_folder = {'content_id' : instance.content_id, 'title': instance.title}
+        path.insert(0, current_folder)
+        instance = instance.parent_folder
+        while instance:
+            current_folder = {'content_id' : instance.content_id, 'title': instance.title}
+            path.insert(0, current_folder)
+            instance = instance.parent_folder
         return path
 
 

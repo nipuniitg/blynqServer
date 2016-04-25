@@ -22,3 +22,7 @@ def user_and_organization(request):
 def string_to_dict(str):
     #json_acceptable_string = str.replace("'", "\"")
     return json.loads(str)
+
+
+def list_to_json(list):
+    return JsonResponse(list, safe=False)
