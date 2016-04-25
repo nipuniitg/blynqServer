@@ -35,10 +35,13 @@ class FlatJsonSerializer(Serializer):
             if field == 'groups':
                 groups = self.get_groups(obj)
                 data['groups'] = groups
+            # field_id is not showing up in the serialized data, so adding it manually
             if field == 'group_id':
                 data['group_id'] = obj.pk
             if field == 'screen_id':
                 data['screen_id'] = obj.pk
+            if field == 'content_id':
+                data['content_id'] = obj.content_id
             if field == 'status':
                 data['status'] = obj.status.status_name
             if field == 'document':
@@ -47,8 +50,6 @@ class FlatJsonSerializer(Serializer):
                     data['url'] = ''
                 else:
                     data['url'] = obj.document.url
-            if field == 'content_id':
-                data['content_id'] = obj.content_id
         return data
 
     def end_object(self, obj):

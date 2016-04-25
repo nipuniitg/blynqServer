@@ -29,7 +29,6 @@ def default_screen_status():
     return ScreenStatus.objects.get(status_name__icontains='offline')
 
 
-
 @login_required
 def add_group(request):
     context_dic = {}
@@ -237,7 +236,7 @@ def routeToHome(request):
 # https://docs.djangoproject.com/en/1.9/topics/serialization/
 def get_groups_json(request):
     user_details, organization = user_and_organization(request)
-    groups_data = Group.objects.filter(created_by__organization=organization)
+    groups_data = Group.get_user_relevant_objects(user_details=user_details)
     # json_data = serializers.serialize("json", groups_data, fields=('group_id','group_name', 'description', 'screen'))
     json_data = json_serializer().serialize(groups_data, fields=('group_id','group_name', 'description', 'screen'))
     return HttpResponse(json_data, content_type='application/json')
@@ -261,6 +260,6 @@ def get_selectable_screens_json(request, group_id=-1):
 
 def get_selectable_groups_json(request, screen_id=-1):
     user_details, organization = user_and_organization(request)
-    groups_data = Group.objects.filter(created_by__organization=organization).exclude(screen__pk=screen_id)
+    groups_data = Group.objects.filter(organization=organization).exclude(screen__pk=screen_id)
     json_data = json_serializer().serialize(groups_data, fields=('group_id', 'group_name'))
     return HttpResponse(json_data, content_type='application/json')

@@ -1,5 +1,6 @@
 from django.db import models
 from authentication.models import Organization, UserDetails, Address
+from customLibrary.views_lib import user_and_organization
 
 
 import random, string
@@ -42,7 +43,7 @@ class Group(models.Model):
     # For each entry in the Screen table, we add an entry in the Group table and
     # set the flag dummy_screen_group to True. So that it would be easy in the scheduleManagement
     # dummy_screen_group = models.BooleanField(default=False)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
 
     class Meta:
         ordering = ('-created_on', 'group_name')
@@ -53,8 +54,10 @@ class Group(models.Model):
     def natural_key(self):
         return ({'group_id': self.group_id, 'group_name': self.group_name } )
 
-    # def get_screens(id):
-    #     return Screen.Objects.all(group_id = id)
+    # Only used once, try to refractor more code using functions like this
+    @staticmethod
+    def get_user_relevant_objects(user_details):
+        return Group.objects.filter(organization=user_details.organization)
 
 
 class ScreenSpecs(models.Model):

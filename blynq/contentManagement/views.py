@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.db.models import Q
+# from django.db.models import Q
 
 from blynq.settings import BASE_DIR
 from contentManagement.forms import UploadContentForm
@@ -27,14 +27,12 @@ def index(request):
 def upload_content(request):
     errors = []
     success = False
-    import pdb; pdb.set_trace()
     user_details, organization = user_and_organization(request)
     try:
-        import pdb;pdb.set_trace()
         document = request.FILES['file']
-        # posted_data = string_to_dict(request.body)
-        title = 'hello' #posted_data.get('title')
-        parent_folder_id = -1 # posted_data.get('currentFolderId')
+        posted_data = request.POST
+        title = posted_data.get('title')
+        parent_folder_id = int(posted_data.get('currentFolderId'))
         if parent_folder_id == -1:
             parent_folder = None
         else:
@@ -72,7 +70,8 @@ def delete_file_helper(content):
 @login_required
 def delete_content(request, content_id):
     user_details, organization = user_and_organization(request)
-    user_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
+    # user_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
+    user_content = Content.objects.filter(organization=organization)
     try:
         required_content = user_content.get(content_id=int(content_id))
         if required_content.is_folder:
@@ -114,10 +113,10 @@ def create_folder(request):
     return ajax_response(success=success, errors=errors)
 
 
-def get_tree_view(request, folder_id=-1):
-    folder_id = int(folder_id)
+def get_tree_view(request, parent_folder_id=-1):
+    parent_folder_id = int(parent_folder_id)
     tree_view = []
-    json_folders = get_folders_json(request, folder_id)
+    json_folders = get_folders_json(request, parent_folder_id)
     for folder in json_folders:
         folder['folders'] = get_tree_view(request, folder.get('content_id'))
     tree_view = json_folders
@@ -126,12 +125,15 @@ def get_tree_view(request, folder_id=-1):
 
 def get_content_helper(request, parent_folder_id=-1, is_folder=False):
     user_details, organization = user_and_organization(request)
-    user_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization)).filter(is_folder=is_folder)
+    # Below line is to get content for both user and organization
+    # user_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
+    user_content = Content.objects.filter(organization=organization)
+    user_content = user_content.filter(is_folder=is_folder)
     parent_folder_id = int(parent_folder_id)
     if parent_folder_id == -1:
         user_content = user_content.filter(parent_folder=None)
     else:
-        parent_folder = Content.objects.get(parent_folder_id)
+        parent_folder = Content.objects.get(content_id=parent_folder_id)
         user_content = user_content.filter(parent_folder=parent_folder)
     json_content = json_serializer().serialize(user_content, fields=('title', 'description', 'document', 'content_id'))
     return HttpResponse(json_content, content_type='application/json')
@@ -147,10 +149,21 @@ def get_files_json(request, parent_folder_id=-1):
 
 # TODO: Move files across folders
 
-def update_content_title(request):
-    success = True
+def update_content_title(request, content_id):
     user_details, organization = user_and_organization(request)
-    print request.POST
-    files_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
+    success = False
+    errors = []
+    content_id = int(content_id)
+    posted_data = request.POST
+    title = posted_data.get('title')
+    if content_id != -1:
+        try:
+            content = Content.objects.get(content_id=content_id)
+            content.title = title
+            content.save()
+        except:
+            error = 'Invalid content_id or Error while saving the title to the database'
+            errors.append(error)
+            print error
     return ajax_response(success=success)
 

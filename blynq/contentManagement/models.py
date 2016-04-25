@@ -142,9 +142,18 @@ class Content(models.Model):
             instance = instance.parent_folder
         return path
 
-    class Meta:
-        # unique_together = (('title', 'folder', 'uploaded_by'))
-        unique_together = (('title', 'parent_folder', 'uploaded_by'))
+    def logical_path_list(self):
+        path = []
+        instance = self
+        path.append()
+        path.append({'content_id' : -1, 'title': 'Home'})
+        while instance.parent_folder:
+            path.append({'content_id' : instance.content_id, 'title': instance.title})
+        return path
+
+
+    # class Meta:
+    #     unique_together = (('title', 'parent_folder', 'uploaded_by'))
 
 
     # def _move_file(self, dst_file_name ):
