@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import render
 # from django.db.models import Q
-
+import json
 from blynq.settings import BASE_DIR
 from contentManagement.forms import UploadContentForm
 # Create your views here.
@@ -129,7 +129,7 @@ def folder_path(request, current_folder_id):
     if current_folder_id != -1:
         user_content = Content.objects.filter(organization=organization).get(content_id=current_folder_id)
         path = user_content.logical_path_list()
-    home_folder = {'contentId': -1, 'title': 'Home'}
+    home_folder = {'content_id': -1, 'title': 'Home'}
     path.insert(0, home_folder)
     print path
     return list_to_json(path)
@@ -164,7 +164,7 @@ def update_content_title(request):
     user_details, organization = user_and_organization(request)
     success = False
     errors = []
-    posted_data = request.POST
+    posted_data = json.loads(request.body)
     title = posted_data.get('title')
     content_id = posted_data.get('content_id')
     content_id = int(content_id)
@@ -173,6 +173,7 @@ def update_content_title(request):
             content = Content.objects.filter(organization=organization).get(content_id=content_id)
             content.title = title
             content.save()
+            success = True
         except:
             error = 'Invalid content_id or Error while saving the title to the database'
             errors.append(error)

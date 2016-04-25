@@ -124,6 +124,21 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
             });
     }
 
+    var getFolderPath = function(folderId, callback){
+        $http({
+             method : "GET"
+             ,url : 'folderPath/'+ folderId
+         }).then(function mySuccess(response){
+                returnData = angular.copy(response.data);
+                if(callback)
+                {
+                    callback(returnData);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
+    }
+
     return{
         getContentJson : getContentJson
         ,deleteContent : deleteContent
@@ -132,6 +147,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
         ,uploadContent : uploadContent
         ,createFolder : createFolder
         ,updateContentTitle : updateContentTitle
+        ,getFolderPath : getFolderPath
     }
 
 }]);
@@ -165,6 +181,7 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
     var onLoad = function(){
         $scope.currentFolderId = -1  //-1 represents root folder. And hence fetches the data in root folder.
         refreshContent($scope.currentFolderId);
+        updateFolderPath($scope.currentFolderId);
     };
 
     var refreshContent = function(folderId){
@@ -179,8 +196,17 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
             $scope.files = data;
         });
 
-        $scope.currentFolderId = folderId;
     };
+
+    var updateFolderPath = function(folderId){
+        ctDataAccessFactory.getFolderPath(folderId, function(data){
+            $scope.folderPath = data
+            $scope.currentFolderId = folderId;
+        });
+
+    }
+
+
 
     //public or Scope releated functions
     $scope.deleteContent = function(contentId){
@@ -211,8 +237,9 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
         });
     }
 
-    $scope.navigateToFolder = function(contentId){
-        refreshContent(contentId);
+    $scope.navigateToFolder = function(folderId){
+        refreshContent(folderId);
+        updateFolderPath(folderId);
     }
 
     //----createFolderfunctions
