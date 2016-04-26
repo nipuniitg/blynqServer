@@ -91,6 +91,10 @@ class ScreenSpecs(models.Model):
 #     time_slot = models.IntegerField(null=True)
 
 
+class ScreenGroups(models.Model):
+    screen = models.ForeignKey('Screen', on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+
 class Screen(models.Model):
     screen_id = models.AutoField(primary_key=True)
     screen_name = models.CharField(max_length=100)
@@ -122,7 +126,7 @@ class Screen(models.Model):
     business_type = models.CharField(max_length=20, choices=BUSINESS_TYPE_CHOICES, default=BUSINESS_TYPE_CHOICES[0][0])
 
     status = models.ForeignKey(ScreenStatus, on_delete=models.PROTECT)
-    groups = models.ManyToManyField(Group, blank=True)
+    groups = models.ManyToManyField(Group, blank=True, through=ScreenGroups)
 
     @staticmethod
     def generate_activation_key(length=16):

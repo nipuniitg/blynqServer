@@ -66,10 +66,12 @@ def delete_file_helper(content):
 
 
 @login_required
-def delete_content(request, content_id):
+def delete_content(request):
     user_details, organization = user_and_organization(request)
     # user_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
     user_content = Content.get_user_relevant_objects(user_details=user_details)
+    posted_data = string_to_dict(request.body)
+    content_id = int(posted_data.get('content_id'))
     try:
         required_content = user_content.get(content_id=int(content_id))
         if required_content.is_folder:
@@ -167,7 +169,7 @@ def update_content_title(request):
     user_details, organization = user_and_organization(request)
     success = False
     errors = []
-    posted_data = json.loads(request.body)
+    posted_data = string_to_dict(request.body)
     title = posted_data.get('title')
     content_id = posted_data.get('content_id')
     content_id = int(content_id)

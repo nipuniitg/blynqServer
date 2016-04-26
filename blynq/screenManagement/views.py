@@ -9,7 +9,7 @@ from django.shortcuts import render
 from JsonTestData import TestDataClass
 from authentication.models import UserDetails, Organization, Address
 from customLibrary.serializers import FlatJsonSerializer as json_serializer
-from customLibrary.views_lib import ajax_response, user_and_organization
+from customLibrary.views_lib import ajax_response, user_and_organization, string_to_dict
 from screenManagement.forms import AddScreenForm, AddScreenLocation, AddScreenSpecs, AddGroup
 from screenManagement.models import Screen, ScreenStatus, ScreenSpecs, Group
 
@@ -263,3 +263,20 @@ def get_selectable_groups_json(request, screen_id=-1):
     groups_data = Group.objects.filter(organization=organization).exclude(screen__pk=screen_id)
     json_data = json_serializer().serialize(groups_data, fields=('group_id', 'group_name'))
     return HttpResponse(json_data, content_type='application/json')
+
+
+def delete_group(request):
+    user_details, organization = user_and_organization(request)
+    posted_data = string_to_dict(request.body)
+    group_id = int(posted_data.get('group_id'))
+    success = False
+    errors = []
+    try:
+        user_content = Group.get_user_relevant_objects(user_details).get(group_id=group_id)
+        user_content.delete()
+        success = True
+    except:
+        error = "Error while deleting the group"
+        print error
+        errors.append(error)
+    return ajax_response(success=success, errors=errors)
