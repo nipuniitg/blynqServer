@@ -24,8 +24,9 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
     //How to send data to views through ajax in django
     var deleteContent = function(contentId, callback){
         $http({
-             method : "GET"
-             ,url : '/content/deleteContent/'+ contentId
+             method : "POST"
+             ,url : '/content/deleteContent'
+             ,data : contentId
          }).then(function mySuccess(response){
                 var returnData = response.data;
                 if(callback)
@@ -127,7 +128,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
     var getFolderPath = function(folderId, callback){
         $http({
              method : "GET"
-             ,url : 'folderPath/'+ folderId
+             ,url : '/content/folderPath/'+ folderId
          }).then(function mySuccess(response){
                 returnData = angular.copy(response.data);
                 if(callback)
@@ -318,9 +319,9 @@ return{
 plApp.directive('droppable', function($compile){
 return{
     restrict : 'A'
-    ,scope : {
-        queueItems : '=data-ng-model'
-    }
+    /*,scope : {
+        'data-ng-model' : '=queueItems'
+    }*/
     ,link: function(scope, element, attrs) {
             element.droppable({
               accept : '.div-draggable-wrap'
