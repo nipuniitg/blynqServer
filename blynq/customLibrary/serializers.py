@@ -3,6 +3,8 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.serializers.python import Serializer
 
+from playlistManagement.models import PlaylistItems
+
 
 class FlatJsonSerializer(Serializer):
     # Ref : http://stackoverflow.com/questions/15453072/django-serializers-to-json-custom-json-output-format
@@ -23,11 +25,47 @@ class FlatJsonSerializer(Serializer):
             groups.append({'group_id':value.group_id, 'group_name': value.group_name})
         return groups
 
-    def get_dump_object(self, obj):
-        data = self._current
-        # if not self.selected_fields or 'pk' in self.selected_fields:
-        if not self.selected_fields:
-            return data
+    def add_content_fields(self, obj, data, fields=None):
+        if fields == None:
+            fields = self.selected_fields
+        for field in fields:
+            if field == 'content_id':
+                data['content_id'] = obj.content_id
+            if field == 'document':
+                if obj.is_folder:
+                    # TODO: Keep the url as the path to the default folder icon
+                    data['url'] = ''
+                else:
+                    data['url'] = obj.document.url
+            if field == 'title':
+                data['title'] = obj.title
+            if field == 'is_folder':
+                data['is_folder'] = obj.is_folder
+        return data
+
+    def get_playlist_items(self, obj):
+        content_items = obj.playlist_items.all()
+        playlist_items = PlaylistItems.objects.filter(playlist=obj)
+        contents = []
+        fields=('title', 'document', 'content_id', 'is_folder')
+        for instance in content_items:
+            data = {}
+            data = self.add_content_fields(instance, data, fields)
+            playlist_item = playlist_items.get(content=instance)
+            data['position_index'] = playlist_item.position_index
+            data['display_time'] = playlist_item.display_time
+            contents.append(data)
+        return contents
+
+    def add_playlist_items(self, obj, data):
+        for field in self.selected_fields:
+            if field == 'playlist_id':
+                data['playlist_id'] = obj.playlist_id
+            if field == 'playlist_items':
+                data['playlist_items'] = self.get_playlist_items(obj)
+        return data
+
+    def add_screen_and_group_fields(self, obj, data):
         for field in self.selected_fields:
             if field == 'screen':
                 screens = self.get_screens(obj)
@@ -40,16 +78,18 @@ class FlatJsonSerializer(Serializer):
                 data['group_id'] = obj.pk
             if field == 'screen_id':
                 data['screen_id'] = obj.pk
-            if field == 'content_id':
-                data['content_id'] = obj.content_id
             if field == 'status':
                 data['status'] = obj.status.status_name
-            if field == 'document':
-                if obj.is_folder:
-                    # TODO: Keep the url as the path to the default folder icon
-                    data['url'] = ''
-                else:
-                    data['url'] = obj.document.url
+        return data
+
+    def get_dump_object(self, obj):
+        data = self._current
+        # if not self.selected_fields or 'pk' in self.selected_fields:
+        if not self.selected_fields:
+            return data
+        data = self.add_screen_and_group_fields(obj, data)
+        data = self.add_content_fields(obj, data)
+        data = self.add_playlist_items(obj, data)
         return data
 
     def end_object(self, obj):

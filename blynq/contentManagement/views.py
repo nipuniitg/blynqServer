@@ -9,7 +9,7 @@ from blynq.settings import BASE_DIR
 from contentManagement.forms import UploadContentForm
 # Create your views here.
 from customLibrary.views_lib import ajax_response, user_and_organization, string_to_dict, list_to_json
-from customLibrary.serializers import FlatJsonSerializer as json_serializer
+from customLibrary.serializers import FlatJsonSerializer
 from contentManagement.models import Content
 
 
@@ -69,16 +69,16 @@ def delete_file_helper(content):
 def delete_content(request, content_id):
     user_details, organization = user_and_organization(request)
     # user_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
-    user_content = Content.objects.filter(organization=organization)
+    user_content = Content.get_user_relevant_objects(user_details=user_details)
     try:
         required_content = user_content.get(content_id=int(content_id))
         if required_content.is_folder:
             delete_folder_helper(req_content=required_content, user_content=user_content)
         else:
             delete_file_helper(required_content)
-        success=True
+        success = True
     except:
-        success=False
+        success = False
     return ajax_response(success=success)
 
 
@@ -94,7 +94,7 @@ def create_folder(request):
         if parent_folder_id == -1:
             parent_folder = None
         else:
-            parent_folder = Content.objects.filter(organization=organization).get(content_id=parent_folder_id)
+            parent_folder = Content.get_user_relevant_objects(user_details=user_details).get(content_id=parent_folder_id)
         title = posted_data.get('title')
         Content.objects.create(title=title,
                                document=None,
@@ -122,31 +122,34 @@ def get_tree_view(request, parent_folder_id=-1):
 
 
 def folder_path(request, current_folder_id):
-    print current_folder_id
     current_folder_id = int(current_folder_id)
     user_details, organization = user_and_organization(request)
     path = []
     if current_folder_id != -1:
-        user_content = Content.objects.filter(organization=organization).get(content_id=current_folder_id)
+        user_content = Content.get_user_relevant_objects(user_details=user_details).get(content_id=current_folder_id)
         path = user_content.logical_path_list()
     home_folder = {'content_id': -1, 'title': 'Home'}
     path.insert(0, home_folder)
-    print path
     return list_to_json(path)
 
+
 def get_content_helper(request, parent_folder_id=-1, is_folder=False):
-    user_details, organization = user_and_organization(request)
-    # Below line is to get content for both user and organization
-    # user_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
-    user_content = Content.objects.filter(organization=organization)
-    parent_folder_id = int(parent_folder_id)
-    if parent_folder_id == -1:
-        user_content = user_content.filter(parent_folder=None)
-    else:
-        parent_folder = user_content.get(content_id=parent_folder_id)
-        user_content = user_content.filter(parent_folder=parent_folder)
-    user_content = user_content.filter(is_folder=is_folder)
-    json_content = json_serializer().serialize(user_content, fields=('title', 'description', 'document', 'content_id'))
+    try:
+        user_details, organization = user_and_organization(request)
+        # Below line is to get content for both user and organization
+        # user_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
+        user_content = Content.get_user_relevant_objects(user_details=user_details)
+        parent_folder_id = int(parent_folder_id)
+        if parent_folder_id == -1:
+            user_content = user_content.filter(parent_folder=None)
+        else:
+            parent_folder = user_content.get(content_id=parent_folder_id)
+            user_content = user_content.filter(parent_folder=parent_folder)
+        user_content = user_content.filter(is_folder=is_folder)
+        json_content = FlatJsonSerializer().serialize(user_content, fields=('title', 'document', 'content_id'))
+    except:
+        json_content = []
+        error = "Error while fetching the content or invalid parent folder id"
     return HttpResponse(json_content, content_type='application/json')
 
 
@@ -170,7 +173,7 @@ def update_content_title(request):
     content_id = int(content_id)
     if content_id != -1:
         try:
-            content = Content.objects.filter(organization=organization).get(content_id=content_id)
+            content = Content.get_user_relevant_objects(user_details=user_details).get(content_id=content_id)
             content.title = title
             content.save()
             success = True

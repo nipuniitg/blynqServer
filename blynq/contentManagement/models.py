@@ -134,6 +134,12 @@ class Content(models.Model):
     # TODO: call logical_path to update this relative_path when a Content object is created or modified
     relative_path = models.CharField(max_length=1025, default='/')
 
+    def __unicode__(self):
+        return self.title
+
+    def natural_key(self):
+        return self.title
+
     def logical_path(self):
         path = '/'
         instance = self
@@ -154,6 +160,9 @@ class Content(models.Model):
             instance = instance.parent_folder
         return path
 
+    @staticmethod
+    def get_user_relevant_objects(user_details):
+        return Content.objects.filter(organization=user_details.organization)
 
     # class Meta:
     #     unique_together = (('title', 'parent_folder', 'uploaded_by'))
