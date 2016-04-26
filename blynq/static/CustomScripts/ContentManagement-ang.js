@@ -22,11 +22,11 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
     };
 
     //How to send data to views through ajax in django
-    var deleteContent = function(contentId, callback){
+    var deleteContent = function(content_id, callback){
         $http({
              method : "POST"
              ,url : '/content/deleteContent'
-             ,data : contentId
+             ,data : content_id
          }).then(function mySuccess(response){
                 var returnData = response.data;
                 if(callback)
@@ -75,7 +75,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
         fd.append('file', file);
         fd.append('title', newContentObj.title);
         fd.append('currentFolderId', currentFolderId);
-        uploadUrl ='uploadContent'
+        uploadUrl ='/content/uploadContent'
         $http.post(uploadUrl, fd, {
             transformRequest: angular.identity,
             headers: {'Content-Type': undefined}
@@ -96,7 +96,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
         postData.title = mdlObj.title;
         $http({
              method : "POST",
-             url : 'createFolder',
+             url : '/content/createFolder',
              data : postData
          }).then(function mySuccess(response){
                 returnData = angular.copy(response.data);
@@ -112,7 +112,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
     var updateContentTitle = function(contentObj, callback){
         $http({
              method : "POST",
-             url : 'updateContentTitle',
+             url : '/content/updateContentTitle',
              data : contentObj
          }).then(function mySuccess(response){
                 returnData = angular.copy(response.data);
