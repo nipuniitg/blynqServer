@@ -123,6 +123,36 @@ def get_tree_view(request, parent_folder_id=-1):
     return tree_view
 
 
+def get_files_recursively(request, parent_folder_id=-1):
+    user_details, organization = user_and_organization(request)
+    user_content = Content.get_user_relevant_objects(user_details=user_details)
+    parent_folder_id = int(parent_folder_id)
+    if parent_folder_id == -1:
+        parent_folder = None
+    else:
+        parent_folder = user_content.get(content_id=parent_folder_id)
+    all_files_content_id = []
+    current_folder_files = user_content.filter(parent_folder=parent_folder, is_folder=False)
+    for each_file in current_folder_files:
+        all_files_content_id.append(each_file.content_id)
+
+    current_folder_folders = user_content.filter(parent_folder=parent_folder, is_folder=True)
+    for folder in current_folder_folders:
+        current_folder_files = get_files_recursively(request, parent_folder_id=folder.content_id)
+        all_files_content_id = all_files_content_id + current_folder_files
+
+    return all_files_content_id
+
+
+def get_files_recursively_json(request, parent_folder_id):
+    all_files_content_ids = get_files_recursively(request, parent_folder_id=parent_folder_id)
+    user_details, organization = user_and_organization(request)
+    user_content = Content.get_user_relevant_objects(user_details=user_details)
+    all_files = user_content.filter(content_id__in=all_files_content_ids)
+    json_content = FlatJsonSerializer().serialize(all_files, fields=('title', 'document', 'content_id'))
+    return HttpResponse(json_content, content_type='application/json')
+
+
 def folder_path(request, current_folder_id):
     current_folder_id = int(current_folder_id)
     user_details, organization = user_and_organization(request)

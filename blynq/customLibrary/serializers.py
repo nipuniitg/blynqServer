@@ -47,10 +47,10 @@ class FlatJsonSerializer(Serializer):
         content_items = obj.playlist_items.all()
         playlist_items = PlaylistItems.objects.filter(playlist=obj)
         contents = []
-        fields=('title', 'document', 'content_id', 'is_folder')
+        content_fields=('title', 'document', 'content_id')
         for instance in content_items:
             data = {}
-            data = self.add_content_fields(instance, data, fields)
+            data = self.add_content_fields(instance, data, content_fields)
             playlist_item = playlist_items.get(content=instance)
             data['position_index'] = playlist_item.position_index
             data['display_time'] = playlist_item.display_time

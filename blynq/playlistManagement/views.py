@@ -17,24 +17,34 @@ def index(request):
     return render(request, 'playlistManagement/playlist_index.html')
 
 
-def add_playlist(request):
-    #data in request.body- components passes "title"
+def upsert_playlist(request):
+    #data in request.body- components passes "playlist_title"
     errors = []
     success = False
     user_details, organization = user_and_organization(request)
     try:
         posted_data = string_to_dict(request.body)
-        title = posted_data.get('title')
-        Playlist.objects.create(title=title,
-                                created_by=user_details,
-                                last_updated_by=user_details,
-                                organization=organization)
+        playlist_title = posted_data.get('playlist_title')
+        playlist_id = int(posted_data.get('playlist_id'))
+        if playlist_id == -1:
+            playlist = Playlist.objects.create(playlist_title=playlist_title, created_by=user_details,
+                                               last_updated_by=user_details, organization=organization)
+            playlist_id = playlist.playlist_id
+            playlist_items = []
+        else:
+            playlist = Playlist.objects.get(playlist_id=playlist_id)
+            playlist.playlist_title = playlist_title
+            playlist_items = FlatJsonSerializer().get_playlist_items(playlist)
+            playlist.save()
+        playlist_dict = {'playlist_id': playlist_id, 'playlist_title': playlist_title, 'playlist_items': playlist_items}
+        obj_dict = { 'playlist': playlist_dict }
         success = True
     except:
-        error = 'Error with the submitted data in add playlist'
+        error = 'Error with the submitted data in upsert playlist'
         print error
         errors.append(error)
-    return ajax_response(success=success, errors=errors)
+        obj_dict = None
+    return ajax_response(success=success, errors=errors, obj_dict=obj_dict)
 
 
 # This function is for inserting, updating and deleting content from a playlist
@@ -76,7 +86,8 @@ def upsert_playlist_items(request):
 def get_playlist_items(request):
     user_details, organization = user_and_organization(request)
     user_playlists = Playlist.get_user_relevant_objects(user_details=user_details)
-    json_data = FlatJsonSerializer().serialize(user_playlists, fields=('playlist_id', 'title','playlist_items'))
+    json_data = FlatJsonSerializer().serialize(user_playlists,
+                                               fields=('playlist_id', 'playlist_title','playlist_items'))
     return HttpResponse(json_data, content_type='application/json')
 
 
