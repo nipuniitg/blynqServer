@@ -8,8 +8,9 @@ def ajax_response(success=False, errors=[], obj_dict=None):
     context_dic = {}
     context_dic['success'] = success
     context_dic['errors'] = errors
-    for key in obj_dict.keys():
-        context_dic[key] = obj_dict[key]
+    if obj_dict:
+        for key in obj_dict.keys():
+            context_dic[key] = obj_dict[key]
     return JsonResponse(context_dic, safe=False)
 
 
