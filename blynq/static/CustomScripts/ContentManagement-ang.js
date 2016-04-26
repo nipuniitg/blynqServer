@@ -22,11 +22,11 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
     };
 
     //How to send data to views through ajax in django
-    var deleteContent = function(content_id, callback){
+    var deleteContent = function(content, callback){
         $http({
              method : "POST"
              ,url : '/content/deleteContent'
-             ,data : content_id
+             ,data : content
          }).then(function mySuccess(response){
                 var returnData = response.data;
                 if(callback)
@@ -210,8 +210,8 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
 
 
     //public or Scope releated functions
-    $scope.deleteContent = function(contentId){
-        ctDataAccessFactory.deleteContent(contentId,  function(data){
+    $scope.deleteContent = function(content){
+        ctDataAccessFactory.deleteContent(content,  function(data){
             if(data.success)
             {
                 refreshContent($scope.currentFolderId);

@@ -39,7 +39,7 @@
                         <div class="item-container-footer">
                             <div class="input-group">
                                 <i class="fa fa-trash-o pull-right pointer"
-                                   ng-click="deleteContent(folder.content_id)"></i>
+                                   ng-click="deleteContent(folder)"></i>
                                 <i class="fa fa-pencil pull-right pointer"
                                    ng-click="editTitle(folder, $index, 'folder')"
                                    data-toggle="modal" data-target="#mdlEditContentTitle"></i>
@@ -61,7 +61,7 @@
                         <div class="item-container-footer">
                             <div class="input-group">
                                 <i class="fa fa-trash-o pointer pull-right"
-                                   ng-click="deleteContent(file.content_id)"></i>
+                                   ng-click="deleteContent(file)"></i>
                                 <i class="fa fa-pencil pull-right pointer"
                                    ng-click="editTitle(file, $index, 'file')"></i>
                             </div>
