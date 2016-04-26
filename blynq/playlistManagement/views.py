@@ -83,7 +83,7 @@ def upsert_playlist_items(request):
     return ajax_response(success=success, errors=errors)
 
 
-def get_playlist_items(request):
+def get_playlists(request):
     user_details, organization = user_and_organization(request)
     user_playlists = Playlist.get_user_relevant_objects(user_details=user_details)
     json_data = FlatJsonSerializer().serialize(user_playlists,
