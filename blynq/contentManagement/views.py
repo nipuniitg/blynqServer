@@ -92,7 +92,7 @@ def create_folder(request):
     user_details, organization = user_and_organization(request)
     try:
         posted_data = string_to_dict(request.body)
-        parent_folder_id = posted_data.get('currentFolderId')
+        parent_folder_id = int(posted_data.get('currentFolderId'))
         if parent_folder_id == -1:
             parent_folder = None
         else:
