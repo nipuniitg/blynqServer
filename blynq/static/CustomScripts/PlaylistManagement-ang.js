@@ -11,17 +11,16 @@ plApp.config(function($httpProvider) {
 
 plApp.factory('dataAccessFactory',['$http','$window', function($http,$window){
 
-    var getPlaylistsJson = function(callback){
+    var getPlaylists = function(callback){
          $http({
              method : "GET",
-             url : 'getPlaylistsJson'
+             url : 'getPlaylists'
          }).then(function mySucces(response){
                 returnData = angular.copy(response.data);
                 if(callback)
                 {
                     callback(returnData);
                 }
-                return returnData
             }, function myError(response) {
                 console.log(response.statusText);
             });
@@ -41,16 +40,67 @@ plApp.factory('dataAccessFactory',['$http','$window', function($http,$window){
                 {
                     callback(returnData);
                 }
-                return returnData
             }, function myError(response) {
                 console.log(response.statusText);
             });
 
     };
 
+    var upsertPlaylist = function(playlist, callback){
+        $http({
+             method : "POST"
+             ,url : 'upsertPlaylist'
+             ,data : playlist
+         }).then(function mySucces(response){
+                returnData = angular.copy(response.data);
+                if(callback)
+                {
+                    callback(returnData);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
+    }
+
+    var deletePlaylist = function(playlist, callback){
+        $http({
+             method : "POST"
+             ,url : 'deletePlaylist'
+             ,data : playlist
+         }).then(function mySucces(response){
+                returnData = angular.copy(response.data);
+                if(callback)
+                {
+                    callback(returnData);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
+    }
+
+    var savePlaylistItems = function(playlist, callback)
+    {
+        $http({
+             method : "POST"
+             ,url : 'savePlaylistItems'
+             ,data : playlist
+         }).then(function mySucces(response){
+                returnData = angular.copy(response.data);
+                if(callback)
+                {
+                    callback(returnData);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
+    }
+
     return{
-        getPlaylistsJson : getPlaylistsJson,
-        savePlaylist : savePlaylist
+        getPlaylists : getPlaylists
+        ,savePlaylist : savePlaylist
+        ,upsertPlaylist : upsertPlaylist
+        ,deletePlaylist : deletePlaylist
+
     };
 
 }]);
@@ -58,91 +108,159 @@ plApp.factory('dataAccessFactory',['$http','$window', function($http,$window){
 plApp.factory('plFactory',['dataAccessFactory', function(dataAccessFactory)
 {
     var playlistBluePrint = {
-    playlistId: 1,
-    playlistName: "dummy",
-    queueItems: []};
+        playlist_id: -1,
+        playlist_title: "",
+        playlist_items: []
+    };
+
+    var mdlType = {
+        'Add' : 0,
+        'Edit' : 1
+    }
 
     var getPlaylists = function(callback){
         dataAccessFactory.getPlaylistsJson(callback);
     };
 
 return{
-    getPlaylists : getPlaylists,
-    playlistBluePrint : playlistBluePrint
+    mdlType : mdlType
+    ,playlistBluePrint : playlistBluePrint
 }
 
 }]);
 
-plApp.controller('plCtrl', ['plFactory','$scope','$window', function(plFactory, $scope, $window){
+plApp.controller('plCtrl', ['plFactory','$scope','$window','dataAccessFactory', function(plFactory, $scope, $window, dataAccessFactory){
 
-    //playlist
-    $scope.playlists =null;
-    $scope.activePlaylistIndex = 0;
-    $scope.activePlaylistObj = null;
+    var onLoad = function(){
+        //playlist
+        $scope.playlists =null;
+        $scope.activePlaylistIndex = 0;
+        $scope.activePlaylistObj = null;
 
-    //playlist queue
-    $scope.activeQueueItemIndex= null;
-    $scope.activeQueueItem = null;
-    $scope.dragControlListeners = {
-        //accept: function (sourceItemHandleScope, destSortableScope) {return boolean}//override to determine drag is allowed or not. default is true.
-        itemMoved: function (event) {},
-        orderChanged: function(event) {},
-        containment: '#div-playlistQueue',//optional param.
-        clone: true, //optional param for clone feature.
-        allowDuplicates: false //optional param allows duplicates to be dropped.
-    };
+        //playlist queue
+        $scope.activeQueueItemIndex= null;
+        $scope.activeQueueItem = null;
+        $scope.dragControlListeners = {
+            //accept: function (sourceItemHandleScope, destSortableScope) {return boolean}//override to determine drag is allowed or not. default is true.
+            itemMoved: function (event) {},
+            orderChanged: function(event) {},
+            containment: '#div-playlistQueue',//optional param.
+            clone: true, //optional param for clone feature.
+            allowDuplicates: false //optional param allows duplicates to be dropped.
+        };
 
-    //bool values
-    $scope.playlistQueueEditMode = false;
-    $scope.showQueueItemDetails = false;
+        //bool values
+        $scope.playlistQueueEditMode = false;
+        $scope.showQueueItemDetails = false;
 
-    $scope.displayContentDiv = false;
+        $scope.displayContentDiv = false;
 
-
-    plFactory.getPlaylists(function(playlists){
-        $scope.playlists = angular.copy(playlists);
-        $scope.activePlaylistObj = $scope.playlists[0];
-    });
-
-    //methods
-    $scope.addPlyalist = function(){
-        $scope.activePlaylistObj = angular.copy(plFactory.playlistBluePrint);
-    };
-
-    $scope.saveAddPlaylist = function(){
-        //ajax save activePlaylistObj(only name will be there). and add it to the playlists
-        $scope.playlists.push(angular.copy($scope.activePlaylistObj));
-        $scope.activePlaylistIndex = $scope.playlists.length -1;
-        $scope.playlistQueueEditMode = true;
+        getPlaylists();
     }
 
-    $scope.cancelAddPlaylist = function(){
-        $scope.activePlaylistObj = angular.copy($scope.playlists[$scope.activePlaylistIndex]);
+
+
+    //private methods
+    var  getPlaylists = function(){
+        dataAccessFactory.getPlaylists(function(data){
+            $scope.playlists = data;
+            updateActivePlaylist(0);
+        });
+    }
+
+    var updateActivePlaylist = function(index){
+        $scope.activePlaylistObj = angular.copy($scope.playlists[index]);
+        $scope.activePlaylistIndex = index;
+    }
+
+    //methods
+    //----add / edit playlist (title)
+    $scope.addPlaylist = function(){
+        $scope.mdlPlaylist = angular.copy(plFactory.playlistBluePrint);
+        $scope.mdlType = plFactory.mdlType['Add'];
     };
 
-    $scope.deletePlaylist = function(){
-        //ajax delete playlsit and once confirms... remove it from playlists here.
+    $scope.editPlaylist = function(playlist, index){
+        $scope.mdlPlaylist = angular.copy(playlist);
+        $scope.mdlType = plFactory.mdlType['Edit'];
+    }
 
+    $scope.upsertPlaylist = function(){
+        dataAccessFactory.upsertPlaylist($scope.mdlPlaylist, function(data){
+            if(data.success)
+            {
+                if($scope.mdlType == plFactory.mdlType['Add'])
+                {
+                    toastr.success('Playlist added successfully');
+                    $scope.playlists.push(data.playlist);
+                    updateActivePlaylist($scope.playlists.length-1);
+                }
+                else
+                {
+                    $scope.playlists[$scope.activePlaylistIndex].playlist_title = data.playlist.playlist_title;
+                    toastr.success('Playlist name updated successfully');
+                }
+                $scope.playlistQueueEditMode = true;
+            }
+            else{
+                toastr.warning('Oops!! Some error occured. Please try again.');
+            }
+        });
+
+
+        //ajax save activePlaylistObj(only name will be there). and add it to the playlists
+        //$scope.playlists.push(angular.copy($scope.activePlaylistObj));
+
+    }
+
+    $scope.deletePlaylist = function(index){
+        dataAccessFactory.deletePlaylist($scope.playlists[index], function(data){
+            if(data.success)
+            {
+                toastr.success('Playlist deleted successfully');
+                $scope.playlists.splice(index, 1);
+                $scope.activePlaylistIndex = null; //should be modified
+            }
+            else
+            {
+                toastr.warning('Oops!! Some error occured. Please try again');
+            }
+        });
+    };
+    //---- add / edit plyalist
+
+
+    $scope.clickedOnPlaylist= function(index){
+        updateActivePlaylist(index);
     };
 
-    $scope.editPlaylist = function(){
+
+    //----edit/remove playlistItems details (title)
+    $scope.editPlaylistItems = function(){
         //need selector here
         $scope.playlistQueueEditMode= true;
     };
 
     $scope.savePlaylistQueueItems = function(){
-        $scope.playlistQueueEditMode = false;
+        dataAccessFactory.savePlaylistItems($scope.activePlaylistObj, function(data){
+            if(data.success)
+            {
+                toastr.success('Playlist saved successfully');
+                $scope.playlistQueueEditMode = false;
+                playlists[$scope.activePlaylistIndex] = data.playlist;
+            }
+            else{
+                toastr.warning('Oops!! Some error occured. Please try again.');
+            }
+        });
     };
 
     $scope.cancelPlaylistQueueItemsEdit = function(){
         $scope.playlistQueueEditMode = false;
-        $scope.activePlaylistObj = angular.copy($scope.playlists[$scope.activePlaylistIndex]);
+        updateActivePlaylist($scope.activePlaylistIndex);
     }
 
-    $scope.clickedOnPlaylist= function(playlist, $index){
-        $scope.activePlaylistObj = angular.copy(playlist)
-        $scope.activePlaylistIndex = $index;
-    };
+
 
     //Related to queue item details methods
     $scope.clickedOnQueueItem = function(index){
@@ -166,5 +284,7 @@ plApp.controller('plCtrl', ['plFactory','$scope','$window', function(plFactory, 
     $scope.saveItemDurationUpdate = function(){
         $scope.showQueueItemDetails = false;
     };
+
+    onLoad();
 
 }]);
