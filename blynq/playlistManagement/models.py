@@ -18,7 +18,7 @@ class PlaylistItems(models.Model):
     display_time = models.IntegerField(default=settings.DEFAULT_DISPLAY_TIME)
 
     def __unicode__(self):
-        return self.playlist.title + ' - ' + self.content.title
+        return self.playlist.playlist_title + ' - ' + self.content.title
 
     # def natural_key(self):
     #     return ({'playlist_id': self.playlist.playlist_id, 'content_id': self.content.content_id,
