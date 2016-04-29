@@ -2,7 +2,7 @@ from django.http import JsonResponse
 import json
 
 from authentication.models import UserDetails
-
+import pytz
 
 def ajax_response(success=False, errors=[], obj_dict=None):
     context_dic = {}
@@ -29,3 +29,12 @@ def string_to_dict(str):
 
 def list_to_json(list):
     return JsonResponse(list, safe=False)
+
+
+local_timezone = pytz.timezone('Asia/Kolkata')
+
+
+# Delete the below function if not used
+def get_local_time(utc_datetime):
+    local_datetime = utc_datetime.replace(tzinfo=pytz.utc).astimezone(local_timezone)
+    return local_datetime

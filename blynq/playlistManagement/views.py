@@ -6,7 +6,7 @@ from django.http import JsonResponse, HttpResponse
 from contentManagement.models import Content
 from contentManagement.views import get_files_recursively
 from customLibrary.views_lib import user_and_organization, string_to_dict, ajax_response
-from customLibrary.serializers import FlatJsonSerializer
+from customLibrary.serializers import FlatJsonSerializer, playlist_dict
 from playlistManagement.models import Playlist, PlaylistItems
 
 
@@ -46,6 +46,7 @@ def index(request):
 #         errors.append(error)
 #         obj_dict = None
 #     return ajax_response(success=success, errors=errors, obj_dict=obj_dict)
+
 
 
 # This function is for inserting, updating and deleting content from a playlist
@@ -95,9 +96,7 @@ def upsert_playlist(request):
             playlist_item_id__in=playlist_item_id_list)
         for content in removed_playlist_content:
             content.delete()
-        playlist_items = FlatJsonSerializer().get_playlist_items(playlist)
-        playlist_dict = {'playlist_id': playlist_id, 'playlist_title': playlist_title, 'playlist_items': playlist_items}
-        obj_dict = { 'playlist': playlist_dict }
+        obj_dict = {'playlist': playlist_dict(playlist)}
         success = True
     except:
         error = 'Error while upserting content to playlist'

@@ -1,4 +1,6 @@
 from django.db import models
+from schedule.models import Calendar
+
 from authentication.models import Organization, UserDetails, Address
 from customLibrary.views_lib import user_and_organization
 
@@ -128,9 +130,16 @@ class Screen(models.Model):
     status = models.ForeignKey(ScreenStatus, on_delete=models.PROTECT)
     groups = models.ManyToManyField(Group, blank=True, through=ScreenGroups)
 
+    # Remove null=True for screen_calendar
+    screen_calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE, null=True)
+
     @staticmethod
     def generate_activation_key(length=16):
         return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(length))
 
     def __unicode__(self):
         return self.screen_name
+
+    @staticmethod
+    def get_user_relevant_objects(user_details):
+        return Screen.objects.filter(owned_by=user_details.organization)

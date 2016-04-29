@@ -90,6 +90,23 @@ def upsert_group(request):
     return ajax_response(success=success, errors=errors)
 
 
+def delete_group(request):
+    user_details, organization = user_and_organization(request)
+    posted_data = string_to_dict(request.body)
+    group_id = int(posted_data.get('group_id'))
+    success = False
+    errors = []
+    try:
+        user_content = Group.get_user_relevant_objects(user_details).get(group_id=group_id)
+        user_content.delete()
+        success = True
+    except:
+        error = "Error while deleting the group"
+        print error
+        errors.append(error)
+    return ajax_response(success=success, errors=errors)
+
+
 @login_required
 def upsert_screen(request):
     json_obj = json.loads(request.body)
@@ -244,7 +261,7 @@ def get_groups_json(request):
 
 def get_screens_json(request):
     user_details, organization = user_and_organization(request)
-    screen_data = Screen.objects.filter(owned_by=organization)
+    screen_data = Screen.get_user_relevant_objects(user_details)
     json_data = json_serializer().serialize(screen_data, fields=('screen_id', 'screen_name', 'address', 'status',
                                                                  'groups', 'screen_size', 'resolution'))
     return HttpResponse(json_data, content_type='application/json')
@@ -252,7 +269,7 @@ def get_screens_json(request):
 
 def get_selectable_screens_json(request, group_id=-1):
     user_details, organization = user_and_organization(request)
-    screen_data = Screen.objects.filter(owned_by=organization).exclude(groups__pk=group_id)
+    screen_data = Screen.get_user_relevant_objects(user_details).exclude(groups__pk=group_id)
     json_data = json_serializer().serialize(screen_data, fields=('screen_id', 'screen_name', 'address', 'status',
                                                                  'groups', 'screen_size', 'resolution'))
     return HttpResponse(json_data, content_type='application/json')
@@ -264,19 +281,3 @@ def get_selectable_groups_json(request, screen_id=-1):
     json_data = json_serializer().serialize(groups_data, fields=('group_id', 'group_name'))
     return HttpResponse(json_data, content_type='application/json')
 
-
-def delete_group(request):
-    user_details, organization = user_and_organization(request)
-    posted_data = string_to_dict(request.body)
-    group_id = int(posted_data.get('group_id'))
-    success = False
-    errors = []
-    try:
-        user_content = Group.get_user_relevant_objects(user_details).get(group_id=group_id)
-        user_content.delete()
-        success = True
-    except:
-        error = "Error while deleting the group"
-        print error
-        errors.append(error)
-    return ajax_response(success=success, errors=errors)
