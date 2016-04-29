@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'djng', # django-angular http://django-angular.readthedocs.org/en/latest/installation.html
+    'schedule', # https://github.com/llazzaro/django-scheduler
     # 'easy_thumbnails', # https://django-filer.readthedocs.org/en/latest/installation.html for easy_thumbnails, filer and mptt
     # 'filer',
     # 'mptt',

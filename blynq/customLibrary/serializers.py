@@ -6,6 +6,13 @@ from django.core.serializers.python import Serializer
 from playlistManagement.models import PlaylistItems
 
 
+def playlist_dict(playlist, only_files=False):
+    playlist_items = FlatJsonSerializer().get_playlist_items(playlist, only_files=only_files)
+    playlist_dictionary = {'playlist_id': playlist.playlist_id, 'playlist_title': playlist.playlist_title,
+                     'playlist_items': playlist_items}
+    return playlist_dictionary
+
+
 class FlatJsonSerializer(Serializer):
     # Ref : http://stackoverflow.com/questions/15453072/django-serializers-to-json-custom-json-output-format
 
@@ -43,12 +50,14 @@ class FlatJsonSerializer(Serializer):
                 data['is_folder'] = obj.is_folder
         return data
 
-    def get_playlist_items(self, obj):
+    def get_playlist_items(self, obj, only_files=False):
         content_items = obj.playlist_items.all()
         playlist_items = PlaylistItems.objects.filter(playlist=obj)
         contents = []
         content_fields=('title', 'document', 'content_id')
         for instance in content_items:
+            if only_files and instance.is_folder:
+                continue
             data = {}
             data = self.add_content_fields(instance, data, content_fields)
             playlist_item = playlist_items.get(content=instance)
