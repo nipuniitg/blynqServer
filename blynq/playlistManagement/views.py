@@ -4,6 +4,7 @@ from JsonTestData import TestDataClass
 from django.http import JsonResponse, HttpResponse
 
 from contentManagement.models import Content
+from contentManagement.views import get_files_recursively
 from customLibrary.views_lib import user_and_organization, string_to_dict, ajax_response
 from customLibrary.serializers import FlatJsonSerializer
 from playlistManagement.models import Playlist, PlaylistItems
@@ -58,7 +59,7 @@ def upsert_playlist(request):
         playlist_id = int(posted_data.get('playlist_id'))
         playlist_title = posted_data.get('playlist_title')
         playlist_items = posted_data.get('playlist_items')
-        user_content = Playlist.get_user_relevant_objects(user_details=user_details)
+        user_playlists = Playlist.get_user_relevant_objects(user_details=user_details)
 
         # upsert playlist
         if playlist_id == -1:
@@ -66,31 +67,33 @@ def upsert_playlist(request):
                                                last_updated_by=user_details, organization=organization)
             playlist_id = playlist.playlist_id
         else:
-            playlist = user_content.get(playlist_id=playlist_id)
+            playlist = user_playlists.get(playlist_id=playlist_id)
             playlist.playlist_title = playlist_title
             playlist.last_updated_by = user_details
             playlist.save()
 
         # upsert playlist items
-        content_id_list = []
-        for item in playlist_items:
-            # item = item.string_to_dict(item)
+        playlist_item_id_list = []
+        for pos_index, item in enumerate(playlist_items):
+            playlist_item_id = int(item.get('playlist_item_id'))
             content_id = int(item.get('content_id'))
-            content_id_list.append(content_id)
-            position_index = int(item.get('position_index'))
             display_time = int(item.get('display_time'))
             content = Content.get_user_relevant_objects(user_details=user_details).get(content_id=content_id)
-            entry, created = PlaylistItems.objects.get_or_create(playlist=playlist, content=content,
-                                                        defaults={'position_index': position_index,
-                                                                  'display_time': display_time})
-            if not created:
-                entry.position_index = position_index
+            if playlist_item_id == -1:
+                entry = PlaylistItems.objects.create(playlist=playlist, content=content, position_index=pos_index,
+                                                     display_time=display_time)
+                playlist_item_id = entry.playlist_item_id
+            else:
+                entry = PlaylistItems.objects.get(playlist_item_id=playlist_item_id)
+                entry.position_index = pos_index
                 entry.display_time = display_time
                 entry.save()
+            playlist_item_id_list.append(playlist_item_id)
 
         # Remove content not in playlist_items
-        removed_content = PlaylistItems.objects.filter(playlist=playlist).exclude(content__content_id__in=content_id_list)
-        for content in removed_content:
+        removed_playlist_content = PlaylistItems.objects.filter(playlist=playlist).exclude(
+            playlist_item_id__in=playlist_item_id_list)
+        for content in removed_playlist_content:
             content.delete()
         playlist_items = FlatJsonSerializer().get_playlist_items(playlist)
         playlist_dict = {'playlist_id': playlist_id, 'playlist_title': playlist_title, 'playlist_items': playlist_items}
@@ -110,6 +113,15 @@ def get_playlists(request):
     json_data = FlatJsonSerializer().serialize(user_playlists,
                                                fields=('playlist_id', 'playlist_title','playlist_items'))
     return HttpResponse(json_data, content_type='application/json')
+
+
+def get_files_recursively_json(request, parent_folder_id):
+    all_files_content_ids = get_files_recursively(request, parent_folder_id=parent_folder_id)
+    user_details, organization = user_and_organization(request)
+    user_content = Content.get_user_relevant_objects(user_details=user_details)
+    all_files = user_content.filter(content_id__in=all_files_content_ids)
+    json_content = FlatJsonSerializer().serialize(all_files, fields=('title', 'document', 'content_id'))
+    return HttpResponse(json_content, content_type='application/json')
 
 
 def delete_playlist(request):

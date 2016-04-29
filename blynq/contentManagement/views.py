@@ -144,15 +144,6 @@ def get_files_recursively(request, parent_folder_id=-1):
     return all_files_content_id
 
 
-def get_files_recursively_json(request, parent_folder_id):
-    all_files_content_ids = get_files_recursively(request, parent_folder_id=parent_folder_id)
-    user_details, organization = user_and_organization(request)
-    user_content = Content.get_user_relevant_objects(user_details=user_details)
-    all_files = user_content.filter(content_id__in=all_files_content_ids)
-    json_content = FlatJsonSerializer().serialize(all_files, fields=('title', 'document', 'content_id'))
-    return HttpResponse(json_content, content_type='application/json')
-
-
 def folder_path(request, current_folder_id):
     current_folder_id = int(current_folder_id)
     user_details, organization = user_and_organization(request)
@@ -178,7 +169,8 @@ def get_content_helper(request, parent_folder_id=-1, is_folder=False):
             parent_folder = user_content.get(content_id=parent_folder_id)
             user_content = user_content.filter(parent_folder=parent_folder)
         user_content = user_content.filter(is_folder=is_folder)
-        json_content = FlatJsonSerializer().serialize(user_content, fields=('title', 'document', 'content_id'))
+        json_content = FlatJsonSerializer().serialize(user_content, fields=('title', 'document', 'content_id',
+                                                                            'is_folder'))
     except:
         json_content = []
         error = "Error while fetching the content or invalid parent folder id"

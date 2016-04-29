@@ -9,7 +9,7 @@ from contentManagement.models import Content
 
 
 class PlaylistItems(models.Model):
-    playlist_items_id = models.AutoField(primary_key=True)
+    playlist_item_id = models.AutoField(primary_key=True)
     playlist = models.ForeignKey('Playlist', on_delete=models.CASCADE)
     content = models.ForeignKey(Content, on_delete=models.CASCADE)
     # index signifies the position of content in the playlist

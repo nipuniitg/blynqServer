@@ -156,27 +156,49 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
 //Any logic that needs some computation goes here.
 plApp.factory('ctFactory', ['ctDataAccessFactory', function(ctDataAccessFactory){
 
-    var getContent = function(callback)
+    // These are used by the playlist controller.
+    var folders =null;
+    var files = null;
+
+
+    var getFolders = function(folderId, callback)
     {
-        ctDataAccessFactory.getContentJson(callback);
+        ctDataAccessFactory.getFolders(folderId,function(data)
+        {
+            folders = data;
+            callback(data)
+        });
+    };
+
+    var getFiles = function(folderId, callback)
+    {
+        ctDataAccessFactory.getFiles(folderId,function(data)
+        {
+            files = data;
+            callback(data)
+        });
+    };
+
+    var getFoldersObj = function()
+    {
+        return folders;
+    };
+
+    var getFilesObj = function()
+    {
+        return files;
     };
 
     return{
-        getContent : getContent
+        getFolders : getFolders
+        ,getFiles : getFiles
+        ,getFoldersObj : getFoldersObj
+        ,getFilesObj : getFilesObj
     }
 
 }]);
 
 plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function($scope, ctFactory, ctDataAccessFactory){
-
-   /* $scope.dragControlListeners = {
-        //accept: function (sourceItemHandleScope, destSortableScope) {return boolean}//override to determine drag is allowed or not. default is true.
-        itemMoved: function (event) {},
-        orderChanged: function(event) {},
-        containment: '#div-playlistQueue',//optional param.
-        clone: true, //optional param for clone feature.
-        allowDuplicates: false //optional param allows duplicates to be dropped.
-    };*/
 
     //private functions
     var onLoad = function(){
@@ -187,12 +209,12 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
 
     var refreshContent = function(folderId){
 
-        ctDataAccessFactory.getFolders(folderId, function(data)
+        ctFactory.getFolders(folderId, function(data)
         {
             $scope.folders = data;
         });
 
-        ctDataAccessFactory.getFiles(folderId, function(data)
+        ctFactory.getFiles(folderId, function(data)
         {
             $scope.files = data;
         });
@@ -319,16 +341,26 @@ return{
 plApp.directive('droppable', function($compile){
 return{
     restrict : 'A'
-    /*,scope : {
-        'data-ng-model' : '=queueItems'
-    }*/
+    ,scope : {
+        addContentFunction : '&addContentFunction'
+        ,addFolderFunction : '&addFolderFunction'
+    }
     ,link: function(scope, element, attrs) {
             element.droppable({
               accept : '.div-draggable-wrap'
               ,hoverClass : '.highlight-acceptable'
               ,drop: function(event, ui){
+
                    var dragIndex = angular.element(ui.draggable).data('index');
-                   console.log();
+                   var isFolder = angular.element(ui.draggable).data('isfolder');
+                   if(isFolder){
+                        scope.addFolderFunction()(dragIndex);
+                   }
+                   else
+                   {
+                        scope.addContentFunction()(dragIndex);
+                   }
+
                 }
             });
 

@@ -21,7 +21,7 @@
                 <div class="item-search-row">
                     <div class="input-group">
                         <input class="form-control" placeholder="Search" type="text"
-                               ng-model="searchPlaylists.playlistName">
+                               ng-model="searchPlaylists.playlist_title">
                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
                     </div>
                 </div>
@@ -43,7 +43,7 @@
         <div id="div-playlistQueue" class="col-md-2 col-fluid" style="z-index:0">
             <div class="panel panel-default" style="border-right:1px solid grey">
                 <div class="panel-heading ">
-                    <div class="pull-left">Playlist Queue</div>
+                    <div class="pull-left">Playlist Items</div>
                     <div class="widget-icons pull-right" ng-show="!playlistQueueEditMode">
                         <a href="#" ng-click="editPlaylistItems()" class="wminimize"><i
                                 class="fa fa-pencil"></i>Edit</a>
@@ -63,25 +63,28 @@
                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
                     </div>
                 </div>
-                <ul id="ul-playlistQueue" class="list-group" style="height:490px;overflow-y:scroll"
-                    data-as-sortable="board.dragControlListeners"
-                    is-disabled="false"
-                    data-ng-model="activePlaylistObj.queueItems"
-                    droppable>
-                    <li ng-repeat="item in activePlaylistObj.queueItems | filter: searchPlaylistQueue"
-                        class="list-group-item"
-                        ng-class="{active: $index === activeQueueItemIndex }"
-                        ng-click="clickedOnQueueItem($index)"
-                        style="padding:2px 5px"
-                        data-as-sortable-item>
-                        <i class="fa fa-ellipsis-v" data-as-sortable-item-handle></i>
-                        {[ item.queueItemName ]}
-                        <i class="pull-right fa fa-times pointer" ng-click="reomveQueueItem($index)"
-                           ng-show="playlistQueueEditMode"></i>
-                        </br>
-                        <span style="font-size:11px">{[ item.queueItemDuration ]}</span>
-                    </li>
-                </ul>
+                <div droppable add-content-function="addContentToPlaylistItems"
+                     add-folder-function="addFolderContentToPlaylistItems">
+                    <ul id="ul-playlistQueue" class="list-group" style="height:490px;overflow-y:scroll"
+                        data-as-sortable="board.dragControlListeners"
+                        is-disabled="false"
+                        data-ng-model="activePlaylistObj.playlist_items">
+                        <li ng-repeat="item in activePlaylistObj.playlist_items | filter: searchPlaylistQueue"
+                            class="list-group-item"
+                            ng-class="{active: $index === activePlaylistItemIndex }"
+                            ng-click="clickedOnQueueItem($index)"
+                            style="padding:2px 5px"
+                            data-as-sortable-item
+                            data-as-sortable-item-handle>
+                            <i class="fa fa-ellipsis-v" ></i>
+                            {[ item.title ]}
+                            <i class="pull-right fa fa-times pointer" ng-click="reomveQueueItem($index)"
+                               ng-show="playlistQueueEditMode"></i>
+                            </br>
+                            <span style="font-size:11px">{[ item.display_time ]}</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
 
@@ -93,14 +96,14 @@
                 </div>
                 <div class="panel-body">
                     <div class="item-container" style="width:50%; margin:0 auto">
-                        <img src="{% static 'images/nba.jpg' %}">
+                        <img ng-src="{[ activePlaylistItem.url ]}">
                     </div>
                     <form class="form-horizontal" role="form" style="height: 400px;overflow-y:scroll">
                         <div class="form-group">
                             <label class="col-md-3 control-label">Item Name</label>
                             <div class="col-md-9">
                                 <div class="form-control-static">
-                                    {[ activeQueueItem.queueItemName ]}
+                                    {[ activePlaylistItem.title ]}
                                 </div>
                             </div>
                         </div>
@@ -108,7 +111,7 @@
                             <label class="col-md-3 control-label">Resolution</label>
                             <div class="col-md-9">
                                 <div class="form-control-static">
-                                    {[ activeQueueItem.itemResolution ]}
+                                    {[ activePlaylistItem.itemResolution ]}
                                 </div>
                             </div>
                         </div>
@@ -116,7 +119,7 @@
                             <label class="col-md-3 control-label">Duration</label>
                             <div class="col-md-9">
                                 <div class="form-control-static">
-                                    {[ activeQueueItem.queueItemDuration ]}
+                                    {[ activePlaylistItem.display_time ]}
                                 </div>
                             </div>
                         </div>
@@ -124,7 +127,7 @@
                             <label class="col-md-3 control-label">Duration</label>
                             <div class="col-md-9">
                                 <input type="text" class="form-control" placeholder="3h 5m 29s"
-                                       ng-model="activeQueueItem.queueItemDuration">
+                                       ng-model="activePlaylistItem.display_time">
                             </div>
                         </div>
 
@@ -151,7 +154,7 @@
         </div>
 
         <!-- Content div -->
-        <div class="col-md-8">
+        <div class="col-md-8" ng-show="!showQueueItemDetails">
             {% include 'contentManagement/content_holder.html' %}
         </div>
 

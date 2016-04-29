@@ -8,8 +8,6 @@ urlpatterns = [
      url(r'^deleteContent', views.delete_content, name='delete_item'),
      url(r'^getFoldersJson/(?P<parent_folder_id>-?\d+)', views.get_folders_json, name='get_folders_json'),
      url(r'^getFilesJson/(?P<parent_folder_id>-?\d+)', views.get_files_json, name='get_files_json'),
-     url(r'^getFilesRecursively/(?P<parent_folder_id>-?\d+)', views.get_files_recursively_json,
-         name='get_files_recursively'),
      url(r'^createFolder', views.create_folder, name='create_folder'),
      url(r'^updateContentTitle', views.update_content_title, name='update_content_title'),
      url(r'^folderPath/(?P<current_folder_id>-?\d+)', views.folder_path, name='folder_path'),

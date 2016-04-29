@@ -30,11 +30,13 @@
                 <div class="panel-body">
                     <!-- Folders -->
                     <div class="item-container-wrap" ng-repeat="folder in folders">
-                        <div class="item-container-header">
-                            <p>{[ folder.title ]}</p>
-                        </div>
-                        <div class="folder-container" ng-click="navigateToFolder(folder.content_id)">
-                            <img src="{% static 'images/folder-icon.png' %}">
+                        <div class="div-draggable-wrap" draggable data-index="{[$index]}" data-isFolder="{[folder.is_folder]}">
+                            <div class="item-container-header">
+                                <p>{[ folder.title ]}</p>
+                            </div>
+                            <div class="folder-container" ng-click="navigateToFolder(folder.content_id)">
+                                <img src="{% static 'images/folder-icon.png' %}">
+                            </div>
                         </div>
                         <div class="item-container-footer">
                             <div class="input-group">
@@ -48,9 +50,8 @@
                     </div>
                     <!-- Files -->
                     <div class="item-container-wrap"
-                         ng-repeat="file in files"
-                    >
-                        <div class="div-draggable-wrap" draggable data-index="{[$index]}">
+                         ng-repeat="file in files">
+                        <div class="div-draggable-wrap" draggable data-index="{[$index]}" data-isfolder="{[file.is_folder]}">
                             <div class="item-container-header">
                                 {[ file.title ]}
                             </div>

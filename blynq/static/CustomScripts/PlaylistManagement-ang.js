@@ -26,26 +26,7 @@ plApp.factory('dataAccessFactory',['$http','$window', function($http,$window){
             });
     }
 
-    var savePlaylist = function(playlistObj, callback)
-    {
-        $http({
-             method : "POST",
-             url : 'getPlaylistsJson',
-             data : {
-                playlistObj : playlistObj
-             }
-         }).then(function mySucces(response){
-                returnData = angular.copy(response.data);
-                if(callback)
-                {
-                    callback(returnData);
-                }
-            }, function myError(response) {
-                console.log(response.statusText);
-            });
-
-    };
-
+    //This function is used for add/edit playlist and editing playlist-items.
     var upsertPlaylist = function(playlist, callback){
         $http({
              method : "POST"
@@ -95,11 +76,28 @@ plApp.factory('dataAccessFactory',['$http','$window', function($http,$window){
             });
     }
 
+    var getFolderContentsRecursively = function(folderId, callback)
+    {
+        $http({
+             method : "GET"
+             ,url : 'getFilesRecursively/'+folderId
+         }).then(function mySucces(response){
+                returnData = angular.copy(response.data);
+                if(callback)
+                {
+                    callback(returnData);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
+
+    }
+
     return{
         getPlaylists : getPlaylists
-        ,savePlaylist : savePlaylist
         ,upsertPlaylist : upsertPlaylist
         ,deletePlaylist : deletePlaylist
+        ,getFolderContentsRecursively : getFolderContentsRecursively
 
     };
 
@@ -107,29 +105,53 @@ plApp.factory('dataAccessFactory',['$http','$window', function($http,$window){
 
 plApp.factory('plFactory',['dataAccessFactory', function(dataAccessFactory)
 {
+    //TODO: Refactor the below code. Get the templates from the backend.
     var playlistBluePrint = {
         playlist_id: -1,
         playlist_title: "",
         playlist_items: []
     };
 
+    var playlistItemBlueprint = {
+        playlist_item_id : -1
+        ,content_id: -1
+        ,url: ''
+        ,display_time: 15
+        ,title: ''
+    }
+
     var mdlType = {
         'Add' : 0,
         'Edit' : 1
     }
 
-    var getPlaylists = function(callback){
-        dataAccessFactory.getPlaylistsJson(callback);
-    };
+    var getFolderContentsAsPlaylistItems = function(folderId, callback){
+        dataAccessFactory.getFolderContentsRecursively(folderId, function(contentItems){
+            var noOfContents = contentItems.length;
+            if(noOfContents>0)
+            {
+                for(var i=0;i<noOfContents; i++)
+                {
+                    contentItems[i].playlist_item_id =-1
+                    contentItems[i].display_time= 15
+                }
+            }
+            callback(contentItems);
+        })
+
+    }
+
 
 return{
-    mdlType : mdlType
+     mdlType : mdlType
     ,playlistBluePrint : playlistBluePrint
+    ,playlistItemBlueprint : playlistItemBlueprint
+    ,getFolderContentsAsPlaylistItems : getFolderContentsAsPlaylistItems
 }
 
 }]);
 
-plApp.controller('plCtrl', ['plFactory','$scope','$window','dataAccessFactory', function(plFactory, $scope, $window, dataAccessFactory){
+plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','dataAccessFactory', function(plFactory,ctFactory, $scope, $window, dataAccessFactory){
 
     var onLoad = function(){
         //playlist
@@ -138,27 +160,17 @@ plApp.controller('plCtrl', ['plFactory','$scope','$window','dataAccessFactory', 
         $scope.activePlaylistObj = null;
 
         //playlist queue
-        $scope.activeQueueItemIndex= null;
-        $scope.activeQueueItem = null;
-        $scope.dragControlListeners = {
-            //accept: function (sourceItemHandleScope, destSortableScope) {return boolean}//override to determine drag is allowed or not. default is true.
-            itemMoved: function (event) {},
-            orderChanged: function(event) {},
-            containment: '#div-playlistQueue',//optional param.
-            clone: true, //optional param for clone feature.
-            allowDuplicates: false //optional param allows duplicates to be dropped.
-        };
+        $scope.activePlaylistItemIndex= null;
+        $scope.activePlaylistItem = null;
 
         //bool values
         $scope.playlistQueueEditMode = false;
         $scope.showQueueItemDetails = false;
 
-        $scope.displayContentDiv = false;
+        //$scope.displayContentDiv = false;
 
         getPlaylists();
     }
-
-
 
     //private methods
     var  getPlaylists = function(){
@@ -172,6 +184,8 @@ plApp.controller('plCtrl', ['plFactory','$scope','$window','dataAccessFactory', 
         $scope.activePlaylistObj = angular.copy($scope.playlists[index]);
         $scope.activePlaylistIndex = index;
     }
+
+
 
     //methods
     //----add / edit playlist (title)
@@ -232,6 +246,7 @@ plApp.controller('plCtrl', ['plFactory','$scope','$window','dataAccessFactory', 
 
     $scope.clickedOnPlaylist= function(index){
         updateActivePlaylist(index);
+        $scope.playlistQueueEditMode = false;
     };
 
 
@@ -239,15 +254,17 @@ plApp.controller('plCtrl', ['plFactory','$scope','$window','dataAccessFactory', 
     $scope.editPlaylistItems = function(){
         //need selector here
         $scope.playlistQueueEditMode= true;
+        console.log($scope.activePlaylistObj);
     };
 
     $scope.savePlaylistQueueItems = function(){
-        dataAccessFactory.savePlaylistItems($scope.activePlaylistObj, function(data){
+        dataAccessFactory.upsertPlaylist($scope.activePlaylistObj, function(data){
             if(data.success)
             {
                 toastr.success('Playlist saved successfully');
                 $scope.playlistQueueEditMode = false;
-                playlists[$scope.activePlaylistIndex] = data.playlist;
+                $scope.playlists[$scope.activePlaylistIndex] = data.playlist;
+                $scope.activePlaylistObj = angular.copy($scope.playlists[$scope.activePlaylistIndex]);
             }
             else{
                 toastr.warning('Oops!! Some error occured. Please try again.');
@@ -260,18 +277,61 @@ plApp.controller('plCtrl', ['plFactory','$scope','$window','dataAccessFactory', 
         updateActivePlaylist($scope.activePlaylistIndex);
     }
 
+    //----Add Contents To activePlaylistObj
+        //Below functions are being called from the droppable directive
+    $scope.addContentToPlaylistItems = function(index){
+        if($scope.playlistQueueEditMode)
+        {
+            toastr.success('dropped')
+            var contentDropped = ctFactory.getFilesObj()[index];
+            var newPlaylistItem = angular.copy(plFactory.playlistItemBlueprint);
+            newPlaylistItem.title = contentDropped.title;
+            newPlaylistItem.url  = contentDropped.url;
+            newPlaylistItem.content_id = contentDropped.content_id;
+            //:TODO If the dropped content is video, duration time should be set as per that video duration
+
+            //Had to put apply manually as the DOM is not updated by itself.
+            $scope.$apply(function(){
+                 $scope.activePlaylistObj.playlist_items.push(newPlaylistItem);
+            });
+        }
+        else
+        {
+            toastr.warning('Please set the playlist items in edit mode.');
+        }
+
+
+    }
+
+    $scope.addFolderContentToPlaylistItems= function(index)
+    {
+        if($scope.playlistQueueEditMode)
+        {
+            toastr.success('Folder Dragged. Loading the content in the folder.');
+            var folderDropped = ctFactory.getFoldersObj()[index];
+            plFactory.getFolderContentsAsPlaylistItems(folderDropped.content_id, function(data){
+                $scope.activePlaylistObj.playlist_items= $scope.activePlaylistObj.playlist_items.concat(data);
+                toastr.success('Playlist Items updated')
+            });
+        }
+        else{
+            toastr.warning('Please set the playlist items in edit mode.');
+        }
+
+    }
+
 
 
     //Related to queue item details methods
     $scope.clickedOnQueueItem = function(index){
         $scope.showQueueItemDetails = true;
-        $scope.activeQueueItem = $scope.activePlaylistObj.queueItems[index];
-        $scope.activeQueueItemIndex = index;
+        $scope.activePlaylistItem = $scope.activePlaylistObj.playlist_items[index];
+        $scope.activePlaylistItemIndex = index;
     };
 
     $scope.reomveQueueItem = function(index){
-        $scope.activePlaylistObj.queueItems.splice(index,1);
-        if($scope.activeQueueItemIndex == index)
+        $scope.activePlaylistObj.playlist_items.splice(index,1);
+        if($scope.activePlaylistItemIndex == index)
         {
             $scope.showQueueItemDetails = false;
         }
@@ -288,3 +348,4 @@ plApp.controller('plCtrl', ['plFactory','$scope','$window','dataAccessFactory', 
     onLoad();
 
 }]);
+

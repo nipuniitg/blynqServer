@@ -3,6 +3,7 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.serializers.python import Serializer
 
+from contentManagement.models import Content
 from playlistManagement.models import PlaylistItems
 
 
@@ -44,15 +45,13 @@ class FlatJsonSerializer(Serializer):
         return data
 
     def get_playlist_items(self, obj):
-        content_items = obj.playlist_items.all()
-        playlist_items = PlaylistItems.objects.filter(playlist=obj)
+        playlist_items = PlaylistItems.objects.filter(playlist=obj).order_by('-position_index')
         contents = []
-        content_fields=('title', 'document', 'content_id')
-        for instance in content_items:
+        content_fields=('title', 'document', 'content_id', 'is_folder')
+        for playlist_item in playlist_items:
             data = {}
-            data = self.add_content_fields(instance, data, content_fields)
-            playlist_item = playlist_items.get(content=instance)
-            data['position_index'] = playlist_item.position_index
+            data = self.add_content_fields(playlist_item.content, data, content_fields)
+            data['playlist_item_id'] = playlist_item.playlist_item_id
             data['display_time'] = playlist_item.display_time
             contents.append(data)
         return contents
