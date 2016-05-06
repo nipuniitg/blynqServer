@@ -338,7 +338,7 @@ return{
         }
 }});
 
-plApp.directive('droppable', function($compile){
+plApp.directive('droppable', function(){
 return{
     restrict : 'A'
     ,scope : {

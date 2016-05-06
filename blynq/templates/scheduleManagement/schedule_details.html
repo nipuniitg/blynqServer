@@ -1,0 +1,85 @@
+{% extends 'masterLayout.html' %}
+{% load staticfiles %}
+
+{% block content%}
+<script src="{% static 'CustomScripts/ScheduleManagement-ang.js' %}"></script>
+<section class="wrapper" ng-app="sdApp" ng-controller="scheduleDetailsCtrl">
+    <div class="row">
+        <div class="col-md-12" style="min-height:400px; overflow-y: scroll">
+            <div class="panel panel-default" style="border-right:1px solid grey">
+                <div class="panel-heading">Schedule Details</div>
+                <div class="panel-body">
+                    <form id="form_schedule_details" class="" enctype="multipart/form-data">
+
+                        <div class="form-group">
+                            <div class="control-label">Screens</div>
+                            <div class="col-sm-12">
+                                <div id="inpScreensAndGroups" class="tagsinput " style="height: 100%;">
+                                    <!--<span class="tag" ng-repeat="group in modalScreenDetailsObj.groups">-->
+                                    <span class="tag">
+                                        <span> Group1 &nbsp;&nbsp;</span>
+                                        <a class="tagsinput-remove-link"
+                                           ng-click=""></a>
+                                    </span>
+                                    <div class="tagsinput-add-container">
+                                        <div class="tagsinput-add"
+                                             ng-click="addGroupsToScreen()"></div>
+                                        <input value="" data-default=""
+                                               style="color: rgb(102, 102, 102); width: 7px;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="help-block with-errors col-sm-offset-3 col-sm-9">
+                                some error
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="control-label">Playlists</div>
+                            <div class="col-sm-12">
+                                <div id="playlistTextbox" class="tagsinput " style="height: 100%;">
+                                    <!--<span class="tag" ng-repeat="group in modalScreenDetailsObj.groups">-->
+                                    <span class="tag">
+                                        <span> Playlist &nbsp;&nbsp;</span>
+                                        <a class="tagsinput-remove-link"
+                                           ng-click=""></a>
+                                    </span>
+                                    <div class="tagsinput-add-container">
+                                        <div class="tagsinput-add"
+                                             ng-click="addPlaylists()"></div>
+                                        <input value="" data-default=""
+                                               style="color: rgb(102, 102, 102); width: 7px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-3">Timeline</div>
+                            <timeline-textbox
+                                    time-defined="schedule.timeDefined"
+                                    start-date="schedule.startDate"
+                                    end-date="schedule.endDate"
+                                    start-time="schedule.startTime"
+                                    end-time="schedule.endTime"
+                                    recurrence-type="schedule.recurrenceType"
+                                    recurrence-frequency="schedule.recurrenceFrequency"
+                                    recurrence-absolute="schedule.recurrenceAbsolute"
+                                    recurrence-day-of-week="schedule.recurrenceDayOfWeek"
+                                    recurrence-day-of-month="schedule.recurrenceDayOfMonth"
+                                    recurrence-week-of-month="schedule.recurrenceWeekOfMonth"
+                                    recurrence-month-of-year="schedule.recurrenceMonthOfYear"
+                                    recurrence-days-of-week="schedule.recurrenceDaysOfWeek"
+                                    >
+                                {% include 'scheduleManagement/_timeline_textbox.html'%}
+                            </timeline-textbox>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+

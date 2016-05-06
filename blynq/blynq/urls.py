@@ -19,8 +19,9 @@ urlpatterns = [
     url(r'^playlist/', include(playlist_urls)),
     url(r'^$', auth_views.homePage),
     url(r'^home/', auth_views.homePage, name='homepage'),
-    url(r'^home/', screen_views.routeToHome, name='homepage'),
+    #url(r'^home/', screen_views.routeToHome, name='homepage'),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^templates/scheduleManagement',auth_views.getPartailtemplate)
 ]
 
 if settings.DEBUG:

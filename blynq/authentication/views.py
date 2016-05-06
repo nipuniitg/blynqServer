@@ -59,7 +59,11 @@ def login(request):
 
 @login_required
 def homePage(request):
-    return render(request, 'authentication/homepage.html')
+    return render(request, 'Home.html')
+
+@login_required
+def getPartailtemplate(request):
+    return render(request, 'scheduleManagement/_timeline_modal.html')
 
 # def logout(request):
 #     print 'I am in logout'

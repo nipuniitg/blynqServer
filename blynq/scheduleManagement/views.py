@@ -18,6 +18,12 @@ from screenManagement.models import Screen
 def index(request):
     return render(request,'scheduleManagement/schedule_index.html')
 
+@login_required
+def upsert_schedule(request, schedule_id = -1):
+    #if(schedule_id == -1):
+    return render(request, 'scheduleManagement/schedule_details.html')
+
+
 
 def get_screen_data(request, screen_id, nof_days=7):
     user_details, organization = user_and_organization(request)
