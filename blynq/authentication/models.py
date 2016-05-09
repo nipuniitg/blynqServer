@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 # See https://docs.djangoproject.com/en/1.8/ref/contrib/auth/ for User model details
 
 
+# Not being used
 class City(models.Model):
     city_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, unique=True)
@@ -18,6 +19,7 @@ class City(models.Model):
         return ((self.name, self.state))
 
 
+# Not being used
 class Address(models.Model):
     address_id = models.AutoField(primary_key=True)
     building_name = models.CharField(max_length=100)

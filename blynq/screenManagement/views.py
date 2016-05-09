@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import render
+from schedule.models import Calendar
 
 from JsonTestData import TestDataClass
 from authentication.models import UserDetails, Organization, Address
@@ -62,16 +63,16 @@ def add_group(request):
 
 @login_required
 def upsert_group(request):
-    json_obj = json.loads(request.body)
+    posted_data = string_to_dict(request.body)
     success = False
     errors = []
     if request.method == 'POST':
-        add_group_form = AddGroup(data=json_obj)
+        add_group_form = AddGroup(data=posted_data)
         if add_group_form.is_valid():
             user_details, organization = user_and_organization(request)
             form_data = add_group_form.cleaned_data
             try:
-                group_id = json_obj['group_id']
+                group_id = posted_data['group_id']
                 if group_id == -1:
                     group = Group(group_name=form_data.get('group_name'), created_by=user_details)
                 else:
@@ -109,18 +110,18 @@ def delete_group(request):
 
 @login_required
 def upsert_screen(request):
-    json_obj = json.loads(request.body)
+    posted_data = string_to_dict(request.body)
     success = False
     errors = []
     if request.method == 'POST':
-        add_screen_form = AddScreenForm(data=json_obj)
+        add_screen_form = AddScreenForm(data=posted_data)
         if add_screen_form.is_valid():
             user_details, organization = user_and_organization(request)
             form_data = add_screen_form.cleaned_data
             try:
                 # TODO: The logic for activation_key is pending and update the fields activated_by and activated_on
                 status = default_screen_status()
-                screen_id = json_obj['screen_id']
+                screen_id = posted_data['screen_id']
                 if screen_id == -1:
                     screen = Screen(screen_name=form_data.get('screen_name'))
                 else:
@@ -134,9 +135,16 @@ def upsert_screen(request):
                 screen.owned_by=organization
                 screen.status=status
                 screen.save()
-                for group in json_obj.get('groups'):
+                for group in posted_data.get('groups'):
                     group_entry = Group.objects.get(group_id=group.get('group_id'))
                     screen.groups.add(group_entry)
+
+                # Adding a calendar for each screen
+                if not screen.screen_calendar:
+                    calendar = Calendar(name=screen.screen_name)
+                    calendar.save()
+                    screen.screen_calendar = calendar
+                    screen.save()
                 # TODO: The above case only handles the PRIVATE businessType, add a check
                 success = True
             except:
@@ -149,6 +157,40 @@ def upsert_screen(request):
     return ajax_response(success=success, errors=errors)
 
 
+# TODO: Understand the difference between natural_key method and get_by_natural_key method in
+# https://docs.djangoproject.com/en/1.9/topics/serialization/
+def get_groups_json(request):
+    user_details, organization = user_and_organization(request)
+    groups_data = Group.get_user_relevant_objects(user_details=user_details)
+    # json_data = serializers.serialize("json", groups_data, fields=('group_id','group_name', 'description', 'screen'))
+    json_data = json_serializer().serialize(groups_data, fields=('group_id','group_name', 'description', 'screen'))
+    return HttpResponse(json_data, content_type='application/json')
+
+
+def get_screens_json(request):
+    user_details, organization = user_and_organization(request)
+    screen_data = Screen.get_user_relevant_objects(user_details)
+    json_data = json_serializer().serialize(screen_data, fields=('screen_id', 'screen_name', 'address', 'status',
+                                                                 'groups', 'screen_size', 'resolution'))
+    return HttpResponse(json_data, content_type='application/json')
+
+
+def get_selectable_screens_json(request, group_id=-1):
+    user_details, organization = user_and_organization(request)
+    screen_data = Screen.get_user_relevant_objects(user_details).exclude(groups__pk=group_id)
+    json_data = json_serializer().serialize(screen_data, fields=('screen_id', 'screen_name', 'address', 'status',
+                                                                 'groups', 'screen_size', 'resolution'))
+    return HttpResponse(json_data, content_type='application/json')
+
+
+def get_selectable_groups_json(request, screen_id=-1):
+    user_details, organization = user_and_organization(request)
+    groups_data = Group.objects.filter(organization=organization).exclude(screen__pk=screen_id)
+    json_data = json_serializer().serialize(groups_data, fields=('group_id', 'group_name'))
+    return HttpResponse(json_data, content_type='application/json')
+
+
+# Unused functions
 @login_required
 def add_screen_location(request):
     context_dic = {}
@@ -232,6 +274,10 @@ def add_screen_specs(request):
     return render(request,'Shared/displayForm.html', context_dic)
 
 
+def routeToHome(request):
+    return render(request, 'Home.html')
+
+
 @login_required
 def screen_index(request):
     context_dic = {}
@@ -243,41 +289,4 @@ def group_index(request):
     context_dic ={}
     context_dic['form'] = AddGroup(form_name='formGroup', scope_prefix='modalGroupDetailsObj')
     return render(request, 'screen/groups.html', context_dic)
-
-
-def routeToHome(request):
-    return render(request, 'Home.html')
-
-
-# TODO: Understand the difference between natural_key method and get_by_natural_key method in
-# https://docs.djangoproject.com/en/1.9/topics/serialization/
-def get_groups_json(request):
-    user_details, organization = user_and_organization(request)
-    groups_data = Group.get_user_relevant_objects(user_details=user_details)
-    # json_data = serializers.serialize("json", groups_data, fields=('group_id','group_name', 'description', 'screen'))
-    json_data = json_serializer().serialize(groups_data, fields=('group_id','group_name', 'description', 'screen'))
-    return HttpResponse(json_data, content_type='application/json')
-
-
-def get_screens_json(request):
-    user_details, organization = user_and_organization(request)
-    screen_data = Screen.get_user_relevant_objects(user_details)
-    json_data = json_serializer().serialize(screen_data, fields=('screen_id', 'screen_name', 'address', 'status',
-                                                                 'groups', 'screen_size', 'resolution'))
-    return HttpResponse(json_data, content_type='application/json')
-
-
-def get_selectable_screens_json(request, group_id=-1):
-    user_details, organization = user_and_organization(request)
-    screen_data = Screen.get_user_relevant_objects(user_details).exclude(groups__pk=group_id)
-    json_data = json_serializer().serialize(screen_data, fields=('screen_id', 'screen_name', 'address', 'status',
-                                                                 'groups', 'screen_size', 'resolution'))
-    return HttpResponse(json_data, content_type='application/json')
-
-
-def get_selectable_groups_json(request, screen_id=-1):
-    user_details, organization = user_and_organization(request)
-    groups_data = Group.objects.filter(organization=organization).exclude(screen__pk=screen_id)
-    json_data = json_serializer().serialize(groups_data, fields=('group_id', 'group_name'))
-    return HttpResponse(json_data, content_type='application/json')
 

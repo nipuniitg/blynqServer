@@ -1,8 +1,7 @@
-from django.http import JsonResponse
-import json
+from django.http import JsonResponse, Http404
+import json, pytz
 
 from authentication.models import UserDetails
-import pytz
 
 def ajax_response(success=False, errors=[], obj_dict=None):
     context_dic = {}
@@ -15,8 +14,12 @@ def ajax_response(success=False, errors=[], obj_dict=None):
 
 
 def user_and_organization(request):
-    user_details = UserDetails.objects.get(username=request.user.username)
-    organization = user_details.organization
+    try:
+        user_details = UserDetails.objects.get(username=request.user.username)
+        organization = user_details.organization
+    except UserDetails.DoesNotExist:
+        raise Http404("No UserDetails matches the given query. If you're logged in as django superuser please logout"
+                      " and re-login as normal user")
     # user_details = default_userdetails()
     # organization = default_organization()
     return user_details, organization

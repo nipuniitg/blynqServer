@@ -186,7 +186,6 @@ def get_files_json(request, parent_folder_id=-1):
 
 
 # TODO: Move files across folders
-
 def update_content_title(request):
     user_details, organization = user_and_organization(request)
     success = False
