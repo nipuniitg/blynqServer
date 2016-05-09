@@ -83,19 +83,10 @@ class ScreenSpecs(models.Model):
         return ((self.brand, self.model_num, self.display_type))
 
 
-# class OrganizationScreen(models.Model):
-#     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
-#     screen = models.ForeignKey('Screen', on_delete=models.PROTECT)
-#     start_time = models.DateTimeField()
-#     end_time = models.DateTimeField()
-#     time_slot_valid = models.BooleanField()
-#     # time_slot should be in seconds
-#     time_slot = models.IntegerField(null=True)
-
-
 class ScreenGroups(models.Model):
     screen = models.ForeignKey('Screen', on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
+
 
 class Screen(models.Model):
     screen_id = models.AutoField(primary_key=True)
@@ -109,7 +100,7 @@ class Screen(models.Model):
     #location = models.ForeignKey(Address, on_delete=models.PROTECT)
     address = models.CharField(max_length=100, blank=True)
 
-    device_identification_id = models.CharField(max_length=16, blank=True, null=True)
+    device_identification_id = models.CharField(max_length=20, blank=True, null=True)
     activation_key = models.CharField(max_length=16, blank=True, null=True)
     activated_on = models.DateField(null=True, blank=True)
     activated_by = models.ForeignKey(UserDetails, null=True, blank=True)
@@ -130,8 +121,9 @@ class Screen(models.Model):
     status = models.ForeignKey(ScreenStatus, on_delete=models.PROTECT)
     groups = models.ManyToManyField(Group, blank=True, through=ScreenGroups)
 
+    # Each screen should have a separate calendar
     # Remove null=True for screen_calendar
-    screen_calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE, null=True)
+    screen_calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE, null=True, blank=True)
 
     @staticmethod
     def generate_activation_key(length=16):

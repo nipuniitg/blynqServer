@@ -30,7 +30,7 @@ class FlatJsonSerializer(Serializer):
         values = obj.groups.all()
         groups = []
         for value in values:
-            groups.append({'group_id':value.group_id, 'group_name': value.group_name})
+            groups.append({'group_id': value.group_id, 'group_name': value.group_name})
         return groups
 
     def add_content_fields(self, obj, data, fields=None):
@@ -54,7 +54,12 @@ class FlatJsonSerializer(Serializer):
     def get_playlist_items(self, obj, only_files=False):
         playlist_items = PlaylistItems.objects.filter(playlist=obj).order_by('-position_index')
         contents = []
-        content_fields=('title', 'document', 'content_id', 'is_folder')
+        # is_folder is removed as player don't require it. If need be you remove this check and keep the is_folder,
+        # as the player will anyway ignore this field
+        if only_files:
+            content_fields=('title', 'document', 'content_id')
+        else:
+            content_fields=('title', 'document', 'content_id', 'is_folder')
         for playlist_item in playlist_items:
             if only_files and playlist_item.content.is_folder:
                 continue
