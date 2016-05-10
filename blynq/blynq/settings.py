@@ -141,6 +141,7 @@ LOGIN_URL = '/authentication/login/'  # The page users are directed to if they a
 
 # Content related settings
 DEFAULT_DISPLAY_TIME = 10
+STORAGE_LIMIT_PER_ORGANIZATION = 5*1024*1024*1024  # 5 gb
 
 # Filer related settings
 THUMBNAIL_HIGH_RESOLUTION = True

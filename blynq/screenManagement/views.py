@@ -10,7 +10,7 @@ from schedule.models import Calendar
 from JsonTestData import TestDataClass
 from authentication.models import UserDetails, Organization, Address
 from customLibrary.serializers import FlatJsonSerializer as json_serializer
-from customLibrary.views_lib import ajax_response, user_and_organization, string_to_dict
+from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict
 from screenManagement.forms import AddScreenForm, AddScreenLocation, AddScreenSpecs, AddGroup
 from screenManagement.models import Screen, ScreenStatus, ScreenSpecs, Group
 
@@ -39,7 +39,7 @@ def add_group(request):
         if add_group_form.is_valid():
             form_data = add_group_form.cleaned_data
             try:
-                user_details, organization = user_and_organization(request)
+                user_details = get_userdetails(request)
                 group = Group.objects.create(group_name=form_data.get('group_name'),
                                              description=form_data.get('description'),
                                              created_by=user_details,
@@ -69,7 +69,7 @@ def upsert_group(request):
     if request.method == 'POST':
         add_group_form = AddGroup(data=posted_data)
         if add_group_form.is_valid():
-            user_details, organization = user_and_organization(request)
+            user_details = get_userdetails(request)
             form_data = add_group_form.cleaned_data
             try:
                 group_id = posted_data['group_id']
@@ -92,7 +92,7 @@ def upsert_group(request):
 
 
 def delete_group(request):
-    user_details, organization = user_and_organization(request)
+    user_details = get_userdetails(request)
     posted_data = string_to_dict(request.body)
     group_id = int(posted_data.get('group_id'))
     success = False
@@ -116,7 +116,7 @@ def upsert_screen(request):
     if request.method == 'POST':
         add_screen_form = AddScreenForm(data=posted_data)
         if add_screen_form.is_valid():
-            user_details, organization = user_and_organization(request)
+            user_details = get_userdetails(request)
             form_data = add_screen_form.cleaned_data
             try:
                 # TODO: The logic for activation_key is pending and update the fields activated_by and activated_on
@@ -132,7 +132,7 @@ def upsert_screen(request):
                 screen.address=form_data.get('address')
                 screen.aspect_ratio=form_data.get('aspect_ratio')
                 screen.resolution=form_data.get('resolution')
-                screen.owned_by=organization
+                screen.owned_by=user_details.organization
                 screen.status=status
                 screen.save()
                 for group in posted_data.get('groups'):
@@ -160,7 +160,7 @@ def upsert_screen(request):
 # TODO: Understand the difference between natural_key method and get_by_natural_key method in
 # https://docs.djangoproject.com/en/1.9/topics/serialization/
 def get_groups_json(request):
-    user_details, organization = user_and_organization(request)
+    user_details = get_userdetails(request)
     groups_data = Group.get_user_relevant_objects(user_details=user_details)
     # json_data = serializers.serialize("json", groups_data, fields=('group_id','group_name', 'description', 'screen'))
     json_data = json_serializer().serialize(groups_data, fields=('group_id','group_name', 'description', 'screen'))
@@ -168,7 +168,7 @@ def get_groups_json(request):
 
 
 def get_screens_json(request):
-    user_details, organization = user_and_organization(request)
+    user_details = get_userdetails(request)
     screen_data = Screen.get_user_relevant_objects(user_details)
     json_data = json_serializer().serialize(screen_data, fields=('screen_id', 'screen_name', 'address', 'status',
                                                                  'groups', 'screen_size', 'resolution'))
@@ -176,7 +176,7 @@ def get_screens_json(request):
 
 
 def get_selectable_screens_json(request, group_id=-1):
-    user_details, organization = user_and_organization(request)
+    user_details = get_userdetails(request)
     screen_data = Screen.get_user_relevant_objects(user_details).exclude(groups__pk=group_id)
     json_data = json_serializer().serialize(screen_data, fields=('screen_id', 'screen_name', 'address', 'status',
                                                                  'groups', 'screen_size', 'resolution'))
@@ -184,8 +184,8 @@ def get_selectable_screens_json(request, group_id=-1):
 
 
 def get_selectable_groups_json(request, screen_id=-1):
-    user_details, organization = user_and_organization(request)
-    groups_data = Group.objects.filter(organization=organization).exclude(screen__pk=screen_id)
+    user_details = get_userdetails(request)
+    groups_data = Group.objects.filter(organization=user_details.organization).exclude(screen__pk=screen_id)
     json_data = json_serializer().serialize(groups_data, fields=('group_id', 'group_name'))
     return HttpResponse(json_data, content_type='application/json')
 

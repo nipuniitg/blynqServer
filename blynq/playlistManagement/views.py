@@ -5,7 +5,7 @@ from django.http import JsonResponse, HttpResponse
 
 from contentManagement.models import Content
 from contentManagement.views import get_files_recursively
-from customLibrary.views_lib import user_and_organization, string_to_dict, ajax_response
+from customLibrary.views_lib import get_userdetails, string_to_dict, ajax_response
 from customLibrary.serializers import FlatJsonSerializer, playlist_dict
 from playlistManagement.models import Playlist, PlaylistItems
 
@@ -22,7 +22,7 @@ def index(request):
 def upsert_playlist(request):
     errors = []
     success = False
-    user_details, organization = user_and_organization(request)
+    user_details = get_userdetails(request)
     try:
         # Extract data from request.body
         posted_data = string_to_dict(request.body)
@@ -34,7 +34,7 @@ def upsert_playlist(request):
         # upsert playlist
         if playlist_id == -1:
             playlist = Playlist.objects.create(playlist_title=playlist_title, created_by=user_details,
-                                               last_updated_by=user_details, organization=organization)
+                                               last_updated_by=user_details, organization=user_details.organization)
             playlist_id = playlist.playlist_id
         else:
             playlist = user_playlists.get(playlist_id=playlist_id)
@@ -76,7 +76,7 @@ def upsert_playlist(request):
 
 
 def get_playlists(request):
-    user_details, organization = user_and_organization(request)
+    user_details = get_userdetails(request)
     user_playlists = Playlist.get_user_relevant_objects(user_details=user_details)
     json_data = FlatJsonSerializer().serialize(user_playlists,
                                                fields=('playlist_id', 'playlist_title','playlist_items'))
@@ -85,7 +85,7 @@ def get_playlists(request):
 
 def get_files_recursively_json(request, parent_folder_id):
     all_files_content_ids = get_files_recursively(request, parent_folder_id=parent_folder_id)
-    user_details, organization = user_and_organization(request)
+    user_details = get_userdetails(request)
     user_content = Content.get_user_relevant_objects(user_details=user_details)
     all_files = user_content.filter(content_id__in=all_files_content_ids)
     json_content = FlatJsonSerializer().serialize(all_files, fields=('title', 'document', 'content_id'))
@@ -93,7 +93,7 @@ def get_files_recursively_json(request, parent_folder_id):
 
 
 def delete_playlist(request):
-    user_details, organization = user_and_organization(request)
+    user_details = get_userdetails(request)
     posted_data = string_to_dict(request.body)
     playlist_id = int(posted_data.get('playlist_id'))
     errors = []

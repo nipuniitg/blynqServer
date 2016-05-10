@@ -2,7 +2,7 @@ from django.db import models
 from schedule.models import Calendar
 
 from authentication.models import Organization, UserDetails, Address
-from customLibrary.views_lib import user_and_organization
+from customLibrary.views_lib import get_userdetails
 
 
 import random, string

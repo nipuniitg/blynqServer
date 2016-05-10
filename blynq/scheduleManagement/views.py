@@ -9,7 +9,7 @@ from schedule.models import Event
 
 # Create your views here.
 from customLibrary.serializers import FlatJsonSerializer, playlist_dict
-from customLibrary.views_lib import user_and_organization, get_local_time, ajax_response, list_to_json, string_to_dict
+from customLibrary.views_lib import get_userdetails, get_local_time, ajax_response, list_to_json, string_to_dict
 from scheduleManagement.models import Schedule, ScreenSchedule
 from screenManagement.models import Screen
 
@@ -72,14 +72,14 @@ def get_screen_data(request, screen_id, nof_days=7):
 
 
 def get_schedules(request):
-    user_details, organization = user_and_organization(request)
+    user_details = get_userdetails(request)
     user_schedules = Schedule.get_user_relevant_objects(user_details)
     json_data = FlatJsonSerializer().serialize(user_schedules,
                                                fields=('schedule_id', 'schedule_title', 'playlist', 'screens',))
 
 
 def run_playlist(request):
-    user_details, organization = user_and_organization(request)
+    user_details = get_userdetails(request)
 
 
 # def upsert_schedule(request):

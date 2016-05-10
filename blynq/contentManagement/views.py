@@ -8,7 +8,7 @@ import json
 from blynq.settings import BASE_DIR
 from contentManagement.forms import UploadContentForm
 # Create your views here.
-from customLibrary.views_lib import ajax_response, user_and_organization, string_to_dict, list_to_json
+from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, list_to_json
 from customLibrary.serializers import FlatJsonSerializer
 from contentManagement.models import Content
 
@@ -25,7 +25,7 @@ def index(request):
 def upload_content(request):
     errors = []
     success = False
-    user_details, organization = user_and_organization(request)
+    user_details = get_userdetails(request)
     try:
         document = request.FILES['file']
         posted_data = request.POST
@@ -34,12 +34,13 @@ def upload_content(request):
         if parent_folder_id == -1:
             parent_folder = None
         else:
-            parent_folder = Content.objects.filter(organization=organization).get(content_id=parent_folder_id)
+            parent_folder = Content.objects.filter(
+                organization=user_details.organization).get(content_id=parent_folder_id)
         Content.objects.create(title=title,
                                document=document,
                                uploaded_by=user_details,
                                last_modified_by=user_details,
-                               organization=organization,
+                               organization=user_details.organization,
                                parent_folder=parent_folder,
                                is_folder=False)
         success = True
@@ -67,7 +68,7 @@ def delete_file_helper(content):
 
 @login_required
 def delete_content(request):
-    user_details, organization = user_and_organization(request)
+    user_details = get_userdetails(request)
     # user_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
     user_content = Content.get_user_relevant_objects(user_details=user_details)
     posted_data = string_to_dict(request.body)
@@ -89,7 +90,7 @@ def create_folder(request):
     #data in request.body- components passes "currentFolderId", "title"
     errors = []
     success = False
-    user_details, organization = user_and_organization(request)
+    user_details = get_userdetails(request)
     try:
         posted_data = string_to_dict(request.body)
         parent_folder_id = int(posted_data.get('currentFolderId'))
@@ -102,7 +103,7 @@ def create_folder(request):
                                document=None,
                                uploaded_by=user_details,
                                last_modified_by=user_details,
-                               organization=organization,
+                               organization=user_details.organization,
                                parent_folder=parent_folder,
                                is_folder=True)
         success = True
@@ -124,7 +125,7 @@ def get_tree_view(request, parent_folder_id=-1):
 
 
 def get_files_recursively(request, parent_folder_id=-1):
-    user_details, organization = user_and_organization(request)
+    user_details = get_userdetails(request)
     user_content = Content.get_user_relevant_objects(user_details=user_details)
     parent_folder_id = int(parent_folder_id)
     if parent_folder_id == -1:
@@ -146,7 +147,7 @@ def get_files_recursively(request, parent_folder_id=-1):
 
 def folder_path(request, current_folder_id):
     current_folder_id = int(current_folder_id)
-    user_details, organization = user_and_organization(request)
+    user_details = get_userdetails(request)
     path = []
     if current_folder_id != -1:
         user_content = Content.get_user_relevant_objects(user_details=user_details).get(content_id=current_folder_id)
@@ -158,7 +159,7 @@ def folder_path(request, current_folder_id):
 
 def get_content_helper(request, parent_folder_id=-1, is_folder=False):
     try:
-        user_details, organization = user_and_organization(request)
+        user_details = get_userdetails(request)
         # Below line is to get content for both user and organization
         # user_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
         user_content = Content.get_user_relevant_objects(user_details=user_details)
@@ -187,7 +188,7 @@ def get_files_json(request, parent_folder_id=-1):
 
 # TODO: Move files across folders
 def update_content_title(request):
-    user_details, organization = user_and_organization(request)
+    user_details = get_userdetails(request)
     success = False
     errors = []
     posted_data = string_to_dict(request.body)
