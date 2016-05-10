@@ -4,12 +4,10 @@ from django.db.models.signals import post_save
 from django.core.exceptions import ValidationError
 
 # See https://docs.djangoproject.com/en/1.8/ref/contrib/auth/ for User model details
+from blynq.settings import STORAGE_LIMIT_PER_ORGANIZATION
 
 
 # Not being used
-from blynq import settings
-
-
 class City(models.Model):
     city_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, unique=True)
@@ -56,8 +54,8 @@ class Organization(models.Model):
     #address = models.ForeignKey(Address, on_delete=models.PROTECT, blank=True, null=True)
     address = models.CharField(max_length=100, blank=True, null=True)
     contact = models.CharField(max_length=12, blank=True, null=True)
-    total_file_size_limit = models.IntegerField(default=settings.STORAGE_LIMIT_PER_ORGANIZATION)
-    used_file_size = models.IntegerField(default=0)
+    total_file_size_limit = models.BigIntegerField(default=STORAGE_LIMIT_PER_ORGANIZATION)
+    used_file_size = models.BigIntegerField(default=0)
 
     def __unicode__(self):
         return self.name
