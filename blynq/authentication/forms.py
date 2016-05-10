@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django import forms
-from authentication.models import UserDetails
-from djng.forms import NgModelForm, NgFormValidationMixin
+from authentication.models import UserDetails, RequestedQuote
+from djng.forms import NgModelForm, NgFormValidationMixin, NgModelFormMixin
 from django.core.exceptions import ValidationError
 
 
@@ -29,6 +29,13 @@ class UserDetailsForm(forms.ModelForm):
         if password != confirm_password:
              raise forms.ValidationError('Passwords doesnt match')
         return cleaned_data
+
+
+class RequestQuoteForm(NgModelFormMixin, NgFormValidationMixin, NgModelForm, forms.ModelForm):
+
+    class Meta:
+        model = RequestedQuote
+        fields = ('name', 'email', 'mobile_number', 'num_of_devices', 'additional_details')
 
 
 # Field Validators

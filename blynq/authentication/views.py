@@ -1,12 +1,13 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
-from authentication.forms import UserDetailsForm
+from authentication.forms import UserDetailsForm, RequestQuoteForm
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from authentication.models import UserDetails, Organization, Role
+from customLibrary.views_lib import string_to_dict, ajax_response
 
 
 def register(request):
@@ -57,13 +58,36 @@ def login(request):
 
     return render(request, 'authentication/login.html', context_dic)
 
+
 @login_required
 def homePage(request):
     return render(request, 'Home.html')
 
+
 @login_required
 def getPartailtemplate(request):
     return render(request, 'scheduleManagement/_timeline_modal.html')
+
+
+def request_quote(request):
+    posted_data = string_to_dict(request.body)
+    success = False
+    errors = []
+    if request.method == 'POST':
+        request_quote_form = RequestQuoteForm(data=posted_data)
+        if request_quote_form.is_valid():
+            try:
+                request_quote_form.save()
+            except:
+                error = "Error while saving the requested Quote"
+                errors.append(error)
+                print error
+        else:
+            error = "Request Quote form data is not valid"
+            errors.append(error)
+            print error
+    return ajax_response(success=success, errors=errors)
+
 
 # def logout(request):
 #     print 'I am in logout'

@@ -7,6 +7,9 @@ from django.core.exceptions import ValidationError
 
 
 # Not being used
+from blynq import settings
+
+
 class City(models.Model):
     city_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, unique=True)
@@ -53,6 +56,8 @@ class Organization(models.Model):
     #address = models.ForeignKey(Address, on_delete=models.PROTECT, blank=True, null=True)
     address = models.CharField(max_length=100, blank=True, null=True)
     contact = models.CharField(max_length=12, blank=True, null=True)
+    total_file_size_limit = models.IntegerField(default=settings.STORAGE_LIMIT_PER_ORGANIZATION)
+    used_file_size = models.IntegerField(default=0)
 
     def __unicode__(self):
         return self.name
@@ -96,11 +101,14 @@ class UserDetails(User):
         return self.username
 
 
-'''
-def Save_User_Details(sender, instance, **kwargs):
-    userdetails, new = UserDetails.objects.get_or_create(user = instance)
-post_save.connect(Save_User_Details, User)
-'''
+class RequestedQuote(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.CharField(max_length=100)
+    mobile_number = models.CharField(max_length=12)
+    num_of_devices = models.IntegerField()
+    additional_details = models.TextField(blank=True, null=True)
+    requested_on = models.DateTimeField(auto_now_add=True)
+
 
 # class models.User
 #     username
