@@ -10,11 +10,12 @@ from screenManagement.models import Screen, Group
 from schedule.models import Event
 
 
-class ScreenSchedule(models.Model):
+class ScheduleScreens(models.Model):
     # One entry for each screen in a group. ( Obsolete comment? )
     # If only screen is scheduled, then group should be null
-    screen_schedule_id = models.AutoField(primary_key=True)
-    screen = models.ForeignKey(Screen, on_delete=models.CASCADE, related_name='%(class)s_screen_id')
+    schedule_screen_id = models.AutoField(primary_key=True)
+    screen = models.ForeignKey(Screen, on_delete=models.CASCADE, related_name='%(class)s_screen_id', blank=True,
+                               null=True)
     schedule = models.ForeignKey('Schedule', on_delete=models.CASCADE, related_name='%(class)s_schedule')
     group = models.ForeignKey(Group, on_delete=models.CASCADE, blank=True, null=True)
     # TODO: Remove null=True for event
@@ -28,27 +29,30 @@ class ScreenSchedule(models.Model):
     # last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True)
 
     def __unicode__(self):
-        return self.screen.screen_name + '-' + self.schedule.schedule_title
+        return self.schedule.schedule_title + '-' + self.screen.screen_name
 
     # class Meta:
     #     unique_together = (('screen', 'schedule', 'group'))
 
 
-class PlaylistSchedule(models.Model):
-    playlist_schedule_id = models.AutoField(primary_key=True)
+class SchedulePlaylists(models.Model):
+    schedule_playlist_id = models.AutoField(primary_key=True)
     playlist = models.ForeignKey(Playlist, on_delete=models.CASCADE, related_name='%(class)s_playlist_id')
     schedule = models.ForeignKey('Schedule', on_delete=models.CASCADE, blank=True, null=True)
     position_index = models.IntegerField()
 
     def __unicode__(self):
-        return self.playlist.playlist_title + '-' + self.schedule.schedule_title
+        return self.schedule.schedule_title + '-' + self.playlist.playlist_title
 
 
 class Schedule(models.Model):
     schedule_id = models.AutoField(primary_key=True)
     schedule_title = models.CharField(max_length=100)
-    playlists = models.ManyToManyField(Playlist, through=PlaylistSchedule)
-    screens = models.ManyToManyField(Screen, through=ScreenSchedule)
+    playlists = models.ManyToManyField(Playlist, through=SchedulePlaylists)
+    screens = models.ManyToManyField(Screen, through=ScheduleScreens)
+    is_always = models.BooleanField(default=True)
+    all_day = models.BooleanField(default=True)
+    recurrence_absolute = models.BooleanField(default=False)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
 
     created_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True, related_name='%(class)s_created_by')

@@ -25,13 +25,16 @@ def get_userdetails(request):
 
 
 def string_to_dict(str):
-    #json_acceptable_string = str.replace("'", "\"")
+    # json_acceptable_string = str.replace("'", "\"")
     return json.loads(str)
 
 
 def list_to_json(list):
     return JsonResponse(list, safe=False)
 
+
+def list_to_comma_string(list):
+    return ','.join(map(str, list))
 
 local_timezone = pytz.timezone('Asia/Kolkata')
 

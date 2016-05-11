@@ -87,6 +87,9 @@ class ScreenGroups(models.Model):
     screen = models.ForeignKey('Screen', on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
 
+    def __unicode__(self):
+        return self.screen.screen_name + '-' + self.group.group_name
+
 
 class Screen(models.Model):
     screen_id = models.AutoField(primary_key=True)

@@ -5,6 +5,7 @@ from django.core.serializers.python import Serializer
 
 from contentManagement.models import Content
 from playlistManagement.models import PlaylistItems
+from scheduleManagement.models import SchedulePlaylists, ScheduleScreens
 
 
 def playlist_dict(playlist, only_files=False):
@@ -12,6 +13,75 @@ def playlist_dict(playlist, only_files=False):
     playlist_dictionary = {'playlist_id': playlist.playlist_id, 'playlist_title': playlist.playlist_title,
                      'playlist_items': playlist_items}
     return playlist_dictionary
+
+
+def get_schedule_playlists(schedule):
+    schedule_playlists_list = []
+    schedule_playlists = SchedulePlaylists.objects.filter(schedule=schedule).order_by('position_index')
+    for each_schedule_playlist in schedule_playlists:
+        single_json = {'schedule_playlist_id': each_schedule_playlist.schedule_playlist_id,
+                       'playlist': playlist_dict(each_schedule_playlist.playlist),
+                       'position_index': each_schedule_playlist.position_index}
+        schedule_playlists_list.append(single_json)
+    return schedule_playlists_list
+
+
+def get_schedule_screens(schedule):
+    schedule_screens_list = []
+    schedule_screens_all = ScheduleScreens.objects.filter(schedule=schedule)
+    schedule_screens = schedule_screens_all.exclude(group__isnull=False)
+    for each_schedule_screen in schedule_screens:
+        screen = each_schedule_screen.screen
+        single_json = {'screen_id': screen.screen_id, 'screen_name': screen.screen_name, 'address': screen.address,
+                       'schedule_screen_id': each_schedule_screen.schedule_screen_id}
+
+        schedule_screens_list.append(single_json)    
+    return schedule_screens_list
+
+
+def get_schedule_groups(schedule):
+    schedule_groups_list = []
+    schedule_groups_all = ScheduleScreens.objects.filter(schedule=schedule)
+    # Extract Groups
+    schedule_groups = schedule_groups_all.filter(group__isnull=False)
+    for each_schedule_group in schedule_groups:
+        group = each_schedule_group.group
+        single_json = {'group_id': group.group_id, 'group_name': group.group_name,
+                       'description': group.description, 'schedule_screen_id': each_schedule_group.schedule_screen_id}
+        schedule_groups_list.append(single_json)
+    return schedule_groups_list
+
+
+def get_schedule_timeline(schedule):
+    schedule_screens = ScheduleScreens.objects.filter(schedule=schedule)
+    event_json = {}
+    if schedule_screens:
+        event = schedule_screens[0].event
+        if event:
+            event_json['is_always'] = schedule.is_always
+            event_json['recurrence_absolute'] = schedule.recurrence_absolute
+            event_json['all_day'] = schedule.all_day
+            event_json['start_date'] = event.start.date() if event.start else None
+            event_json['end_recurring_period'] = event.end_recurring_period.date() if event.end_recurring_period else None
+            event_json['start_time'] = event.start.time() if event.start else None
+            event_json['end_time'] = event.end.time() if event.end else None
+            rule = event.rule
+            params = rule.get_params() if rule else {}
+            event_json['frequency'] = rule.frequency
+            event_json['interval'] = params.get('interval')
+            event_json['byweekday'] = params.get('byweekday')
+            event_json['bymonthday'] = params.get('bymonthday')
+            event_json['byweekno'] = params.get('byweekno')
+    return event_json
+
+
+def schedule_dict(schedule):
+    schedule_dictionary = {'schedule_id': schedule.schedule_id, 'schedule_title': schedule.schedule_title,
+                           'schedule_playlists': get_schedule_playlists(schedule),
+                           'schedule_screens': get_schedule_screens(schedule),
+                           'schedule_groups': get_schedule_groups(schedule),
+                           'timeline': get_schedule_timeline(schedule), }
+    return schedule_dictionary
 
 
 class FlatJsonSerializer(Serializer):

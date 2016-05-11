@@ -82,7 +82,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `content_type_id` (`content_type_id`,`codename`),
   CONSTRAINT `auth__content_type_id_508cf46651277a81_fk_django_content_type_id` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=88 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=109 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -91,7 +91,7 @@ CREATE TABLE `auth_permission` (
 
 LOCK TABLES `auth_permission` WRITE;
 /*!40000 ALTER TABLE `auth_permission` DISABLE KEYS */;
-INSERT INTO `auth_permission` VALUES (1,'Can add log entry',1,'add_logentry'),(2,'Can change log entry',1,'change_logentry'),(3,'Can delete log entry',1,'delete_logentry'),(4,'Can add permission',2,'add_permission'),(5,'Can change permission',2,'change_permission'),(6,'Can delete permission',2,'delete_permission'),(7,'Can add group',3,'add_group'),(8,'Can change group',3,'change_group'),(9,'Can delete group',3,'delete_group'),(10,'Can add user',4,'add_user'),(11,'Can change user',4,'change_user'),(12,'Can delete user',4,'delete_user'),(13,'Can add content type',5,'add_contenttype'),(14,'Can change content type',5,'change_contenttype'),(15,'Can delete content type',5,'delete_contenttype'),(16,'Can add session',6,'add_session'),(17,'Can change session',6,'change_session'),(18,'Can delete session',6,'delete_session'),(19,'Can add city',7,'add_city'),(20,'Can change city',7,'change_city'),(21,'Can delete city',7,'delete_city'),(22,'Can add address',8,'add_address'),(23,'Can change address',8,'change_address'),(24,'Can delete address',8,'delete_address'),(25,'Can add organization',9,'add_organization'),(26,'Can change organization',9,'change_organization'),(27,'Can delete organization',9,'delete_organization'),(28,'Can add role',10,'add_role'),(29,'Can change role',10,'change_role'),(30,'Can delete role',10,'delete_role'),(31,'Can add user',11,'add_userdetails'),(32,'Can change user',11,'change_userdetails'),(33,'Can delete user',11,'delete_userdetails'),(34,'Can add screen status',12,'add_screenstatus'),(35,'Can change screen status',12,'change_screenstatus'),(36,'Can delete screen status',12,'delete_screenstatus'),(37,'Can add group',13,'add_group'),(38,'Can change group',13,'change_group'),(39,'Can delete group',13,'delete_group'),(40,'Can add screen specs',14,'add_screenspecs'),(41,'Can change screen specs',14,'change_screenspecs'),(42,'Can delete screen specs',14,'delete_screenspecs'),(43,'Can add screen',15,'add_screen'),(44,'Can change screen',15,'change_screen'),(45,'Can delete screen',15,'delete_screen'),(46,'Can add content type',16,'add_contenttype'),(47,'Can change content type',16,'change_contenttype'),(48,'Can delete content type',16,'delete_contenttype'),(49,'Can add content',17,'add_content'),(50,'Can change content',17,'change_content'),(51,'Can delete content',17,'delete_content'),(52,'Can add playlist items',18,'add_playlistitems'),(53,'Can change playlist items',18,'change_playlistitems'),(54,'Can delete playlist items',18,'delete_playlistitems'),(55,'Can add playlist',19,'add_playlist'),(56,'Can change playlist',19,'change_playlist'),(57,'Can delete playlist',19,'delete_playlist'),(58,'Can add screen schedule',20,'add_screenschedule'),(59,'Can change screen schedule',20,'change_screenschedule'),(60,'Can delete screen schedule',20,'delete_screenschedule'),(61,'Can add schedule',21,'add_schedule'),(62,'Can change schedule',21,'change_schedule'),(63,'Can delete schedule',21,'delete_schedule'),(67,'Can add screen groups',23,'add_screengroups'),(68,'Can change screen groups',23,'change_screengroups'),(69,'Can delete screen groups',23,'delete_screengroups'),(70,'Can add calendar',24,'add_calendar'),(71,'Can change calendar',24,'change_calendar'),(72,'Can delete calendar',24,'delete_calendar'),(73,'Can add calendar relation',25,'add_calendarrelation'),(74,'Can change calendar relation',25,'change_calendarrelation'),(75,'Can delete calendar relation',25,'delete_calendarrelation'),(76,'Can add rule',26,'add_rule'),(77,'Can change rule',26,'change_rule'),(78,'Can delete rule',26,'delete_rule'),(79,'Can add event',27,'add_event'),(80,'Can change event',27,'change_event'),(81,'Can delete event',27,'delete_event'),(82,'Can add event relation',28,'add_eventrelation'),(83,'Can change event relation',28,'change_eventrelation'),(84,'Can delete event relation',28,'delete_eventrelation'),(85,'Can add occurrence',29,'add_occurrence'),(86,'Can change occurrence',29,'change_occurrence'),(87,'Can delete occurrence',29,'delete_occurrence');
+INSERT INTO `auth_permission` VALUES (1,'Can add log entry',1,'add_logentry'),(2,'Can change log entry',1,'change_logentry'),(3,'Can delete log entry',1,'delete_logentry'),(4,'Can add permission',2,'add_permission'),(5,'Can change permission',2,'change_permission'),(6,'Can delete permission',2,'delete_permission'),(7,'Can add group',3,'add_group'),(8,'Can change group',3,'change_group'),(9,'Can delete group',3,'delete_group'),(10,'Can add user',4,'add_user'),(11,'Can change user',4,'change_user'),(12,'Can delete user',4,'delete_user'),(13,'Can add content type',5,'add_contenttype'),(14,'Can change content type',5,'change_contenttype'),(15,'Can delete content type',5,'delete_contenttype'),(16,'Can add session',6,'add_session'),(17,'Can change session',6,'change_session'),(18,'Can delete session',6,'delete_session'),(19,'Can add city',7,'add_city'),(20,'Can change city',7,'change_city'),(21,'Can delete city',7,'delete_city'),(22,'Can add address',8,'add_address'),(23,'Can change address',8,'change_address'),(24,'Can delete address',8,'delete_address'),(25,'Can add organization',9,'add_organization'),(26,'Can change organization',9,'change_organization'),(27,'Can delete organization',9,'delete_organization'),(28,'Can add role',10,'add_role'),(29,'Can change role',10,'change_role'),(30,'Can delete role',10,'delete_role'),(31,'Can add user',11,'add_userdetails'),(32,'Can change user',11,'change_userdetails'),(33,'Can delete user',11,'delete_userdetails'),(34,'Can add screen status',12,'add_screenstatus'),(35,'Can change screen status',12,'change_screenstatus'),(36,'Can delete screen status',12,'delete_screenstatus'),(37,'Can add group',13,'add_group'),(38,'Can change group',13,'change_group'),(39,'Can delete group',13,'delete_group'),(40,'Can add screen specs',14,'add_screenspecs'),(41,'Can change screen specs',14,'change_screenspecs'),(42,'Can delete screen specs',14,'delete_screenspecs'),(43,'Can add screen',15,'add_screen'),(44,'Can change screen',15,'change_screen'),(45,'Can delete screen',15,'delete_screen'),(46,'Can add content type',16,'add_contenttype'),(47,'Can change content type',16,'change_contenttype'),(48,'Can delete content type',16,'delete_contenttype'),(49,'Can add content',17,'add_content'),(50,'Can change content',17,'change_content'),(51,'Can delete content',17,'delete_content'),(52,'Can add playlist items',18,'add_playlistitems'),(53,'Can change playlist items',18,'change_playlistitems'),(54,'Can delete playlist items',18,'delete_playlistitems'),(55,'Can add playlist',19,'add_playlist'),(56,'Can change playlist',19,'change_playlist'),(57,'Can delete playlist',19,'delete_playlist'),(61,'Can add schedule',21,'add_schedule'),(62,'Can change schedule',21,'change_schedule'),(63,'Can delete schedule',21,'delete_schedule'),(70,'Can add calendar',24,'add_calendar'),(71,'Can change calendar',24,'change_calendar'),(72,'Can delete calendar',24,'delete_calendar'),(73,'Can add calendar relation',25,'add_calendarrelation'),(74,'Can change calendar relation',25,'change_calendarrelation'),(75,'Can delete calendar relation',25,'delete_calendarrelation'),(76,'Can add rule',26,'add_rule'),(77,'Can change rule',26,'change_rule'),(78,'Can delete rule',26,'delete_rule'),(79,'Can add event',27,'add_event'),(80,'Can change event',27,'change_event'),(81,'Can delete event',27,'delete_event'),(82,'Can add event relation',28,'add_eventrelation'),(83,'Can change event relation',28,'change_eventrelation'),(84,'Can delete event relation',28,'delete_eventrelation'),(85,'Can add occurrence',29,'add_occurrence'),(86,'Can change occurrence',29,'change_occurrence'),(87,'Can delete occurrence',29,'delete_occurrence'),(94,'Can add screen groups',32,'add_screengroups'),(95,'Can change screen groups',32,'change_screengroups'),(96,'Can delete screen groups',32,'delete_screengroups'),(100,'Can add requested quote',34,'add_requestedquote'),(101,'Can change requested quote',34,'change_requestedquote'),(102,'Can delete requested quote',34,'delete_requestedquote'),(103,'Can add schedule playlists',35,'add_scheduleplaylists'),(104,'Can change schedule playlists',35,'change_scheduleplaylists'),(105,'Can delete schedule playlists',35,'delete_scheduleplaylists'),(106,'Can add schedule screens',36,'add_schedulescreens'),(107,'Can change schedule screens',36,'change_schedulescreens'),(108,'Can delete schedule screens',36,'delete_schedulescreens');
 /*!40000 ALTER TABLE `auth_permission` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -125,7 +125,7 @@ CREATE TABLE `auth_user` (
 
 LOCK TABLES `auth_user` WRITE;
 /*!40000 ALTER TABLE `auth_user` DISABLE KEYS */;
-INSERT INTO `auth_user` VALUES (1,'pbkdf2_sha256$20000$SqQofbBFt1mm$CsDDuv+oh4QcrJvMeadmQ+hiXsj6ofeBePlEgfEPU9s=','2016-04-28 12:11:28.729629',1,'admin','','','admin@gmail.com',1,1,'2016-04-22 06:32:39.913688'),(5,'pbkdf2_sha256$20000$5MobmJBtYQzj$ZXSERJnNNZ2AQbqewdHrPecqC2A2PLVu/SK6/rYp3t0=','2016-04-22 07:26:11.047069',0,'jaydev','jaydev','kalivarapu','jaydev@gmail.com',0,1,'2016-04-22 07:25:49.122709'),(7,'pbkdf2_sha256$20000$PUxTJLrDbayP$AHpHYc6EmoZrPrCoWKYEan9LxHF/lyzr+wtk2xUZC5M=','2016-04-22 11:11:54.410590',0,'blynq','blynq','technologies','blynq@gmail.com',0,1,'2016-04-22 11:11:38.974145'),(8,'pbkdf2_sha256$20000$Mv4AbkbrBl55$iWTc/A7Thc64f3uU5TifJJmVyZyZajadB5r1QsnKrEc=','2016-04-28 08:58:37.970111',0,'nipun','Nipun','Edara','nipun425@gmail.com',0,1,'2016-04-22 11:12:38.176576'),(9,'pbkdf2_sha256$20000$R0ktrto3ZsYb$sS27znxrpJPEmSZZXacdS6fx6Ekp0wA9LpiCWpdmUDE=','2016-04-22 11:15:34.224634',0,'kmpk123','prasanth','kuriseti','kmpk123@gmail.com',0,1,'2016-04-22 11:13:09.428652');
+INSERT INTO `auth_user` VALUES (1,'pbkdf2_sha256$20000$SqQofbBFt1mm$CsDDuv+oh4QcrJvMeadmQ+hiXsj6ofeBePlEgfEPU9s=','2016-05-10 10:41:37.524601',1,'admin','','','admin@gmail.com',1,1,'2016-04-22 06:32:39.913688'),(5,'pbkdf2_sha256$20000$5MobmJBtYQzj$ZXSERJnNNZ2AQbqewdHrPecqC2A2PLVu/SK6/rYp3t0=','2016-04-22 07:26:11.047069',0,'jaydev','jaydev','kalivarapu','jaydev@gmail.com',0,1,'2016-04-22 07:25:49.122709'),(7,'pbkdf2_sha256$20000$PUxTJLrDbayP$AHpHYc6EmoZrPrCoWKYEan9LxHF/lyzr+wtk2xUZC5M=','2016-04-22 11:11:54.410590',0,'blynq','blynq','technologies','blynq@gmail.com',0,1,'2016-04-22 11:11:38.974145'),(8,'pbkdf2_sha256$20000$Mv4AbkbrBl55$iWTc/A7Thc64f3uU5TifJJmVyZyZajadB5r1QsnKrEc=','2016-05-09 20:47:51.513603',0,'nipun','Nipun','Edara','nipun425@gmail.com',0,1,'2016-04-22 11:12:38.176576'),(9,'pbkdf2_sha256$20000$R0ktrto3ZsYb$sS27znxrpJPEmSZZXacdS6fx6Ekp0wA9LpiCWpdmUDE=','2016-04-22 11:15:34.224634',0,'kmpk123','prasanth','kuriseti','kmpk123@gmail.com',0,1,'2016-04-22 11:13:09.428652');
 /*!40000 ALTER TABLE `auth_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -258,6 +258,8 @@ CREATE TABLE `authentication_organization` (
   `website` varchar(100) NOT NULL,
   `contact` varchar(12) DEFAULT NULL,
   `address` varchar(100) DEFAULT NULL,
+  `total_file_size_limit` bigint(20) NOT NULL,
+  `used_file_size` bigint(20) NOT NULL,
   PRIMARY KEY (`organization_id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
@@ -269,8 +271,36 @@ CREATE TABLE `authentication_organization` (
 
 LOCK TABLES `authentication_organization` WRITE;
 /*!40000 ALTER TABLE `authentication_organization` DISABLE KEYS */;
-INSERT INTO `authentication_organization` VALUES (1,'Blynq Pvt Ltd','http://www.blynq.in','8277121319','Sastry house, pragathi nagar, hyderabad'),(2,'TestOrganization2','www.google.com','9440806969','sanath nagar, hyderabad');
+INSERT INTO `authentication_organization` VALUES (1,'Blynq Pvt Ltd','http://www.blynq.in','8277121319','Sastry house, pragathi nagar, hyderabad',5368709120,0),(2,'TestOrganization2','www.google.com','9440806969','sanath nagar, hyderabad',5368709120,0);
 /*!40000 ALTER TABLE `authentication_organization` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `authentication_requestedquote`
+--
+
+DROP TABLE IF EXISTS `authentication_requestedquote`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `authentication_requestedquote` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `mobile_number` varchar(12) NOT NULL,
+  `num_of_devices` int(11) NOT NULL,
+  `additional_details` longtext,
+  `requested_on` datetime(6) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `authentication_requestedquote`
+--
+
+LOCK TABLES `authentication_requestedquote` WRITE;
+/*!40000 ALTER TABLE `authentication_requestedquote` DISABLE KEYS */;
+/*!40000 ALTER TABLE `authentication_requestedquote` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -363,7 +393,7 @@ CREATE TABLE `contentManagement_content` (
   CONSTRAINT `a4652993b4665036cee91bc59709d44d` FOREIGN KEY (`uploaded_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`),
   CONSTRAINT `c28200b62fd5064ce5f884826faee3c7` FOREIGN KEY (`parent_folder_id`) REFERENCES `contentManagement_content` (`content_id`),
   CONSTRAINT `c2eecc547f70ea071d71762c8e998420` FOREIGN KEY (`file_type_id`) REFERENCES `contentManagement_contenttype` (`content_type_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -372,7 +402,7 @@ CREATE TABLE `contentManagement_content` (
 
 LOCK TABLES `contentManagement_content` WRITE;
 /*!40000 ALTER TABLE `contentManagement_content` DISABLE KEYS */;
-INSERT INTO `contentManagement_content` VALUES (8,'Jaffa','','',NULL,'2016-04-24 14:38:49.933946','2016-04-24 14:38:49.934053',1,'/',NULL,8,1,NULL,8),(21,'inside jaffa','','',NULL,'2016-04-25 06:00:56.622113','2016-04-25 06:00:56.622163',1,'/',NULL,8,1,8,8),(22,'logo','usercontent/8/blynq_logo.png','',NULL,'2016-04-25 06:01:21.569886','2016-04-25 06:01:21.569967',0,'/',NULL,8,1,8,8),(23,'groups ui','usercontent/8/Groups UI.png','',NULL,'2016-04-25 09:24:32.045743','2016-04-25 09:24:32.045812',0,'/',NULL,8,1,8,8),(24,'logo','usercontent/8/blynq_logo_YZWVlEC.png','',NULL,'2016-04-26 10:00:36.175680','2016-04-26 10:00:36.175751',0,'/',NULL,8,1,NULL,8);
+INSERT INTO `contentManagement_content` VALUES (8,'Jaffa','','',NULL,'2016-04-24 14:38:49.933946','2016-04-24 14:38:49.934053',1,'/',NULL,8,1,NULL,8),(21,'inside jaffa','','',NULL,'2016-04-25 06:00:56.622113','2016-04-25 06:00:56.622163',1,'/',NULL,8,1,8,8),(22,'logo','usercontent/8/blynq_logo.png','',NULL,'2016-04-25 06:01:21.569886','2016-04-25 06:01:21.569967',0,'/',NULL,8,1,8,8),(23,'groups ui','usercontent/8/Groups UI.png','',NULL,'2016-04-25 09:24:32.045743','2016-04-25 09:24:32.045812',0,'/',NULL,8,1,8,8),(24,'logo','usercontent/8/blynq_logo_YZWVlEC.png','',NULL,'2016-04-26 10:00:36.175680','2016-04-26 10:00:36.175751',0,'/',NULL,8,1,NULL,8),(25,'sastry','','',NULL,'2016-05-04 12:14:44.069166','2016-05-04 12:14:44.069287',1,'/',NULL,8,1,NULL,8),(26,'Flow diagram','usercontent/8/flow_diagram.jpg','',NULL,'2016-05-04 12:15:08.194831','2016-05-04 12:15:08.194897',0,'/',NULL,8,1,25,8);
 /*!40000 ALTER TABLE `contentManagement_content` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -421,7 +451,7 @@ CREATE TABLE `django_admin_log` (
   KEY `django_admin_log_user_id_52fdd58701c5f563_fk_auth_user_id` (`user_id`),
   CONSTRAINT `djang_content_type_id_697914295151027a_fk_django_content_type_id` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`),
   CONSTRAINT `django_admin_log_user_id_52fdd58701c5f563_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -430,7 +460,7 @@ CREATE TABLE `django_admin_log` (
 
 LOCK TABLES `django_admin_log` WRITE;
 /*!40000 ALTER TABLE `django_admin_log` DISABLE KEYS */;
-INSERT INTO `django_admin_log` VALUES (1,'2016-04-22 06:35:31.975476','1','Blynq Pvt Ltd',1,'',9,1),(2,'2016-04-22 06:36:11.974841','2','TestOrganization2',1,'',9,1),(3,'2016-04-22 06:38:52.231767','1','viewer',1,'',10,1),(4,'2016-04-22 06:40:11.592123','2','scheduler',1,'',10,1),(5,'2016-04-22 06:40:28.895113','3','manager',1,'',10,1),(6,'2016-04-22 06:41:33.028602','2','blynq',1,'',11,1),(7,'2016-04-22 06:42:18.224503','3','nipun',1,'',11,1),(8,'2016-04-22 06:44:44.936902','4','kmpk123',1,'',11,1),(9,'2016-04-22 06:45:48.884127','1','bangalore 1',1,'',13,1),(10,'2016-04-22 06:46:07.432807','2','bangalore 2',1,'',13,1),(11,'2016-04-22 06:46:49.857408','3','hyderabad 1',1,'',13,1),(12,'2016-04-22 06:47:12.344962','4','hyderabad 2',1,'',13,1),(13,'2016-04-22 06:48:20.261650','1','Unactivated',1,'',12,1),(14,'2016-04-22 06:49:05.785756','2','Online',1,'',12,1),(15,'2016-04-22 06:49:27.786467','3','Offline',1,'',12,1),(16,'2016-04-22 06:50:10.900914','4','Idle',1,'',12,1),(17,'2016-04-22 06:52:30.969449','1','bellandur 1',1,'',15,1),(18,'2016-04-22 06:53:44.641054','2','screen 2',1,'',15,1),(19,'2016-04-22 06:55:29.817983','3','hyd orbit 1',1,'',15,1),(20,'2016-04-22 06:56:23.957961','4','hyd orbit 2',1,'',15,1),(21,'2016-04-22 07:45:55.555679','1','bangalore 1',2,'Changed created_by.',13,1),(22,'2016-04-22 07:46:02.105668','2','bangalore 2',2,'Changed created_by.',13,1),(23,'2016-04-22 07:46:08.198043','3','hyderabad 1',2,'Changed created_by.',13,1),(24,'2016-04-22 07:46:14.458728','4','hyderabad 2',2,'Changed created_by.',13,1),(25,'2016-04-22 07:46:40.090793','4','hyd orbit 2',2,'Changed activated_by.',15,1),(26,'2016-04-22 07:46:47.868025','3','hyd orbit 1',2,'Changed activated_by.',15,1),(27,'2016-04-22 07:46:55.836043','2','screen 2',2,'Changed activated_by.',15,1),(28,'2016-04-22 07:47:02.991106','1','bellandur 1',2,'Changed activated_by.',15,1),(29,'2016-04-22 07:50:32.715096','6','sastry',1,'',4,1),(30,'2016-04-22 11:10:18.408622','2','blynq',3,'',4,1),(31,'2016-04-22 11:10:18.416316','4','kmpk123',3,'',4,1),(32,'2016-04-22 11:10:18.420189','3','nipun',3,'',4,1),(33,'2016-04-22 11:10:18.428245','6','sastry',3,'',4,1),(34,'2016-04-22 11:14:09.474238','1','bangalore 1',2,'Changed created_by.',13,1),(35,'2016-04-22 11:14:16.915189','1','bangalore 1',2,'Changed created_by.',13,1),(36,'2016-04-22 11:14:23.466001','2','bangalore 2',2,'Changed created_by.',13,1),(37,'2016-04-22 11:14:28.964783','3','hyderabad 1',2,'Changed created_by.',13,1),(38,'2016-04-22 11:14:34.116173','4','hyderabad 2',2,'Changed created_by.',13,1),(39,'2016-04-22 11:14:46.390893','2','screen 2',2,'Changed activated_by.',15,1),(40,'2016-04-22 11:14:52.282249','1','bellandur 1',2,'Changed activated_by.',15,1),(41,'2016-04-22 11:14:58.780257','4','hyd orbit 2',2,'Changed activated_by.',15,1),(42,'2016-04-22 11:15:12.617404','3','hyd orbit 1',2,'Changed activated_by.',15,1),(43,'2016-04-25 05:32:31.637159','1','bangalore 1',2,'Changed organization.',13,1),(44,'2016-04-25 05:32:37.949614','2','bangalore 2',2,'Changed organization.',13,1),(45,'2016-04-25 05:32:44.412702','3','hyderabad 1',2,'Changed organization.',13,1),(46,'2016-04-25 05:32:50.838333','4','hyderabad 2',2,'Changed organization.',13,1),(47,'2016-04-25 10:24:28.670243','1','Playlist object',1,'',19,1),(48,'2016-04-25 10:26:58.223219','1','PlaylistItems object',1,'',18,1),(49,'2016-04-25 10:27:09.348365','2','PlaylistItems object',1,'',18,1),(50,'2016-04-26 06:12:21.567326','3','First playlist - inside jaffa',1,'',18,1),(51,'2016-04-27 09:56:01.313080','1','Flipkart Calendar',1,'',24,1),(52,'2016-04-27 09:56:35.207152','1','Rule Month start sale params ',1,'',26,1),(53,'2016-04-27 10:00:28.490568','1','Flipkart start month event: May 1, 2016 - June 1, 2016',1,'',27,1),(54,'2016-04-27 10:00:50.214390','1','Flipkart start month event: May 1, 2016 - May 1, 2016',2,'Changed end.',27,1),(55,'2016-04-27 10:01:30.751114','1','Flipkart Calendar - None',1,'',25,1),(56,'2016-04-28 02:29:09.170245','2','amazon calendar',1,'',24,1),(57,'2016-04-28 02:30:52.379897','2','Schedule one day two hours amazon event : April 28, 2016 - April 29, 2016',1,'',27,1),(58,'2016-04-28 03:01:11.311653','1','Schedule object',1,'',21,1),(59,'2016-04-28 03:01:39.012086','1','bellandur 1',2,'Changed screen_calendar.',15,1),(60,'2016-04-28 03:03:39.951046','1','ScreenSchedule object',1,'',20,1),(61,'2016-04-28 03:08:04.556063','2','First schedule - screen 2',1,'',20,1),(62,'2016-04-28 03:08:33.886270','2','First schedule - bellandur 1',2,'Changed screen.',20,1),(63,'2016-04-28 03:10:48.922299','2','First schedule - bellandur 1',2,'Changed group.',20,1),(64,'2016-04-28 03:11:08.724386','1','First schedule - bellandur 1',2,'Changed group.',20,1),(65,'2016-04-28 03:12:08.076712','2','First schedule - bellandur 1',2,'Changed group.',20,1),(66,'2016-04-28 03:12:14.854511','2','First schedule - bellandur 1',2,'Changed group.',20,1),(67,'2016-04-28 03:43:45.721461','2','Schedule one day two hours amazon event : April 28, 2016 - April 29, 2016',2,'Changed calendar.',27,1),(68,'2016-04-28 10:39:44.250950','1','First schedule',2,'Changed organization.',21,1),(69,'2016-04-28 10:39:49.965905','1','First schedule',2,'No fields changed.',21,1),(70,'2016-04-28 10:40:10.137467','2','First schedule - bellandur 1',2,'Changed event.',20,1),(71,'2016-04-28 10:40:19.074126','1','First schedule - bellandur 1',2,'Changed event.',20,1),(72,'2016-04-28 12:25:15.090974','2','Rule Daily params ',1,'',26,1);
+INSERT INTO `django_admin_log` VALUES (1,'2016-04-22 06:35:31.975476','1','Blynq Pvt Ltd',1,'',9,1),(2,'2016-04-22 06:36:11.974841','2','TestOrganization2',1,'',9,1),(3,'2016-04-22 06:38:52.231767','1','viewer',1,'',10,1),(4,'2016-04-22 06:40:11.592123','2','scheduler',1,'',10,1),(5,'2016-04-22 06:40:28.895113','3','manager',1,'',10,1),(6,'2016-04-22 06:41:33.028602','2','blynq',1,'',11,1),(7,'2016-04-22 06:42:18.224503','3','nipun',1,'',11,1),(8,'2016-04-22 06:44:44.936902','4','kmpk123',1,'',11,1),(9,'2016-04-22 06:45:48.884127','1','bangalore 1',1,'',13,1),(10,'2016-04-22 06:46:07.432807','2','bangalore 2',1,'',13,1),(11,'2016-04-22 06:46:49.857408','3','hyderabad 1',1,'',13,1),(12,'2016-04-22 06:47:12.344962','4','hyderabad 2',1,'',13,1),(13,'2016-04-22 06:48:20.261650','1','Unactivated',1,'',12,1),(14,'2016-04-22 06:49:05.785756','2','Online',1,'',12,1),(15,'2016-04-22 06:49:27.786467','3','Offline',1,'',12,1),(16,'2016-04-22 06:50:10.900914','4','Idle',1,'',12,1),(17,'2016-04-22 06:52:30.969449','1','bellandur 1',1,'',15,1),(18,'2016-04-22 06:53:44.641054','2','screen 2',1,'',15,1),(19,'2016-04-22 06:55:29.817983','3','hyd orbit 1',1,'',15,1),(20,'2016-04-22 06:56:23.957961','4','hyd orbit 2',1,'',15,1),(21,'2016-04-22 07:45:55.555679','1','bangalore 1',2,'Changed created_by.',13,1),(22,'2016-04-22 07:46:02.105668','2','bangalore 2',2,'Changed created_by.',13,1),(23,'2016-04-22 07:46:08.198043','3','hyderabad 1',2,'Changed created_by.',13,1),(24,'2016-04-22 07:46:14.458728','4','hyderabad 2',2,'Changed created_by.',13,1),(25,'2016-04-22 07:46:40.090793','4','hyd orbit 2',2,'Changed activated_by.',15,1),(26,'2016-04-22 07:46:47.868025','3','hyd orbit 1',2,'Changed activated_by.',15,1),(27,'2016-04-22 07:46:55.836043','2','screen 2',2,'Changed activated_by.',15,1),(28,'2016-04-22 07:47:02.991106','1','bellandur 1',2,'Changed activated_by.',15,1),(29,'2016-04-22 07:50:32.715096','6','sastry',1,'',4,1),(30,'2016-04-22 11:10:18.408622','2','blynq',3,'',4,1),(31,'2016-04-22 11:10:18.416316','4','kmpk123',3,'',4,1),(32,'2016-04-22 11:10:18.420189','3','nipun',3,'',4,1),(33,'2016-04-22 11:10:18.428245','6','sastry',3,'',4,1),(34,'2016-04-22 11:14:09.474238','1','bangalore 1',2,'Changed created_by.',13,1),(35,'2016-04-22 11:14:16.915189','1','bangalore 1',2,'Changed created_by.',13,1),(36,'2016-04-22 11:14:23.466001','2','bangalore 2',2,'Changed created_by.',13,1),(37,'2016-04-22 11:14:28.964783','3','hyderabad 1',2,'Changed created_by.',13,1),(38,'2016-04-22 11:14:34.116173','4','hyderabad 2',2,'Changed created_by.',13,1),(39,'2016-04-22 11:14:46.390893','2','screen 2',2,'Changed activated_by.',15,1),(40,'2016-04-22 11:14:52.282249','1','bellandur 1',2,'Changed activated_by.',15,1),(41,'2016-04-22 11:14:58.780257','4','hyd orbit 2',2,'Changed activated_by.',15,1),(42,'2016-04-22 11:15:12.617404','3','hyd orbit 1',2,'Changed activated_by.',15,1),(43,'2016-04-25 05:32:31.637159','1','bangalore 1',2,'Changed organization.',13,1),(44,'2016-04-25 05:32:37.949614','2','bangalore 2',2,'Changed organization.',13,1),(45,'2016-04-25 05:32:44.412702','3','hyderabad 1',2,'Changed organization.',13,1),(46,'2016-04-25 05:32:50.838333','4','hyderabad 2',2,'Changed organization.',13,1),(47,'2016-04-25 10:24:28.670243','1','Playlist object',1,'',19,1),(48,'2016-04-25 10:26:58.223219','1','PlaylistItems object',1,'',18,1),(49,'2016-04-25 10:27:09.348365','2','PlaylistItems object',1,'',18,1),(50,'2016-04-26 06:12:21.567326','3','First playlist - inside jaffa',1,'',18,1),(51,'2016-04-27 09:56:01.313080','1','Flipkart Calendar',1,'',24,1),(52,'2016-04-27 09:56:35.207152','1','Rule Month start sale params ',1,'',26,1),(53,'2016-04-27 10:00:28.490568','1','Flipkart start month event: May 1, 2016 - June 1, 2016',1,'',27,1),(54,'2016-04-27 10:00:50.214390','1','Flipkart start month event: May 1, 2016 - May 1, 2016',2,'Changed end.',27,1),(55,'2016-04-27 10:01:30.751114','1','Flipkart Calendar - None',1,'',25,1),(56,'2016-04-28 02:29:09.170245','2','amazon calendar',1,'',24,1),(57,'2016-04-28 02:30:52.379897','2','Schedule one day two hours amazon event : April 28, 2016 - April 29, 2016',1,'',27,1),(58,'2016-04-28 03:01:11.311653','1','Schedule object',1,'',21,1),(59,'2016-04-28 03:01:39.012086','1','bellandur 1',2,'Changed screen_calendar.',15,1),(67,'2016-04-28 03:43:45.721461','2','Schedule one day two hours amazon event : April 28, 2016 - April 29, 2016',2,'Changed calendar.',27,1),(68,'2016-04-28 10:39:44.250950','1','First schedule',2,'Changed organization.',21,1),(69,'2016-04-28 10:39:49.965905','1','First schedule',2,'No fields changed.',21,1),(72,'2016-04-28 12:25:15.090974','2','Rule Daily params ',1,'',26,1),(74,'2016-05-07 14:37:13.976214','1','Flipkart start day event: May 1, 2016 - May 1, 2016',2,'Changed title, description and rule.',27,1),(75,'2016-05-10 10:41:53.446639','1','ScreenGroups object',1,'',32,1),(76,'2016-05-10 10:42:00.484383','2','ScreenGroups object',1,'',32,1),(77,'2016-05-10 17:46:23.108012','3','Rule Every monday, tuesday fortnight params \"interval:2;bysetpos:1,2\"',1,'',26,1);
 /*!40000 ALTER TABLE `django_admin_log` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -447,7 +477,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_45f3b1d93ec8c61c_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -456,7 +486,7 @@ CREATE TABLE `django_content_type` (
 
 LOCK TABLES `django_content_type` WRITE;
 /*!40000 ALTER TABLE `django_content_type` DISABLE KEYS */;
-INSERT INTO `django_content_type` VALUES (1,'admin','logentry'),(3,'auth','group'),(2,'auth','permission'),(4,'auth','user'),(8,'authentication','address'),(7,'authentication','city'),(9,'authentication','organization'),(10,'authentication','role'),(11,'authentication','userdetails'),(17,'contentManagement','content'),(16,'contentManagement','contenttype'),(5,'contenttypes','contenttype'),(19,'playlistManagement','playlist'),(18,'playlistManagement','playlistitems'),(24,'schedule','calendar'),(25,'schedule','calendarrelation'),(27,'schedule','event'),(28,'schedule','eventrelation'),(29,'schedule','occurrence'),(26,'schedule','rule'),(21,'scheduleManagement','schedule'),(20,'scheduleManagement','screenschedule'),(13,'screenManagement','group'),(15,'screenManagement','screen'),(23,'screenManagement','screengroups'),(14,'screenManagement','screenspecs'),(12,'screenManagement','screenstatus'),(6,'sessions','session');
+INSERT INTO `django_content_type` VALUES (1,'admin','logentry'),(3,'auth','group'),(2,'auth','permission'),(4,'auth','user'),(8,'authentication','address'),(7,'authentication','city'),(9,'authentication','organization'),(34,'authentication','requestedquote'),(10,'authentication','role'),(11,'authentication','userdetails'),(17,'contentManagement','content'),(16,'contentManagement','contenttype'),(5,'contenttypes','contenttype'),(19,'playlistManagement','playlist'),(18,'playlistManagement','playlistitems'),(24,'schedule','calendar'),(25,'schedule','calendarrelation'),(27,'schedule','event'),(28,'schedule','eventrelation'),(29,'schedule','occurrence'),(26,'schedule','rule'),(21,'scheduleManagement','schedule'),(35,'scheduleManagement','scheduleplaylists'),(36,'scheduleManagement','schedulescreens'),(13,'screenManagement','group'),(15,'screenManagement','screen'),(32,'screenManagement','screengroups'),(14,'screenManagement','screenspecs'),(12,'screenManagement','screenstatus'),(6,'sessions','session');
 /*!40000 ALTER TABLE `django_content_type` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -473,7 +503,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -482,7 +512,7 @@ CREATE TABLE `django_migrations` (
 
 LOCK TABLES `django_migrations` WRITE;
 /*!40000 ALTER TABLE `django_migrations` DISABLE KEYS */;
-INSERT INTO `django_migrations` VALUES (1,'contenttypes','0001_initial','2016-04-22 06:14:27.142432'),(2,'auth','0001_initial','2016-04-22 06:14:27.672152'),(3,'admin','0001_initial','2016-04-22 06:14:27.799562'),(4,'contenttypes','0002_remove_content_type_name','2016-04-22 06:14:27.953275'),(5,'auth','0002_alter_permission_name_max_length','2016-04-22 06:14:28.012227'),(6,'auth','0003_alter_user_email_max_length','2016-04-22 06:14:28.064646'),(7,'auth','0004_alter_user_username_opts','2016-04-22 06:14:28.082069'),(8,'auth','0005_alter_user_last_login_null','2016-04-22 06:14:28.146214'),(9,'auth','0006_require_contenttypes_0002','2016-04-22 06:14:28.152336'),(10,'authentication','0001_initial','2016-04-22 06:14:28.896733'),(11,'contentManagement','0001_initial','2016-04-22 06:14:29.782199'),(12,'playlistManagement','0001_initial','2016-04-22 06:14:30.174308'),(13,'screenManagement','0001_initial','2016-04-22 06:14:30.803252'),(14,'scheduleManagement','0001_initial','2016-04-22 06:14:31.419035'),(15,'sessions','0001_initial','2016-04-22 06:14:31.478635'),(16,'authentication','0002_auto_20160422_0634','2016-04-22 06:34:45.369440'),(17,'contentManagement','0002_remove_content_description','2016-04-22 19:14:20.995266'),(18,'playlistManagement','0002_auto_20160422_1914','2016-04-22 19:14:21.061820'),(19,'contentManagement','0002_auto_20160424_1514','2016-04-24 15:14:37.319927'),(20,'screenManagement','0002_group_organization','2016-04-25 05:31:29.419374'),(21,'playlistManagement','0002_auto_20160425_2051','2016-04-25 20:51:22.815014'),(22,'playlistManagement','0002_auto_20160426_0714','2016-04-26 07:14:45.794458'),(23,'scheduleManagement','0002_auto_20160427_0640','2016-04-27 06:41:06.625644'),(24,'schedule','0001_initial','2016-04-27 09:51:37.178588'),(25,'scheduleManagement','0003_auto_20160427_2018','2016-04-27 14:49:05.238717'),(26,'screenManagement','0002_screen_screen_calendar','2016-04-28 02:25:39.012409'),(27,'scheduleManagement','0002_auto_20160428_0822','2016-04-28 02:57:00.912806'),(28,'scheduleManagement','0003_remove_schedule_event','2016-04-28 02:59:14.975272'),(29,'scheduleManagement','0004_schedule_event','2016-04-28 02:59:50.402020'),(30,'scheduleManagement','0005_auto_20160428_0836','2016-04-28 03:06:30.044059'),(31,'scheduleManagement','0006_auto_20160428_0836','2016-04-28 03:06:50.243485'),(32,'scheduleManagement','0007_auto_20160428_0837','2016-04-28 03:07:55.654473'),(33,'scheduleManagement','0008_auto_20160428_1038','2016-04-28 10:38:26.807356'),(34,'playlistManagement','0002_auto_20160429_1503','2016-04-29 15:03:07.017994');
+INSERT INTO `django_migrations` VALUES (1,'contenttypes','0001_initial','2016-04-22 06:14:27.142432'),(2,'auth','0001_initial','2016-04-22 06:14:27.672152'),(3,'admin','0001_initial','2016-04-22 06:14:27.799562'),(4,'contenttypes','0002_remove_content_type_name','2016-04-22 06:14:27.953275'),(5,'auth','0002_alter_permission_name_max_length','2016-04-22 06:14:28.012227'),(6,'auth','0003_alter_user_email_max_length','2016-04-22 06:14:28.064646'),(7,'auth','0004_alter_user_username_opts','2016-04-22 06:14:28.082069'),(8,'auth','0005_alter_user_last_login_null','2016-04-22 06:14:28.146214'),(9,'auth','0006_require_contenttypes_0002','2016-04-22 06:14:28.152336'),(10,'authentication','0001_initial','2016-04-22 06:14:28.896733'),(11,'contentManagement','0001_initial','2016-04-22 06:14:29.782199'),(12,'playlistManagement','0001_initial','2016-04-22 06:14:30.174308'),(13,'screenManagement','0001_initial','2016-04-22 06:14:30.803252'),(14,'scheduleManagement','0001_initial','2016-04-22 06:14:31.419035'),(15,'sessions','0001_initial','2016-04-22 06:14:31.478635'),(16,'authentication','0002_auto_20160422_0634','2016-04-22 06:34:45.369440'),(17,'contentManagement','0002_remove_content_description','2016-04-22 19:14:20.995266'),(18,'playlistManagement','0002_auto_20160422_1914','2016-04-22 19:14:21.061820'),(19,'contentManagement','0002_auto_20160424_1514','2016-04-24 15:14:37.319927'),(20,'screenManagement','0002_group_organization','2016-04-25 05:31:29.419374'),(21,'playlistManagement','0002_auto_20160425_2051','2016-04-25 20:51:22.815014'),(22,'playlistManagement','0002_auto_20160426_0714','2016-04-26 07:14:45.794458'),(23,'scheduleManagement','0002_auto_20160427_0640','2016-04-27 06:41:06.625644'),(24,'schedule','0001_initial','2016-04-27 09:51:37.178588'),(25,'scheduleManagement','0003_auto_20160427_2018','2016-04-27 14:49:05.238717'),(26,'screenManagement','0002_screen_screen_calendar','2016-04-28 02:25:39.012409'),(27,'scheduleManagement','0002_auto_20160428_0822','2016-04-28 02:57:00.912806'),(28,'scheduleManagement','0003_remove_schedule_event','2016-04-28 02:59:14.975272'),(29,'scheduleManagement','0004_schedule_event','2016-04-28 02:59:50.402020'),(30,'scheduleManagement','0005_auto_20160428_0836','2016-04-28 03:06:30.044059'),(31,'scheduleManagement','0006_auto_20160428_0836','2016-04-28 03:06:50.243485'),(32,'scheduleManagement','0007_auto_20160428_0837','2016-04-28 03:07:55.654473'),(33,'scheduleManagement','0008_auto_20160428_1038','2016-04-28 10:38:26.807356'),(34,'playlistManagement','0002_auto_20160429_1503','2016-04-29 15:03:07.017994'),(35,'scheduleManagement','0002_auto_20160429_1516','2016-04-29 17:36:45.984785'),(36,'scheduleManagement','0002_auto_20160429_1838','2016-04-29 18:41:16.661900'),(37,'scheduleManagement','0002_auto_20160429_1852','2016-04-29 18:53:00.054649'),(38,'scheduleManagement','0003_screenschedule_group','2016-04-29 18:53:36.158906'),(39,'scheduleManagement','0004_screenschedule_created_by','2016-04-29 18:53:59.180038'),(40,'scheduleManagement','0005_auto_20160429_1855','2016-04-29 18:55:34.327062'),(41,'scheduleManagement','0002_auto_20160429_1857','2016-04-29 18:58:06.114352'),(42,'scheduleManagement','0003_auto_20160429_1858','2016-04-29 18:59:26.536372'),(43,'scheduleManagement','0004_auto_20160429_1859','2016-04-29 19:00:22.193849'),(44,'screenManagement','0002_auto_20160429_1903','2016-04-29 19:04:14.625108'),(45,'screenManagement','0003_auto_20160429_1909','2016-04-29 19:09:38.995705'),(46,'screenManagement','0004_auto_20160429_1910','2016-04-29 19:10:29.832800'),(47,'scheduleManagement','0002_auto_20160429_1911','2016-04-29 19:11:49.484390'),(48,'scheduleManagement','0002_auto_20160429_1913','2016-04-29 19:14:01.536206'),(49,'scheduleManagement','0002_auto_20160429_1917','2016-04-29 19:17:52.487696'),(50,'screenManagement','0002_auto_20160429_1917','2016-04-29 19:17:52.497695'),(51,'screenManagement','0003_screengroups','2016-04-29 19:18:28.777324'),(52,'screenManagement','0004_screen_groups','2016-04-29 19:18:58.879393'),(53,'scheduleManagement','0003_auto_20160430_1422','2016-04-30 14:23:00.595909'),(54,'schedule','0002_event_color_event','2016-05-05 07:16:30.305460'),(55,'playlistManagement','0002_playlist_playlist_total_time','2016-05-07 12:21:34.835259'),(56,'scheduleManagement','0004_auto_20160507_1228','2016-05-07 12:28:50.037410'),(57,'scheduleManagement','0005_auto_20160507_1357','2016-05-07 13:57:32.314665'),(58,'screenManagement','0005_auto_20160509_0605','2016-05-09 06:05:12.117198'),(59,'scheduleManagement','0002_auto_20160510_0420','2016-05-10 04:21:07.736648'),(60,'scheduleManagement','0002_auto_20160510_0422','2016-05-10 04:22:52.968493'),(61,'authentication','0002_remove_organization_total_file_size_limit','2016-05-10 04:24:47.174609'),(62,'authentication','0003_organization_total_file_size_limit','2016-05-10 04:27:30.012546'),(63,'authentication','0004_remove_organization_total_file_size_limit','2016-05-10 04:27:30.019693'),(64,'scheduleManagement','0002_auto_20160510_0445','2016-05-10 04:45:17.765584'),(65,'scheduleManagement','0002_auto_20160510_0452','2016-05-10 04:53:16.658682'),(66,'authentication','0002_auto_20160510_0453','2016-05-10 04:53:42.630502'),(67,'authentication','0003_auto_20160510_0908','2016-05-10 09:09:01.977671'),(68,'scheduleManagement','0003_auto_20160510_0908','2016-05-10 09:09:02.846125'),(69,'scheduleManagement','0004_auto_20160510_0925','2016-05-10 09:26:03.622905'),(70,'scheduleManagement','0005_auto_20160510_0936','2016-05-10 09:38:00.277302'),(71,'scheduleManagement','0006_auto_20160510_0937','2016-05-10 09:38:00.393615'),(72,'scheduleManagement','0002_auto_20160510_1801','2016-05-10 18:02:36.005400');
 /*!40000 ALTER TABLE `django_migrations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -508,7 +538,6 @@ CREATE TABLE `django_session` (
 
 LOCK TABLES `django_session` WRITE;
 /*!40000 ALTER TABLE `django_session` DISABLE KEYS */;
-INSERT INTO `django_session` VALUES ('9zhngskygej7gq8vszbpbrml2q47ib9f','ODVmNjc2ZjhmYTU0NjIxMmZmZDcwZDEyNTkyNTA2OTc3YjMxNjRmNjp7Il9hdXRoX3VzZXJfaGFzaCI6Ijk3MjhmMDBiZWUzN2JmNjNlYjIyOWNmNTgxMTRlOTc3Y2NjMGI4NzgiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=','2016-05-12 12:11:28.736272');
 /*!40000 ALTER TABLE `django_session` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -527,6 +556,7 @@ CREATE TABLE `playlistManagement_playlist` (
   `created_by_id` int(11) NOT NULL,
   `last_updated_by_id` int(11) NOT NULL,
   `organization_id` int(11) DEFAULT NULL,
+  `playlist_total_time` int(11) NOT NULL,
   PRIMARY KEY (`playlist_id`),
   KEY `D50229839cd0cf7d84abc44588a9db0d` (`created_by_id`),
   KEY `c98e25b8402d78f8544a252ae221ba89` (`last_updated_by_id`),
@@ -534,7 +564,7 @@ CREATE TABLE `playlistManagement_playlist` (
   CONSTRAINT `D50229839cd0cf7d84abc44588a9db0d` FOREIGN KEY (`created_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`),
   CONSTRAINT `D9f916f791b6ae8d4fd6a9f347b63d4b` FOREIGN KEY (`organization_id`) REFERENCES `authentication_organization` (`organization_id`),
   CONSTRAINT `c98e25b8402d78f8544a252ae221ba89` FOREIGN KEY (`last_updated_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -543,7 +573,7 @@ CREATE TABLE `playlistManagement_playlist` (
 
 LOCK TABLES `playlistManagement_playlist` WRITE;
 /*!40000 ALTER TABLE `playlistManagement_playlist` DISABLE KEYS */;
-INSERT INTO `playlistManagement_playlist` VALUES (1,'First playlist','2016-04-25 10:24:28.654764','2016-04-25 10:24:28.654820',8,8,1),(2,'abc','2016-04-26 10:28:37.589518','2016-04-26 10:28:37.593203',8,8,1),(3,'abc','2016-04-26 10:29:00.724624','2016-04-26 10:29:00.724678',8,8,1),(4,'abc','2016-04-26 10:30:16.398610','2016-04-26 10:30:16.399392',8,8,1),(5,'playlist 2','2016-04-26 10:30:42.048235','2016-04-26 10:30:42.048332',8,8,1);
+INSERT INTO `playlistManagement_playlist` VALUES (1,'First playlist','2016-04-25 10:24:28.654764','2016-05-04 13:50:47.486028',8,8,1,0),(2,'abc','2016-04-26 10:28:37.589518','2016-04-26 10:28:37.593203',8,8,1,0),(4,'abc','2016-04-26 10:30:16.398610','2016-04-26 10:30:16.399392',8,8,1,0),(5,'playlist 2','2016-04-26 10:30:42.048235','2016-04-26 10:30:42.048332',8,8,1,0),(6,'xyz','2016-05-04 12:17:48.785768','2016-05-04 12:18:29.089376',8,8,1,0);
 /*!40000 ALTER TABLE `playlistManagement_playlist` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -565,7 +595,7 @@ CREATE TABLE `playlistManagement_playlistitems` (
   KEY `D6f7b6973df14ff8936bc055e5fdcc7f` (`playlist_id`),
   CONSTRAINT `D6f7b6973df14ff8936bc055e5fdcc7f` FOREIGN KEY (`playlist_id`) REFERENCES `playlistManagement_playlist` (`playlist_id`),
   CONSTRAINT `a5995af3c9ed21aaf6196289c9204d16` FOREIGN KEY (`content_id`) REFERENCES `contentManagement_content` (`content_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -574,7 +604,7 @@ CREATE TABLE `playlistManagement_playlistitems` (
 
 LOCK TABLES `playlistManagement_playlistitems` WRITE;
 /*!40000 ALTER TABLE `playlistManagement_playlistitems` DISABLE KEYS */;
-INSERT INTO `playlistManagement_playlistitems` VALUES (2,2,10,23,1),(3,3,10,21,1);
+INSERT INTO `playlistManagement_playlistitems` VALUES (2,2,10,23,1),(3,3,10,21,1),(4,1,15,22,1),(5,0,15,23,1),(6,0,15,26,6);
 /*!40000 ALTER TABLE `playlistManagement_playlistitems` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -587,21 +617,18 @@ DROP TABLE IF EXISTS `scheduleManagement_schedule`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `scheduleManagement_schedule` (
   `schedule_id` int(11) NOT NULL AUTO_INCREMENT,
-  `schedule_name` varchar(100) NOT NULL,
+  `schedule_title` varchar(100) NOT NULL,
   `created_time` datetime(6) NOT NULL,
   `last_updated_time` datetime(6) NOT NULL,
   `created_by_id` int(11) DEFAULT NULL,
   `last_updated_by_id` int(11) DEFAULT NULL,
-  `playlist_id` int(11) NOT NULL,
   `organization_id` int(11),
   PRIMARY KEY (`schedule_id`),
-  KEY `add2a9f106fb1c03fac51eaadf12f0e2` (`playlist_id`),
   KEY `b405690da41b1b8e66ba521e8f2675f6` (`created_by_id`),
   KEY `D0008ec854458223fc0440e7f59934e8` (`last_updated_by_id`),
   KEY `scheduleManagement_schedule_26b2345e` (`organization_id`),
   CONSTRAINT `D0008ec854458223fc0440e7f59934e8` FOREIGN KEY (`last_updated_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`),
   CONSTRAINT `D1e8960ced6145002a4e9f87736e58c2` FOREIGN KEY (`organization_id`) REFERENCES `authentication_organization` (`organization_id`),
-  CONSTRAINT `add2a9f106fb1c03fac51eaadf12f0e2` FOREIGN KEY (`playlist_id`) REFERENCES `playlistManagement_playlist` (`playlist_id`),
   CONSTRAINT `b405690da41b1b8e66ba521e8f2675f6` FOREIGN KEY (`created_by_id`) REFERENCES `authentication_userdetails` (`user_ptr_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -612,43 +639,71 @@ CREATE TABLE `scheduleManagement_schedule` (
 
 LOCK TABLES `scheduleManagement_schedule` WRITE;
 /*!40000 ALTER TABLE `scheduleManagement_schedule` DISABLE KEYS */;
-INSERT INTO `scheduleManagement_schedule` VALUES (1,'First schedule','2016-04-28 03:01:11.307795','2016-04-28 10:39:49.964548',8,8,1,1);
+INSERT INTO `scheduleManagement_schedule` VALUES (1,'First schedule','2016-04-28 03:01:11.307795','2016-04-28 10:39:49.964548',8,8,1);
 /*!40000 ALTER TABLE `scheduleManagement_schedule` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `scheduleManagement_screenschedule`
+-- Table structure for table `scheduleManagement_scheduleplaylists`
 --
 
-DROP TABLE IF EXISTS `scheduleManagement_screenschedule`;
+DROP TABLE IF EXISTS `scheduleManagement_scheduleplaylists`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `scheduleManagement_screenschedule` (
-  `screen_schedule_id` int(11) NOT NULL AUTO_INCREMENT,
-  `schedule_id` int(11) NOT NULL,
-  `screen_id` int(11) NOT NULL,
-  `group_id` int(11) DEFAULT NULL,
-  `event_id` int(11),
-  PRIMARY KEY (`screen_schedule_id`),
-  KEY `D8aad8cf02e766892e297a7809befaf3` (`schedule_id`),
-  KEY `screen_id_74a226f26c9094d9_fk_screenManagement_screen_screen_id` (`screen_id`),
-  KEY `scheduleManagement_screenschedule_0e939a4f` (`group_id`),
-  KEY `scheduleManagement_screenschedule_4437cfac` (`event_id`),
-  CONSTRAINT `D8aad8cf02e766892e297a7809befaf3` FOREIGN KEY (`schedule_id`) REFERENCES `scheduleManagement_schedule` (`schedule_id`),
-  CONSTRAINT `sche_group_id_9883e79c7047d8b_fk_screenManagement_group_group_id` FOREIGN KEY (`group_id`) REFERENCES `screenManagement_group` (`group_id`),
-  CONSTRAINT `scheduleManagemen_event_id_74f8ba53a1b97818_fk_schedule_event_id` FOREIGN KEY (`event_id`) REFERENCES `schedule_event` (`id`),
-  CONSTRAINT `screen_id_74a226f26c9094d9_fk_screenManagement_screen_screen_id` FOREIGN KEY (`screen_id`) REFERENCES `screenManagement_screen` (`screen_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+CREATE TABLE `scheduleManagement_scheduleplaylists` (
+  `schedule_playlist_id` int(11) NOT NULL AUTO_INCREMENT,
+  `position_index` int(11) NOT NULL,
+  `playlist_id` int(11) NOT NULL,
+  `schedule_id` int(11),
+  PRIMARY KEY (`schedule_playlist_id`),
+  KEY `D14cbb3d9d04709e1c3e85ecef80ff83` (`playlist_id`),
+  KEY `scheduleManagement_scheduleplaylists_9bc70bb9` (`schedule_id`),
+  CONSTRAINT `D14cbb3d9d04709e1c3e85ecef80ff83` FOREIGN KEY (`playlist_id`) REFERENCES `playlistManagement_playlist` (`playlist_id`),
+  CONSTRAINT `fae4cee4482027edf411bf20126c431d` FOREIGN KEY (`schedule_id`) REFERENCES `scheduleManagement_schedule` (`schedule_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `scheduleManagement_screenschedule`
+-- Dumping data for table `scheduleManagement_scheduleplaylists`
 --
 
-LOCK TABLES `scheduleManagement_screenschedule` WRITE;
-/*!40000 ALTER TABLE `scheduleManagement_screenschedule` DISABLE KEYS */;
-INSERT INTO `scheduleManagement_screenschedule` VALUES (1,1,1,NULL,2),(2,1,1,1,1);
-/*!40000 ALTER TABLE `scheduleManagement_screenschedule` ENABLE KEYS */;
+LOCK TABLES `scheduleManagement_scheduleplaylists` WRITE;
+/*!40000 ALTER TABLE `scheduleManagement_scheduleplaylists` DISABLE KEYS */;
+/*!40000 ALTER TABLE `scheduleManagement_scheduleplaylists` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `scheduleManagement_schedulescreens`
+--
+
+DROP TABLE IF EXISTS `scheduleManagement_schedulescreens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `scheduleManagement_schedulescreens` (
+  `schedule_screen_id` int(11) NOT NULL AUTO_INCREMENT,
+  `event_id` int(11) DEFAULT NULL,
+  `group_id` int(11) DEFAULT NULL,
+  `schedule_id` int(11) NOT NULL,
+  `screen_id` int(11) NOT NULL,
+  PRIMARY KEY (`schedule_screen_id`),
+  KEY `scheduleManagemen_event_id_151cbcd7ab0f3afc_fk_schedule_event_id` (`event_id`),
+  KEY `sch_group_id_1f92042eee00a477_fk_screenManagement_group_group_id` (`group_id`),
+  KEY `scheduleManagement_schedulescreens_9bc70bb9` (`schedule_id`),
+  KEY `scheduleManagement_schedulescreens_e4ec8585` (`screen_id`),
+  CONSTRAINT `D29edf893c4f7c5fbba5410fe2ce1ccd` FOREIGN KEY (`schedule_id`) REFERENCES `scheduleManagement_schedule` (`schedule_id`),
+  CONSTRAINT `sch_group_id_1f92042eee00a477_fk_screenManagement_group_group_id` FOREIGN KEY (`group_id`) REFERENCES `screenManagement_group` (`group_id`),
+  CONSTRAINT `scheduleManagemen_event_id_151cbcd7ab0f3afc_fk_schedule_event_id` FOREIGN KEY (`event_id`) REFERENCES `schedule_event` (`id`),
+  CONSTRAINT `screen_id_5aa6103c3cd0e0ad_fk_screenManagement_screen_screen_id` FOREIGN KEY (`screen_id`) REFERENCES `screenManagement_screen` (`screen_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `scheduleManagement_schedulescreens`
+--
+
+LOCK TABLES `scheduleManagement_schedulescreens` WRITE;
+/*!40000 ALTER TABLE `scheduleManagement_schedulescreens` DISABLE KEYS */;
+/*!40000 ALTER TABLE `scheduleManagement_schedulescreens` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -728,6 +783,7 @@ CREATE TABLE `schedule_event` (
   `calendar_id` int(11) DEFAULT NULL,
   `creator_id` int(11) DEFAULT NULL,
   `rule_id` int(11),
+  `color_event` varchar(10),
   PRIMARY KEY (`id`),
   KEY `schedule_ev_calendar_id_4c9dba94868bbeb0_fk_schedule_calendar_id` (`calendar_id`),
   KEY `schedule_event_creator_id_f3a6304c337da5b_fk_auth_user_id` (`creator_id`),
@@ -744,7 +800,7 @@ CREATE TABLE `schedule_event` (
 
 LOCK TABLES `schedule_event` WRITE;
 /*!40000 ALTER TABLE `schedule_event` DISABLE KEYS */;
-INSERT INTO `schedule_event` VALUES (1,'2016-05-01 09:00:00.000000','2016-05-01 10:00:00.000000','Flipkart start month event','Month start sale event for flipkart','2016-04-27 10:00:28.489167','2016-04-27 10:00:50.212029','2016-09-01 11:00:00.000000',1,8,1),(2,'2016-04-28 02:29:20.000000','2016-04-29 04:29:30.000000','Schedule one day two hours amazon event ','Nothing much','2016-04-28 02:30:52.376234','2016-04-28 03:43:45.719082',NULL,1,8,NULL);
+INSERT INTO `schedule_event` VALUES (1,'2016-05-01 09:00:00.000000','2016-05-01 10:00:00.000000','Flipkart start day event','Daily start sale event for flipkart','2016-04-27 10:00:28.489167','2016-05-07 14:37:13.970378','2016-09-01 11:00:00.000000',1,8,2,NULL),(2,'2016-04-28 02:29:20.000000','2016-04-29 04:29:30.000000','Schedule one day two hours amazon event ','Nothing much','2016-04-28 02:30:52.376234','2016-04-28 03:43:45.719082',NULL,1,8,NULL,NULL);
 /*!40000 ALTER TABLE `schedule_event` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -826,7 +882,7 @@ CREATE TABLE `schedule_rule` (
   `frequency` varchar(10) NOT NULL,
   `params` longtext,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -835,7 +891,7 @@ CREATE TABLE `schedule_rule` (
 
 LOCK TABLES `schedule_rule` WRITE;
 /*!40000 ALTER TABLE `schedule_rule` DISABLE KEYS */;
-INSERT INTO `schedule_rule` VALUES (1,'Month start sale','This sale starts every month on 1st','MONTHLY',''),(2,'Daily','Every day','DAILY','');
+INSERT INTO `schedule_rule` VALUES (1,'Month start sale','This sale starts every month on 1st','MONTHLY',''),(2,'Daily','Every day','DAILY',''),(3,'Every monday, tuesday fortnight','Select monday and tuesday once in every two weeks','WEEKLY','\"interval:2;bysetpos:1,2\"');
 /*!40000 ALTER TABLE `schedule_rule` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -885,7 +941,7 @@ CREATE TABLE `screenManagement_screen` (
   `aspect_ratio` varchar(20) DEFAULT NULL,
   `resolution` varchar(20) DEFAULT NULL,
   `address` varchar(100) NOT NULL,
-  `device_identification_id` varchar(16) DEFAULT NULL,
+  `device_identification_id` varchar(20) DEFAULT NULL,
   `activation_key` varchar(16) DEFAULT NULL,
   `activated_on` date DEFAULT NULL,
   `business_type` varchar(20) NOT NULL,
@@ -916,35 +972,6 @@ INSERT INTO `screenManagement_screen` VALUES (1,'bellandur 1',32,'4:3','1024*768
 UNLOCK TABLES;
 
 --
--- Table structure for table `screenManagement_screen_groups`
---
-
-DROP TABLE IF EXISTS `screenManagement_screen_groups`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `screenManagement_screen_groups` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `screen_id` int(11) NOT NULL,
-  `group_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `screen_id` (`screen_id`,`group_id`),
-  KEY `scr_group_id_4dc0b1699266de69_fk_screenManagement_group_group_id` (`group_id`),
-  CONSTRAINT `scr_group_id_4dc0b1699266de69_fk_screenManagement_group_group_id` FOREIGN KEY (`group_id`) REFERENCES `screenManagement_group` (`group_id`),
-  CONSTRAINT `screen_id_113a154b52f5ae05_fk_screenManagement_screen_screen_id` FOREIGN KEY (`screen_id`) REFERENCES `screenManagement_screen` (`screen_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `screenManagement_screen_groups`
---
-
-LOCK TABLES `screenManagement_screen_groups` WRITE;
-/*!40000 ALTER TABLE `screenManagement_screen_groups` DISABLE KEYS */;
-INSERT INTO `screenManagement_screen_groups` VALUES (15,1,1),(13,2,1),(14,2,2),(17,3,3),(18,3,4),(16,4,4),(19,5,1);
-/*!40000 ALTER TABLE `screenManagement_screen_groups` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `screenManagement_screengroups`
 --
 
@@ -954,8 +981,13 @@ DROP TABLE IF EXISTS `screenManagement_screengroups`;
 CREATE TABLE `screenManagement_screengroups` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `group_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `screen_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `scr_group_id_6ba051396bec04fd_fk_screenManagement_group_group_id` (`group_id`),
+  KEY `screen_id_3e7bcc6b4b453527_fk_screenManagement_screen_screen_id` (`screen_id`),
+  CONSTRAINT `scr_group_id_6ba051396bec04fd_fk_screenManagement_group_group_id` FOREIGN KEY (`group_id`) REFERENCES `screenManagement_group` (`group_id`),
+  CONSTRAINT `screen_id_3e7bcc6b4b453527_fk_screenManagement_screen_screen_id` FOREIGN KEY (`screen_id`) REFERENCES `screenManagement_screen` (`screen_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -964,6 +996,7 @@ CREATE TABLE `screenManagement_screengroups` (
 
 LOCK TABLES `screenManagement_screengroups` WRITE;
 /*!40000 ALTER TABLE `screenManagement_screengroups` DISABLE KEYS */;
+INSERT INTO `screenManagement_screengroups` VALUES (1,1,1),(2,2,2);
 /*!40000 ALTER TABLE `screenManagement_screengroups` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1033,4 +1066,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-04-29 20:33:19
+-- Dump completed on 2016-05-10 23:44:42
