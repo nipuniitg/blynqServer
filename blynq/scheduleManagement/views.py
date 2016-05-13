@@ -294,7 +294,11 @@ def get_screen_data(request, screen_id, nof_days=7):
             end_time = start_time + datetime.timedelta(days=nof_days)
             screen_schedules = ScheduleScreens.objects.filter(event__in=calendar_events)
             for event in calendar_events:
-                screen_schedule = screen_schedules.get(event=event)
+                try:
+                    screen_schedule = screen_schedules.get(event=event)
+                except:
+                    print 'Event does not exist in the schedule screens'
+                    continue
                 schedule = screen_schedule.schedule
                 assert screen_schedule.screen_id == screen_id
                 # TODO: optimize this
