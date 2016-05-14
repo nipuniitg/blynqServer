@@ -61,6 +61,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django_pdb.middleware.PdbMiddleware',
+    'customLibrary.app_exceptions.AppExceptionTrap',
 )
 
 ROOT_URLCONF = 'blynq.urls'
@@ -131,6 +132,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static_root")
 # Media files directory takes care of the uploaded pictures
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# The url where we would host the user uploaded media
+MEDIA_HOST = 'http://www.blynq.in'
 
 # The below variables are for registration app
 #REGISTRATION_OPEN = True        # If True, users can register

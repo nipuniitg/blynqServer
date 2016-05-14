@@ -8,7 +8,8 @@ from schedule.models import Event, Rule
 
 # Create your views here.
 from customLibrary.serializers import playlist_dict, schedule_dict
-from customLibrary.views_lib import get_userdetails, ajax_response, list_to_json, string_to_dict, list_to_comma_string
+from customLibrary.views_lib import get_userdetails, ajax_response, list_to_json, string_to_dict, list_to_comma_string, \
+    default_string_to_datetime
 from playlistManagement.models import Playlist
 from scheduleManagement.models import Schedule, ScheduleScreens, SchedulePlaylists
 from screenManagement.models import Screen, Group
@@ -277,13 +278,15 @@ def upsert_schedule(request):
     return ajax_response(success=success, errors=errors)
 
 
-def get_screen_data(request, screen_id, nof_days=7):
+def get_screen_data(request, screen_id, last_received, nof_days=7):
     # TODO: Login system for screens
     # user_details, organization = user_and_organization(request)
     screen_id = int(screen_id)
     errors = []
     screen_data_json = []
     success = False
+    is_modified = False
+    last_received_datetime = default_string_to_datetime(last_received)
     try:
         screen = Screen.objects.get(screen_id=screen_id)
         calendar = screen.screen_calendar
@@ -293,6 +296,8 @@ def get_screen_data(request, screen_id, nof_days=7):
             start_time = current_time
             end_time = start_time + datetime.timedelta(days=nof_days)
             screen_schedules = ScheduleScreens.objects.filter(event__in=calendar_events)
+            if not calendar_events:
+                is_modified = True
             for event in calendar_events:
                 try:
                     screen_schedule = screen_schedules.get(event=event)
@@ -300,7 +305,15 @@ def get_screen_data(request, screen_id, nof_days=7):
                     print 'Event does not exist in the schedule screens'
                     continue
                 schedule = screen_schedule.schedule
-                assert screen_schedule.screen_id == screen_id
+                if schedule.last_updated_time < last_received_datetime:
+                    continue
+                else:
+                    is_modified = True
+                # assert screen_schedule.screen_id == screen_id
+                occurrences = event.get_occurrences(start_time, end_time)
+                if not occurrences:
+                    is_modified = True
+                    continue
                 # TODO: optimize this
                 playlists = schedule.playlists.all()
                 playlists_json = []
@@ -311,17 +324,16 @@ def get_screen_data(request, screen_id, nof_days=7):
                                  'playlists': playlists_json,
                                  'last_updated_time': schedule.last_updated_time,
                                  }
-                occurrences = event.get_occurrences(start_time, end_time)
                 for each_occur in occurrences:
                     campaign_dict['start_time'] = each_occur.start
                     campaign_dict['end_time'] = each_occur.end
                     screen_data_json.append(campaign_dict)
             # print screen_data_json
-        campaigns_json = {'campaigns': screen_data_json}
+        campaigns_json = {'campaigns': screen_data_json, 'is_modified': is_modified}
         success = True
         return list_to_json(campaigns_json)
     except:
-        error = "Error while fetching the occurences"
+        error = "Error while fetching the occurences or invalid screen identifier"
         errors.append(error)
         print error
     return ajax_response(success=success, errors=errors)
