@@ -62,10 +62,10 @@ def get_schedule_timeline(schedule):
             event_json['is_always'] = schedule.is_always
             event_json['recurrence_absolute'] = schedule.recurrence_absolute
             event_json['all_day'] = schedule.all_day
-            event_json['start_date'] = event.start.date() if event.start else None
-            event_json['end_recurring_period'] = event.end_recurring_period.date() if event.end_recurring_period else None
-            event_json['start_time'] = event.start.time() if event.start else None
-            event_json['end_time'] = event.end.time() if event.end else None
+            event_json['start_date'] = str(event.start.date()) if event.start else None
+            event_json['end_recurring_period'] = str(event.end_recurring_period.date()) if event.end_recurring_period else None
+            event_json['start_time'] = str(event.start.time()) if event.start else None
+            event_json['end_time'] = str(event.end.time()) if event.end else None
             rule = event.rule
             params = rule.get_params() if rule else {}
             event_json['frequency'] = rule.frequency

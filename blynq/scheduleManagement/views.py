@@ -1,5 +1,6 @@
 import datetime
 
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -348,3 +349,22 @@ def get_schedules(request):
         all_schedules.append(schedule_dictionary)
     all_schedules_json = {'schedule_details': all_schedules}
     return list_to_json(all_schedules_json)
+
+
+@login_required
+def get_schedule_details(request,schedule_id):
+    user_details = get_userdetails(request)
+    context_dic = {}
+    if schedule_id == -1:
+        context_dic['schedule'] = {}
+        context_dic['relevant'] = True
+    else:
+        try:
+            schedule = Schedule.get_user_relevant_objects(user_details=user_details).get(schedule_id=schedule_id)
+            schedule_dictionary = schedule_dict(schedule)
+            context_dic['relevant'] = True
+            context_dic['schedule'] = schedule_dictionary
+        except:
+            context_dic['relevant'] = False
+    #return JsonResponse(context_dic)
+    return render(request,'scheduleManagement/schedule_details.html',context_dic)

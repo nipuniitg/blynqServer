@@ -10,34 +10,213 @@ sdApp.config(function($httpProvider) {
 });
 
 //list of all the recent schedules
-sdApp.controller('scheduleIndexCtrl', ['$scope', function($scope){
+sdApp.controller('scheduleIndexCtrl', ['$scope','scheduleIndexFactory','$uibModal',
+    function($scope,sIF, $uibModal){
 
+    var newScheduleIndex = -1
 
-}]);
+    var newScheduleTemplate = {
+        schedule_id : -1,
+        schedule_name : 'latest schedule',
+        screens : [],
+        groups : [],
+        playlists:[],
+        timeline:{
+            is_always   : !0
+            ,start_date  : null
+            ,end_recurring_period :null
+            ,all_day     :null
+            ,start_time  :null
+            ,end_time    :null
+            ,frequency  :null
+            ,interval   :null
+            ,recurrence_absolute:null
+            ,byweekno   :null
+            ,byweekday  :null
+            ,bymonthday :null
+        }
+    };
 
-sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal', function($scope, $uibModal){
-    //schedule Details -screens/groups
-    /*$scope.scheduleDetails.screens;
-    $scope.scheduleDetails.playlist;
-    $scope.scheduleDetails.timeline;*/
-
-    $scope.openmodal = function(){
-        var modalInstance = $uibModal.open({
-          animation: false,
-          //template : '<p>Hello</p>',
-          templateUrl: '/templates/scheduleManagement/_timline_modal.html',
-          //controller: 'ModalInstanceCtrl',
-          size: 'lg',
-          /*resolve: {
-            items: function () {
-              return $scope.items;
-            }
-          }*/
-        });
+    var onLoad = function(){
+        refreshSchedules();
     }
 
+    var refreshSchedules = function(){
+        sIF.getSchedules(function(data){
+            $scope.schedules = data;
+        });
+    };
+
+    var openModalPopup = function(index){
+        var isNewSchedule = index == newScheduleIndex ? !0 : !1;
+        var modalInstance = $uibModal.open({
+          animation: true,
+          templateUrl: '/templates/scheduleManagement/schedule_details.html',
+          controller: 'scheduleDetailsCtrl',
+          size: 'lg'
+          ,backdrop: 'static' //disables modal closing by click on the backdrop.
+          ,resolve: {
+            schedule: function(){
+                if(isNewSchedule)
+                {
+                    return angular.copy(newScheduleTemplate);
+                }
+                else{
+                    return angular.copy($scope.schedules[scheduleId]);
+                }
+            }
+          }
+        });
+
+        modalInstance.result.then(function saved(){
+            refreshSchedules();
+        }, function cancelled(){
+            toastr.warning('schedule cancelled')
+        })
+    }
+
+    $scope.addSchedule= function(){
+        openModalPopup(newScheduleIndex);
+    };
+
+    $scope.editSchedule = function(index){
+        openModalPopup(index);
+    }
+
+    //onLoad();
+
 }]);
 
+sdApp.factory('scheduleIndexFactory', ['$http', function($http){
+
+    var getScheduleDetails = function(callback){
+        $http({
+             method : "GET",
+             url : 'getSchedules
+         }).then(function mySucces(response){
+                if(callback)
+                {
+                    callback(response.data);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
+    };
+
+    return{
+        getScheduleDetails : getScheduleDetails
+    }
+}]);
+
+
+
+//schedule Details material
+sdApp.factory('scheduleDetailsFactory', ['$log','$http', function($log, $http){
+
+    var selectedBoolSetter = function(allItems, selectedItems, key){
+        var r = []
+        ,allItemsLength = allItems.length;
+
+        if (typeof(selectedItems) !== 'undefined'){
+            selectedItemsLength = selectedItems.length;
+        }
+        for(i=0; i<allItemsLength; i++){
+            var item = allItems[i];
+            if(typeof(selectedItemsLength) !== 'undefined')
+            {
+                for(l=0; l<selectedItemsLength; l++){
+                if(item[key] == selectedItems[l][key]){
+                    item['selected']= !0
+                    selectedItemsLength -= 1;
+                    selectedItems.splice(l,1);
+                    break;
+                }
+            }
+            }
+            if(!item['selected']){
+                item['selected'] = !1;
+            }
+            r.push(item);
+        }
+        return r;
+    };
+
+    var getSelectedItems = function(allItems){
+        var selectedItems = [];
+        var allItemsLength = allItems.length;
+        for(i=0; i<allItemsLength; i++){
+            if(allItems[i].selected){
+                delete allItems[i].selected;
+                selectedItems.push(allItems[i]);
+            }
+        }
+        return selectedItems;
+    };
+
+    var upsertScheduleDetails = function(schedule, callback){
+        $http({
+            method : "POST"
+            ,url : "/schedule/upsertSchedule"
+            ,data : schedule
+        }).then(function mySucces(response){
+            if(callback)
+            {
+                callback(response.data);
+            }
+        }, function myError(response) {
+            console.log(response.statusText);
+        });
+    };
+
+    return{
+        selectedBoolSetter : selectedBoolSetter
+        ,getSelectedItems : getSelectedItems
+        ,upsertScheduleDetails : upsertScheduleDetails
+    }
+}]);
+
+sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleDetailsFactory',
+'$uibModalInstance','schedule', function($scope, $uibModal, $log, sDF, $uibModalInstance, schedule){
+
+    $scope.schedule = schedule;
+
+    var isNewSchedule = schedule.schedule_id == -1 ? !0 : !1
+
+    $scope.title = isNewSchedule? 'Add Schedule' : 'Edit Schedule'
+
+    $scope.saveSchedule= function(){
+        $log.log($scope.schedule);
+
+        sDF.upsertScheduleDetails($scope.schedule, function(status){
+            if(status == 'success')
+            {
+                if(isNewSchedule)
+                {
+                    toastr.success('New Schedule Added');
+                }
+                else{
+                    toastr.success('Schduel updated successfully');
+                }
+                $uibModalInstance.close($scope.schedule);
+            }
+            else
+            {
+                toastr.warning('Oops!.There was some error while updating the schedule.');
+            }
+        });
+
+
+    };
+
+    $scope.cancel = function(){
+        $uibModalInstance.dismiss();
+    };
+
+    //onLoad();
+}]);
+// end schedule details material
+
+//timeline material
 sdApp.directive('timelineTextbox', function(){
 return{
     restrict: 'E'
@@ -45,17 +224,17 @@ return{
         timeDefined :'='
         ,startDate :'='
         ,endDate :'='
+        ,allDay : '='
         ,startTime :'='
         ,endTime :'='
         ,recurrenceType    :'='
         ,recurrenceFrequency  :'='
         ,recurrenceAbsolute    :'='
-        ,recurrenceDayOfWeek   :'='
         ,recurrenceDayOfMonth  :'='
         ,recurrenceWeekOfMonth :'='
-        ,recurrenceMonthOfYear :'='
         ,recurrenceDaysOfWeek  :'='
     }
+    ,templateUrl : '/templates/scheduleManagement/_timeline_textbox.html'
     ,controller : 'timelinetextboxController'
     ,link : function($scope,element, attr){
 
@@ -63,40 +242,308 @@ return{
 }
 });
 
-sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log', function($scope, $uibModal, $log){
+sdApp.factory('timelineFactory', ['$log', function($log){
 
-    $scope.sometext = 'HI, this is from timeline contrller'
+    //private methods
+
+    var timeFunction = function(hours, minutes){
+        var today = new Date();
+        today.setHours(hours);
+        today.setMinutes(minutes);
+        return today
+    };
+
+    var e = {
+        DAILY: "DAILY",
+        WEEKLY: "WEEKLY",
+        MONTHLY: "MONTHLY",
+        YEARLY: "YEARLY"
+    };
+
+    //public methods
+    var getTimeline = function(timeDefined, startDate, endDate, allDay, startTime, endTime,
+                                recurrenceType,recurrenceFrequency, recurrenceAbsolute,
+                                recurrenceDayOfMonth, recurrenceWeekOfMonth, recurrenceDaysOfWeek)
+                                {
+        var today = new Date();
+        var timeline = {
+            timeDefined             :   timeDefined
+            ,startDate              :   startDate || today
+            ,endDate                :   endDate || null
+            ,allDay                 :   !startTime && !endTime || false
+            ,startTime              :   startTime ||  timeFunction(8,30)
+            ,endTime                :   endTime   ||  null
+            ,recurrenceType         :   recurrenceType || null
+            ,recurrenceFrequency    :   recurrenceFrequency || 1
+            ,recurrenceAbsolute     :   recurrenceAbsolute  || null
+            ,recurrenceDayOfMonth   :   recurrenceDayOfMonth || null
+            ,recurrenceWeekOfMonth  :   recurrenceWeekOfMonth|| null
+            ,recurrenceDaysOfWeek   :   recurrenceDaysOfWeek || null
+        };
+
+        return timeline;
+
+    };
+
+    var getTimelineRecurrenceWise = function(n){
+        var i = n
+          , r = {
+            daily: {
+                recurrenceFrequency: 1
+            },
+            weekly: {
+                recurrenceFrequency: 1
+            },
+            monthly: {
+                recurrenceAbsolute: !1,
+                absolute: {
+                    recurrenceFrequency: 1,
+                    recurrenceDayOfMonth: 1
+                },
+                relative: {
+                    recurrenceFrequency: 1,
+                    recurrenceWeekOfMonth: 0,
+                    recurrenceDayOfWeek: 0
+                }
+            }
+        }
+          , a = function() {
+            if (i.recurrenceType === e.DAILY)
+            {
+                r.daily.recurrenceFrequency = i.recurrenceFrequency;
+            }
+            else
+             {
+                if (i.recurrenceType === e.WEEKLY)
+                {
+                    r.weekly.recurrenceFrequency = i.recurrenceFrequency;
+                        for (var t = 0; t < i.recurrenceDaysOfWeek.length; t++)
+                            "Mon" === i.recurrenceDaysOfWeek[t] ? r.weekly.monday = !0 : "Tue" === i.recurrenceDaysOfWeek[t] ? r.weekly.tuesday = !0 : "Wed" === i.recurrenceDaysOfWeek[t] ? r.weekly.wednesday = !0 : "Thu" === i.recurrenceDaysOfWeek[t] ? r.weekly.thursday = !0 : "Fri" === i.recurrenceDaysOfWeek[t] ? r.weekly.friday = !0 : "Sat" === i.recurrenceDaysOfWeek[t] ? r.weekly.saturday = !0 : "Sun" === i.recurrenceDaysOfWeek[t] && (r.weekly.sunday = !0)
+                }
+                else
+                {
+                    //i.recurrenceType === e.MONTHLY ?
+                     (r.monthly.recurrenceAbsolute = i.recurrenceAbsolute,
+                        i.recurrenceAbsolute ?
+                            (r.monthly.absolute.recurrenceFrequency = i.recurrenceFrequency,
+                            r.monthly.absolute.recurrenceDayOfMonth = i.recurrenceDayOfMonth)
+                            : (r.monthly.relative.recurrenceFrequency = i.recurrenceFrequency,
+                            r.monthly.relative.recurrenceWeekOfMonth = i.recurrenceWeekOfMonth,
+                            r.monthly.relative.recurrenceDayOfWeek = i.recurrenceDayOfWeek)
+                     )
+
+                }
+             }
+          }
+          , o = function() {
+            i.allDay && (i.startTime = timeFunction(8, 0),
+            i.endTime = timeFunction(17, 30)),
+            a()
+        };
+        o();
+        var s = function() {
+            i.recurrenceType === e.DAILY ? i.recurrenceFrequency = r.daily.recurrenceFrequency : i.recurrenceType === e.WEEKLY ? (i.recurrenceFrequency = r.weekly.recurrenceFrequency,
+            i.recurrenceDaysOfWeek = [],
+            r.weekly.monday && i.recurrenceDaysOfWeek.push("Mon"),
+            r.weekly.tuesday && i.recurrenceDaysOfWeek.push("Tue"),
+            r.weekly.wednesday && i.recurrenceDaysOfWeek.push("Wed"),
+            r.weekly.thursday && i.recurrenceDaysOfWeek.push("Thu"),
+            r.weekly.friday && i.recurrenceDaysOfWeek.push("Fri"),
+            r.weekly.saturday && i.recurrenceDaysOfWeek.push("Sat"),
+            r.weekly.sunday && i.recurrenceDaysOfWeek.push("Sun")) : i.recurrenceType === e.MONTHLY ? (i.recurrenceAbsolute = r.monthly.recurrenceAbsolute,
+            i.recurrenceAbsolute ? (i.recurrenceFrequency = r.monthly.absolute.recurrenceFrequency,
+            i.recurrenceDayOfMonth = r.monthly.absolute.recurrenceDayOfMonth) : (i.recurrenceFrequency = r.monthly.relative.recurrenceFrequency,
+            i.recurrenceWeekOfMonth = r.monthly.relative.recurrenceWeekOfMonth,
+            i.recurrenceDayOfWeek = r.monthly.relative.recurrenceDayOfWeek)) : i.recurrenceType === e.YEARLY && (i.recurrenceAbsolute = r.yearly.recurrenceAbsolute,
+            i.recurrenceAbsolute ? (i.recurrenceMonthOfYear = r.yearly.absolute.recurrenceMonthOfYear,
+            i.recurrenceDayOfMonth = r.yearly.absolute.recurrenceDayOfMonth) : (i.recurrenceDayOfWeek = r.yearly.relative.recurrenceDayOfWeek,
+            i.recurrenceWeekOfMonth = r.yearly.relative.recurrenceWeekOfMonth,
+            i.recurrenceMonthOfYear = r.yearly.relative.recurrenceMonthOfYear))
+        }
+        ;
+        this.save = function() {
+            i.startTime = i.allDay ? null  : i.startTime,
+            i.endTime = i.allDay ? null  : i.endTime,
+            s()
+        }
+        ,
+        this.recurrence = r,
+        this.timeline = i
+
+        return this;
+    };
+
+    var getTimelineLabel = function(timeline){
+      var t = {}
+      , n = {
+        DAILY: "Daily",
+        WEEKLY: "Weekly",
+        MONTHLY: "Monthly",
+        YEARLY: "Yearly"
+    }
+      , i = {
+        EVERY_DAY: "Every Day",
+        ALL_DAY: "All Day",
+        START: "Start",
+        END: "End",
+        TO: "to",
+        DAY: "Day",
+        OF: "Of",
+        EVERY: "Every"
+    }
+      , r = ["First", "Second", "Third", "Fourth", "Last"]
+      , a = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+      , o = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+      , s = function(t, n, i) {
+        var r = ""
+          , a = new Date(t);
+        return n ? (a.setMinutes(a.getMinutes() + a.getTimezoneOffset()),
+        r = e("date")(a, i)) : r = e("date")(a, i),
+        r
+    };
+
+
+
+
+    };
+
+return{
+    getTimeline : getTimeline
+    ,getTimelineRecurrenceWise : getTimelineRecurrenceWise
+    ,getTimelineLabel : getTimelineLabel
+}
+
+}]);
+
+sdApp.factory('timelineDescription',['$filter', function(e){
+var t = {}
+      , n = {
+        DAILY: "Daily",
+        WEEKLY: "Weekly",
+        MONTHLY: "Monthly",
+        YEARLY: "Yearly"
+    }
+      , i = {
+        EVERY_DAY: "Every Day",
+        ALL_DAY: "All Day",
+        START: "Start",
+        END: "End",
+        TO: "to",
+        DAY: "Day",
+        OF: "Of",
+        EVERY: "Every"
+    }
+      , r = ["First", "Second", "Third", "Fourth", "Last"]
+      , a = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+      , o = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+      , s = function(t, n, i) {
+        var r = ""
+          , a = new Date(t);
+        return n ? (a.setMinutes(a.getMinutes() + a.getTimezoneOffset()),
+        r = e("date")(a, i)) : r = e("date")(a, i),
+        r
+    };
+
+    var updateLabel = function(e) {
+        var t = ""
+          , l = "dd-MMM-yyyy";
+        if (e.startDate && (t = t + s(e.startDate, e.useLocaldate, l) + " "),
+        e.endDate && (t = t + i.TO + " " + s(e.endDate, e.useLocaldate, l) + " "),
+        e.startTime) {
+            var c = "hh:mm a";
+            t = t + s(e.startTime, e.useLocaldate, c) + " ",
+            e.endTime && (t = t + i.TO + " " + s(e.endTime, e.useLocaldate, c) + " ")
+        }
+        if (e.recurrenceType) {
+            var u = 0;
+            if (t = t + e.recurrenceType + " ",
+            e.recurrenceType === n.MONTHLY && (e.recurrenceAbsolute ? (t = t + i.DAY + " " + e.recurrenceDayOfMonth + " " + i.OF + " ",
+            u = e.recurrenceFrequency) : (t = t + r[e.recurrenceWeekOfMonth] + " " + a[e.recurrenceDayOfWeek] + " " + i.OF + " ",
+            u = e.recurrenceFrequency)),
+            t = t + i.EVERY + " ",
+            t = e.recurrenceType === n.YEARLY ? e.recurrenceAbsolute ? t + o[e.recurrenceMonthOfYear] + " " + e.recurrenceDayOfMonth + " " : t + r[e.recurrenceWeekOfMonth] + " " + a[e.recurrenceDayOfWeek] + " " + i.OF + " " + o[e.recurrenceMonthOfYear] + " " : t + e.recurrenceFrequency + " " + e.recurrenceType.substring(0, e.recurrenceType.length - 2).replace("i", "y") + "(s) ",
+            e.recurrenceType === n.WEEKLY && e.recurrenceDaysOfWeek)
+                for (var d = 0; d < e.recurrenceDaysOfWeek.length; d++)
+                    "Mon" === e.recurrenceDaysOfWeek[d] ? t = t + a[1] + " " : "Tue" === e.recurrenceDaysOfWeek[d] ? t = t + a[2] + " " : "Wed" === e.recurrenceDaysOfWeek[d] ? t = t + a[3] + " " : "Thu" === e.recurrenceDaysOfWeek[d] ? t = t + a[4] + " " : "Fri" === e.recurrenceDaysOfWeek[d] ? t = t + a[5] + " " : "Sat" === e.recurrenceDaysOfWeek[d] ? t = t + a[6] + " " : "Sun" === e.recurrenceDaysOfWeek[d] && (t = t + a[0] + " ")
+        }
+        return t
+    };
+
+    return{
+        updateLabel : updateLabel
+    }
+
+}]);
+
+sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','timelineFactory','timelineDescription',
+ function($scope, $uibModal, $log, timelineFactory, timelineDescription){
+
+    //private methods
+    var onLoad = function(){
+        $log.log($scope.timeDefined);
+        $scope.timeline = timelineFactory.getTimeline(
+            $scope.timeDefined
+            ,$scope.startDate
+            ,$scope.endDate
+            ,$scope.allDay
+            ,$scope.startTime
+            ,$scope.endTime
+            ,$scope.recurrenceType
+            ,$scope.recurrenceFrequency
+            ,$scope.recurrenceAbsolute
+            ,$scope.recurrenceDayOfMonth
+            ,$scope.recurrenceWeekOfMonth
+            ,$scope.recurrenceDaysOfWeek
+        );
+        $scope.label = timelineDescription.updateLabel($scope.timeline);
+    };
     $scope.openTimelineModal=function(){
         var modalInstance = $uibModal.open({
           animation: true,
           templateUrl: '/templates/scheduleManagement/_timeline_modal.html',
-          controller: 'editTimelineController',
+          controller: 'timelineModalController',
           size: 'lg'
           ,backdrop: 'static' //disables modal closing by click on the backdrop.
           ,resolve: {
-            sometext: function(){
-                return $scope.sometext;
+            timeline: function(){
+                return angular.copy($scope.timeline);
             }
           }
         });
 
-        modalInstance.result.then(function (selectedItem) {
-            $scope.selected = selectedItem;
-            }, function () {
+        modalInstance.result.then(function apply(timeline) {
+            $scope.timeline = timeline
+            ,$scope.timeDefined = timeline.timeDefined
+            ,$scope.startDate= timeline.startDate
+            ,$scope.endDate=timeline.endDate
+            ,$scope.allDay = timeline.allDay
+            ,$scope.startTime=timeline.startTime
+            ,$scope.endTime=timeline.endTime
+            ,$scope.recurrenceType=timeline.recurrenceType
+            ,$scope.recurrenceFrequency=timeline.recurrenceFrequency
+            ,$scope.recurrenceAbsolute=timeline.recurrenceAbsolute
+            ,$scope.recurrenceDayOfMonth=timeline.recurrenceDayOfMonth
+            ,$scope.recurrenceWeekOfMonth=timeline.recurrenceWeekOfMonth
+            ,$scope.recurrenceDaysOfWeek=timeline.recurrenceDaysOfWeek
 
+            toastr.success('timeline updated');
+            $scope.label = timelineDescription.updateLabel($scope.timeline);
+
+            }, function cancel() {
+                toastr.warning('cancelled');
             });
     }
+
+    onLoad();
 }]);
 
-sdApp.controller('editTimelineController',['$scope','$uibModalInstance','sometext', '$log',
-        function($scope, $uibModalInstance,sometext, $log ){
-    $scope.sometext = sometext;
-    $scope.timeline = {};
-
+sdApp.controller('timelineModalController',['$scope','$uibModalInstance','timeline', '$log','timelineFactory',
+ function($scope, $uibModalInstance, timeline, $log, timelineFactory){
+    var r = new timelineFactory.getTimelineRecurrenceWise(timeline);
+    $scope.timeline=r.timeline;
+    $scope.recurrence = r.recurrence;
 
     //date
-    $scope.timeline.startDate = new Date();
-    $scope.timeline.endDate = null;
     $scope.popUp1dateOptions = {
             dateDisabled: false,
             formatYear: 'yy',
@@ -136,7 +583,7 @@ sdApp.controller('editTimelineController',['$scope','$uibModalInstance','sometex
     });
 
     //time
-    $scope.
+
 
     $scope.apply = function () {
         if($scope.timeline.endDate < $scope.timeline.startDate)
@@ -144,7 +591,9 @@ sdApp.controller('editTimelineController',['$scope','$uibModalInstance','sometex
             alert('end date should be more than start date')
         }
         else{
-            //$uibModalInstance.close($scope.selected.item);
+            r.save();
+            $uibModalInstance.close($scope.timeline);
+            $log.log($scope.timeline);
             alert('applied');
         }
 
@@ -157,3 +606,264 @@ sdApp.controller('editTimelineController',['$scope','$uibModalInstance','sometex
 
 
 }]);
+
+sdApp.directive("largerThanDate", [function() {
+        return {
+            require: "ngModel",
+            link: function(e, t, n, i) {
+                e.$watchGroup(["timeline.startDate", "timeline.endDate"], function(e) {
+                    var t = e[0] && new Date(e[0])
+                      , n = e[1] && new Date(e[1])
+                      , r = !(t && n && t > n);
+                    i.$setValidity("largerThanDate", r)
+                })
+            }
+        }
+    }
+]);
+// end timline material
+
+//distribution list material
+sdApp.directive('distributionList', function(){
+    return{
+        restrict : 'E'
+        ,scope : {
+            selectedScreens : '='
+            ,selectedGroups : '='
+        }
+        ,controller : 'distributionListController'
+        ,templateUrl : '/templates/scheduleManagement/_distribution_list.html'
+        ,link : function($scope, elements, attr){
+
+        }
+    }
+});
+
+sdApp.controller('distributionListController',['$scope', '$uibModal','$log',
+ function($scope, $uibModal, $log){
+
+    $scope.openDistributionSelectorModal = function(){
+        var modalInstance = $uibModal.open({
+          animation: true,
+          templateUrl: '/templates/scheduleManagement/_distribution_selector_modal.html',
+          controller: 'distributionSelectorController',
+          size: 'lg'
+          ,backdrop: 'static' //disables modal closing by click on the backdrop.
+          ,resolve: {
+            selectedScreens: function(){
+                return angular.copy($scope.selectedScreens);
+            }
+            ,selectedGroups : function(){
+                return angular.copy($scope.selectedGroups)
+            }
+          }
+        });
+
+        modalInstance.result.then(function apply(selectedList){
+            $scope.selectedScreens= angular.copy(selectedList.screens);
+            $scope.selectedGroups = angular.copy(selectedList.groups);
+            $log.log($scope.selectedGroups);
+            $log.log($scope.selectedScreens);
+        }, function cancel(){
+            toastr.warning('cancelled');
+        })
+    };
+
+    $scope.removeScreen=function(index){
+        $scope.selectedScreens.splice(index,1);
+        toastr.success('screen Removed')
+    };
+    $scope.removeGroup=function(index){
+        $scope.selectedGroups.splice(index,1);
+        toastr.success('group Removed');
+    }
+}]);
+
+sdApp.factory('distributionSelectorFactory', ['$log', '$http', '$q','scheduleDetailsFactory',
+ function($log, $http, $q, sDF){
+
+    //private methods
+    var getScreensJson = function(callback){
+        $http({
+            method : "GET",
+            url : "/screen/getScreens"
+        }).then(function mySucces(response) {
+            if(callback)
+            {
+                callback(response.data);
+            }
+        }, function myError(response) {
+            console.log(response.statusText);
+        });
+    };
+
+    var getGroupsJson = function(callback){
+         $http({
+            method : "GET",
+            url : "/screen/getGroups"
+        }).then(function mySucces(response) {
+            if(callback)
+            {
+                callback(response.data);
+            }
+        }, function myError(response) {
+            console.log(response.statusText);
+        });
+    };
+
+
+    //public methods
+    var getScreensListWithSelectedBool = function(selectedScreens, callback){
+        getScreensJson(function(allScreens){
+            var allScreensWithSelectedBool = sDF.selectedBoolSetter(allScreens, selectedScreens, 'sreen_id');
+            callback(allScreensWithSelectedBool);
+        });
+    };
+
+    var getGroupsListWithSelectedBool = function(selectedGroups, callback){
+        getGroupsJson(function(allGroups){
+            var allGroupsWithSelectedBool = sDF.selectedBoolSetter(allGroups, selectedGroups, 'group_id');
+            callback(allGroupsWithSelectedBool);
+        });
+    };
+
+    var getSelectedItems = function(allItems){
+        var selectedItems = sDF.getSelectedItems(allItems);
+        return selectedItems;
+    }
+
+    return{
+        getScreensListWithSelectedBool : getScreensListWithSelectedBool
+        ,getGroupsListWithSelectedBool : getGroupsListWithSelectedBool
+        ,getSelectedItems : getSelectedItems
+    }
+
+}]);
+
+sdApp.controller('distributionSelectorController',['$scope','$uibModalInstance', '$log','selectedScreens',
+ 'selectedGroups','distributionSelectorFactory',
+  function($scope,$uibModalInstance, $log, selectedScreens, selectedGroups, dSF){
+
+//private methods
+var onLoad = function(){
+    dSF.getScreensListWithSelectedBool(selectedScreens, function(data){
+        $scope.allScreens = data;
+    });
+    dSF.getGroupsListWithSelectedBool(selectedGroups, function(data){
+        $scope.allGroups = data;
+    });
+};
+
+//public methods
+$scope.apply = function(){
+    var selectedScreens = dSF.getSelectedItems($scope.allScreens);
+    var selectedGroups = dSF.getSelectedItems($scope.allGroups);
+    var selectedItems = {
+        screens : selectedScreens,
+        groups : selectedGroups
+    };
+    $uibModalInstance.close(selectedItems);
+};
+$scope.cancel = function(){
+    $uibModalInstance.dismiss();
+}
+
+onLoad();
+
+ }]);
+//end-distribution list material
+
+
+//playlistsList material
+
+sdApp.directive('playlistTextbox',['$uibModal', function($uibModal){
+    return{
+        restrict:'E'
+        ,scope : {
+            selectedPlaylists : '='
+        }
+        ,templateUrl : '/templates/scheduleManagement/_playlist_textbox.html'
+        ,link : function($scope, elements,attr){
+            $scope.removePlaylist = function(index){
+                $scope.selectedPlaylists.splice(index,1);
+            }
+            $scope.openPlaylistSelectorModal = function(){
+                var modalInstance = $uibModal.open({
+                  animation: true,
+                  templateUrl: '/templates/scheduleManagement/_playlist_selector_modal.html',
+                  controller: 'playlistSelectorController',
+                  size: 'lg'
+                  ,backdrop: 'static' //disables modal closing by click on the backdrop.
+                  ,resolve: {
+                    selectedPlaylists: function(){
+                        return angular.copy($scope.selectedPlaylists);
+                    }
+                  }
+                });
+                modalInstance.result.then(function apply(selectedPlaylists){
+                    $scope.selectedPlaylists= selectedPlaylists;
+                }, function cancel(){
+                    toastr.warning('cancelled');
+                })
+            };
+        }
+    }
+}]);
+
+sdApp.factory('playlistSelectorFactory', ['scheduleDetailsFactory','$http', function(sDF, $http){
+    //private functions
+    var getPlaylistsJson = function(callback){
+        $http({
+             method : "GET",
+             url : '/playlist/getPlaylists'
+         }).then(function mySucces(response){
+                if(callback)
+                {
+                    callback(response.data);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
+    };
+
+    //public functions
+    var getPlaylistsListWithSelectedBool = function(selectedPlaylists, callback){
+        getPlaylistsJson(function(allPlaylists){
+            var allPlaylistsWithSelectedBool = sDF.selectedBoolSetter(allPlaylists,selectedPlaylists, 'playlist_id');
+            callback(allPlaylistsWithSelectedBool);
+        })
+    };
+
+    var getSelectedItems = function(allItems){
+        var selectedItems = sDF.getSelectedItems(allItems);
+        return selectedItems;
+    }
+
+    return{
+        getPlaylistsListWithSelectedBool : getPlaylistsListWithSelectedBool
+        ,getSelectedItems : getSelectedItems
+    }
+}]);
+
+sdApp.controller('playlistSelectorController', ['$scope', '$log','$uibModalInstance','selectedPlaylists',
+'playlistSelectorFactory', function($scope, $log, $uibModalInstance, selectedPlaylists, pSF){
+    var onLoad = function(){
+        pSF.getPlaylistsListWithSelectedBool(selectedPlaylists,function(data) {
+            $scope.allPlaylists = data;
+        });
+    };
+
+    $scope.apply = function(){
+        var selectedPlaylists = pSF.getSelectedItems($scope.allPlaylists)
+        $uibModalInstance.close(selectedPlaylists);
+    };
+    $scope.cancel = function(){
+        $uibModalInstance.dismiss();
+    }
+
+
+
+    onLoad();
+}]);
+
+//end playlists List material

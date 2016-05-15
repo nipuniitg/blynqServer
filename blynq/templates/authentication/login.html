@@ -1,10 +1,25 @@
-{% extends 'masterLayout.html' %}
+{% extends 'landing_page.html' %}
 {% load staticfiles %}
 
-{% block title %}Blynq Login Page{% endblock %}
+<!--{% block title %}Blynq Login Page{% endblock %}-->
 
-{% block nonAuthenticatedContent %}
-    <div class="well col-sm-8">
+{% block content %}
+<header class="head-section">
+    <div class="navbar navbar-default navbar-static-top container">
+        <div class="navbar-header">
+            <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse" type="button">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/" style="height:80px;width:200px">
+                <img src="{%static 'LandingPage/img/Blynq_Logo.png'%}" style="height:100%;width:100%">
+            </a>
+        </div>
+    </div>
+</header>
+<div class="container" style="margin:20px">
+    <div class="well  col-md-offset-2 col-sm-8">
         <div class="container" id="divLoginFields">
             <h2>Blynq Login</h2>
 
@@ -44,7 +59,8 @@
             {% endif %}
         </div>
     </div>
+    </div>
 
     <script src="{% static 'Libraries/jquery-1.11.3.js' %}"></script>
     <script src="{% static 'CustomScripts/login.js' %}"></script>
-{% endblock nonAuthenticatedContent %}
+{% endblock content %}

@@ -2,14 +2,14 @@
 {% load staticfiles %}
 
 {% block content%}
-<section class="wrapper" ng-app="plApp" ng-controller="plCtrl">
-    <script src="{% static 'CustomScripts/PlaylistManagement-ang.js' %}"></script>
-    <div class="row" ng-app="" ng-controller="">
+<script src="{% static 'CustomScripts/ScheduleManagement-ang.js' %}"></script>
+<section class="wrapper" ng-app="sdApp" ng-controller="scheduleIndexCtrl">
+    <div class="row">
         <div class="col-md-12 col-fluid">
             <section class="panel panel-default">
                 <div class="panel-heading">
                     Latest Schedules
-                    <a class="btn  btn-primary pull-right" href="{% url 'upsert_schedule'%}">
+                    <a class="btn  btn-primary pull-right" ng-click="addSchedule()">
                         <i class="fa fa-plus"></i>
                         Add Schedule
                     </a>

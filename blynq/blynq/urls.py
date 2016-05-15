@@ -12,6 +12,7 @@ from scheduleManagement import schedule_urls
 
 
 urlpatterns = [
+    url(r'^$', auth_views.divertToLandingPage, name='landing_page'),
     url(r'^authentication/', include(authentication_urls)),
     url(r'^schedule/', include(schedule_urls)),
     url(r'^screen/', include(screen_urls)),
@@ -21,7 +22,7 @@ urlpatterns = [
     url(r'^home/', auth_views.homePage, name='homepage'),
     #url(r'^home/', screen_views.routeToHome, name='homepage'),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^templates/scheduleManagement',auth_views.getPartailtemplate)
+    url(r'^templates/scheduleManagement/(?P<template_name>[\w-]+)',auth_views.getPartailtemplate)
 ]
 
 if settings.DEBUG:

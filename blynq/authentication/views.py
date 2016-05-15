@@ -64,9 +64,15 @@ def homePage(request):
     return render(request, 'Home.html')
 
 
+def divertToLandingPage(request):
+    return render(request, 'landing_page_content.html')
+
+
 @login_required
-def getPartailtemplate(request):
-    return render(request, 'scheduleManagement/_timeline_modal.html')
+def getPartailtemplate(request, template_name):
+    path = 'scheduleManagement/'
+    extn = '.html'
+    return render(request, (path+template_name+extn))
 
 
 def request_quote(request):
@@ -100,5 +106,7 @@ def request_quote(request):
 def setSessionVar(request, status):
     request.session['userLoggedIn'] = status
 '''
+
+# TODO: Using tv remote to move slides.
 
 
