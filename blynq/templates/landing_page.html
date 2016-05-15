@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Developed BlynQ team">
+    <meta name="author" content="BlynQ team">
+    <meta name="keywords"
+          content="Blynq , Digital Signage Solution, display, Manage Screens, Intelligent Dashboards, Content Schedules">
+
+    <title>
+        BlynQ Landing Page
+    </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'LandingPage/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'LandingPage/css/theme.css' %}" rel="stylesheet">
+    <link href="{% static 'LandingPage/css/bootstrap-reset.css' %}" rel="stylesheet">
+
+
+    <!--external css-->
+    <link href="{% static 'Niceadmin/css/font-awesome.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'LandingPage/css/animate.css'%}" rel="stylesheet">
+
+    <!--external CDNs-->
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+
+
+    <!-- Custom styles for this template -->
+    <link href="{% static 'LandingPage/css/component.css'%}" rel="stylesheet" type="text/css">
+    <link href="{% static 'LandingPage/css/style.css'%}" rel="stylesheet">
+    <link href="{% static 'LandingPage/css/style-responsive.css'%}" rel="stylesheet"/>
+
+
+    <!-- Angular Js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js" rel="text/javascript"></script>
+
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 tooltipss and media queries -->
+    <!--[if lt IE 9]>
+    <script src="js/html5shiv.js">
+    </script>
+    <script src="js/respond.min.js">
+    </script>
+    <![endif]-->
+</head>
+
+<body>
+{% block content%}
+
+{% endblock content%}
+<script src="{% static 'LandingPage/js/jquery-1.8.3.min.js' %}">
+</script>
+<script src="{% static 'Niceadmin/js/jquery.js' %}"></script>
+<script src="{% static 'LandingPage/js/wow.min.js' %}">
+</script>
+<script src="{% static 'LandingPage/js/bootstrap.min.js'%}"></script>
+
+
+<!--common script for all pages-->
+<script src="{%static 'LandingPage/js/common-scripts.js'%}">
+</script>
+
+<script>
+      $('a.info').tooltip();
+      new WOW().init();
+</script>
+
+</body>
+</html>

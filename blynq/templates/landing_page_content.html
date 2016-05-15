@@ -1,0 +1,457 @@
+{% extends 'landing_page.html' %}
+{% load staticfiles %}
+
+{% block content%}
+
+<!--header start-->
+<header class="head-section">
+    <div class="navbar navbar-default navbar-static-top container">
+        <div class="navbar-header">
+            <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse" type="button">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/" style="height:80px;width:200px">
+                <img src="{%static 'LandingPage/img/Blynq_Logo.png'%}" style="height:100%;width:100%">
+            </a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a class="dropdown-toggle" data-close-others="false" data-delay="0" href="/">Home</a>
+                </li>
+                <li>
+                    <a class="dropdown-toggle" data-close-others="false" data-delay="0" href="#Product_Container">Product
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-toggle" data-close-others="false" href="#requestAQuote">Request a Quote
+                    </a>
+                </li>
+                <li>
+                    <a href="#contactUs">Contact Us</a>
+                </li>
+                <li>
+                    <a href="/authentication/login">Login</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>
+<!--header end-->
+
+<!-- Sequence Slider -->
+<div class="row">
+    <div class="gray-bg" style="
+    height: 500px">
+        <div class="row" style="padding:10%;">
+            <div id="display_screen" class="col-md-6 col-md-offset-1">
+                <div id="screen_wrapper">
+                    <div id="slider">
+                        <figure>
+                            <img src="{%static 'LandingPage/img/website_Image.png'%}" alt>
+                            <img src="{%static 'LandingPage/img/blynq_background.png'%}" alt>
+                            <img src="{%static 'LandingPage/img/person_1.png'%}">
+                            <img src="{%static 'LandingPage/img/person_2.png'%}">
+                            <img src="{%static 'LandingPage/img/person_3.png'%}">
+                        </figure>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <h1>
+                    Manage content smartly
+                </h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Product Container -->
+<div class="container" id="Product_Container">
+    <div class="row mar-b-50">
+        <div class="col-md-12" >
+            <div class="text-center feature-head wow fadeInDown">
+                <h1 class="">
+                    Product
+                </h1>
+            </div>
+            <div class="text-center feature-head wow fadeInDown">
+                <p class="">
+                    We offer a device with web based application, which can remotely control content displayed on
+                    standalone screens.
+                </p>
+            </div>
+
+            <div class="feature-box">
+                <div class="col-md-3 col-sm-3 text-center wow fadeInUp">
+                    <div class="feature-box-heading">
+                        <em>
+                            <img src="{%static 'LandingPage/img/cloud_icon_br.png'%}" alt="" width="100" height="100">
+
+                        </em>
+                        <h4>
+                            <b>Cloud Storage</b>
+                        </h4>
+                    </div>
+                    <p class="text-center">
+                        Upload your content into our cloud storage and access it anywhere, anytime
+                    </p>
+                </div>
+                <div class="col-md-3 col-sm-3 text-center wow fadeInUp">
+                    <div class="feature-box-heading">
+                        <em>
+                            <img src="{%static 'LandingPage/img/monitoring_icon.png'%}" alt="" width="100" height="100">
+                        </em>
+                        <h4>
+                            <b>Real Time Monitoring</b>
+                        </h4>
+                    </div>
+                    <p class="text-center">
+                        Know what is being displayed on your screen at any moment.
+                    </p>
+                </div>
+                <div class="col-md-3 col-sm-3 text-center wow fadeInUp">
+                    <div class="feature-box-heading">
+                        <em>
+                            <img src="{%static 'LandingPage/img/dashboard_icon.png'%}" alt="" width="100" height="100">
+                        </em>
+                        <h4>
+                            <b>Intelligent Dashboards</b>
+                        </h4>
+                    </div>
+                    <p class="text-center">
+                        Effective utilization of your screens using smart analytics.
+                    </p>
+                </div>
+                <div class="col-md-3 col-sm-3 text-center wow fadeInUp">
+                    <div class="feature-box-heading">
+                        <em>
+                            <img src="{%static 'LandingPage/img/schedule_icon.png'%}" alt="" width="100" height="100">
+                        </em>
+                        <h4>
+                            <b>Schedule</b>
+                        </h4>
+                    </div>
+                    <p class="text-center">
+                        Manage content displayed on multiple screens placed at different locations.
+                    </p>
+                </div>
+            </div>
+
+            <!--feature end-->
+        </div>
+    </div>
+</div>
+<!--end Product Container -->
+
+<!--property start-->
+<div class="property gray-bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-sm-6 text-center wow fadeInLeft">
+                <img src="{%static 'LandingPage/img/website_Image.png'%}" alt=""
+                     style="max-height: 100%;max-width:100%">
+            </div>
+            <div class="col-lg-6 col-sm-6 wow fadeInRight">
+                <h1>
+                    Advantages
+                </h1>
+                <hr>
+                <p>
+                    <i class="fa fa-check fa-lg pr-10">
+                    </i>
+                    Easy monitoring of screens
+                </p>
+                <p>
+                    <i class="fa fa-check fa-lg pr-10">
+                    </i>
+                    No need to use CPUs and wires
+                </p>
+                <p>
+                    <i class="fa fa-check fa-lg pr-10">
+                    </i>
+                    Immediate change in content
+                </p>
+                <p>
+                    <i class="fa fa-check fa-lg pr-10">
+                    </i>
+                    Cost effective
+                </p>
+                <hr>
+                <a href="javascript:;" class="btn btn-purchase">
+                    Purchase now
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--property end-->
+
+
+<div id="home-services">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>
+                    How to use
+                </h2>
+            </div>
+
+            <div class="col-md-4">
+                <div class="h-service">
+                    <div class="icon-wrap ico-bg round-fifty wow fadeInDown">
+                        <!-- <i class="fa fa-question">
+                        </i> -->
+                        1
+                    </div>
+                    <div class="h-service-content wow fadeInUp">
+                        <h3>
+                            Step - 1
+                        </h3>
+                        <p>
+                            Plug the device and configure.
+                            <br>
+                            <a href="#">
+                                Learn more
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="h-service">
+                    <div class="icon-wrap ico-bg round-fifty wow fadeInDown">
+                        <!-- <i class="fa fa-h-square">
+                        </i> -->
+                        2
+                    </div>
+                    <div class="h-service-content wow fadeInUp">
+                        <h3>
+                            Step-2
+                        </h3>
+                        <p>
+                            Login at <a href="www.blynq.in/login">Blynq-site</a>
+                            <br>
+                            <a href="#">
+                                Learn more
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="h-service">
+                    <div class="icon-wrap ico-bg round-fifty wow fadeInDown">
+                        <!-- <i class="fa fa-users">
+                        </i> -->
+                        3
+                    </div>
+                    <div class="h-service-content wow fadeInUp">
+                        <h3>
+                            Step-3
+                        </h3>
+                        <p>
+                            Create campaigns and manage your screen.
+                            <br>
+                            <a href="#">
+                                Learn more
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /row -->
+
+    </div>
+    <!-- /container -->
+
+</div>
+<!-- service end -->
+<div class="hr">
+    <span class="hr-inner"></span>
+</div>
+
+<!--Request Quote -->
+<div class="row">
+    <div class=" property gray-bg" id="requestAQuote">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 style="text-align : center;">
+                    Request a Quote
+                </h2>
+            </div>
+            <div class="col-md-8 col-md-offset-2">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="name" class="col-md-2 wow fadeInLeft">
+                            Name
+                        </label>
+                        <div class="col-md-6 wow fadeInRight">
+                            <input type="text" placeholder="" id="name" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email" class="col-md-2 wow fadeInLeft">
+                            Email
+                        </label>
+                        <div class="col-md-6 wow fadeInRight">
+                            <input type="email" placeholder="" id="email" class="form-control ">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone" class="col-md-2 wow fadeInLeft">
+                            Phone
+                        </label>
+                        <div class="col-md-6 wow fadeInRight">
+                            <input type="numbers" id="phone" class="form-control ">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="message" class="col-md-2 wow fadeInLeft">
+                            Message
+                        </label>
+                        <div class="col-md-6 wow fadeInRight">
+                            <textarea placeholder="" id="message" rows="5" class="form-control ">
+                            </textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-info col-md-offset-2 wow fadeInRight" type="submit">
+                        Submit
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!--footer start-->
+<footer class="footer" id="contactUs">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-sm-3 address wow fadeInUp" data-wow-duration="2s" data-wow-delay=".1s">
+                <h1>
+                    contact info
+                </h1>
+                <address>
+                    <p><i class="fa fa-home pr-10"></i>Address: G-1, Mount Fort Appartments</p>
+                    <p><i class="fa fa-globe pr-10"></i>Pragathi Nagar, Hyderabad </p>
+                    <p><i class="fa fa-mobile pr-10"></i>Mobile : (123) 456-7890 </p>
+                    <p><i class="fa fa-phone pr-10"></i>Phone : 040-4027 1088 </p>
+                    <p><i class="fa fa-envelope pr-10"></i>Email : <a href="javascript:;">hello@blynq.com</a></p>
+                </address>
+            </div>
+            <div class="col-lg-3 col-sm-3 wow fadeInUp" data-wow-duration="2s" data-wow-delay=".3s">
+                <h1>latest tweet</h1>
+                <div class="tweet-box">
+                    <i class="fa fa-twitter"></i>
+                    <em>
+                        Please follow
+                        <a href="javascript:;">@example</a>
+                        for all future updates of us!
+                        <a href="javascript:;">twitter.com/acme</a>
+                    </em>
+                </div>
+                <div class="tweet-box">
+                    <i class="fa fa-twitter"></i>
+                    <em>
+                        Please follow
+                        <a href="javascript:;">@example</a>
+                        for all future updates of us!
+                        <a href="javascript:;">twitter.com/acme</a>
+                    </em>
+                </div>
+                <div class="tweet-box">
+                    <i class="fa fa-twitter"></i>
+                    <em>
+                        Please follow
+                        <a href="javascript:;">@example</a>
+                        for all future updates of us!
+                        <a href="javascript:;">twitter.com/acme</a>
+                    </em>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-3">
+                <div class="page-footer wow fadeInUp" data-wow-duration="2s" data-wow-delay=".5s">
+                    <h1>
+                        Our Company
+                    </h1>
+                    <ul class="page-footer-list">
+                        <li>
+                            <i class="fa fa-angle-right"></i>
+                            <a href="about.html">About Us</a>
+                        </li>
+                        <li>
+                            <i class="fa fa-angle-right"></i>
+                            <a href="faq.html">Support</a>
+                        </li>
+                        <li>
+                            <i class="fa fa-angle-right"></i>
+                            <a href="service.html">Service</a>
+                        </li>
+                        <li>
+                            <i class="fa fa-angle-right"></i>
+                            <a href="privacy-policy.html">Privacy Policy</a>
+                        </li>
+                        <li>
+                            <i class="fa fa-angle-right"></i>
+                            <a href="terms.html">Term & condition</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-3">
+                <div class="text-footer wow fadeInUp" data-wow-duration="2s" data-wow-delay=".7s">
+                    <h1>
+                        Text Widget
+                    </h1>
+                    <p>
+                        This is a text widget.Lorem ipsum dolor sit amet.
+                        This is a text widget.Lorem ipsum dolor sit amet.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- footer end -->
+<!--small footer start -->
+<footer class="footer-small">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-sm-6 pull-right">
+                <ul class="social-link-footer list-unstyled">
+                    <li class="wow flipInX" data-wow-duration="2s" data-wow-delay=".1s"><a href="#"><i
+                            class="fa fa-facebook"></i></a></li>
+                    <li class="wow flipInX" data-wow-duration="2s" data-wow-delay=".2s"><a href="#"><i
+                            class="fa fa-google-plus"></i></a></li>
+                    <li class="wow flipInX" data-wow-duration="2s" data-wow-delay=".3s"><a href="#"><i
+                            class="fa fa-dribbble"></i></a></li>
+                    <li class="wow flipInX" data-wow-duration="2s" data-wow-delay=".4s"><a href="#"><i
+                            class="fa fa-linkedin"></i></a></li>
+                    <li class="wow flipInX" data-wow-duration="2s" data-wow-delay=".5s"><a href="#"><i
+                            class="fa fa-twitter"></i></a></li>
+                    <li class="wow flipInX" data-wow-duration="2s" data-wow-delay=".6s"><a href="#"><i
+                            class="fa fa-skype"></i></a></li>
+                    <li class="wow flipInX" data-wow-duration="2s" data-wow-delay=".7s"><a href="#"><i
+                            class="fa fa-github"></i></a></li>
+                    <li class="wow flipInX" data-wow-duration="2s" data-wow-delay=".8s"><a href="#"><i
+                            class="fa fa-youtube"></i></a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <div class="copyright">
+                    <p></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<!--small footer end-->
+
+
+{% endblock content%}
+
