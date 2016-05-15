@@ -1,4 +1,7 @@
+# import django.utils.timezone.datetime as datetime
+import datetime
 from django.http import JsonResponse, Http404
+from django.utils import timezone
 import json, pytz
 
 from authentication.models import UserDetails
@@ -37,6 +40,13 @@ def list_to_comma_string(list):
     return ','.join(map(str, list))
 
 local_timezone = pytz.timezone('Asia/Kolkata')
+
+
+# Format of the string is 31012016095455
+def default_string_to_datetime(str):
+    dt=datetime.datetime.strptime(str,'%d%m%Y%H%M%S')
+    dt = timezone.make_aware(dt, timezone.get_default_timezone())
+    return dt
 
 
 # Delete the below function if not used

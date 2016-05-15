@@ -3,6 +3,7 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.serializers.python import Serializer
 
+from blynq import settings
 from contentManagement.models import Content
 from playlistManagement.models import PlaylistItems
 from scheduleManagement.models import SchedulePlaylists, ScheduleScreens
@@ -114,7 +115,7 @@ class FlatJsonSerializer(Serializer):
                     # TODO: Keep the url as the path to the default folder icon
                     data['url'] = ''
                 else:
-                    data['url'] = obj.document.url
+                    data['url'] = settings.MEDIA_HOST + obj.document.url
             if field == 'title':
                 data['title'] = obj.title
             if field == 'is_folder':
