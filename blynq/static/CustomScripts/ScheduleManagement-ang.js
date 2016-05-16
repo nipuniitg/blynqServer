@@ -113,7 +113,7 @@ sdApp.factory('scheduleIndexFactory', ['$http', function($http){
 //schedule Details material
 sdApp.factory('scheduleDetailsFactory', ['$log','$http', function($log, $http){
 
-    var selectedBoolSetter = function(allItems, selectedItems, key){
+    var selectedBoolSetter = function(allItems, selectedItems, key, schedule_key_id){
         var r = []
         ,allItemsLength = allItems.length;
 
@@ -126,15 +126,20 @@ sdApp.factory('scheduleDetailsFactory', ['$log','$http', function($log, $http){
             {
                 for(l=0; l<selectedItemsLength; l++){
                 if(item[key] == selectedItems[l][key]){
-                    item['selected']= !0
+                    //set selected bool
+                    item['selected']= !0;
+                    //set schedule_key_id value from the selected values
+                    item[schedule_key_id] = selectedItems[l][schedule_key_id];
                     selectedItemsLength -= 1;
                     selectedItems.splice(l,1);
                     break;
                 }
-            }
+                }
             }
             if(!item['selected']){
                 item['selected'] = !1;
+                //set the new schedule_key_id(schedule_playlist_id, schedule_screen_id, schedule_group_id) as -1
+                item[schedule_key_id] = -1;
             }
             r.push(item);
         }
@@ -186,7 +191,7 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
 
     $scope.saveSchedule= function(){
         $log.log($scope.schedule);
-        
+
 
 //        sDF.upsertScheduleDetails($scope.schedule, function(status){
 //        ƒ    if(status == 'success')
@@ -417,7 +422,7 @@ sdApp.factory('timelineFactory', ['$log', function($log){
         };
 
     var getOnlyDate = function(datetime){
-        if(datetime)
+        if(datetime == null)
         {
            return null
         }
@@ -765,14 +770,16 @@ sdApp.factory('distributionSelectorFactory', ['$log', '$http', '$q','scheduleDet
     //public methods
     var getScreensListWithSelectedBool = function(selectedScreens, callback){
         getScreensJson(function(allScreens){
-            var allScreensWithSelectedBool = sDF.selectedBoolSetter(allScreens, selectedScreens, 'sreen_id');
+            var allScreensWithSelectedBool = sDF.selectedBoolSetter(allScreens, selectedScreens, 'sreen_id',
+             'schedule_screen_id');
             callback(allScreensWithSelectedBool);
         });
     };
 
     var getGroupsListWithSelectedBool = function(selectedGroups, callback){
         getGroupsJson(function(allGroups){
-            var allGroupsWithSelectedBool = sDF.selectedBoolSetter(allGroups, selectedGroups, 'group_id');
+            var allGroupsWithSelectedBool = sDF.selectedBoolSetter(allGroups, selectedGroups, 'group_id'
+            ,'schedule_screen_id');
             callback(allGroupsWithSelectedBool);
         });
     };
@@ -879,7 +886,8 @@ sdApp.factory('playlistSelectorFactory', ['scheduleDetailsFactory','$http', func
     //public functions
     var getPlaylistsListWithSelectedBool = function(selectedPlaylists, callback){
         getPlaylistsJson(function(allPlaylists){
-            var allPlaylistsWithSelectedBool = sDF.selectedBoolSetter(allPlaylists,selectedPlaylists, 'playlist_id');
+            var allPlaylistsWithSelectedBool = sDF.selectedBoolSetter(allPlaylists,selectedPlaylists, 'playlist_id'
+            ,'schedule_playlist_id');
             callback(allPlaylistsWithSelectedBool);
         })
     };
