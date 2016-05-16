@@ -193,23 +193,23 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
         $log.log($scope.schedule);
 
 
-//        sDF.upsertScheduleDetails($scope.schedule, function(status){
-//        ƒ    if(status == 'success')
-//            {
-//                if(isNewSchedule)
-//                {
-//                    toastr.success('New Schedule Added');
-//                }
-//                else{
-//                    toastr.success('Schduel updated successfully');
-//                }
-//                $uibModalInstance.close($scope.schedule);
-//            }
-//            else
-//            {
-//                toastr.warning('Oops!.There was some error while updating the schedule.');
-//            }
-//        });
+        sDF.upsertScheduleDetails($scope.schedule, function(data){
+            if(data.success)
+            {
+                if(isNewSchedule)
+                {
+                    toastr.success('New Schedule Added');
+                }
+                else{
+                    toastr.success('Schedule updated successfully');
+                }
+                $uibModalInstance.close($scope.schedule);
+            }
+            else
+            {
+                toastr.warning('Oops!.There was some error while updating the schedule.');
+            }
+        });
 
     };
 
@@ -432,7 +432,7 @@ sdApp.factory('timelineFactory', ['$log', function($log){
 
     }
 
-    var getDateTimeFromTime = function(dateString){
+    var getDateTimeFromDate = function(dateString){
         if(dateString==null)
         {
             return null;
@@ -467,6 +467,8 @@ return{
     ,getTimelineLabel : getTimelineLabel
     ,getOnlyTime : getOnlyTime
     ,getOnlyDate : getOnlyDate
+    ,getDateTimeFromDate : getDateTimeFromDate
+    ,getDateTimeFromTime : getDateTimeFromTime
 }
 
 }]);
@@ -539,11 +541,11 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
         $log.log($scope.timeDefined);
         $scope.timeline = timelineFactory.getTimeline(
             $scope.timeDefined
-            ,$scope.startDate
-            ,$scope.endDate
+            ,timelineFactory.getDateTimeFromDate($scope.startDate)
+            ,timelineFactory.getDateTimeFromDate($scope.endDate)
             ,$scope.allDay
-            ,$scope.startTime
-            ,$scope.endTime
+            ,timelineFactory.getDateTimeFromTime($scope.startTime)
+            ,timelineFactory.getDateTimeFromTime($scope.endTime)
             ,$scope.recurrenceType
             ,$scope.recurrenceFrequency
             ,$scope.recurrenceAbsolute

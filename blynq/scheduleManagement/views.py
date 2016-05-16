@@ -10,7 +10,7 @@ from schedule.models import Event, Rule
 # Create your views here.
 from customLibrary.serializers import playlist_dict, schedule_dict
 from customLibrary.views_lib import get_userdetails, ajax_response, list_to_json, string_to_dict, list_to_comma_string, \
-    default_string_to_datetime
+    default_string_to_datetime, get_utc_datetime
 from playlistManagement.models import Playlist
 from scheduleManagement.models import Schedule, ScheduleScreens, SchedulePlaylists
 from screenManagement.models import Screen, Group
@@ -53,6 +53,7 @@ def append_params(params, new_keyvalue):
 
 # byweekday should be a list [0,2,3] meaning 0-Monday, 1-Tuesday, 2-Wednesday, 3-Thursday, 4-Friday, 5-Saturday,6-Sunday
 def generate_rule_params(interval=1, bymonthday=None, byweekday=None, byweekno=None):
+    print "inside generate_rule_params"
     params = interval_param(interval)
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekday', bylistday=byweekday))
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekday', bylistday=byweekday))
@@ -62,6 +63,7 @@ def generate_rule_params(interval=1, bymonthday=None, byweekday=None, byweekno=N
 
 
 def upsert_schedule_screens(user_details, schedule, schedule_screens, event_dict):
+    print "inside upsert_schedule_screens"
     success = False
     error = ''
     try:
@@ -96,6 +98,7 @@ def upsert_schedule_screens(user_details, schedule, schedule_screens, event_dict
 
 
 def upsert_schedule_groups(user_details, schedule, schedule_groups, event_dict):
+    print "inside upsert_schedule_groups"
     success = False
     error = ''
     try:
@@ -138,14 +141,14 @@ def upsert_schedule_groups(user_details, schedule, schedule_groups, event_dict):
 
 # upsert schedule playlists
 def upsert_schedule_playlists(user_details, schedule, schedule_playlists):
+    print "inside upsert_schedule_playlists"
     success = False
     error = ''
     try:
         schedule_playlist_id_list = []
         for pos_index, item in enumerate(schedule_playlists):
             schedule_playlist_id = int(item.get('schedule_playlist_id'))
-            playlist_str = item.get('playlist')
-            playlist_id = int(playlist_str.get('playlist_id'))
+            playlist_id = int(item.get('playlist_id'))
             playlist = Playlist.get_user_relevant_objects(user_details).get(playlist_id=playlist_id)
             if schedule_playlist_id == -1:
                 entry = SchedulePlaylists.objects.create(schedule=schedule, playlist=playlist, position_index=pos_index)
@@ -170,6 +173,7 @@ def upsert_schedule_playlists(user_details, schedule, schedule_playlists):
 
 
 def generate_rule(timeline, name, description):
+    print "inside generate_rule"
     interval = int(timeline.get('interval'))
     byweekno = timeline.get('byweekno')
     bymonthday = timeline.get('bymonthday')
@@ -181,14 +185,15 @@ def generate_rule(timeline, name, description):
 
 
 def event_for_allday(schedule, timeline):
+    print "inside event_for_allday"
     start_date = timeline.get('start_date')
-    start_time = datetime.time(0)
-    start = datetime.datetime.combine(start_date, start_time)
+    start_time = "00:00" # datetime.time(0)
+    start = get_utc_datetime(ist_date=start_date, ist_time=start_time)
     end_date = start_date
-    end_time = datetime.time(23, 59, 59, 999)
-    end = datetime.datetime.combine(end_date, end_time)
+    end_time = "23:59" # datetime.time(23, 59, 59, 999)
+    end = get_utc_datetime(ist_date=end_date, ist_time=end_time)
     end_recurring_period_date = timeline.get('end_recurring_period')
-    end_recurring_period = datetime.datetime.combine(end_recurring_period_date, end_time)
+    end_recurring_period = get_utc_datetime(ist_date=end_recurring_period_date, ist_time=end_time)
     rule = generate_rule(timeline=timeline, name=schedule.schedule_title, description=schedule.schedule_title)
     event_dict = {'start': start, 'end': end, 'title': schedule.schedule_title, 'creator': schedule.created_by,
                   'rule': rule}
@@ -196,12 +201,15 @@ def event_for_allday(schedule, timeline):
 
 
 def event_for_always(schedule):
-    start_date = datetime.datetime.today()
+    print "inside event_for_always"
+    start_date = timezone.now().date()
     start_time = datetime.time(0)
-    start = datetime.datetime.combine(start_date, start_time)
+    # start = datetime.datetime.combine(start_date, start_time)
+    start = timezone.now().replace(hour=0, minute=0, second=0)
     end_date = start_date
-    end_time = datetime.time(23, 59, 59, 999)
-    end = datetime.datetime.combine(end_date, end_time)
+    end_time = datetime.time(23, 59, 59)
+    # end = datetime.datetime.combine(end_date, end_time)
+    end = timezone.now().replace(hour=23, minute=59, second=59)
     rule = default_rule(frequency='DAILY')
     event_dict = {'start': start, 'end': end, 'title': schedule.schedule_title, 'creator': schedule.created_by,
                   'rule': rule}
@@ -209,6 +217,7 @@ def event_for_always(schedule):
 
 
 def event_dict_from_timeline(timeline, schedule):
+    print "insisde event_dict_from_timeline"
     is_always = timeline.get('is_always')
     all_day = timeline.get('all_day')
     if is_always:
@@ -218,13 +227,13 @@ def event_dict_from_timeline(timeline, schedule):
     else:
         start_date = timeline.get('start_date')
         start_time = timeline.get('start_time')
-        start = datetime.datetime.combine(start_date, start_time)
+        start = get_utc_datetime(ist_date=start_date, ist_time=start_time)
         end_date = start_date
         end_time = timeline.get('end_time')
-        end = datetime.datetime.combine(end_date, end_time)
+        end = get_utc_datetime(ist_date=end_date, ist_time=end_time)
         end_recurring_period_time = end_time
         end_recurring_period = timeline.get('end_recurring_period')
-        end_recurring_period = datetime.datetime.combine(end_recurring_period, end_recurring_period_time)
+        end_recurring_period = get_utc_datetime(ist_date=end_recurring_period, ist_time=end_recurring_period_time)
         rule = generate_rule(timeline, name=schedule.schedule_title, description=schedule.schedule_title)
         event_dict = {'start': start, 'end': end, 'title': schedule.schedule_title, 'creator': schedule.created_by,
                       'rule': rule, 'end_recurring_period': end_recurring_period}
@@ -233,6 +242,7 @@ def event_dict_from_timeline(timeline, schedule):
 
 @login_required
 def upsert_schedule(request):
+    print "inside upsert_schedule"
     errors = []
     success = False
     user_details = get_userdetails(request)
@@ -245,17 +255,19 @@ def upsert_schedule(request):
         schedule_screens = posted_data.get('schedule_screens')
         schedule_groups = posted_data.get('schedule_groups')
         timeline = posted_data.get('timeline')
+        print 'timeline is'
+        print timeline
         user_schedules = Schedule.get_user_relevant_objects(user_details=user_details)
 
         # upsert schedule
         if schedule_id == -1:
-            schedule = Schedule.objects.create(schedule_title=schedule_title, created_by=user_details,
-                                               last_updated_by=user_details, organization=user_details.organization)
+            schedule = Schedule(schedule_title=schedule_title, created_by=user_details,
+                                last_updated_by=user_details, organization=user_details.organization)
         else:
             schedule = user_schedules.get(schedule_id=schedule_id)
             schedule.schedule_title = schedule_title
             schedule.last_updated_by = user_details
-            schedule.save()
+        schedule.save()
 
         success, error = upsert_schedule_playlists(user_details=user_details, schedule=schedule,
                                                    schedule_playlists=schedule_playlists)
@@ -274,12 +286,13 @@ def upsert_schedule(request):
         errors.append(error)
     except:
         error = 'Error while upserting content to schedule'
-        print error
         errors.append(error)
+        print errors
     return ajax_response(success=success, errors=errors)
 
 
 def get_screen_data(request, screen_id, last_received, nof_days=7):
+    print "inside get_screen_data"
     # TODO: Login system for screens
     # user_details, organization = user_and_organization(request)
     screen_id = int(screen_id)
@@ -296,6 +309,7 @@ def get_screen_data(request, screen_id, last_received, nof_days=7):
             calendar_events = calendar.events.exclude(end_recurring_period__lt=current_time)
             start_time = current_time
             end_time = start_time + datetime.timedelta(days=nof_days)
+            # TODO: Filter the below query using unique schedules
             screen_schedules = ScheduleScreens.objects.filter(event__in=calendar_events)
             if not calendar_events:
                 is_modified = True
@@ -341,6 +355,7 @@ def get_screen_data(request, screen_id, last_received, nof_days=7):
 
 
 def get_schedules(request):
+    print "inside get_schedules"
     user_details = get_userdetails(request)
     user_schedules = Schedule.get_user_relevant_objects(user_details)
     all_schedules = []
@@ -352,6 +367,7 @@ def get_schedules(request):
 
 @login_required
 def get_schedule_details(request,schedule_id):
+    print 'inside get_schedule_details'
     user_details = get_userdetails(request)
     context_dic = {}
     if schedule_id == -1:

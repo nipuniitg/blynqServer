@@ -6,6 +6,7 @@ import json, pytz
 
 from authentication.models import UserDetails
 
+
 def ajax_response(success=False, errors=[], obj_dict=None):
     context_dic = {}
     context_dic['success'] = success
@@ -39,8 +40,6 @@ def list_to_json(list):
 def list_to_comma_string(list):
     return ','.join(map(str, list))
 
-local_timezone = pytz.timezone('Asia/Kolkata')
-
 
 # Format of the string is 31012016095455
 def default_string_to_datetime(str):
@@ -49,7 +48,34 @@ def default_string_to_datetime(str):
     return dt
 
 
+ist_timezone = pytz.timezone('Asia/Kolkata')
+time_fmt = "%H:%M"
+date_fmt = "%Y-%m-%d"
+datetime_fmt = "%Y-%m-%d %H:%M"
+
+
 # Delete the below function if not used
-def get_local_time(utc_datetime):
-    local_datetime = utc_datetime.replace(tzinfo=pytz.utc).astimezone(local_timezone)
+def get_ist_datetime(utc_datetime):
+    local_datetime = utc_datetime.replace(tzinfo=pytz.utc).astimezone(ist_timezone)
     return local_datetime
+
+
+def get_utc_datetime(ist_date, ist_time):
+    ist_datetime = ist_date + ' ' + ist_time
+    local = pytz.timezone ("Asia/Kolkata")
+    naive = datetime.datetime.strptime (ist_datetime, datetime_fmt)
+    local_dt = local.localize(naive, is_dst=None)
+    utc_dt = local_dt.astimezone (pytz.utc)
+    return utc_dt
+
+
+def get_ist_date_str(utc_datetime):
+    ist_datetime = get_ist_datetime(utc_datetime=utc_datetime)
+    ist_date = ist_datetime.strftime(date_fmt)
+    return ist_date
+
+
+def get_ist_time_str(utc_datetime):
+    ist_datetime = get_ist_datetime(utc_datetime=utc_datetime)
+    ist_time = ist_datetime.strftime(time_fmt)
+    return ist_time

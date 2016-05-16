@@ -22,7 +22,10 @@ class ContentType(models.Model):
         ('GIF', 'Gif'),
     )
     type = models.CharField(max_length=3, choices=CONTENT_TYPE_CHOICES)
-    fileExtension = models.CharField(max_length=5)
+    file_extension = models.CharField(max_length=5)
+
+    def __unicode__(self):
+        return self.type + ' - ' + self.file_extension
 
 
 def upload_to_dir(instance, filename):

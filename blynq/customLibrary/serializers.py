@@ -5,8 +5,14 @@ from django.core.serializers.python import Serializer
 
 from blynq import settings
 from contentManagement.models import Content
+from customLibrary.views_lib import get_ist_date_str, get_ist_time_str
 from playlistManagement.models import PlaylistItems
 from scheduleManagement.models import SchedulePlaylists, ScheduleScreens
+
+def default_timeline():
+    return {'is_always': True, 'recurrence_absolute': False, 'all_day': True, 'start_date':None,
+            'end_recurring_period': None, 'start_time': None, 'end_time': None, 'frequency':None, 'interval': None,
+            'byweekday': None, 'bymonthday': None, 'byweekno': None }
 
 
 def playlist_dict(playlist, only_files=False):
@@ -32,10 +38,12 @@ def get_schedule_screens(schedule):
     schedule_screens = schedule_screens_all.exclude(group__isnull=False)
     for each_schedule_screen in schedule_screens:
         screen = each_schedule_screen.screen
+        screen_groups = FlatJsonSerializer().get_groups(screen)
         single_json = {'screen_id': screen.screen_id, 'screen_name': screen.screen_name, 'address': screen.address,
+                       'status': screen.status.status_name, 'groups': screen_groups,
+                       'screen_size': screen.screen_size, 'resolution': screen.resolution,
                        'schedule_screen_id': each_schedule_screen.schedule_screen_id}
-
-        schedule_screens_list.append(single_json)    
+        schedule_screens_list.append(single_json)
     return schedule_screens_list
 
 
@@ -46,8 +54,10 @@ def get_schedule_groups(schedule):
     schedule_groups = schedule_groups_all.filter(group__isnull=False)
     for each_schedule_group in schedule_groups:
         group = each_schedule_group.group
+        group_screens = FlatJsonSerializer().get_screens(group)
         single_json = {'group_id': group.group_id, 'group_name': group.group_name,
-                       'description': group.description, 'schedule_screen_id': each_schedule_group.schedule_screen_id}
+                       'description': group.description, 'screen': group_screens,
+                       'schedule_screen_id': each_schedule_group.schedule_screen_id}
         schedule_groups_list.append(single_json)
     return schedule_groups_list
 
@@ -61,18 +71,25 @@ def get_schedule_timeline(schedule):
             event_json['is_always'] = schedule.is_always
             event_json['recurrence_absolute'] = schedule.recurrence_absolute
             event_json['all_day'] = schedule.all_day
-            event_json['start_date'] = str(event.start.date()) if event.start else None
-            event_json['end_recurring_period'] = str(event.end_recurring_period.date()) if event.end_recurring_period else None
-            event_json['start_time'] = str(event.start.time()) if event.start else None
-            event_json['end_time'] = str(event.end.time()) if event.end else None
+            event_json['start_date'] = get_ist_date_str(event.start) if event.start else None
+            if event.end_recurring_period:
+                event_json['end_recurring_period'] = get_ist_date_str(utc_datetime=event.end_recurring_period)
+            else:
+                event_json['end_recurring_period'] = None
+            event_json['start_time'] = get_ist_time_str(utc_datetime=event.start) if event.start else None
+            event_json['end_time'] = get_ist_time_str(utc_datetime=event.end) if event.end else None
             rule = event.rule
             params = rule.get_params() if rule else {}
-            event_json['frequency'] = rule.frequency
+            event_json['frequency'] = rule.frequency if rule else None
             event_json['interval'] = params.get('interval')
             event_json['byweekday'] = params.get('byweekday')
             event_json['bymonthday'] = params.get('bymonthday')
             event_json['byweekno'] = params.get('byweekno')
-    return event_json
+            return event_json
+        print "Event doesn't exist for the schedule"
+    else:
+        print "No screens added for this schedule"
+    return default_timeline()
 
 
 def schedule_dict(schedule):
