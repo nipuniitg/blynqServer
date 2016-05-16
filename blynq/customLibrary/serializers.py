@@ -20,9 +20,8 @@ def get_schedule_playlists(schedule):
     schedule_playlists_list = []
     schedule_playlists = SchedulePlaylists.objects.filter(schedule=schedule).order_by('position_index')
     for each_schedule_playlist in schedule_playlists:
-        single_json = {'schedule_playlist_id': each_schedule_playlist.schedule_playlist_id,
-                       'playlist': playlist_dict(each_schedule_playlist.playlist),
-                       'position_index': each_schedule_playlist.position_index}
+        single_json = playlist_dict(each_schedule_playlist.playlist)
+        single_json['schedule_playlist_id'] = each_schedule_playlist.schedule_playlist_id
         schedule_playlists_list.append(single_json)
     return schedule_playlists_list
 

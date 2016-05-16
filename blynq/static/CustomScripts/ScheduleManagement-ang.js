@@ -9,7 +9,7 @@ sdApp.config(function($httpProvider) {
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
 });
 
-//list of all the recent schedules
+//schedule index material
 sdApp.controller('scheduleIndexCtrl', ['$scope','scheduleIndexFactory','$uibModal',
     function($scope,sIF, $uibModal){
 
@@ -17,10 +17,10 @@ sdApp.controller('scheduleIndexCtrl', ['$scope','scheduleIndexFactory','$uibModa
 
     var newScheduleTemplate = {
         schedule_id : -1,
-        schedule_name : 'latest schedule',
-        screens : [],
-        groups : [],
-        playlists:[],
+        schedule_title : 'latest schedule',
+        schedule_screens : [],
+        schedule_groups : [],
+        schedule_playlists:[],
         timeline:{
             is_always   : !0
             ,start_date  : null
@@ -62,7 +62,7 @@ sdApp.controller('scheduleIndexCtrl', ['$scope','scheduleIndexFactory','$uibModa
                     return angular.copy(newScheduleTemplate);
                 }
                 else{
-                    return angular.copy($scope.schedules[scheduleId]);
+                    return angular.copy($scope.schedules[index]);
                 }
             }
           }
@@ -83,16 +83,16 @@ sdApp.controller('scheduleIndexCtrl', ['$scope','scheduleIndexFactory','$uibModa
         openModalPopup(index);
     }
 
-    //onLoad();
+    onLoad();
 
 }]);
 
 sdApp.factory('scheduleIndexFactory', ['$http', function($http){
 
-    var getScheduleDetails = function(callback){
+    var getSchedules = function(callback){
         $http({
              method : "GET",
-             url : 'getSchedules
+             url : 'getSchedules'
          }).then(function mySucces(response){
                 if(callback)
                 {
@@ -104,10 +104,10 @@ sdApp.factory('scheduleIndexFactory', ['$http', function($http){
     };
 
     return{
-        getScheduleDetails : getScheduleDetails
+        getSchedules : getSchedules
     }
 }]);
-
+// end schedule index material
 
 
 //schedule Details material
@@ -186,25 +186,25 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
 
     $scope.saveSchedule= function(){
         $log.log($scope.schedule);
+        
 
-        sDF.upsertScheduleDetails($scope.schedule, function(status){
-            if(status == 'success')
-            {
-                if(isNewSchedule)
-                {
-                    toastr.success('New Schedule Added');
-                }
-                else{
-                    toastr.success('Schduel updated successfully');
-                }
-                $uibModalInstance.close($scope.schedule);
-            }
-            else
-            {
-                toastr.warning('Oops!.There was some error while updating the schedule.');
-            }
-        });
-
+//        sDF.upsertScheduleDetails($scope.schedule, function(status){
+//        ƒ    if(status == 'success')
+//            {
+//                if(isNewSchedule)
+//                {
+//                    toastr.success('New Schedule Added');
+//                }
+//                else{
+//                    toastr.success('Schduel updated successfully');
+//                }
+//                $uibModalInstance.close($scope.schedule);
+//            }
+//            else
+//            {
+//                toastr.warning('Oops!.There was some error while updating the schedule.');
+//            }
+//        });
 
     };
 
@@ -407,10 +407,61 @@ sdApp.factory('timelineFactory', ['$log', function($log){
 
     };
 
+    var getOnlyTime = function(datetime){
+        if(datetime== null){
+            return null
+        }
+        else{
+            return datetime.getHours()+':'+ datetime.getMinutes()
+        }
+        };
+
+    var getOnlyDate = function(datetime){
+        if(datetime)
+        {
+           return null
+        }
+        else{
+            return (datetime.getFullYear() + '/' + (datetime.getMonth()+1)+'/'+ datetime.getDate())
+        }
+
+    }
+
+    var getDateTimeFromTime = function(dateString){
+        if(dateString==null)
+        {
+            return null;
+        }
+        else{
+            var newDate = new Date(dateString);
+            return newDate
+        }
+    }
+
+    var getDateTimeFromTime = function(timeString){
+        if(timeString == null){
+            return null;
+        }
+        else{
+            var dateTime =  new Date();
+            dateTime.setHours(timeString.split(':')[0]);
+            dateTime.setMinutes(timeString.split(':')[1]);
+            return dateTime;
+        }
+
+    }
+
+//        //var date = new Date(parseInt(datetime));
+//        var localeSpecificTime = datetime.toLocaleTimeString();
+//        return localeSpecificTime.replace(/:\d+ /, ' ');
+
+
 return{
     getTimeline : getTimeline
     ,getTimelineRecurrenceWise : getTimelineRecurrenceWise
     ,getTimelineLabel : getTimelineLabel
+    ,getOnlyTime : getOnlyTime
+    ,getOnlyDate : getOnlyDate
 }
 
 }]);
@@ -514,11 +565,11 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
         modalInstance.result.then(function apply(timeline) {
             $scope.timeline = timeline
             ,$scope.timeDefined = timeline.timeDefined
-            ,$scope.startDate= timeline.startDate
-            ,$scope.endDate=timeline.endDate
+            ,$scope.startDate= timelineFactory.getOnlyDate(timeline.startDate)
+            ,$scope.endDate=timelineFactory.getOnlyDate(timeline.endDate)
             ,$scope.allDay = timeline.allDay
-            ,$scope.startTime=timeline.startTime
-            ,$scope.endTime=timeline.endTime
+            ,$scope.startTime=timelineFactory.getOnlyTime(timeline.startTime)
+            ,$scope.endTime=timelineFactory.getOnlyTime(timeline.endTime)
             ,$scope.recurrenceType=timeline.recurrenceType
             ,$scope.recurrenceFrequency=timeline.recurrenceFrequency
             ,$scope.recurrenceAbsolute=timeline.recurrenceAbsolute
@@ -594,7 +645,6 @@ sdApp.controller('timelineModalController',['$scope','$uibModalInstance','timeli
             r.save();
             $uibModalInstance.close($scope.timeline);
             $log.log($scope.timeline);
-            alert('applied');
         }
 
     };
@@ -614,7 +664,7 @@ sdApp.directive("largerThanDate", [function() {
                 e.$watchGroup(["timeline.startDate", "timeline.endDate"], function(e) {
                     var t = e[0] && new Date(e[0])
                       , n = e[1] && new Date(e[1])
-                      , r = !(t && n && t > n);
+                      , r = !(t && n && t >= n);
                     i.$setValidity("largerThanDate", r)
                 })
             }

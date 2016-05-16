@@ -14,12 +14,12 @@
                         Add Schedule
                     </a>
                 </div>
-                <div class="">
+                <div class="" ng-if="schedules.length>0">
                     <table class="table  table-hover table-advanced table-striped ">
                         <thead>
                             <tr>
                                 <th>Edit</th>
-                                <th class="fix">ScheduleId</th>
+
                                 <th class="fix">Title</th>
                                 <th class="fix">Playlist</th>
                                 <th class="fix">Screens</th>
@@ -31,29 +31,23 @@
                                 <th><input type="form-control" placeholder="search"></th>
                                 <th><input type="form-control" placeholder="search"></th>
                                 <th><input type="form-control" placeholder="search"></th>
-                                <th><input type="form-control" placeholder="search"></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><a href=""><i class="fa fa-pencil"></i></a></td>
-                                <td>SCH000923958</td>
-                                <td>Jaydev's Playlist</td>
-                                <td>Playlist 1</td>
+                            <tr ng-repeat="schedule in schedules">
+                                <td><a ng-click="editSchedule($index)"><i class="fa fa-pencil"></i></a></td>
+                                <td>{[ schedule.schedule_title ]}</td>
                                 <td>
-                                    <div id="tagsinput_tagsinput" class="tagsinput " style="height: 100%;">
-                                        <span class="tag">
-                                            <span> Screen1 &nbsp;&nbsp;</span>
-                                            <a class="tagsinput-remove-link"></a>
+                                    <div class="tagsinput " style="height: 100%;">
+                                        <span class="tag" ng-repeat="playlist in schedule.schedule_playlists">
+                                            <span> {[playlist.playlist_title]} &nbsp;&nbsp;</span>
                                         </span>
-                                        <span class="tag">
-                                            <span> Screen 2 &nbsp;&nbsp;</span>
-                                            <a class="tagsinput-remove-link"></a>
-                                        </span>
-                                        </span>
-                                        <span class="tag">
-                                            <span> Screen 3 &nbsp;&nbsp;</span>
-                                            <a class="tagsinput-remove-link"></a>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tagsinput " style="height: 100%;">
+                                        <span class="tag" ng-repeat="screen in schedule.schedule_screens">
+                                            <span> {[screen.screen_name]} &nbsp;&nbsp;</span>
                                         </span>
                                     </div>
                                 </td>
@@ -61,6 +55,9 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+                <div ng-if="schedules.length==0">
+                    <p>There are no planned schedules. Add a schedule <a ng-click="addSchedule()">here</a></p>
                 </div>
             </section>
         </div>

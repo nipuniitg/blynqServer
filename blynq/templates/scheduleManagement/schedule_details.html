@@ -15,7 +15,7 @@
                         <div class="form-group">
                             <div class="control-label col-md-2">Schedule Name</div>
                             <div class="col-md-10">
-                                <input name="scheduleName" class="form-control" ng-model="schedule.schedule_name">
+                                <input name="scheduleName" class="form-control" ng-model="schedule.schedule_title">
                             </div>
                         </div>
 
@@ -23,8 +23,8 @@
                             <div class="control-label col-md-2">Screens</div>
                             <div class="col-md-10">
                                 <distribution-list
-                                selected-screens="schedule.screens"
-                                selected-groups ="schedule.groups">
+                                selected-screens="schedule.schedule_screens"
+                                selected-groups ="schedule.schedule_groups">
                             </distribution-list>
                             </div>
 
@@ -34,7 +34,7 @@
                             <div class="control-label col-md-2">Playlists</div>
                             <div class="col-md-10">
                                 <playlist-textbox
-                                selected-playlists="schedule.playlists">
+                                selected-playlists="schedule.schedule_playlists">
                             </playlist-textbox>
                             </div>
                         </div>

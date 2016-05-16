@@ -347,8 +347,7 @@ def get_schedules(request):
     for schedule in user_schedules:
         schedule_dictionary = schedule_dict(schedule)
         all_schedules.append(schedule_dictionary)
-    all_schedules_json = {'schedule_details': all_schedules}
-    return list_to_json(all_schedules_json)
+    return list_to_json(all_schedules)
 
 
 @login_required
