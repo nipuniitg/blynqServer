@@ -183,6 +183,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','dataAcce
     var updateActivePlaylist = function(index){
         $scope.activePlaylistObj = angular.copy($scope.playlists[index]);
         $scope.activePlaylistIndex = index;
+        $scope.showQueueItemDetails = false;
     }
 
 
@@ -233,7 +234,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','dataAcce
             {
                 toastr.success('Playlist deleted successfully');
                 $scope.playlists.splice(index, 1);
-                $scope.activePlaylistIndex = null; //should be modified
+                updateActivePlaylist(0);
             }
             else
             {

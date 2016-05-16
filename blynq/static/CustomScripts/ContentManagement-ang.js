@@ -5,23 +5,6 @@
 
 plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
 
-    var getContentJson = function(callback){
-        var URL = '/content/getContentJson';
-        $http({
-             method : "GET",
-             url : URL
-         }).then(function mySuccess(response){
-                returnData = angular.copy(response.data);
-                if(callback)
-                {
-                    callback(returnData);
-                }
-            }, function myError(response) {
-                console.log(response.statusText);
-            });
-    };
-
-    //How to send data to views through ajax in django
     var deleteContent = function(content, callback){
         $http({
              method : "POST"
@@ -141,8 +124,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
     }
 
     return{
-        getContentJson : getContentJson
-        ,deleteContent : deleteContent
+        deleteContent : deleteContent
         ,getFiles : getFilesJson
         ,getFolders : getFoldersJson
         ,uploadContent : uploadContent
@@ -329,7 +311,7 @@ return{
             /*,containment : 'section.wrapper'*/
             ,stack : '.div-draggable-wrap'
             ,snap : '#ul-playlistQueue'
-            ,zIndex : 50000
+            ,zIndex : 5000000
             ,start : function(event, ui){
             }
             ,stop : function(event,ui){
@@ -348,7 +330,7 @@ return{
     ,link: function(scope, element, attrs) {
             element.droppable({
               accept : '.div-draggable-wrap'
-              ,hoverClass : '.highlight-acceptable'
+              ,hoverClass : 'highlight-acceptable'
               ,drop: function(event, ui){
 
                    var dragIndex = angular.element(ui.draggable).data('index');

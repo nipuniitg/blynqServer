@@ -5,13 +5,19 @@ var sagApp = angular.module("sagApp",[]).config(function($interpolateProvider) {
     $interpolateProvider.endSymbol(']}');
     });
 
+sagApp.config(function($httpProvider) {
+    $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+});
+
 //Any methods which touches the dataBase goes here
 sagApp.factory('dataAccessFactory', ['$http', function($http){
 
     var getAllScreens = function(callback){
         $http({
             method : "GET",
-            url : "getScreensJson"
+            url : "getScreens"
         }).then(function mySucces(response) {
             allScreens = angular.copy(response.data);
             if(callback)
@@ -27,14 +33,81 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
     var getAllGroups = function(callback){
         $http({
             method : "GET",
-            url : "getGroupsJson"
+            url : "getGroups"
         }).then(function mySucces(response) {
             var allGroups = angular.copy(response.data);
             if(callback)
             {
                 callback(allGroups);
             }
-            return allGroups;
+        }, function myError(response) {
+            console.log(response.statusText);
+        });
+    };
+
+    var upsertScreen = function(screenDetails, callback){
+        // var screenDetailsJson = JSON.stringify(screenDetails);
+        $http({
+            method : "POST"
+            ,url : "upsertScreen"
+            ,data : screenDetails
+//            data : {
+//                screenDetailsName : screenDetailsJson
+//            }
+        }).then(function mySucces(response) {
+            if(callback)
+            {
+                callback(response.data);
+            }
+        }, function myError(response) {
+            console.log(response.statusText);
+        });
+
+    }
+
+    var upsertGroup = function(groupDetails, callback){
+        $http({
+            method : "POST"
+            ,url : "upsertGroup"
+            ,data : groupDetails
+            /*data : {
+                groupDetails : groupDetails
+            }*/
+        }).then(function mySucces(response) {
+            if(callback)
+            {
+                callback(response.data);
+            }
+        }, function myError(response) {
+            console.log(response.statusText);
+        });
+    };
+
+    var getSelectableGroups = function(screen_id, callback){
+        $http({
+            method : "GET",
+            url : "getSelectableGroups/" + screen_id
+        }).then(function mySucces(response) {
+            var data = angular.copy(response.data);
+            if(callback)
+            {
+                callback(data);
+            }
+        }, function myError(response) {
+            console.log(response.statusText);
+        });
+    };
+
+    var getSelectableScreens = function(group_id, callback){
+        $http({
+            method : "GET",
+            url : "getSelectableScreens/" + group_id
+        }).then(function mySucces(response) {
+            var data = angular.copy(response.data);
+            if(callback)
+            {
+                callback(data);
+            }
         }, function myError(response) {
             console.log(response.statusText);
         });
@@ -42,19 +115,16 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
 
     return{
         getAllScreens : getAllScreens,
-        getAllGroups : getAllGroups
+        getAllGroups : getAllGroups,
+        upsertScreen : upsertScreen,
+        upsertGroup : upsertGroup,
+        getSelectableScreens : getSelectableScreens,
+        getSelectableGroups : getSelectableGroups
     }
 
 }]);
 
 sagApp.factory('screensFactory',['$http', 'dataAccessFactory', function($http, dataAccessFactory){
-
-    var screens = [{screenId : 1, screenName : 'ScreenName1', groups : [{groupId : 1, groupName : "Shopping Mall"},{groupId : 2, groupName : "supermarket"}], status : 'online', city : 'Hyderabad', resolution : '42*34', company : 'ola'},
-    {screenId : 1, screenName : 'secondName', groups : [{groupId : 3, groupName : "cinimax"},{groupId : 4, groupName : "sports corner"}], status : 'online', city : 'Delhi', resolution : '23*44', company : 'oyo'},
-    {screenId : 1, screenName : 'third', groups : [{groupId : 5, groupName : "top floor"},{groupId : 6, groupName : "Entrance"}], status : 'online', city : 'Bangalore', resolution : '52*10', company : 'foodpanda'},
-    {screenId : 1, screenName : 'random', groups : [{groupId :2, groupName : "supermarket"},{groupId : 3, groupName : "cinimax"}], status : 'online', city : 'Chennai', resolution : '34*25', company : 'ola'},
-    {screenId : 1, screenName : 'abby', groups : [{groupId : 7, groupName : "sports center"},{groupId : 0, groupName : "topfloor"}], status : 'online', city : 'Kodai', resolution : '42*23', company : 'swiggy'}
-     ];
 
     var allScreens = [];
 
@@ -63,42 +133,19 @@ sagApp.factory('screensFactory',['$http', 'dataAccessFactory', function($http, d
     }
 
     var screenBluePrint = {
-        screenId : -1,
-        screenName : 'DummyScreenName',
-        city : 'Dummy City',
-        resolution : '',
-        company : '',
+        screen_id : -1,
+        screen_name : '',
+        address : '',
+        aspect_ratio : '',
+        screen_size : '',
+        activation_key : '',
+        resolution :'',
         groups : [],
     }
 
-    var getSelectableGroups = function(selectedGroups, callback){
-        var selectedGroupIds = [];
-        for(var i=0; i<selectedGroups.length; i++)
-        {
-            selectedGroupIds.push(selectedGroups[i].groupId);
-        }
-
-        var allGroups = [];
-        dataAccessFactory.getAllGroups(function(groups){
-            allGroups = groups;
-
-        var selectableGroups = angular.copy(allGroups);
-            for(var i = selectableGroups.length-1; i>-1; i--)
-            {
-                var obj = selectableGroups[i];
-                if(selectedGroupIds.indexOf(obj.groupId) > -1)
-                {
-                    selectableGroups.splice(i,1);
-                }
-            }
-            callback(selectableGroups);
-        });
-    };
-
     return{
-    screens : screens,
-    screenBluePrint : screenBluePrint,
-    getSelectableGroups : getSelectableGroups
+    screenBluePrint : screenBluePrint
+    ,getAllScreens : getAllScreens
     };
 
 }]);
@@ -106,9 +153,10 @@ sagApp.factory('screensFactory',['$http', 'dataAccessFactory', function($http, d
 sagApp.factory('groupsFactory',['$http','dataAccessFactory', function($http, dataAccessFactory){
 
     var groupBluePrint = {
-        groupId : -1,
-        groupName : "",
-        Description : ""
+        group_id : -1,
+        group_name : "",
+        description : "",
+        screens : []
     };
 
     var allGroups =[];
@@ -117,74 +165,68 @@ sagApp.factory('groupsFactory',['$http','dataAccessFactory', function($http, dat
         dataAccessFactory.getAllGroups(callback);
     };
 
-    var getSelectableScreens = function(selectedScreens, callback){
-        var selectedScreenIds = [];
-        for(var i=0; i<selectedScreen.length; i++)
-        {
-            selectedScreenIds.push(selectedScreenIds[i].screenId);
-        }
-
-        var allScreens = [];
-        dataAccessFactory.getAllScreens(function(screens){
-            allScreens = screens;
-
-        var selectableScreens = angular.copy(allScreens);
-        for(var i = selectableScreens.length; i>-1; i--)
-        {
-            var obj = selectableScreens[i];
-            if(selectedScreenIds.indexOf(obj.screenId) > -1)
-            {
-                selectableScreens.splice(i,1);
-            }
-        }
-        callback(selectableGroups);
-        });
-    };
-
     return{
-        groupBluePrint: groupBluePrint,
-        getAllGroups: getAllGroups,
-        getSelectableScreens : getSelectableScreens
+        groupBluePrint: groupBluePrint
+        ,getAllGroups: getAllGroups
     };
 }]);
 
-sagApp.controller('groupCtrl',['groupsFactory', '$scope', function(groupsFactory, $scope){
+sagApp.controller('groupCtrl',['groupsFactory', 'dataAccessFactory', '$scope', function(groupsFactory, dataAccessFactory, $scope){
 
-   groupsFactory.getAllGroups(function(groups){
-            $scope.groups = groups;
-   });
 
-   $scope.selectedIndex = 0;
-   $scope.isNewGroupModal = false;
+   var onLoad = function(){
+          refreshGroups();
+          $scope.selectedIndex = 0;
+          $scope.isNewGroupModal = false;
+   }
+
+   var refreshGroups = function(){
+        groupsFactory.getAllGroups(function(groups){
+                $scope.groups = groups;
+          });
+   };
+
+   var getSelectableGroups = function(){
+        dataAccessFactory.getSelectableScreens($scope.modalGroupDetailsObj.group_id, function(data){
+            $scope.selectableScreens = data;
+        });
+   }
+
 
    //add group;
    $scope.addNewGroup = function()
    {
         $scope.modalGroupDetailsObj = angular.copy(groupsFactory.groupBluePrint);
         $scope.isNewGroupModal = true;
-        groupsFactory.getSelectableScreens($scope.modalGroupDetailsObj.screens, function(data){
-            $scope.selectableScreens = data;
-        });
+        getSelectableGroups();
    };
 
    $scope.editGroupDetails = function(group, index){
         $scope.modalGroupDetailsObj = angular.copy(group);
         $scope.editModelGroupIndex = index;
-        groupsFactory.getSelectableScreens($scope.modalGroupDetailsObj.screens, function(data){
-            $scope.selectableScreens = data;
-        });
+        getSelectableGroups();
    };
 
    $scope.saveGroupDetails = function(){
-        if($scope.isNewGroupModal){
 
-        }
-        else{
-            $scope.groups[$scope.editModelGroupIndex] = angular.copy($scope.modalGroupDetailsObj);
-        }
-
-        $scope.isNewGroupModal = false;
-   }
+        dataAccessFactory.upsertGroup($scope.modalGroupDetailsObj, function successFN(data){
+            if(data.success)
+            {
+                refreshGroups();
+                if($scope.isNewGroupModal)
+                {
+                    toastr.success('Group added successfully');
+                }
+                else{
+                    toastr.success('Group updated successfully');
+                }
+            }
+            else{
+                toastr.warning("There was some error while adding group. Please try again after sometime.");
+            }
+            $scope.isNewGroupModal = false;
+        });
+   };
 
    $scope.cancelGroupDetailsEdit = function(){
         $scope.isNewGroupModal = false;
@@ -196,7 +238,7 @@ sagApp.controller('groupCtrl',['groupsFactory', '$scope', function(groupsFactory
         {
             var obj = $scope.modalGroupDetailsObj.screens[i];
 
-            if(group.groupId == obj.groupId)
+            if(screen.screen_id == obj.screen_id)
             {
                 $scope.modalGroupDetailsObj.screens.splice(i,1);
                 break;
@@ -211,7 +253,7 @@ sagApp.controller('groupCtrl',['groupsFactory', '$scope', function(groupsFactory
         {
             var obj = $scope.selectableScreens[i];
 
-            if(screen.screenId == obj.screenId)
+            if(screen.screen_id == obj.screen_id)
             {
                 $scope.selectableScreens.splice(i,1);
                 break;
@@ -226,53 +268,81 @@ sagApp.controller('groupCtrl',['groupsFactory', '$scope', function(groupsFactory
     //shcedules
     $scope.clickedOnGroup= function(group, index){
         $scope.selectedIndex = index;
+        $scope.screensInSelectedGroup = group.screens;
     }
 
+    onLoad();
 
 }]);
 
-sagApp.controller('screenCtrl',['screensFactory', '$scope',  function(screensFactory, $scope){
+sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope',  function(screensFactory,dataAccessFactory, $scope){
 
-    $scope.screens = screensFactory.screens;
-    $scope.isNewScreenModal = false;
+    //private functions
+    var onLoad = function(){
+        screensFactory.getAllScreens(function(allScreens)
+        {
+            $scope.screens = allScreens;
+        });
+        $scope.isNewScreenModal = false;
+    };
 
+    var addGroupsToScreen = function(){
+      dataAccessFactory.getSelectableGroups($scope.modalScreenDetailsObj.screen_id, function(selectableGroups)
+      {
+        $scope.selectableGroups = angular.copy(selectableGroups);
+      });
+    };
+
+    //public functions
     //screen Details
     $scope.addNewScreen = function(){
         $scope.isNewScreenModal = true;
         $scope.modalScreenDetailsObj = angular.copy(screensFactory.screenBluePrint);
         $scope.newScreenValidationKey = '';
+        addGroupsToScreen();
     };
 
     $scope.editScreenDetails = function(index){
         //copy the object
         $scope.modalScreenDetailsObj = angular.copy($scope.screens[index]);
         $scope.editModeScreenIndex = index;
+        addGroupsToScreen();
     };
 
     $scope.saveScreenDetails = function(){
-         if($scope.modalScreenDetailsObj.screenId == -1)
-         {
+        dataAccessFactory.upsertScreen($scope.modalScreenDetailsObj, function successFN(data){
+            if(data.success)
+            {
+                screensFactory.getAllScreens(function(allScreens)
+                {
+                    $scope.screens = allScreens;
+                });
+                if(isNewScreenModal){
+                    toastr.success('New Screen Added');
+                }
+                else{
+                    toastr.success('Screens details updated');
+                }
+            }
+            else{
+                toastr.warning('Error occured while saving screen. Please try again.');
+            }
+            $scope.isNewScreenModal = false;
 
-         }
-         else{
-            $scope.screens[$scope.editModeScreenIndex] = angular.copy($scope.modalScreenDetailsObj);
-         }
+        });
 
-        $scope.isNewScreenModal = false;
-        toastr.success('Screens details saved');
     };
 
     $scope.cancelScreenDetailsEdit = function(){
         $scope.isNewScreenModal = false;
     };
 
+    $scope.removeGroupTagforScreen = function(index)
+    {
+        $scope.modalScreenDetailsObj.groups.splice(index,1);
+    }
+
     //groups
-    $scope.addGroupsToScreen = function(){
-          screensFactory.getSelectableGroups($scope.modalScreenDetailsObj.groups, function(selectableGroups)
-          {
-            $scope.selectableGroups = angular.copy(selectableGroups);
-          });
-    };
 
     $scope.moveGroupToSelectable = function(group){
         $scope.selectableGroups.push(group);
@@ -280,7 +350,7 @@ sagApp.controller('screenCtrl',['screensFactory', '$scope',  function(screensFac
         {
             var obj = $scope.modalScreenDetailsObj.groups[i];
 
-            if(group.groupId == obj.groupId)
+            if(group.group_id == obj.group_id)
             {
                 $scope.modalScreenDetailsObj.groups.splice(i,1);
                 break;
@@ -294,13 +364,15 @@ sagApp.controller('screenCtrl',['screensFactory', '$scope',  function(screensFac
         {
             var obj = $scope.selectableGroups[i];
 
-            if(group.groupId == obj.groupId)
+            if(group.group_id == obj.group_id)
             {
                 $scope.selectableGroups.splice(i,1);
                 break;
             }
         }
     };
+
+    onLoad();
 
     //schedules
 

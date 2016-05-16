@@ -2,9 +2,8 @@
 {% load staticfiles %}
 
 {% block content%}
+<script src="{% static 'CustomScripts/PlaylistManagement-ang.js' %}"></script>
 <section class="wrapper" ng-app="plApp" ng-controller="plCtrl">
-    <script src="{% static 'CustomScripts/PlaylistManagement-ang.js' %}"></script>
-
 
     <div class="row" >
         <!-- List of all Playlists -->
@@ -64,7 +63,8 @@
                     </div>
                 </div>
                 <div droppable add-content-function="addContentToPlaylistItems"
-                     add-folder-function="addFolderContentToPlaylistItems">
+                     add-folder-function="addFolderContentToPlaylistItems"
+                    >
                     <ul id="ul-playlistQueue" class="list-group" style="height:490px;overflow-y:scroll"
                         data-as-sortable="board.dragControlListeners"
                         is-disabled="false"
