@@ -29,7 +29,12 @@ class ScheduleScreens(models.Model):
     # last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True)
 
     def __unicode__(self):
-        return self.schedule.schedule_title + '-' + self.screen.screen_name
+        description = self.schedule.schedule_title
+        if self.screen:
+            description = description + ' - screen ' + self.screen.screen_name
+        if self.group:
+            description = description + ' - group ' + self.group.group_name
+        return description
 
     # class Meta:
     #     unique_together = (('screen', 'schedule', 'group'))

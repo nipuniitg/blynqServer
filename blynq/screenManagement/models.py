@@ -83,9 +83,12 @@ class ScreenSpecs(models.Model):
         return ((self.brand, self.model_num, self.display_type))
 
 
-class ScreenGroups(models.Model):
+class GroupScreens(models.Model):
+    group_screen_id = models.AutoField(primary_key=True)
     screen = models.ForeignKey('Screen', on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
+
+    created_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True, related_name='%(class)s_created_by')
 
     def __unicode__(self):
         return self.screen.screen_name + '-' + self.group.group_name
@@ -122,7 +125,7 @@ class Screen(models.Model):
     business_type = models.CharField(max_length=20, choices=BUSINESS_TYPE_CHOICES, default=BUSINESS_TYPE_CHOICES[0][0])
 
     status = models.ForeignKey(ScreenStatus, on_delete=models.PROTECT)
-    groups = models.ManyToManyField(Group, blank=True, through=ScreenGroups)
+    groups = models.ManyToManyField(Group, blank=True, through=GroupScreens)
 
     # Each screen should have a separate calendar
     # Remove null=True for screen_calendar

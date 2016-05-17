@@ -9,8 +9,9 @@ from JsonTestData import TestDataClass
 from authentication.models import UserDetails, Organization, Address
 from customLibrary.serializers import FlatJsonSerializer as json_serializer
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict
+from scheduleManagement.models import ScheduleScreens
 from screenManagement.forms import AddScreenForm, AddScreenLocation, AddScreenSpecs, AddGroup
-from screenManagement.models import Screen, ScreenStatus, ScreenSpecs, Group
+from screenManagement.models import Screen, ScreenStatus, ScreenSpecs, Group, GroupScreens
 
 
 # Create your views here.
@@ -59,6 +60,47 @@ def add_group(request):
     return render(request,'Shared/displayForm.html', context_dic)
 
 
+def insert_group_screen(screen, group):
+    group_schedules = ScheduleScreens.objects.filter(screen__isnull=True, group=group)
+    for each_group_schedule in group_schedules:
+        screen_event = each_group_schedule.event
+        screen_event.pk = None
+        screen_event.calendar = screen.screen_calendar
+        screen_event.save()
+        ScheduleScreens.object.create(screen=screen, schedule=each_group_schedule.schedule,
+                                      group=group, event=screen_event)
+    return True
+
+
+# This function is to either remove groups from screens or screens from groups and remove relevant entries from the
+# ScheduleScreens table
+def remove_group_screens(screen=None, group=None, group_screen_id_list=[]):
+    print "inside remove_group_screens"
+    # Only one of the screen/group should be None
+    if screen:
+        # Remove groups not in the group_screen_id_list
+        removed_group_screens = GroupScreens.objects.filter(screen=screen).exclude(
+            group_screen_id__in=group_screen_id_list)
+    elif group:
+        # Remove screens deleted from the group
+        removed_group_screens = GroupScreens.objects.filter(group=group).exclude(
+            group_screen_id__in=group_screen_id_list)
+    else:
+        removed_group_screens = []
+    for each_group_screen in removed_group_screens:
+            schedule_screens = ScheduleScreens.objects.filter(group=each_group_screen.group, screen=each_group_screen.screen)
+            for each_schedule_screen in schedule_screens:
+                event = each_schedule_screen.event
+                if event:
+                    if event.rule:
+                        event.rule.delete()
+                    event.delete()
+            if schedule_screens:
+                rows_deleted = schedule_screens.delete()
+    if removed_group_screens:
+        removed_group_screens.delete()
+    return True
+
 @login_required
 def upsert_group(request):
     posted_data = string_to_dict(request.body)
@@ -72,12 +114,35 @@ def upsert_group(request):
             try:
                 group_id = posted_data['group_id']
                 if group_id == -1:
-                    group = Group(group_name=form_data.get('group_name'), created_by=user_details)
+                    group = Group(group_name=form_data.get('group_name'), organization=user_details.organization,
+                                  created_by=user_details)
                 else:
-                    group = Group.objects.get(group_id=group_id)
+                    group = Group.get_user_relevant_objects(user_details).get(group_id=group_id)
                     group.group_name = form_data.get('group_name')
                 group.description = form_data.get('description')
                 group.save()
+                screens = posted_data.get('screens')
+                group_screen_id_list = []
+                for each_screen in screens:
+                    group_screen_id = each_screen.get('group_screen_id')
+                    if group_screen_id == -1:
+                        screen_id = each_screen.get('screen_id')
+                        screen = Screen.get_user_relevant_objects(user_details=user_details).get(screen_id=screen_id)
+                        group_screen = GroupScreens.objects.create(screen=screen, group=group, created_by=user_details)
+                        group_screen_id = group_screen.group_screen_id
+                        success_insert =  insert_group_screen(group=group, screen=screen)
+                        if not success_insert:
+                            error = 'error while removing inserting screens to group'
+                            print error
+                            return ajax_response(success=success_insert, errors=[error])
+                    group_screen_id_list.append(group_screen_id)
+
+                success_removal = remove_group_screens(group=group, group_screen_id_list=group_screen_id_list)
+                if not success_removal:
+                    error = 'error while removing deleted screens from group'
+                    print error
+                    return ajax_response(success=success_removal, errors=[error])
+
                 success = True
             except:
                 errors = ['Error while adding the group details to database']
@@ -133,9 +198,25 @@ def upsert_screen(request):
                 screen.owned_by=user_details.organization
                 screen.status=status
                 screen.save()
+                group_screen_id_list = []
                 for group in posted_data.get('groups'):
-                    group_entry = Group.objects.get(group_id=group.get('group_id'))
-                    screen.groups.add(group_entry)
+                    group_screen_id = int(group.get('group_screen_id'))
+                    if group.group_screen_id == -1:
+                        group_entry = Group.objects.get(group_id=group.get('group_id'))
+                        group_screen = GroupScreens.objects.create(group=group_entry, screen=screen, created_by=user_details)
+                        group_screen_id = group.group_screen_id
+                        success_insert = insert_group_screen(screen=screen, group=group_entry)
+                        if not success_insert:
+                            error = 'error while inserting group to screen'
+                            print error
+                            return ajax_response(success=success_insert, errors=[error])
+                    group_screen_id_list.append(group_screen_id)
+
+                success_removal = remove_group_screens(screen=screen, group_screen_id_list=group_screen_id_list)
+                if not success_removal:
+                    error = 'error while removing deleted groups from screen'
+                    print error
+                    return ajax_response(success=success_removal, errors=[error])
 
                 # Adding a calendar for each screen
                 if not screen.screen_calendar:

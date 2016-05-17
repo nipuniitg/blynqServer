@@ -87,8 +87,8 @@ def upsert_schedule_screens(user_details, schedule, schedule_screens, event_dict
         # Remove screens not in the schedule
         removed_schedule_screens = ScheduleScreens.objects.filter(schedule=schedule, group__isnull=True).exclude(
             schedule_screen_id__in=schedule_screen_id_list)
-        for schedule_screen in removed_schedule_screens:
-            schedule_screen.delete()
+        if removed_schedule_screens:
+            removed_schedule_screens.delete()
         success = True
         return success, error
     except:
@@ -178,8 +178,9 @@ def generate_rule(timeline, name, description):
     byweekno = timeline.get('byweekno')
     bymonthday = timeline.get('bymonthday')
     byweekday = timeline.get('byweekday')
+    frequency = timeline.get('frequency')
     params = generate_rule_params(interval=interval, bymonthday=bymonthday, byweekday=byweekday, byweekno=byweekno)
-    rule = Rule(name=name, description=description, params=params)
+    rule = Rule(name=name, description=description, frequency=frequency, params=params)
     rule.save()
     return rule
 
@@ -196,21 +197,16 @@ def event_for_allday(schedule, timeline):
     end_recurring_period = get_utc_datetime(ist_date=end_recurring_period_date, ist_time=end_time)
     rule = generate_rule(timeline=timeline, name=schedule.schedule_title, description=schedule.schedule_title)
     event_dict = {'start': start, 'end': end, 'title': schedule.schedule_title, 'creator': schedule.created_by,
-                  'rule': rule}
+                  'rule': rule, 'end_recurring_period': end_recurring_period}
     return event_dict
 
 
 def event_for_always(schedule):
     print "inside event_for_always"
-    start_date = timezone.now().date()
-    start_time = datetime.time(0)
-    # start = datetime.datetime.combine(start_date, start_time)
     start = timezone.now().replace(hour=0, minute=0, second=0)
-    end_date = start_date
-    end_time = datetime.time(23, 59, 59)
-    # end = datetime.datetime.combine(end_date, end_time)
     end = timezone.now().replace(hour=23, minute=59, second=59)
-    rule = default_rule(frequency='DAILY')
+    rule = Rule(name=schedule.schedule_title, description=schedule.schedule_title, frequency='DAILY')
+    rule.save()
     event_dict = {'start': start, 'end': end, 'title': schedule.schedule_title, 'creator': schedule.created_by,
                   'rule': rule}
     return event_dict

@@ -8,6 +8,8 @@ from contentManagement.models import Content
 from customLibrary.views_lib import get_ist_date_str, get_ist_time_str
 from playlistManagement.models import PlaylistItems
 from scheduleManagement.models import SchedulePlaylists, ScheduleScreens
+from screenManagement.models import GroupScreens
+
 
 def default_timeline():
     return {'is_always': True, 'recurrence_absolute': False, 'all_day': True, 'start_date':None,
@@ -105,23 +107,27 @@ class FlatJsonSerializer(Serializer):
     # Ref : http://stackoverflow.com/questions/15453072/django-serializers-to-json-custom-json-output-format
 
     def get_screens(self, obj):
-        values = obj.screen_set.all()
+        group_screens = GroupScreens.objects.filter(group=obj)
         screens = []
-        for value in values:
-            screens.append({'screen_id': value.screen_id, 'screen_name': value.screen_name,
-                            'screen_size': value.screen_size, 'resolution': value.resolution,
-                            'aspect_ratio':value.aspect_ratio, 'address': value.address})
+        for each_group_screen in group_screens:
+            screen = each_group_screen.screen
+            screens.append({'group_screen_id': each_group_screen.group_screen_id, 'screen_id': screen.screen_id,
+                            'screen_name': screen.screen_name, 'screen_size': screen.screen_size,
+                            'resolution': screen.resolution, 'aspect_ratio':screen.aspect_ratio,
+                            'address': screen.address})
         return screens
 
     def get_groups(self, obj):
-        values = obj.groups.all()
+        group_screens = GroupScreens.objects.filter(screen=obj)
         groups = []
-        for value in values:
-            groups.append({'group_id': value.group_id, 'group_name': value.group_name})
+        for each_group_screen in group_screens:
+            group = each_group_screen.group
+            groups.append({'group_screen_id': each_group_screen.group_screen_id, 'group_id': group.group_id,
+                           'group_name': group.group_name})
         return groups
 
     def add_content_fields(self, obj, data, fields=None):
-        if fields == None:
+        if fields is None:
             fields = self.selected_fields
         for field in fields:
             if field == 'content_id':
