@@ -40,9 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'djng', # django-angular http://django-angular.readthedocs.org/en/latest/installation.html
     'schedule', # https://github.com/llazzaro/django-scheduler
-    # 'easy_thumbnails', # https://django-filer.readthedocs.org/en/latest/installation.html for easy_thumbnails, filer and mptt
-    # 'filer',
-    # 'mptt',
+    'reversion',    # http://django-reversion.readthedocs.io/en/latest/
     'authentication',
     'screenManagement',
     'contentManagement',
@@ -52,6 +50,7 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'reversion.middleware.RevisionMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -145,7 +144,7 @@ LOGIN_URL = '/authentication/login/'  # The page users are directed to if they a
 
 # Content related settings
 DEFAULT_DISPLAY_TIME = 10
-STORAGE_LIMIT_PER_ORGANIZATION = 5*1024*1024*1024  #5 gb 5*1024*1024*1024
+STORAGE_LIMIT_PER_ORGANIZATION = 1*1024*1024*1024  # 1 gb 1*1024*1024*1024
 
 # Filer related settings
 THUMBNAIL_HIGH_RESOLUTION = True
