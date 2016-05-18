@@ -186,6 +186,10 @@ class FlatJsonSerializer(Serializer):
                 data['screen_id'] = obj.pk
             if field == 'status':
                 data['status'] = obj.status.status_name
+            # This is being used for the functions get_selectable_screens / groups for which we need to set the
+            # default value of group_screen_id as -1
+            if field == 'group_screen_id':
+                data['group_screen_id'] = -1
         return data
 
     def get_dump_object(self, obj):

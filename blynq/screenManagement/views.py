@@ -258,14 +258,14 @@ def get_selectable_screens_json(request, group_id=-1):
     user_details = get_userdetails(request)
     screen_data = Screen.get_user_relevant_objects(user_details).exclude(groups__pk=group_id)
     json_data = json_serializer().serialize(screen_data, fields=('screen_id', 'screen_name', 'address', 'status',
-                                                                 'groups', 'screen_size', 'resolution'))
+                                                                 'groups', 'screen_size', 'resolution', 'group_screen_id'))
     return HttpResponse(json_data, content_type='application/json')
 
 
 def get_selectable_groups_json(request, screen_id=-1):
     user_details = get_userdetails(request)
     groups_data = Group.objects.filter(organization=user_details.organization).exclude(screen__pk=screen_id)
-    json_data = json_serializer().serialize(groups_data, fields=('group_id', 'group_name'))
+    json_data = json_serializer().serialize(groups_data, fields=('group_id', 'group_name', 'group_screen_id'))
     return HttpResponse(json_data, content_type='application/json')
 
 

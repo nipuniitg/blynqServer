@@ -80,13 +80,22 @@ def upsert_schedule_screens(user_details, schedule, schedule_screens, event_dict
                 schedule_screen_id = entry.schedule_screen_id
             else:
                 entry = ScheduleScreens.objects.get(schedule_screen_id=schedule_screen_id)
-                Event.objects.filter(id=entry.event.id).update(**event_dict)
+                events = Event.objects.filter(id=entry.event.id)
+                for event in events:
+                    if event.rule:
+                        event.rule.delete()
+                events.update(**event_dict)
                 entry.save()
             schedule_screen_id_list.append(schedule_screen_id)
 
         # Remove screens not in the schedule
         removed_schedule_screens = ScheduleScreens.objects.filter(schedule=schedule, group__isnull=True).exclude(
             schedule_screen_id__in=schedule_screen_id_list)
+        for each_schedule_screen in removed_schedule_screens:
+            if each_schedule_screen.event:
+                if each_schedule_screen.event.rule:
+                    each_schedule_screen.event.rule.delete()
+                each_schedule_screen.event.delete()
         if removed_schedule_screens:
             removed_schedule_screens.delete()
         success = True
@@ -214,8 +223,14 @@ def event_for_always(schedule):
 
 def event_dict_from_timeline(timeline, schedule):
     print "insisde event_dict_from_timeline"
+    import pdb;pdb.set_trace()
     is_always = timeline.get('is_always')
     all_day = timeline.get('all_day')
+    recurrence_absolute = timeline.get('recurrence_absolute')
+    schedule.is_always = is_always
+    schedule.all_day = all_day
+    schedule.recurrence_absolute = recurrence_absolute
+    schedule.save()
     if is_always:
         return event_for_always(schedule)
     elif all_day:
@@ -348,6 +363,34 @@ def get_screen_data(request, screen_id, last_received, nof_days=7):
         errors.append(error)
         print error
     return ajax_response(success=success, errors=errors)
+
+
+def get_screen_schedules(request, screen_id):
+    print "inside get_screen_schedules"
+    screen_id = int(screen_id)
+    user_details = get_userdetails(request)
+    screen_schedule_id_list = ScheduleScreens.objects.filter(screen_id=screen_id).values_list('schedule_id', flat=True)
+    screen_schedules = Schedule.get_user_relevant_objects(user_details).filter(schedule_id__in = screen_schedule_id_list)
+    relevant_schedules = []
+    for schedule in screen_schedules:
+        schedule_dictionary = schedule_dict(schedule)
+        relevant_schedules.append(schedule_dictionary)
+    return list_to_json(relevant_schedules)
+
+
+def get_playlist_schedules(request, playlist_id):
+    print "inside get_playlist_schedules"
+    playlist_id = int(playlist_id)
+    user_details = get_userdetails(request)
+    playlist_schedule_id_list = SchedulePlaylists.objects.filter(playlist_id=playlist_id).values_list(
+        'schedule_id', flat=True)
+    playlist_schedules = Schedule.get_user_relevant_objects(user_details=user_details).filter(
+        schedule_id__in=playlist_schedule_id_list)
+    relevant_schedules = []
+    for schedule in playlist_schedules:
+        schedule_dictionary = schedule_dict(schedule)
+        relevant_schedules.append(schedule_dictionary)
+    return list_to_json(relevant_schedules)
 
 
 def get_schedules(request):

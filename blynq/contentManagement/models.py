@@ -22,7 +22,7 @@ class ContentType(models.Model):
         ('GIF', 'Gif'),
     )
     type = models.CharField(max_length=3, choices=CONTENT_TYPE_CHOICES)
-    file_extension = models.CharField(max_length=5)
+    file_extension = models.CharField(max_length=10)
 
     def __unicode__(self):
         return self.type + ' - ' + self.file_extension
@@ -115,7 +115,8 @@ class Content(models.Model):
 
     sha1_hash = models.CharField(_('sha1'), max_length=40, blank=True, default='')
     original_filename = models.CharField(_('original filename'), max_length=100, blank=True, null=True)
-    file_type = models.ForeignKey(ContentType, null=True, on_delete=models.PROTECT)
+    # file_type = models.ForeignKey(ContentType, null=True, on_delete=models.PROTECT)
+    document_type = models.CharField(max_length=50, default='image/jpg')
 
     # folder = models.ForeignKey(Folder, verbose_name=_('folder'), related_name='all_files',
     #                            null=True, blank=True)
@@ -136,6 +137,21 @@ class Content(models.Model):
 
     # TODO: call logical_path to update this relative_path when a Content object is created or modified
     relative_path = models.CharField(max_length=1025, default='/')
+
+    def save(self, *args, **kwargs):
+        if not self.document:
+            super(Content, self).save(*args, **kwargs)
+        else:
+            import mimetypes
+            document_type, encoding = mimetypes.guess_type(self.document.name)
+            self.document_type = document_type
+            if self.organization.used_file_size + self.document.size <= self.organization.total_file_size_limit:
+                self.organization.used_file_size = self.organization.used_file_size + self.document.size
+                self.organization.save()
+                super(Content, self).save(*args, **kwargs)
+            else:
+                print "The organization " + self.organization.name + " total file size limit exceeded"
+                print "Can't upload file"
 
     def __unicode__(self):
         return self.title
