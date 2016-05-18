@@ -311,11 +311,11 @@ return{
             /*,containment : 'section.wrapper'*/
             ,stack : '.div-draggable-wrap'
             ,snap : '#ul-playlistQueue'
-            ,zIndex : 5000000
             ,start : function(event, ui){
             }
             ,stop : function(event,ui){
             }
+            ,appendTo:'body'
         });
         }
 }});
