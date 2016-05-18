@@ -2,6 +2,7 @@
 <script src="{% static 'CustomScripts/PlaylistManagement-ang.js' %}"></script>
 <script src="{% static 'CustomScripts/ContentManagement-ang.js' %}"></script>
 <section ng-controller="ctCtrl">
+    <!-- Folder Path -->
     <div class="row">
         <div class="col-md-12">
             <ol class="breadcrumb">
@@ -14,7 +15,7 @@
             </ol>
         </div>
     </div>
-
+    <!-- Contents -->
     <div class="row">
         <div class="col-md-12" style="min-height:400px; overflow-y: scroll">
             <div class="panel panel-default" style="border-right:1px solid grey">
@@ -30,7 +31,8 @@
                 <div class="panel-body">
                     <!-- Folders -->
                     <div class="item-container-wrap" ng-repeat="folder in folders">
-                        <div class="div-draggable-wrap" draggable data-index="{[$index]}" data-isFolder="{[folder.is_folder]}">
+                        <div class="div-draggable-wrap" draggable data-index="{[$index]}"
+                             data-isFolder="{[folder.is_folder]}">
                             <div class="item-container-header">
                                 <p>{[ folder.title ]}</p>
                             </div>
@@ -39,19 +41,22 @@
                             </div>
                         </div>
                         <div class="item-container-footer">
-                            <div class="input-group">
-                                <i class="fa fa-trash-o pull-right pointer"
-                                   ng-click="deleteContent(folder)"></i>
-                                <i class="fa fa-pencil pull-right pointer"
-                                   ng-click="editTitle(folder, $index, 'folder')"
-                                   data-toggle="modal" data-target="#mdlEditContentTitle"></i>
-                            </div>
+                                <span class="pull-right">
+                                    <a ng-click="deleteContent(folder)">
+                                        <i class="fa fa-trash-o pointer"></i>
+                                    </a>
+                                </span>
+                            <a ng-click="editTitle(folder, $index, 'folder')"
+                               data-toggle="modal" data-target="#mdlEditContentTitle">
+                                <i class="fa fa-pencil pointer"></i>
+                            </a>
                         </div>
                     </div>
                     <!-- Files -->
                     <div class="item-container-wrap"
                          ng-repeat="file in files">
-                        <div class="div-draggable-wrap" draggable data-index="{[$index]}" data-isfolder="{[file.is_folder]}">
+                        <div class="div-draggable-wrap" draggable data-index="{[$index]}"
+                             data-isfolder="{[file.is_folder]}">
                             <div class="item-container-header">
                                 {[ file.title ]}
                             </div>
@@ -64,12 +69,14 @@
                             </div>
                         </div>
                         <div class="item-container-footer">
-                            <div class="input-group">
-                                <i class="fa fa-trash-o pointer pull-right"
-                                   ng-click="deleteContent(file)"></i>
-                                <i class="fa fa-pencil pull-right pointer"
-                                   ng-click="editTitle(file, $index, 'file')"
-                                    data-toggle="modal" data-target="#mdlEditContentTitle"></i>
+                            <div class=>
+                                <span class="pull-right"><a ng-click="deleteContent(file)">
+                                    <i class="fa fa-trash-o pointer "></i></a></span>
+                                <a ng-click="editTitle(file, $index, 'file')"
+                                   data-toggle="modal" data-target="#mdlEditContentTitle">
+                                    <i class="fa fa-pencil pointer"></i>
+                                </a>
+
                             </div>
                         </div>
                     </div>
