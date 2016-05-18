@@ -278,7 +278,7 @@
 
 <!--Request Quote -->
 <div class="row">
-    <div class=" property gray-bg" id="requestAQuote">
+    <div class=" property gray-bg" id="requestAQuote" ng-app="lpApp" ng-controller="formController">
         <div class="row">
             <div class="col-md-12">
                 <h2 style="text-align : center;">
@@ -286,13 +286,18 @@
                 </h2>
             </div>
             <div class="col-md-8 col-md-offset-2">
-                <form class="form-horizontal" role="form">
+                <form class="form-horizontal" role="form" name="requestQuoteForm" >
                     <div class="form-group">
                         <label for="name" class="col-md-2 wow fadeInLeft">
                             Name
                         </label>
                         <div class="col-md-6 wow fadeInRight">
-                            <input type="text" placeholder="" id="name" class="form-control">
+                            <input type="text" placeholder="" id="name" name="requestorName"
+                                   ng-model = "requestQuoteFormDetails.name" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 col-md-offset-2" ng-show="requestQuoteForm.requestorName.$touched &&
+                                requestQuoteForm.requestorName.$invalid">
+                            <span>This field is required.</span>
                         </div>
                     </div>
                     <div class="form-group">
@@ -300,7 +305,12 @@
                             Email
                         </label>
                         <div class="col-md-6 wow fadeInRight">
-                            <input type="email" placeholder="" id="email" class="form-control ">
+                            <input type="email" placeholder="" id="email" ng-model="requestQuoteFormDetails.email"
+                                   name="requestorEmail" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 col-md-offset-2" ng-show="requestQuoteForm.requestorEmail.$touched &&
+                                requestQuoteForm.requestorEmail.$invalid">
+                            <span>This field is required</span>
                         </div>
                     </div>
                     <div class="form-group">
@@ -308,22 +318,53 @@
                             Phone
                         </label>
                         <div class="col-md-6 wow fadeInRight">
-                            <input type="numbers" id="phone" class="form-control ">
+                            <input type="number" id="phone" ng-model="requestQuoteFormDetails.mobile_number"
+                                   name="requestorPhoneNumber" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 col-md-offset-2" ng-show="requestQuoteForm.requestorPhoneNumber.$touched &&
+                                requestQuoteForm.requestorPhoneNumber.$invalid">
+                            <span>This field is required</span>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="message" class="col-md-2 wow fadeInLeft">
-                            Message
+                        <label for="noOfDevices" class="col-md-2 wow fadeInLeft">
+                            Num. of Devices
                         </label>
                         <div class="col-md-6 wow fadeInRight">
-                            <textarea placeholder="" id="message" rows="5" class="form-control ">
+                            <input type="number" id="noOfDevices" ng-model="requestQuoteFormDetails.num_of_devices"
+                                   name="num_of_devices" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 col-md-offset-2" ng-show="requestQuoteForm.num_of_devices.$touched &&
+                                requestQuoteForm.num_of_devices.$invalid">
+                            <span>This field is required</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="additional_details" class="col-md-2 wow fadeInLeft">
+                            Additional Details
+                        </label>
+                        <div class="col-md-6 wow fadeInRight">
+                            <textarea placeholder="" id="additional_details"
+                                      ng-model="requestQuoteFormDetails.additional_details"
+                                      name="message" class="form-control">
                             </textarea>
                         </div>
                     </div>
-                    <button class="btn btn-info col-md-offset-2 wow fadeInRight" type="submit">
+                    <button class="btn btn-info col-md-offset-2 wow fadeInRight"
+                        ng-disabled="requestQuoteForm.$invalid" ng-click="submit()">
                         Submit
                     </button>
                 </form>
+            </div>
+        </div>
+        <div class="row" style="margin:10px">
+            <div class="col-md-offset-2 col-md-8">
+                <uib-alert type="success" ng-show="showSuccessAlert">
+                    Thanks for writing in. Our Team will contact you in 24 hours.
+                </uib-alert>
+                <uib-alert type="error" ng-show="showErrorAlert">
+                    There was some error while saving. Please try after sometime.
+                </uib-alert>
             </div>
         </div>
 
@@ -452,6 +493,8 @@
 <!--</footer>-->
 <!--small footer end-->
 
+<script src="{% static 'CustomScripts/landingPage.js' %}">
+</script>
 
 {% endblock content%}
 

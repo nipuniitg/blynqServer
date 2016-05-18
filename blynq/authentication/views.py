@@ -84,6 +84,7 @@ def request_quote(request):
         if request_quote_form.is_valid():
             try:
                 request_quote_form.save()
+                success = True
             except:
                 error = "Error while saving the requested Quote"
                 errors.append(error)

@@ -13,6 +13,7 @@ from scheduleManagement import schedule_urls
 
 urlpatterns = [
     url(r'^$', auth_views.divertToLandingPage, name='landing_page'),
+    url(r'^requestQuote', auth_views.request_quote, name='request_quote'),
     url(r'^authentication/', include(authentication_urls)),
     url(r'^schedule/', include(schedule_urls)),
     url(r'^screen/', include(screen_urls)),

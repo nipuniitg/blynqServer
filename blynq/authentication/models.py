@@ -107,6 +107,8 @@ class RequestedQuote(models.Model):
     additional_details = models.TextField(blank=True, null=True)
     requested_on = models.DateTimeField(auto_now_add=True)
 
+    def __unicode__(self):
+        return 'Quote requested from ' + self.email
 
 # class models.User
 #     username
