@@ -5,7 +5,7 @@
 <script src="{% static 'CustomScripts/PlaylistManagement-ang.js' %}"></script>
 <section class="wrapper" ng-app="plApp" ng-controller="plCtrl">
 
-    <div class="row" >
+    <div class="row">
         <!-- List of all Playlists -->
         <div class="col-md-2 col-fluid">
             <div class="panel panel-default" style="border-right:1px solid grey">
@@ -64,24 +64,27 @@
                 </div>
                 <div droppable add-content-function="addContentToPlaylistItems"
                      add-folder-function="addFolderContentToPlaylistItems"
-                    >
+                >
                     <ul id="ul-playlistQueue" class="list-group" style="height:490px;overflow-y:scroll"
-                        data-as-sortable="board.dragControlListeners"
-                        is-disabled="false"
+                        data-as-sortable=""
+                        is-disabled="is_sortable_disabled"
                         data-ng-model="activePlaylistObj.playlist_items">
                         <li ng-repeat="item in activePlaylistObj.playlist_items | filter: searchPlaylistQueue"
                             class="list-group-item"
                             ng-class="{active: $index === activePlaylistItemIndex }"
                             ng-click="clickedOnQueueItem($index)"
                             style="padding:2px 5px"
-                            data-as-sortable-item
-                            data-as-sortable-item-handle>
-                            <i class="fa fa-ellipsis-v" ></i>
-                            {[ item.title ]}
-                            <i class="pull-right fa fa-times pointer" ng-click="reomveQueueItem($index)"
-                               ng-show="playlistQueueEditMode"></i>
-                            </br>
-                            <span style="font-size:11px">{[ item.display_time ]}</span>
+                            data-as-sortable-item>
+                            <div data-as-sortable-item-handle>
+                                <i class="fa fa-ellipsis-v" ></i>
+                                {[ item.title ]}
+                                <i class="pull-right fa fa-times pointer" ng-click="reomveQueueItem($index)"
+                                   ng-show="playlistQueueEditMode"></i>
+                                </br>
+                                <span style="font-size:11px">{[ item.display_time ]}</span>
+
+                            </div>
+
                         </li>
                     </ul>
                 </div>
