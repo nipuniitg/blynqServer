@@ -132,8 +132,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static_root")
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# The url where we would host the user uploaded media
-MEDIA_HOST = 'http://www.blynq.in'
 
 # The below variables are for registration app
 #REGISTRATION_OPEN = True        # If True, users can register
@@ -150,6 +148,11 @@ STORAGE_LIMIT_PER_ORGANIZATION = 1*1024*1024*1024  # 1 gb 1*1024*1024*1024
 THUMBNAIL_HIGH_RESOLUTION = True
 FILER_ENABLE_LOGGING = True
 FILER_DEBUG = False # Set this to True to show errors if file or thumbnail doesn't exist
+
+if DEBUG:
+    MEDIA_HOST = 'http://127.0.0.1:8000'
+else:
+    MEDIA_HOST = 'http://www.blynq.in'
 
 
 
