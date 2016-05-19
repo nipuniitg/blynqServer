@@ -220,7 +220,7 @@ def event_for_always(schedule):
     rule = Rule(name=schedule.schedule_title, description=schedule.schedule_title, frequency='DAILY')
     rule.save()
     event_dict = {'start': start, 'end': end, 'title': schedule.schedule_title, 'creator': schedule.created_by,
-                  'rule': rule}
+                  'rule': rule, 'end_recurring_period': None}
     return event_dict
 
 
@@ -347,6 +347,7 @@ def get_screen_data(request, screen_id, last_received, nof_days=7):
                 # assert screen_schedule.screen_id == screen_id
                 occurrences = event.get_occurrences(start_time, end_time)
                 if not occurrences:
+                    is_modified = True
                     continue
                 # TODO: optimize this
                 playlists = schedule.playlists.all()
@@ -359,7 +360,7 @@ def get_screen_data(request, screen_id, last_received, nof_days=7):
                                      'last_updated_time': schedule.last_updated_time, 'start_time': each_occur.start,
                                      'end_time': each_occur.end}
                     screen_data_json.append(campaign_dict)
-        if not screen_data_json:
+        else:
             is_modified = True
         campaigns_json = {'campaigns': screen_data_json, 'is_modified': is_modified}
         success = True
