@@ -325,25 +325,26 @@ def get_screen_data(request, screen_id, last_received, nof_days=7):
             calendar_events = calendar.events.exclude(end_recurring_period__lt=current_time)
             start_time = current_time
             end_time = start_time + datetime.timedelta(days=nof_days)
-            # TODO: Filter the below query using unique schedules
-            screen_schedules = ScheduleScreens.objects.filter(event__in=calendar_events)
+            completed_schedules = []
             if not calendar_events:
                 is_modified = True
             for event in calendar_events:
                 try:
-                    screen_schedule = screen_schedules.get(event=event)
+                    # Each event should have only one entry in Schedule_Screens
+                    screen_schedule = event.schedulescreens.all()[0]
                 except:
                     print 'Event does not exist in the schedule screens'
                     continue
                 schedule = screen_schedule.schedule
-                if schedule.last_updated_time < last_received_datetime:
+                if schedule.schedule_id in completed_schedules:
                     continue
                 else:
-                    is_modified = True
+                    completed_schedules.append(schedule.schedule_id)
+                if schedule.last_updated_time < last_received_datetime:
+                    continue
                 # assert screen_schedule.screen_id == screen_id
                 occurrences = event.get_occurrences(start_time, end_time)
                 if not occurrences:
-                    is_modified = True
                     continue
                 # TODO: optimize this
                 playlists = schedule.playlists.all()
@@ -351,15 +352,13 @@ def get_screen_data(request, screen_id, last_received, nof_days=7):
                 for playlist in playlists:
                     playlist_json = playlist_dict(playlist, only_files=True)
                     playlists_json.append(playlist_json)
-                campaign_dict = {'schedule_id': screen_schedule.schedule.schedule_id,
-                                 'playlists': playlists_json,
-                                 'last_updated_time': schedule.last_updated_time,
-                                 }
                 for each_occur in occurrences:
-                    campaign_dict['start_time'] = each_occur.start
-                    campaign_dict['end_time'] = each_occur.end
+                    campaign_dict = {'schedule_id': screen_schedule.schedule.schedule_id, 'playlists': playlists_json,
+                                     'last_updated_time': schedule.last_updated_time, 'start_time': each_occur.start,
+                                     'end_time': each_occur.end}
                     screen_data_json.append(campaign_dict)
-            # print screen_data_json
+        if not screen_data_json:
+            is_modified = True
         campaigns_json = {'campaigns': screen_data_json, 'is_modified': is_modified}
         success = True
         return list_to_json(campaigns_json)
