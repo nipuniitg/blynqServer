@@ -30,7 +30,7 @@
                 </div>
                 <div class="panel-body">
                     <!-- Folders -->
-                    <div class="item-container-wrap" ng-repeat="folder in folders">
+                    <div content-droppable class="item-container-wrap" ng-repeat="folder in folders" data-index="{[$index]}">
                         <div class="div-draggable-wrap" draggable data-index="{[$index]}"
                              data-isFolder="{[folder.is_folder]}">
                             <div class="item-container-header">

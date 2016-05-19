@@ -11,4 +11,5 @@ urlpatterns = [
      url(r'^createFolder', views.create_folder, name='create_folder'),
      url(r'^updateContentTitle', views.update_content_title, name='update_content_title'),
      url(r'^folderPath/(?P<current_folder_id>-?\d+)', views.folder_path, name='folder_path'),
+     url(r'^moveContent', views.move_content, name='move_content'),
 ]

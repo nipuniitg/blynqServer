@@ -71,7 +71,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
             }, function myError(response) {
                 console.log(response.statusText);
             });
-    }
+    };
 
     var createFolder = function(currentFolderId, mdlObj, callback){
         postData ={};
@@ -90,7 +90,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
             }, function myError(response) {
                 console.log(response.statusText);
             });
-    }
+    };
 
     var updateContentTitle = function(contentObj, callback){
         $http({
@@ -106,7 +106,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
             }, function myError(response) {
                 console.log(response.statusText);
             });
-    }
+    };
 
     var getFolderPath = function(folderId, callback){
         $http({
@@ -121,6 +121,25 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
             }, function myError(response) {
                 console.log(response.statusText);
             });
+    };
+
+    var moveContent = function(content_id, parent_folder_id, callback){
+        var postData ={
+            content_id : content_id
+            ,parent_folder_id : parent_folder_id
+        };
+        $http({
+             method : "POST",
+             url : '/content/moveContent',
+             data : postData
+         }).then(function mySuccess(response){
+                if(callback)
+                {
+                    callback(response.data);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
     }
 
     return{
@@ -131,6 +150,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
         ,createFolder : createFolder
         ,updateContentTitle : updateContentTitle
         ,getFolderPath : getFolderPath
+        ,moveContent    :   moveContent
     }
 
 }]);
@@ -185,11 +205,12 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
     //private functions
     var onLoad = function(){
         $scope.currentFolderId = -1  //-1 represents root folder. And hence fetches the data in root folder.
-        refreshContent($scope.currentFolderId);
+        $scope.refreshContent($scope.currentFolderId);
         updateFolderPath($scope.currentFolderId);
+
     };
 
-    var refreshContent = function(folderId){
+    $scope.refreshContent = function(folderId){
 
         ctFactory.getFolders(folderId, function(data)
         {
@@ -218,7 +239,7 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
         ctDataAccessFactory.deleteContent(content,  function(data){
             if(data.success)
             {
-                refreshContent($scope.currentFolderId);
+                $scope.refreshContent($scope.currentFolderId);
                 toastr.success('Item deleted successfully.');
             }
             else{
@@ -233,7 +254,7 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
         console.dir(file);
         ctDataAccessFactory.uploadContent(file, $scope.currentFolderId, $scope.mdlNewFileDetailsObj, function(data){
             if(data.success){
-                refreshContent($scope.currentFolderId);
+                $scope.refreshContent($scope.currentFolderId);
                 toastr.success('Upload successful');
             }
             else{
@@ -243,7 +264,7 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
     }
 
     $scope.navigateToFolder = function(folderId){
-        refreshContent(folderId);
+        $scope.refreshContent(folderId);
         updateFolderPath(folderId);
     }
 
@@ -261,7 +282,7 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
         ctDataAccessFactory.createFolder($scope.currentFolderId, $scope.mdlNewFolderObj, function(data){
             if(data.success)
             {
-                refreshContent($scope.currentFolderId);
+                $scope.refreshContent($scope.currentFolderId);
                 toastr.success('Folder created Successfully');
             }
             else{
@@ -283,7 +304,7 @@ plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', function(
         ctDataAccessFactory.updateContentTitle($scope.mdlEditContentObj, function(data){
             if(data.success)
             {
-                refreshContent($scope.currentFolderId);
+                $scope.refreshContent($scope.currentFolderId);
                 toastr.success('Title Modified successfully');
             }
             else{
@@ -348,6 +369,45 @@ return{
 
         }
 }});
+
+//content movement into folders
+//maintains same scope.
+plApp.directive('contentDroppable',['ctDataAccessFactory', function(ctDAF){
+    return{
+        restrict : 'A'
+        ,link : function($scope, element,attrs){
+
+            var postMomentFunction = function(returnData){
+                if(returnData.success){
+                    toastr.success('content Moved successfully');
+                    $scope.refreshContent($scope.currentFolderId);
+                }
+                else{
+                    toastr.warning(returnData.error);
+                }
+            };
+
+            element.droppable({
+              accept : '.div-draggable-wrap'
+              ,hoverClass : 'highlight-acceptable'
+              ,drop: function(event, ui){
+                   var dragIndex = angular.element(ui.draggable).data('index');
+                   var draggedisFolder = angular.element(ui.draggable).data('isfolder');
+                   var dropIndex = attrs['index'];
+                   if(draggedisFolder){
+                        ctDAF.moveContent($scope.folders[dragIndex].content_id,
+                         $scope.folders[dropIndex].content_id, postMomentFunction);
+                   }
+                   else
+                   {
+                        ctDAF.moveContent($scope.files[dragIndex].content_id,
+                         $scope.folders[dropIndex].content_id, postMomentFunction);
+                   }
+                }
+            });
+        }
+    }
+}]);
 
 plApp.directive('fileModel', ['$parse', function ($parse) {
     return {
