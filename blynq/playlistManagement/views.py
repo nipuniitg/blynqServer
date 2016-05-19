@@ -11,6 +11,7 @@ from playlistManagement.models import Playlist, PlaylistItems
 
 
 # Create your views here.
+from scheduleManagement.models import SchedulePlaylists
 
 
 @login_required
@@ -65,6 +66,12 @@ def upsert_playlist(request):
             playlist_item_id__in=playlist_item_id_list)
         for content in removed_playlist_content:
             content.delete()
+
+        # Set the last_updated_time for all the schedules having this playlist
+        schedule_playlists = SchedulePlaylists.objects.filter(playlist_id=playlist_id)
+        for each_schedule_playlist in schedule_playlists:
+            schedule = each_schedule_playlist.schedule
+            schedule.save()
         obj_dict = {'playlist': playlist_dict(playlist)}
         success = True
     except:

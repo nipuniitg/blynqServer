@@ -342,6 +342,8 @@ def get_screen_data(request, screen_id, last_received, nof_days=7):
                     completed_schedules.append(schedule.schedule_id)
                 if schedule.last_updated_time < last_received_datetime:
                     continue
+                else:
+                    is_modified = True
                 # assert screen_schedule.screen_id == screen_id
                 occurrences = event.get_occurrences(start_time, end_time)
                 if not occurrences:
