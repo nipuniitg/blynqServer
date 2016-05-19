@@ -167,10 +167,10 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','dataAcce
         $scope.playlistQueueEditMode = false;
         $scope.showQueueItemDetails = false;
 
-        //$scope.displayContentDiv = false;
+        $scope.is_sortable_disabled = !0;
 
         getPlaylists();
-    }
+    };
 
     //private methods
     var  getPlaylists = function(){
@@ -184,6 +184,14 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','dataAcce
         $scope.activePlaylistObj = angular.copy($scope.playlists[index]);
         $scope.activePlaylistIndex = index;
         $scope.showQueueItemDetails = false;
+    }
+
+    var enableSortable = function(){
+        $scope.is_sortable_disabled = !1;
+    };
+
+    var disableSortable = function(){
+        $scope.is_sortable_disabled = !0;
     }
 
 
@@ -255,6 +263,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','dataAcce
     $scope.editPlaylistItems = function(){
         //need selector here
         $scope.playlistQueueEditMode= true;
+        enableSortable()
         console.log($scope.activePlaylistObj);
     };
 
@@ -266,6 +275,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','dataAcce
                 $scope.playlistQueueEditMode = false;
                 $scope.playlists[$scope.activePlaylistIndex] = data.playlist;
                 $scope.activePlaylistObj = angular.copy($scope.playlists[$scope.activePlaylistIndex]);
+                disableSortable();
             }
             else{
                 toastr.warning('Oops!! Some error occured. Please try again.');
@@ -275,8 +285,9 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','dataAcce
 
     $scope.cancelPlaylistQueueItemsEdit = function(){
         $scope.playlistQueueEditMode = false;
+        disableSortable();
         updateActivePlaylist($scope.activePlaylistIndex);
-    }
+    };
 
     //----Add Contents To activePlaylistObj
         //Below functions are being called from the droppable directive
