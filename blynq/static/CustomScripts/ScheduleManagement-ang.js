@@ -275,7 +275,7 @@ sdApp.factory('timelineFactory', ['$log', function($log){
             timeDefined             :   timeDefined
             ,startDate              :   startDate || today
             ,endDate                :   endDate || null
-            ,allDay                 :   !startTime && !endTime || false
+            ,allDay                 :   allDay
             ,startTime              :   startTime ||  timeFunction(8,30)
             ,endTime                :   endTime   ||  null
             ,recurrenceType         :   recurrenceType || null
@@ -555,6 +555,12 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
         );
         $scope.label = timelineDescription.updateLabel($scope.timeline);
     };
+
+    $scope.$watch('timeDefined', function(newValue){
+        $scope.timeline.timeDefined = newValue;
+    });
+
+
     $scope.openTimelineModal=function(){
         var modalInstance = $uibModal.open({
           animation: true,

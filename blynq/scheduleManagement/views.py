@@ -83,7 +83,10 @@ def upsert_schedule_screens(user_details, schedule, schedule_screens, event_dict
                 events = Event.objects.filter(id=entry.event.id)
                 for event in events:
                     if event.rule:
-                        event.rule.delete()
+                        rule = event.rule
+                        event.rule = None
+                        event.save()
+                        rule.delete()
                 events.update(**event_dict)
                 entry.save()
             schedule_screen_id_list.append(schedule_screen_id)
@@ -223,13 +226,15 @@ def event_for_always(schedule):
 
 def event_dict_from_timeline(timeline, schedule):
     print "insisde event_dict_from_timeline"
-    import pdb;pdb.set_trace()
     is_always = timeline.get('is_always')
     all_day = timeline.get('all_day')
     recurrence_absolute = timeline.get('recurrence_absolute')
-    schedule.is_always = is_always
-    schedule.all_day = all_day
-    schedule.recurrence_absolute = recurrence_absolute
+    if is_always is not None:
+        schedule.is_always = is_always
+    if all_day is not None:
+        schedule.all_day = all_day
+    if recurrence_absolute is not None:
+        schedule.recurrence_absolute = recurrence_absolute
     schedule.save()
     if is_always:
         return event_for_always(schedule)
@@ -369,7 +374,8 @@ def get_screen_schedules(request, screen_id):
     print "inside get_screen_schedules"
     screen_id = int(screen_id)
     user_details = get_userdetails(request)
-    screen_schedule_id_list = ScheduleScreens.objects.filter(screen_id=screen_id).values_list('schedule_id', flat=True)
+    screen_schedule_id_list = ScheduleScreens.objects.filter(screen_id=screen_id).values_list(
+        'schedule_id', flat=True).distinct()
     screen_schedules = Schedule.get_user_relevant_objects(user_details).filter(schedule_id__in = screen_schedule_id_list)
     relevant_schedules = []
     for schedule in screen_schedules:
@@ -383,7 +389,7 @@ def get_playlist_schedules(request, playlist_id):
     playlist_id = int(playlist_id)
     user_details = get_userdetails(request)
     playlist_schedule_id_list = SchedulePlaylists.objects.filter(playlist_id=playlist_id).values_list(
-        'schedule_id', flat=True)
+        'schedule_id', flat=True).distinct()
     playlist_schedules = Schedule.get_user_relevant_objects(user_details=user_details).filter(
         schedule_id__in=playlist_schedule_id_list)
     relevant_schedules = []

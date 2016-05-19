@@ -50,8 +50,8 @@ def default_string_to_datetime(str):
 
 ist_timezone = pytz.timezone('Asia/Kolkata')
 time_fmt = "%H:%M"
-date_fmt = "%Y-%m-%d"
-datetime_fmt = "%Y-%m-%d %H:%M"
+date_fmt = "%Y/%m/%d"
+datetime_fmt = "%Y/%m/%d %H:%M"
 
 
 # Delete the below function if not used

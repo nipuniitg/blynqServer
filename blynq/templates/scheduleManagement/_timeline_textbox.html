@@ -1,10 +1,10 @@
 <section>
 <!--<label class="control-label control-label-secondary add-left">-->
     <label class="col-md-2">
-    <input ng-model="timeline.timeDefined" type="checkbox"
+    <input ng-model="timeDefined" type="checkbox"
            > Always</label>
 
-<div class="col-md-10 col-md-offset-2" ng-if="!timeline.timeDefined">
+<div class="col-md-10 col-md-offset-2" ng-if="!timeDefined">
     <div id="timelineTextbox" class="tagsinput " style="height: 100%;">
         <span class="tag" ng-click="openTimelineModal()">
             <span> {[ label ]}  &nbsp;&nbsp;</span>
