@@ -25,7 +25,7 @@ sdApp.controller('scheduleIndexCtrl', ['$scope','scheduleIndexFactory','$uibModa
             is_always   : !0
             ,start_date  : null
             ,end_recurring_period :null
-            ,all_day     :null
+            ,all_day     :!0
             ,start_time  :null
             ,end_time    :null
             ,frequency  :null
@@ -274,10 +274,10 @@ sdApp.factory('timelineFactory', ['$log', function($log){
         var timeline = {
             timeDefined             :   timeDefined
             ,startDate              :   startDate || today
-            ,endDate                :   endDate || null
+            ,endDate                :   endDate || today
             ,allDay                 :   allDay
-            ,startTime              :   startTime ||  timeFunction(8,30)
-            ,endTime                :   endTime   ||  null
+            ,startTime              :   startTime ||  timeFunction(0,0)
+            ,endTime                :   endTime   ||  timeFunction(23,59)
             ,recurrenceType         :   recurrenceType || null
             ,recurrenceFrequency    :   recurrenceFrequency || 1
             ,recurrenceAbsolute     :   recurrenceAbsolute  || null
@@ -473,7 +473,7 @@ return{
 
 }]);
 
-sdApp.factory('timelineDescription',['$filter', function(e){
+sdApp.factory('timelineDescription',['$filter','timelineFactory', function(e, tLF){
 var t = {}
       , n = {
         DAILY: "Daily",
@@ -505,12 +505,16 @@ var t = {}
     var updateLabel = function(e) {
         var t = ""
           , l = "dd-MMM-yyyy";
-        if (e.startDate && (t = t + s(e.startDate, e.useLocaldate, l) + " "),
-        e.endDate && (t = t + i.TO + " " + s(e.endDate, e.useLocaldate, l) + " "),
-        e.startTime) {
-            var c = "hh:mm a";
-            t = t + s(e.startTime, e.useLocaldate, c) + " ",
-            e.endTime && (t = t + i.TO + " " + s(e.endTime, e.useLocaldate, c) + " ")
+        if (e.startDate && (t = t + tLF.getOnlyDate(e.startDate) + " "),
+        e.endDate && (t = t + i.TO + " " + tLF.getOnlyDate(e.endDate) + " ")) {
+            if(e.allDay){
+                t = t + i.ALL_DAY;
+            }else{
+                var c = "hh:mm a";
+                    t = t + tLF.getOnlyTime(e.startTime) + " ",
+                    e.endTime && (t = t + i.TO + " " + tLF.getOnlyTime(e.endTime) + " ")
+            }
+
         }
         if (e.recurrenceType) {
             var u = 0;
@@ -675,9 +679,9 @@ sdApp.directive("largerThanDate", [function() {
             require: "ngModel",
             link: function(e, t, n, i) {
                 e.$watchGroup(["timeline.startDate", "timeline.endDate"], function(e) {
-                    var t = e[0] && new Date(e[0])
-                      , n = e[1] && new Date(e[1])
-                      , r = !(t && n && t >= n);
+                    var startDate = e[0] && new Date(e[0])
+                      , endDate = e[1] && new Date(e[1])
+                      , r = !(startDate && endDate && startDate > endDate);
                     i.$setValidity("largerThanDate", r)
                 })
             }
