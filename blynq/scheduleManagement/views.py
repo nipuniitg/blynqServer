@@ -335,10 +335,12 @@ def get_screen_data(request, screen_id, last_received, nof_days=7):
             completed_schedules = []
             if not calendar_events:
                 is_modified = True
+            schedule_for_event = False
             for event in calendar_events:
                 try:
                     # Each event should have only one entry in Schedule_Screens
                     screen_schedule = event.schedulescreens.all()[0]
+                    schedule_for_event = True
                 except Exception as e:
                     print "Exception is ", e
                     print 'Event does not exist in the schedule screens'
@@ -367,6 +369,8 @@ def get_screen_data(request, screen_id, last_received, nof_days=7):
                                      'last_updated_time': schedule.last_updated_time, 'start_time': each_occur.start,
                                      'end_time': each_occur.end}
                     screen_data_json.append(campaign_dict)
+            if not schedule_for_event:
+                is_modified = True
         else:
             is_modified = True
         campaigns_json = {'campaigns': screen_data_json, 'is_modified': is_modified}

@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 # from django.db.models import Q
 import json
-from blynq.settings import BASE_DIR
+from blynq.settings import MEDIA_ROOT
 from contentManagement.forms import UploadContentForm
 # Create your views here.
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, list_to_json
@@ -63,7 +63,7 @@ def delete_folder_helper(req_content, user_content):
 
 
 def delete_file_helper(content):
-    os.remove(BASE_DIR+content.document.url)
+    os.remove(MEDIA_ROOT + '/' + content.document.name)
     content.delete()
 
 
