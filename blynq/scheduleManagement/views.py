@@ -195,6 +195,8 @@ def generate_rule(timeline, name, description):
     bymonthday = timeline.get('bymonthday')
     byweekday = timeline.get('byweekday')
     frequency = timeline.get('frequency')
+    if not frequency:
+        frequency = 'DAILY'
     params = generate_rule_params(interval=interval, bymonthday=bymonthday, byweekday=byweekday, byweekno=byweekno)
     rule = Rule(name=name, description=description, frequency=frequency, params=params)
     rule.save()
@@ -353,7 +355,6 @@ def get_screen_data(request, screen_id, last_received, nof_days=7):
                 # assert screen_schedule.screen_id == screen_id
                 occurrences = event.get_occurrences(start_time, end_time)
                 if not occurrences:
-                    is_modified = True
                     continue
                 # TODO: optimize this
                 playlists = schedule.playlists.all()
