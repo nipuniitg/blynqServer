@@ -395,8 +395,13 @@ plApp.directive('contentDroppable',['ctDataAccessFactory', function(ctDAF){
                    var draggedisFolder = angular.element(ui.draggable).data('isfolder');
                    var dropIndex = attrs['index'];
                    if(draggedisFolder){
-                        ctDAF.moveContent($scope.folders[dragIndex].content_id,
-                         $scope.folders[dropIndex].content_id, postMomentFunction);
+                        if(dragIndex != dropIndex){
+                            ctDAF.moveContent($scope.folders[dragIndex].content_id,
+                            $scope.folders[dropIndex].content_id, postMomentFunction);
+                        }
+                        else{
+                            toastr.warning('You cant move the folder into the same folder');
+                        }
                    }
                    else
                    {
