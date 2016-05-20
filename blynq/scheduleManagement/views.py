@@ -96,7 +96,9 @@ def upsert_schedule_screens(user_details, schedule, schedule_screens, event_dict
         for each_schedule_screen in removed_schedule_screens:
             if each_schedule_screen.event:
                 if each_schedule_screen.event.rule:
-                    each_schedule_screen.event.rule.delete()
+                    rule = each_schedule_screen.event.rule
+                    each_schedule_screen.event.rule = None
+                    rule.delete()
                 each_schedule_screen.event.delete()
         if removed_schedule_screens:
             removed_schedule_screens.delete()

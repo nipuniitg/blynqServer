@@ -20,7 +20,7 @@ class ScheduleScreens(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, blank=True, null=True)
     # TODO: Remove null=True for event
     # Add one event for each ScreenSchedule since each screen has a different calendar
-    event = models.ForeignKey(Event, on_delete=models.PROTECT, null=True, related_name='schedulescreens')
+    event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True, related_name='schedulescreens')
 
     # created_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True, related_name='%(class)s_created_by')
     # created_time = models.DateTimeField(_('created time'), auto_now_add=True, null=True)

@@ -134,20 +134,51 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # The below variables are for registration app
-#REGISTRATION_OPEN = True        # If True, users can register
-#ACCOUNT_ACTIVATION_DAYS = 7     # One-week activation window; you may, of course, use a different value.
-#REGISTRATION_AUTO_LOGIN = True  # If True, the user will be automatically logged in.
-#LOGIN_REDIRECT_URL = '/admin/'  # The page you want users to arrive at after they successful log in
+# REGISTRATION_OPEN = True        # If True, users can register
+# ACCOUNT_ACTIVATION_DAYS = 7     # One-week activation window; you may, of course, use a different value.
+# REGISTRATION_AUTO_LOGIN = True  # If True, the user will be automatically logged in.
+# LOGIN_REDIRECT_URL = '/admin/'  # The page you want users to arrive at after they successful log in
 LOGIN_URL = '/authentication/login/'  # The page users are directed to if they are not logged in,
 
 # Content related settings
 DEFAULT_DISPLAY_TIME = 10
 STORAGE_LIMIT_PER_ORGANIZATION = 1*1024*1024*1024  # 1 gb 1*1024*1024*1024
 
-# Filer related settings
-THUMBNAIL_HIGH_RESOLUTION = True
-FILER_ENABLE_LOGGING = True
-FILER_DEBUG = False # Set this to True to show errors if file or thumbnail doesn't exist
+
+LOG_DIRECTORY = os.path.join(BASE_DIR, 'logs')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+        'debug': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_DIRECTORY, 'debug.log'),
+        },
+    },
+    'loggers': {
+        'consoleLog': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG'),
+        },
+        'django.request': {
+            'handlers': ['debug'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'debugFileLog': {
+            'handlers': ['debug'],
+            'level': 'DEBUG',
+            'propagate': True,
+        }
+    },
+}
+
+
 
 if DEBUG:
     MEDIA_HOST = 'http://127.0.0.1:8000'

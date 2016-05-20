@@ -14,6 +14,13 @@ from screenManagement.forms import AddScreenForm, AddScreenLocation, AddScreenSp
 from screenManagement.models import Screen, ScreenStatus, ScreenSpecs, Group, GroupScreens
 
 
+# import the logging library
+import logging
+
+# Get an instance of a logger
+consoleLog = logging.getLogger('consoleLog')
+debugFileLog = logging.getLogger('debugFileLog')
+
 # Create your views here.
 
 
@@ -31,6 +38,7 @@ def default_screen_status():
 
 @login_required
 def add_group(request):
+    debugFileLog.info("inside Add Group")
     context_dic = {}
     success = False
     if request.method == 'POST':
@@ -248,6 +256,7 @@ def upsert_screen(request):
 # TODO: Understand the difference between natural_key method and get_by_natural_key method in
 # https://docs.djangoproject.com/en/1.9/topics/serialization/
 def get_groups_json(request):
+    debugFileLog.info("inside get_groups_json")
     user_details = get_userdetails(request)
     groups_data = Group.get_user_relevant_objects(user_details=user_details)
     # json_data = serializers.serialize("json", groups_data, fields=('group_id','group_name', 'description', 'screen'))
