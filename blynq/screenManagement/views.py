@@ -46,7 +46,8 @@ def add_group(request):
                 success = True
                 success_message = "Group %s have been successfully Added." % form_data.get('group_name')
                 context_dic['success_message'] = success_message
-            except:
+            except Exception as e:
+                print "Exception is ", e
                 print 'Error while adding the new group to database'
         else:
             print 'Add Group Form is not valid'
@@ -144,7 +145,8 @@ def upsert_group(request):
                     return ajax_response(success=success_removal, errors=[error])
 
                 success = True
-            except:
+            except Exception as e:
+                print "Exception is ", e
                 errors = ['Error while adding the group details to database']
                 print errors[0]
         else:
@@ -164,7 +166,8 @@ def delete_group(request):
         user_content = Group.get_user_relevant_objects(user_details).get(group_id=group_id)
         user_content.delete()
         success = True
-    except:
+    except Exception as e:
+        print "Exception is ", e
         error = "Error while deleting the group"
         print error
         errors.append(error)
@@ -191,7 +194,12 @@ def upsert_screen(request):
                     screen = Screen.objects.get(screen_id=screen_id)
                     screen.screen_name = form_data.get('screen_name')
                 screen.screen_size = form_data.get('screen_size')
-                screen.activation_key=form_data.get('activation_key')
+                activation_key=form_data.get('activation_key')
+                # TODO: Remove hard-coding and Integrate this with the android unique key
+                if activation_key != "0123456789":
+                    errors.append('Not a valid activation key, Please contact support@blynq.in in case of issues')
+                    return ajax_response(success=success, errors=errors)
+                screen.activation_key = activation_key
                 screen.address=form_data.get('address')
                 screen.aspect_ratio=form_data.get('aspect_ratio')
                 screen.resolution=form_data.get('resolution')
@@ -226,7 +234,8 @@ def upsert_screen(request):
                     screen.save()
                 # TODO: The above case only handles the PRIVATE businessType, add a check
                 success = True
-            except:
+            except Exception as e:
+                print "Exception is ", e
                 errors = ['Error while adding the screen details to database']
                 print errors[0]
         else:
@@ -279,7 +288,8 @@ def add_screen_location(request):
         if screen_location_form.is_valid():
             try:
                 user_details = UserDetails.objects.get(username=request.user.username)
-            except:
+            except Exception as e:
+                print "Exception is ", e
                 print 'Error: username %s does not exist' % str(request.user.username)
                 user_details = default_userdetails()
             form_data = screen_location_form.cleaned_data
@@ -301,7 +311,8 @@ def add_screen_location(request):
                 success = True
                 success_message = "The address of location has been successfully Added."
                 context_dic['success_message'] = success_message
-            except:
+            except Exception as e:
+                print "Exception is ", e
                 print 'Error while adding the screen location to database'
         else:
             print 'Add Screen location Form is not valid'
@@ -339,7 +350,8 @@ def add_screen_specs(request):
                 success = True
                 success_message = "The specifications of the screen have been successfully Added."
                 context_dic['success_message'] = success_message
-            except:
+            except Exception as e:
+                print "Exception is ", e
                 print 'Error while adding the screen specifications to database'
         else:
             print 'Add Screen specifications Form is not valid'

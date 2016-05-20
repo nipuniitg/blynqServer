@@ -44,7 +44,8 @@ def upload_content(request):
                                parent_folder=parent_folder,
                                is_folder=False)
         success = True
-    except:
+    except Exception as e:
+        print "Exception is ", e
         error = 'Error while uploading the file'
         print error
         errors.append(error)
@@ -80,7 +81,8 @@ def delete_content(request):
         else:
             delete_file_helper(required_content)
         success = True
-    except:
+    except Exception as e:
+        print "Exception is ", e
         success = False
     return ajax_response(success=success)
 
@@ -107,7 +109,8 @@ def create_folder(request):
                                parent_folder=parent_folder,
                                is_folder=True)
         success = True
-    except:
+    except Exception as e:
+        print "Exception is ", e
         error = 'Error with the submitted data in create folder'
         print error
         errors.append(error)
@@ -172,7 +175,8 @@ def get_content_helper(request, parent_folder_id=-1, is_folder=False):
         user_content = user_content.filter(is_folder=is_folder)
         json_content = FlatJsonSerializer().serialize(user_content, fields=('title', 'document', 'content_id',
                                                                             'is_folder'))
-    except:
+    except Exception as e:
+        print "Exception is ", e
         json_content = []
         error = "Error while fetching the content or invalid parent folder id"
     return HttpResponse(json_content, content_type='application/json')
@@ -201,7 +205,8 @@ def update_content_title(request):
             content.title = title
             content.save()
             success = True
-        except:
+        except Exception as e:
+            print "Exception is ", e
             error = 'Invalid content_id or Error while saving the title to the database'
             errors.append(error)
             print error

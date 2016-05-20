@@ -7,7 +7,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from authentication.models import UserDetails, Organization, Role
-from customLibrary.views_lib import string_to_dict, ajax_response
+from blynq import settings
+from customLibrary.views_lib import string_to_dict, ajax_response, get_userdetails
+from scheduleManagement.models import Schedule
+from screenManagement.models import Screen
 
 
 def register(request):
@@ -85,7 +88,8 @@ def request_quote(request):
             try:
                 request_quote_form.save()
                 success = True
-            except:
+            except Exception as e:
+                print "Exception is ", e
                 error = "Error while saving the requested Quote"
                 errors.append(error)
                 print error
@@ -94,6 +98,26 @@ def request_quote(request):
             errors.append(error)
             print error
     return ajax_response(success=success, errors=errors)
+
+
+@login_required
+def organization_homepage_summary(request):
+    print "inside organization_homepage_summary"
+    user_details = get_userdetails(request=request)
+    context_dic = {}
+    try:
+        screen_count = Screen.get_user_relevant_objects(user_details=user_details).count()
+        schedule_count = Schedule.get_user_relevant_objects(user_details=user_details).count()
+        context_dic['screen_count'] = screen_count
+        context_dic['schedule_count'] = schedule_count
+        organization = user_details.organization
+        context_dic['used_storage'] = organization.used_file_size
+        context_dic['total_storage'] = organization.total_file_size_limit
+    except Exception as e:
+        print "Exception is ", e
+        context_dic['used_storage'] = 0
+        context_dic['total_storage'] = settings.STORAGE_LIMIT_PER_ORGANIZATION
+    return context_dic
 
 
 # def logout(request):

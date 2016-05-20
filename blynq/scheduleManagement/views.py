@@ -1,6 +1,5 @@
 import datetime
 
-from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -103,7 +102,8 @@ def upsert_schedule_screens(user_details, schedule, schedule_screens, event_dict
             removed_schedule_screens.delete()
         success = True
         return success, error
-    except:
+    except Exception as e:
+        print "Exception is ", e
         error = 'Error while upserting screens in schedule'
         print error
         return success, error
@@ -145,7 +145,8 @@ def upsert_schedule_groups(user_details, schedule, schedule_groups, event_dict):
             schedule_group.delete()
         success = True
         return success, error
-    except:
+    except Exception as e:
+        print "Exception is ", e
         error = 'Error while upserting groups in schedule'
         print error
         return success, error
@@ -178,7 +179,8 @@ def upsert_schedule_playlists(user_details, schedule, schedule_playlists):
             playlist_schedule.delete()
         success = True
         return success, error
-    except:
+    except Exception as e:
+        print "Exception is ", e
         error = 'Error while upserting playlists in schedule'
         print error
         return success, error
@@ -200,10 +202,10 @@ def generate_rule(timeline, name, description):
 def event_for_allday(schedule, timeline):
     print "inside event_for_allday"
     start_date = timeline.get('start_date')
-    start_time = "00:00" # datetime.time(0)
+    start_time = "00:00"  # datetime.time(0)
     start = get_utc_datetime(ist_date=start_date, ist_time=start_time)
     end_date = start_date
-    end_time = "23:59" # datetime.time(23, 59, 59, 999)
+    end_time = "23:59"  # datetime.time(23, 59, 59, 999)
     end = get_utc_datetime(ist_date=end_date, ist_time=end_time)
     end_recurring_period_date = timeline.get('end_recurring_period')
     end_recurring_period = get_utc_datetime(ist_date=end_recurring_period_date, ist_time=end_time)
@@ -300,7 +302,8 @@ def upsert_schedule(request):
                                                        schedule_groups=schedule_groups, event_dict=event_dict)
         success = success and success_groups
         errors.append(error)
-    except:
+    except Exception as e:
+        print "Exception is ", e
         error = 'Error while upserting content to schedule'
         errors.append(error)
         print errors
@@ -332,7 +335,8 @@ def get_screen_data(request, screen_id, last_received, nof_days=7):
                 try:
                     # Each event should have only one entry in Schedule_Screens
                     screen_schedule = event.schedulescreens.all()[0]
-                except:
+                except Exception as e:
+                    print "Exception is ", e
                     print 'Event does not exist in the schedule screens'
                     continue
                 schedule = screen_schedule.schedule
@@ -365,7 +369,8 @@ def get_screen_data(request, screen_id, last_received, nof_days=7):
         campaigns_json = {'campaigns': screen_data_json, 'is_modified': is_modified}
         success = True
         return list_to_json(campaigns_json)
-    except:
+    except Exception as e:
+        print "Exception is ", e
         error = "Error while fetching the occurences or invalid screen identifier"
         errors.append(error)
         print error
@@ -378,7 +383,7 @@ def get_screen_schedules(request, screen_id):
     user_details = get_userdetails(request)
     screen_schedule_id_list = ScheduleScreens.objects.filter(screen_id=screen_id).values_list(
         'schedule_id', flat=True).distinct()
-    screen_schedules = Schedule.get_user_relevant_objects(user_details).filter(schedule_id__in = screen_schedule_id_list)
+    screen_schedules = Schedule.get_user_relevant_objects(user_details).filter(schedule_id__in=screen_schedule_id_list)
     relevant_schedules = []
     for schedule in screen_schedules:
         schedule_dictionary = schedule_dict(schedule)
@@ -413,7 +418,7 @@ def get_schedules(request):
 
 
 @login_required
-def get_schedule_details(request,schedule_id):
+def get_schedule_details(request, schedule_id):
     print 'inside get_schedule_details'
     user_details = get_userdetails(request)
     context_dic = {}
@@ -426,7 +431,7 @@ def get_schedule_details(request,schedule_id):
             schedule_dictionary = schedule_dict(schedule)
             context_dic['relevant'] = True
             context_dic['schedule'] = schedule_dictionary
-        except:
+        except Exception as e:
+            print "Exception is ", e
             context_dic['relevant'] = False
-    #return JsonResponse(context_dic)
-    return render(request,'scheduleManagement/schedule_details.html',context_dic)
+    return render(request, 'scheduleManagement/schedule_details.html', context_dic)

@@ -29,7 +29,7 @@ class Playlist(models.Model):
     playlist_id = models.AutoField(primary_key=True)
     playlist_title = models.CharField(max_length=100)
     playlist_items = models.ManyToManyField(Content, through=PlaylistItems)
-    playlist_total_time = models.IntegerField()
+    playlist_total_time = models.IntegerField(null=True)
 
     created_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_created_by',
                                    null=True)
