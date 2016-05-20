@@ -13,11 +13,11 @@ sdApp.config(function($httpProvider) {
 sdApp.controller('scheduleIndexCtrl', ['$scope','scheduleIndexFactory','$uibModal',
     function($scope,sIF, $uibModal){
 
-    var newScheduleIndex = -1
+    var newScheduleIndex = -1;
 
     var newScheduleTemplate = {
         schedule_id : -1,
-        schedule_title : 'latest schedule',
+        schedule_title : '',
         schedule_screens : [],
         schedule_groups : [],
         schedule_playlists:[],
@@ -39,7 +39,7 @@ sdApp.controller('scheduleIndexCtrl', ['$scope','scheduleIndexFactory','$uibModa
 
     var onLoad = function(){
         refreshSchedules();
-    }
+    };
 
     var refreshSchedules = function(){
         sIF.getSchedules(function(data){
@@ -73,7 +73,7 @@ sdApp.controller('scheduleIndexCtrl', ['$scope','scheduleIndexFactory','$uibModa
         }, function cancelled(){
             toastr.warning('schedule cancelled')
         })
-    }
+    };
 
     $scope.addSchedule= function(){
         openModalPopup(newScheduleIndex);
@@ -81,7 +81,19 @@ sdApp.controller('scheduleIndexCtrl', ['$scope','scheduleIndexFactory','$uibModa
 
     $scope.editSchedule = function(index){
         openModalPopup(index);
-    }
+    };
+
+    $scope.deleteSchedule = function(index){
+        sIF.deleteSchedule($scope.schedules[index].schedule_id, function(returnData){
+            if(returnData.success){
+                toastr.success('Deleted Schedule successfully');
+                refreshSchedules();
+            }
+            else{
+                toastr.warning('There was some error while deleting scheduling.Please refresh and try again.');
+            }
+        });
+    };
 
     onLoad();
 
@@ -103,8 +115,28 @@ sdApp.factory('scheduleIndexFactory', ['$http', function($http){
             });
     };
 
+    var deleteSchedule = function(schedule_id, callback){
+      var obj = {
+        schedule_id : schedule_id
+      };
+        $http({
+            method : "POST"
+            ,url : "/schedule/deleteSchedule"
+            ,data : obj
+        }).then(function mySucces(response){
+            if(callback)
+            {
+                callback(response.data);
+            }
+        }, function myError(response) {
+            console.log(response.statusText);
+            toastr.warning('Internal Error');
+        });
+    }
+
     return{
         getSchedules : getSchedules
+        ,deleteSchedule : deleteSchedule
     }
 }]);
 // end schedule index material
