@@ -8,4 +8,5 @@ urlpatterns = [
     url(r'^getScreenData/screen/(?P<screen_id>\d+)/lastreceived/(?P<last_received>\d{14})', views.get_screen_data, name='screen_calendar'),
     url(r'^addSchedule', views.add_schedule, name='add_schedule'),
     url(r'^getSchedules', views.get_schedules, name='get_schedules'),
+    url(r'^deleteSchedule', views.delete_schedule, name='delete_schedule'),
 ]

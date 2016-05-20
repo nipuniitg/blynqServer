@@ -418,20 +418,20 @@ def get_schedules(request):
 
 
 @login_required
-def get_schedule_details(request, schedule_id):
-    print 'inside get_schedule_details'
+def delete_schedule(request):
+    print "inside delete schedule"
     user_details = get_userdetails(request)
-    context_dic = {}
-    if schedule_id == -1:
-        context_dic['schedule'] = {}
-        context_dic['relevant'] = True
-    else:
-        try:
-            schedule = Schedule.get_user_relevant_objects(user_details=user_details).get(schedule_id=schedule_id)
-            schedule_dictionary = schedule_dict(schedule)
-            context_dic['relevant'] = True
-            context_dic['schedule'] = schedule_dictionary
-        except Exception as e:
-            print "Exception is ", e
-            context_dic['relevant'] = False
-    return render(request, 'scheduleManagement/schedule_details.html', context_dic)
+    errors = []
+    success = False
+    try:
+        posted_data = string_to_dict(request.body)
+        print 'body is ',request.body
+        schedule_id = int(posted_data.get('schedule_id'))
+        schedule = Schedule.get_user_relevant_objects(user_details=user_details).get(schedule_id=schedule_id)
+        schedule.delete()
+        success = True
+    except Exception as e:
+        print "Exception is ", e
+        success = False
+        errors = ['Sorry, you do not have access to this schedule']
+    return ajax_response(success=success, errors=errors)
