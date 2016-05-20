@@ -19,13 +19,14 @@
                         <thead>
                             <tr>
                                 <th>Edit</th>
-
+                                <th>Delete</th>
                                 <th class="fix">Title</th>
                                 <th class="fix">Playlist</th>
                                 <th class="fix">Screens</th>
                                 <th class="fix">Timelines</th>
                             </tr>
                             <tr>
+                                <th></th>
                                 <th></th>
                                 <th><input type="form-control" placeholder="search"></th>
                                 <th><input type="form-control" placeholder="search"></th>
@@ -36,6 +37,7 @@
                         <tbody>
                             <tr ng-repeat="schedule in schedules">
                                 <td><a ng-click="editSchedule($index)"><i class="fa fa-pencil"></i></a></td>
+                                <td><a ng-click="deleteSchedule($index)"><i class="fa fa-trash-o"></i></a></td>
                                 <td>{[ schedule.schedule_title ]}</td>
                                 <td>
                                     <div class="tagsinput " style="height: 100%;">
