@@ -1,12 +1,13 @@
 import datetime
 
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from schedule.models import Event, Rule
-
-
 # Create your views here.
+from schedule.views import calendar
+
 from customLibrary.serializers import playlist_dict, schedule_dict
 from customLibrary.views_lib import get_userdetails, ajax_response, list_to_json, string_to_dict, list_to_comma_string, \
     default_string_to_datetime, get_utc_datetime
@@ -36,6 +37,7 @@ def default_rule(frequency='DAILY'):
 
 
 def interval_param(interval):
+    print 'inside interval_param'
     return 'interval:' + str(interval)
 
 
@@ -99,7 +101,9 @@ def upsert_schedule_screens(user_details, schedule, schedule_screens, event_dict
                     rule = each_schedule_screen.event.rule
                     each_schedule_screen.event.rule = None
                     rule.delete()
-                each_schedule_screen.event.delete()
+                event = each_schedule_screen.event
+                each_schedule_screen.event = None
+                event.delete()
         if removed_schedule_screens:
             removed_schedule_screens.delete()
         success = True
@@ -139,7 +143,7 @@ def upsert_schedule_groups(user_details, schedule, schedule_groups, event_dict):
                 Event.objects.filter(id=entry.event.id).update(**event_dict)
                 entry.save()
             schedule_screen_id_list.append(schedule_screen_id)
-            
+
         # Remove groups not in the schedule
         removed_schedule_groups = ScheduleScreens.objects.filter(schedule=schedule, group__isnull=False).exclude(
             schedule_screen_id__in=schedule_screen_id_list)
@@ -324,15 +328,16 @@ def get_screen_data(request, screen_id, last_received, nof_days=7):
     success = False
     is_modified = False
     last_received_datetime = default_string_to_datetime(last_received)
+    last_received_date = last_received_datetime.date()
     try:
         screen = Screen.objects.get(screen_id=screen_id)
         calendar = screen.screen_calendar
         if calendar:
-            current_time = timezone.now()
-            calendar_events = calendar.events.exclude(end_recurring_period__lt=current_time)
-            start_time = current_time
-            end_time = start_time + datetime.timedelta(days=nof_days)
-            completed_schedules = []
+            current_datetime = timezone.now()
+            calendar_events = calendar.events.exclude(end_recurring_period__lt=current_datetime)
+            start_time = current_datetime.replace(hour=0, minute=0, second=0)
+            time_diff = datetime.timedelta(days=nof_days)
+            end_time = start_time + time_diff
             if not calendar_events:
                 is_modified = True
             schedule_for_event = False
@@ -346,29 +351,52 @@ def get_screen_data(request, screen_id, last_received, nof_days=7):
                     print 'Event does not exist in the schedule screens'
                     continue
                 schedule = screen_schedule.schedule
-                if schedule.schedule_id in completed_schedules:
-                    continue
-                else:
-                    completed_schedules.append(schedule.schedule_id)
-                if schedule.last_updated_time < last_received_datetime:
-                    continue
-                else:
+                if schedule.last_updated_time > last_received_datetime:
                     is_modified = True
-                # assert screen_schedule.screen_id == screen_id
-                occurrences = event.get_occurrences(start_time, end_time)
-                if not occurrences:
-                    continue
-                # TODO: optimize this
-                playlists = schedule.playlists.all()
-                playlists_json = []
-                for playlist in playlists:
-                    playlist_json = playlist_dict(playlist, only_files=True)
-                    playlists_json.append(playlist_json)
-                for each_occur in occurrences:
-                    campaign_dict = {'schedule_id': screen_schedule.schedule.schedule_id, 'playlists': playlists_json,
-                                     'last_updated_time': schedule.last_updated_time, 'start_time': each_occur.start,
-                                     'end_time': each_occur.end}
-                    screen_data_json.append(campaign_dict)
+                    break
+                elif last_received_date == current_datetime.date():
+                    is_modified = False
+                else:
+                    next_day_after_week = last_received_datetime.replace(hour=0, minute=0, second=0) + \
+                                          datetime.timedelta(days=nof_days)
+                    # The player keeps the data of nof_days=7, so if there is no change in the schedules after the
+                    # last_received_datetime and no occurences on the 8th day
+                    occurrences = event.get_occurrences(next_day_after_week, end_time)
+                    if occurrences:
+                        is_modified = True
+                        break
+            completed_schedules = []
+            if is_modified:
+                for event in calendar_events:
+                    try:
+                        # Each event should have only one entry in Schedule_Screens
+                        screen_schedule = event.schedulescreens.all()[0]
+                        schedule_for_event = True
+                    except Exception as e:
+                        print "Exception is ", e
+                        print 'Event does not exist in the schedule screens'
+                        continue
+                    schedule = screen_schedule.schedule
+                    if schedule.schedule_id in completed_schedules:
+                        continue
+                    else:
+                        completed_schedules.append(schedule.schedule_id)
+                    occurrences = event.get_occurrences(start_time, end_time)
+                    if not occurrences:
+                        continue
+                    # TODO: optimize this
+                    playlists = schedule.playlists.all()
+                    playlists_json = []
+                    for playlist in playlists:
+                        playlist_json = playlist_dict(playlist, only_files=True)
+                        playlists_json.append(playlist_json)
+                    for each_occur in occurrences:
+                        campaign_dict = {'schedule_id': screen_schedule.schedule.schedule_id,
+                                         'playlists': playlists_json,
+                                         'last_updated_time': schedule.last_updated_time,
+                                         'start_time': each_occur.start,
+                                         'end_time': each_occur.end}
+                        screen_data_json.append(campaign_dict)
             if not schedule_for_event:
                 is_modified = True
         else:
@@ -424,6 +452,20 @@ def get_schedules(request):
     return list_to_json(all_schedules)
 
 
+def get_screen_calendar(request, screen_id):
+    user_details = get_userdetails(request)
+    context_dic = {}
+    try:
+        screen = Screen.get_user_relevant_objects(user_details=user_details).get(screen_id=screen_id)
+        screen_calendar = screen.screen_calendar
+        calendar_slug = screen_calendar.slug
+        context_dic['calendar'] = screen_calendar
+    except Exception as e:
+        print "Exception is ", e
+        return render(request, 'schedule/calendar.html')
+    return calendar(request, calendar_slug=calendar_slug)
+
+
 @login_required
 def delete_schedule(request):
     print "inside delete schedule"
@@ -432,7 +474,7 @@ def delete_schedule(request):
     success = False
     try:
         posted_data = string_to_dict(request.body)
-        print 'body is ',request.body
+        print 'body is ', request.body
         schedule_id = int(posted_data.get('schedule_id'))
         schedule = Schedule.get_user_relevant_objects(user_details=user_details).get(schedule_id=schedule_id)
         schedule.delete()
