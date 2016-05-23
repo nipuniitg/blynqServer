@@ -10,7 +10,7 @@ class AddScreenForm(NgModelFormMixin, NgFormValidationMixin, NgModelForm, forms.
 
     class Meta:
         model = Screen
-        fields = ('screen_name', 'address', 'activation_key', 'screen_size', 'aspect_ratio', 'resolution') # Add specifications if needed
+        fields = ('screen_name', 'address', 'screen_size', 'aspect_ratio', 'resolution') # activation_key
 
 
     def __init__(self, *args, **kwargs):

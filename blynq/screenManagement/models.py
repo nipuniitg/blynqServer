@@ -34,6 +34,37 @@ class ScreenStatus(models.Model):
 #         return self.type_name
 
 
+class ScreenSpecs(models.Model):
+    screen_specs_id = models.AutoField(primary_key=True)
+    brand = models.CharField(max_length=50)
+    model_num = models.CharField(max_length=50, null=True, blank=True)
+    weight = models.FloatField(null=True, blank=True)    # in kgs
+    dimensions = models.CharField(max_length=50, null=True, blank=True)    # l*b*h in cm
+    display_type = models.CharField(max_length=10, null=True, blank=True)  # LED/ LCD etc
+    contrast_ratio = models.CharField(max_length=20, null=True, blank=True)
+    wattage = models.IntegerField(null=True, blank=True)  # 55 in watts
+    additional_details = models.TextField(null=True, blank=True)
+
+    def __unicode__(self):
+        return self.brand + ' ' + self.model_num
+
+    class Meta:
+        unique_together = (('brand', 'model_num'))
+
+    def natural_key(self):
+        return ((self.brand, self.model_num, self.display_type))
+
+
+class ScreenActivationKey(models.Model):
+    screen_activation_id = models.AutoField(primary_key=True)
+    activation_key = models.CharField(max_length=16, unique=True)
+    device_serial_num = models.CharField(max_length=20, unique=True)
+    in_use = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return 'serial number ' + self.device_serial_num + ' key ' + self.activation_key
+
+
 class Group(models.Model):
     group_id = models.AutoField(primary_key=True)
     group_name = models.CharField(max_length=100,null= False)
@@ -62,27 +93,6 @@ class Group(models.Model):
         return Group.objects.filter(organization=user_details.organization)
 
 
-class ScreenSpecs(models.Model):
-    screen_specs_id = models.AutoField(primary_key=True)
-    brand = models.CharField(max_length=50)
-    model_num = models.CharField(max_length=50, null=True, blank=True)
-    weight = models.FloatField(null=True, blank=True)    # in kgs
-    dimensions = models.CharField(max_length=50, null=True, blank=True)    # l*b*h in cm
-    display_type = models.CharField(max_length=10, null=True, blank=True)  # LED/ LCD etc
-    contrast_ratio = models.CharField(max_length=20, null=True, blank=True)
-    wattage = models.IntegerField(null=True, blank=True)  # 55 in watts
-    additional_details = models.TextField(null=True, blank=True)
-
-    def __unicode__(self):
-        return self.brand + ' ' + self.model_num
-
-    class Meta:
-        unique_together = (('brand', 'model_num'))
-
-    def natural_key(self):
-        return ((self.brand, self.model_num, self.display_type))
-
-
 class GroupScreens(models.Model):
     group_screen_id = models.AutoField(primary_key=True)
     screen = models.ForeignKey('Screen', on_delete=models.CASCADE)
@@ -106,9 +116,8 @@ class Screen(models.Model):
     #location = models.ForeignKey(Address, on_delete=models.PROTECT)
     address = models.CharField(max_length=100, blank=True)
 
-    device_identification_id = models.CharField(max_length=20, blank=True, null=True)
-    activation_key = models.CharField(max_length=16, blank=True, null=True)
-    activated_on = models.DateField(null=True, blank=True)
+    unique_device_key = models.OneToOneField(ScreenActivationKey)
+    activated_on = models.DateTimeField(auto_now_add=True)
     activated_by = models.ForeignKey(UserDetails, null=True, blank=True)
     # related_name - The name to use for the relation from the related object back to this one
     # placed_by - the organization which is keeping the screens
@@ -130,10 +139,6 @@ class Screen(models.Model):
     # Each screen should have a separate calendar
     # Remove null=True for screen_calendar
     screen_calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE, null=True, blank=True)
-
-    @staticmethod
-    def generate_activation_key(length=16):
-        return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(length))
 
     def __unicode__(self):
         return self.screen_name

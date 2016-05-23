@@ -13,7 +13,7 @@ from customLibrary.views_lib import get_userdetails, ajax_response, list_to_json
     default_string_to_datetime, get_utc_datetime
 from playlistManagement.models import Playlist
 from scheduleManagement.models import Schedule, ScheduleScreens, SchedulePlaylists
-from screenManagement.models import Screen, Group
+from screenManagement.models import Screen, Group, ScreenActivationKey
 
 
 @login_required
@@ -320,7 +320,7 @@ def upsert_schedule(request):
 
 def get_screen_data(request, screen_id, last_received, nof_days=7):
     print "inside get_screen_data"
-    # TODO: Login system for screens
+    # TODO: replace screen_id with unique_device_key in Screen
     # user_details, organization = user_and_organization(request)
     screen_id = int(screen_id)
     errors = []
@@ -331,6 +331,8 @@ def get_screen_data(request, screen_id, last_received, nof_days=7):
     last_received_date = last_received_datetime.date()
     try:
         screen = Screen.objects.get(screen_id=screen_id)
+        # unique_device_key = '' # get this from url
+        # screen = ScreenActivationKey.objects.get(activation_key=unique_device_key).screen
         calendar = screen.screen_calendar
         if calendar:
             current_datetime = timezone.now()
@@ -344,7 +346,7 @@ def get_screen_data(request, screen_id, last_received, nof_days=7):
             for event in calendar_events:
                 try:
                     # Each event should have only one entry in Schedule_Screens
-                    screen_schedule = event.schedulescreens.all()[0]
+                    screen_schedule = event.schedulescreens
                     schedule_for_event = True
                 except Exception as e:
                     print "Exception is ", e
@@ -370,7 +372,7 @@ def get_screen_data(request, screen_id, last_received, nof_days=7):
                 for event in calendar_events:
                     try:
                         # Each event should have only one entry in Schedule_Screens
-                        screen_schedule = event.schedulescreens.all()[0]
+                        screen_schedule = event.schedulescreens
                         schedule_for_event = True
                     except Exception as e:
                         print "Exception is ", e

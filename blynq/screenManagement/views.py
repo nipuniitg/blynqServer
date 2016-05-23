@@ -11,9 +11,7 @@ from customLibrary.serializers import FlatJsonSerializer as json_serializer
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict
 from scheduleManagement.models import ScheduleScreens
 from screenManagement.forms import AddScreenForm, AddScreenLocation, AddScreenSpecs, AddGroup
-from screenManagement.models import Screen, ScreenStatus, ScreenSpecs, Group, GroupScreens
-
-
+from screenManagement.models import Screen, ScreenStatus, ScreenSpecs, Group, GroupScreens, ScreenActivationKey
 # import the logging library
 import logging
 
@@ -179,6 +177,74 @@ def delete_group(request):
         error = "Error while deleting the group"
         print error
         errors.append(error)
+    return ajax_response(success=success, errors=errors)
+
+
+# Replace upsert_screen with upsert_screen1 after Prasanth implements the AddScreenForm
+@login_required
+def upsert_screen1(request):
+    user_details = get_userdetails(request)
+    posted_data = string_to_dict(request.body)
+    success = False
+    errors = []
+    try:
+        screen_id = int(posted_data.get('screen_id'))
+        if screen_id == -1:
+            activation_key = posted_data.get('activation_key')
+            try:
+                screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key, in_use=False)
+                screen = Screen(screen_name=posted_data.get('screen_name'), unique_device_key=screen_activation_key,
+                                activated_by=user_details)
+                screen.save()
+                screen_activation_key.in_use = True
+                screen_activation_key.save()
+            except Exception as e:
+                print "Not a valid activation key"
+                print "Exception is ", e
+                return ajax_response(success=False, errors=['Not a valid activation key, contact support@blynq.in'])
+        else:
+            screen = Screen.objects.get(screen_id=screen_id)
+        screen.screen_size = int(posted_data.get('screen_size'))
+        screen.address=posted_data.get('address')
+        screen.aspect_ratio=posted_data.get('aspect_ratio')
+        screen.resolution=posted_data.get('resolution')
+        screen.owned_by=user_details.organization
+        status = default_screen_status()
+        screen.status=status
+        screen.save()
+        group_screen_id_list = []
+        for group in posted_data.get('groups'):
+            group_screen_id = int(group.get('group_screen_id'))
+            if group.group_screen_id == -1:
+                group_entry = Group.objects.get(group_id=int(group.get('group_id')))
+                group_screen = GroupScreens.objects.create(group=group_entry, screen=screen, created_by=user_details)
+                group_screen_id = group.group_screen_id
+                success_insert = insert_group_screen(screen=screen, group=group_entry)
+                if not success_insert:
+                    error = 'error while inserting group to screen'
+                    print error
+                    return ajax_response(success=success_insert, errors=[error])
+            group_screen_id_list.append(group_screen_id)
+
+        success_removal = remove_group_screens(screen=screen, group_screen_id_list=group_screen_id_list)
+        if not success_removal:
+            error = 'error while removing deleted groups from screen'
+            print error
+            return ajax_response(success=success_removal, errors=[error])
+
+        # Adding a calendar for each screen
+        if not screen.screen_calendar:
+            calendar = Calendar(name=screen.screen_name + str(screen.screen_id))
+            calendar.save()
+            screen.screen_calendar = calendar
+            screen.save()
+        # TODO: The above case only handles the PRIVATE businessType, add a check
+        success = True
+    except Exception as e:
+        print "Exception is ", e
+        errors = ['Error while adding the screen details to database']
+        print errors[0]
+        success = False
     return ajax_response(success=success, errors=errors)
 
 
