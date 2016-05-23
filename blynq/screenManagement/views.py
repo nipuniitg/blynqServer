@@ -236,7 +236,7 @@ def upsert_screen(request):
 
                 # Adding a calendar for each screen
                 if not screen.screen_calendar:
-                    calendar = Calendar(name=screen.screen_name)
+                    calendar = Calendar(name=screen.screen_name + str(screen.screen_id))
                     calendar.save()
                     screen.screen_calendar = calendar
                     screen.save()
