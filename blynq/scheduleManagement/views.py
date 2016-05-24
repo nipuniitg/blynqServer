@@ -10,10 +10,11 @@ from schedule.views import calendar
 
 from customLibrary.serializers import playlist_dict, schedule_dict
 from customLibrary.views_lib import get_userdetails, ajax_response, list_to_json, string_to_dict, list_to_comma_string, \
-    default_string_to_datetime, get_utc_datetime
+    default_string_to_datetime, get_utc_datetime, sort_occurrences_by_start
 from playlistManagement.models import Playlist
 from scheduleManagement.models import Schedule, ScheduleScreens, SchedulePlaylists
 from screenManagement.models import Screen, Group, ScreenActivationKey
+from screenManagement.views import debugFileLog
 
 
 @login_required
@@ -316,6 +317,66 @@ def upsert_schedule(request):
         errors.append(error)
         print errors
     return ajax_response(success=success, errors=errors)
+
+
+def occurrence_intersecting(occur1, occur2):
+    return (occur1.start <= occur2.start <= occur1.end) or (occur2.start <= occur1.start <= occur2.end)
+
+
+def screens_intersection(schedule1, schedule2):
+    schedule1_screen_ids = ScheduleScreens.objects.filter(schedule=schedule1,
+                                                       screen_id__isnull=False).values_list('screen_id', flat=True)
+    schedule2_screen_ids = ScheduleScreens.objects.filter(schedule=schedule2,
+                                                       screen_id__isnull=False).values_list('screen_id', flat=True)
+    return not set(schedule1_screen_ids).isdisjoint(set(schedule2_screen_ids))
+
+
+def conflicting_schedule_exists(request, schedule_id, check_for_days=365):
+    # check_for_days number of days to check for conflicts
+    schedule_id = int(schedule_id)
+    start = timezone.now()
+    end = start + datetime.timedelta(days=check_for_days)
+    try:
+        user_details = get_userdetails(request)
+        schedule1 = Schedule.get_user_relevant_objects(user_details=user_details).get(schedule_id=schedule_id)
+        other_schedules = Schedule.get_user_relevant_objects(user_details=user_details).exclude(schedule_id=schedule_id)
+        event1 = ScheduleScreens.objects.filter(schedule=schedule1, event__isnull=False)[0].event
+        list1 = event1.get_occurrences(start, end)
+        list1 = sort_occurrences_by_start(list1)
+        for schedule2 in other_schedules:
+            debugFileLog.info("Comparing schedules " + schedule1.schedule_title + " and " + schedule2.schedule_title)
+            iter1 = iter(list1)
+            if not screens_intersection(schedule1, schedule2):
+                debugFileLog.info(" No intersection of screens ")
+                continue
+            debugFileLog.info(" There are some common screens ")
+            debugFileLog.info("Comparing timeline of schedules")
+            event2 = ScheduleScreens.objects.filter(schedule=schedule2, event__isnull=False)[0].event
+            list2 = event2.get_occurrences(start, end)
+            list2 = sort_occurrences_by_start(list2)
+            iter2 = iter(list2)
+            try:
+                occur1 = iter1.next()
+                occur2 = iter2.next()
+                while True:
+                    if occurrence_intersecting(occur1, occur2):
+                        debugFileLog.info("Intersection of two occurrences found")
+                        return True
+                    elif occur1.start < occur2.start:
+                        occur1 = iter1.next()
+                    else:
+                        occur2 = iter2.next()
+            except StopIteration:
+                debugFileLog.debug("One of the list in event.get_occurrences ended, checking for next schedule")
+    except Exception as e:
+        print "Exception is ", e
+    return False
+
+
+def check_schedule_conflicts(request, schedule_id):
+    is_conflict = conflicting_schedule_exists(request, schedule_id=schedule_id)
+    json_data = {'is_conflict': is_conflict}
+    return list_to_json(json_data)
 
 
 def get_screen_data(request, screen_id, last_received, nof_days=7):

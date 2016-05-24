@@ -9,4 +9,5 @@ urlpatterns = [
     url(r'^addSchedule', views.add_schedule, name='add_schedule'),
     url(r'^getSchedules', views.get_schedules, name='get_schedules'),
     url(r'^deleteSchedule', views.delete_schedule, name='delete_schedule'),
+    url(r'^checkSchedule/(?P<schedule_id>\d+)', views.check_schedule_conflicts, name='check_schedule')
 ]

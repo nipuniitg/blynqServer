@@ -28,6 +28,12 @@ def get_userdetails(request):
     return user_details
 
 
+def sort_occurrences_by_start(list1):
+    # reverse=False for ascending sort
+    list1.sort(key=lambda x: x.start, reverse=False)
+    return list1
+
+
 def string_to_dict(str):
     # json_acceptable_string = str.replace("'", "\"")
     return json.loads(str)
