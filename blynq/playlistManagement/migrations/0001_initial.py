@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('playlist_id', models.AutoField(serialize=False, primary_key=True)),
                 ('playlist_title', models.CharField(max_length=100)),
-                ('playlist_total_time', models.IntegerField()),
+                ('playlist_total_time', models.IntegerField(null=True)),
                 ('created_time', models.DateTimeField(auto_now_add=True, verbose_name='created time')),
                 ('last_updated_time', models.DateTimeField(auto_now=True, verbose_name='updated time')),
                 ('created_by', models.ForeignKey(related_name='playlist_created_by', on_delete=django.db.models.deletion.SET_NULL, to='authentication.UserDetails', null=True)),

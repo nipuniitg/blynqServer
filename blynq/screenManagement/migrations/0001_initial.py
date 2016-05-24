@@ -28,6 +28,14 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='GroupScreens',
+            fields=[
+                ('group_screen_id', models.AutoField(serialize=False, primary_key=True)),
+                ('created_by', models.ForeignKey(related_name='groupscreens_created_by', on_delete=django.db.models.deletion.SET_NULL, to='authentication.UserDetails', null=True)),
+                ('group', models.ForeignKey(to='screenManagement.Group')),
+            ],
+        ),
+        migrations.CreateModel(
             name='Screen',
             fields=[
                 ('screen_id', models.AutoField(serialize=False, primary_key=True)),
@@ -41,14 +49,9 @@ class Migration(migrations.Migration):
                 ('activated_on', models.DateField(null=True, blank=True)),
                 ('business_type', models.CharField(default=b'PRIVATE', max_length=20, choices=[(b'PRIVATE', b'The screens is bought for private use.'), (b'PUBLIC-PRIVATE', b'Only one organization can display advertisement on this screen.'), (b'PUBLIC-SHARED', b'Multiple organization can display advertisement on this screen in slots.')])),
                 ('activated_by', models.ForeignKey(blank=True, to='authentication.UserDetails', null=True)),
-            ],
-        ),
-        migrations.CreateModel(
-            name='ScreenGroups',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('group', models.ForeignKey(to='screenManagement.Group')),
-                ('screen', models.ForeignKey(to='screenManagement.Screen')),
+                ('groups', models.ManyToManyField(to='screenManagement.Group', through='screenManagement.GroupScreens', blank=True)),
+                ('owned_by', models.ForeignKey(to='authentication.Organization', null=True)),
+                ('screen_calendar', models.ForeignKey(blank=True, to='schedule.Calendar', null=True)),
             ],
         ),
         migrations.CreateModel(
@@ -79,22 +82,12 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='screen',
-            name='groups',
-            field=models.ManyToManyField(to='screenManagement.Group', through='screenManagement.ScreenGroups', blank=True),
-        ),
-        migrations.AddField(
-            model_name='screen',
-            name='owned_by',
-            field=models.ForeignKey(to='authentication.Organization', null=True),
-        ),
-        migrations.AddField(
-            model_name='screen',
-            name='screen_calendar',
-            field=models.ForeignKey(blank=True, to='schedule.Calendar', null=True),
-        ),
-        migrations.AddField(
-            model_name='screen',
             name='status',
             field=models.ForeignKey(to='screenManagement.ScreenStatus', on_delete=django.db.models.deletion.PROTECT),
+        ),
+        migrations.AddField(
+            model_name='groupscreens',
+            name='screen',
+            field=models.ForeignKey(to='screenManagement.Screen'),
         ),
     ]

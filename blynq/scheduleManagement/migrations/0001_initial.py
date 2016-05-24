@@ -17,6 +17,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('schedule_id', models.AutoField(serialize=False, primary_key=True)),
                 ('schedule_title', models.CharField(max_length=100)),
+                ('is_always', models.BooleanField(default=True)),
+                ('all_day', models.BooleanField(default=True)),
+                ('recurrence_absolute', models.BooleanField(default=False)),
                 ('created_time', models.DateTimeField(auto_now_add=True, verbose_name='created time')),
                 ('last_updated_time', models.DateTimeField(auto_now=True, verbose_name='updated time')),
             ],
@@ -32,7 +35,7 @@ class Migration(migrations.Migration):
             name='ScheduleScreens',
             fields=[
                 ('schedule_screen_id', models.AutoField(serialize=False, primary_key=True)),
-                ('event', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='schedule.Event', null=True)),
+                ('event', models.ForeignKey(related_name='schedulescreens', on_delete=django.db.models.deletion.SET_NULL, to='schedule.Event', null=True)),
             ],
         ),
     ]

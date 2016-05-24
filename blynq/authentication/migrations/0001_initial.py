@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
                 ('website', models.CharField(max_length=100)),
                 ('address', models.CharField(max_length=100, null=True, blank=True)),
                 ('contact', models.CharField(max_length=12, null=True, blank=True)),
-                ('total_file_size_limit', models.BigIntegerField(default=5368709120)),
+                ('total_file_size_limit', models.BigIntegerField(default=1073741824)),
                 ('used_file_size', models.BigIntegerField(default=0)),
             ],
         ),
