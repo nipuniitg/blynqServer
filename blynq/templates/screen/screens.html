@@ -3,8 +3,7 @@
 
 {% block content%}
 <section class="wrapper">
-    <script src="{% static 'CustomScripts/ScreenManagement-ang.js' %}"></script>
-    <div class="row" ng-app="sagApp" ng-controller="screenCtrl">
+    <div class="row" ng-controller="screenCtrl">
         <!-- List of all screens -->
         <div class="col-md-6 col-fluid">
             <section class="panel panel-default">
@@ -15,7 +14,7 @@
                 </header>
                 <div class="table-responsive" style="height: 520px">
                     <table class="table  table-hover table-advanced table-striped ">
-                        <thead style="overflow-y:scroll">
+                        <thead>
                             <tr>
                             <th>Edit</th>
                             <th>Status</th>
@@ -36,7 +35,7 @@
                         </tr>
                         </thead>
                         <tbody style=" height: 230px;overflow-y: auto;width: 100%;">
-                        <tr ng-repeat="screen in screens | filter: searchScreens">
+                        <tr ng-repeat="screen in screens | filter: searchScreens" ng-click="clickedOnScreen($index)">
                             <td><a href="#" data-toggle="modal" data-target="#myModal" ng-click="editScreenDetails($index)"><i class="fa fa-pencil pointer"></i> </a></td>
                             <td><i class="fa fa-circle online"></i>{[ screen.status ]} </td>
                             <td class="fix">{[ screen.screen_name ]}</td>
@@ -62,166 +61,11 @@
         </div>
 
         <!-- List of all schedules for the selected screen -->
-        <div class="col-md-6">
-            <section class="panel panel-default">
-                <header class="panel-heading">Schedules
-                    <div class="widget-icons pull-right">
-                        <a href="#"><i class="fa fa-plus"></i>Add Schedule</a>
-                    </div>
-
-                </header>
-                <div class="panel-body" style="padding:0px;max-height: 500px;overflow-y:scroll">
-                    <div class="table-responsive" style="height:540px">
-
-                        <table class="table  table-hover table-advanced table-striped ">
-                            <thead>
-                            <tr>
-                                <th>Edit</th>
-                                <th class="fix">ScheduleId</th>
-                                <th class="fix">From</th>
-                                <th class="fix">To</th>
-                                <th class="fix">Repetitor Applied</th>
-                                <th class="fix">Playlists</th>
-                                <th class="fix">Playlist duration</th>
-                            </tr>
-                            <tr>
-                                <th></th>
-                                <th><input type="form-control" placeholder="search"></th>
-                                <th><input type="form-control" placeholder="search"></th>
-                                <th><input type="form-control" placeholder="search"></th>
-                                <th><input type="form-control" placeholder="search"></th>
-                                <th><input type="form-control" placeholder="search"></th>
-                                <th><input type="form-control" placeholder="search"></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td><a href=""><i class="fa fa-pencil"></i></a></td>
-                                <td>SCH000923958</td>
-                                <td>March 24th 5:00 PM</td>
-                                <td>March 24th 9:00 PM</td>
-                                <td>
-                                    Monthly
-                                </td>
-                                <td>
-                                    <div id="tagsinput_tagsinput" class="tagsinput " style="height: 100%;">
-                                <span class="tag">
-                                    <span> GroupName1 &nbsp;&nbsp;</span>
-                                    <a class="tagsinput-remove-link"></a>
-                                </span>
-                                        <span class="tag">
-                                    <span> Playlist 2 &nbsp;&nbsp;</span>
-                                    <a class="tagsinput-remove-link"></a>
-                                </span>
-                                        </span>
-                                        <span class="tag">
-                                    <span> Playlist 2 &nbsp;&nbsp;</span>
-                                    <a class="tagsinput-remove-link"></a>
-                                </span>
-
-                                        <div class="tagsinput-add-container" id="tagsinput_addTag1">
-                                            <div class="tagsinput-add"></div>
-                                            <input id="tagsinput_tag1" value="" data-default=""
-                                                   style="color: rgb(102, 102, 102); width: 7px;">
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>0H 5M 0S</td>
-                            </tr>
-                            <tr>
-                                <td><a href=""><i class="fa fa-pencil"></i></a></td>
-                                <td>SCH000923958</td>
-                                <td>March 24th 5:00 PM</td>
-                                <td>March 24th 9:00 PM</td>
-                                <td>
-                                    Monthly
-                                </td>
-                                <td>
-                                    <div id="tagsinput_tagsinput" class="tagsinput " style="height: 100%;">
-                                <span class="tag">
-                                    <span> GroupName1 &nbsp;&nbsp;</span>
-                                    <a class="tagsinput-remove-link"></a>
-                                </span>
-                                        <span class="tag">
-                                    <span> Playlist 2 &nbsp;&nbsp;</span>
-                                    <a class="tagsinput-remove-link"></a>
-                                </span>
-                                        <div class="tagsinput-add-container" id="tagsinput_addTag">
-                                            <div class="tagsinput-add"></div>
-                                            <input id="tagsinput_tag" value="" data-default=""
-                                                   style="color: rgb(102, 102, 102); width: 7px;">
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>0H 5M 0S</td>
-                            </tr>
-                            <tr>
-                                <td><a href=""><i class="fa fa-pencil"></i></a></td>
-                                <td>SCH000923958</td>
-                                <td>March 24th 5:00 PM</td>
-                                <td>March 24th 9:00 PM</td>
-                                <td>
-                                    Monthly
-                                </td>
-                                <td>
-                                    <div id="tagsinput_tagsinput" class="tagsinput " style="height: 100%;">
-                                <span class="tag">
-                                    <span> GroupName1 &nbsp;&nbsp;</span>
-                                    <a class="tagsinput-remove-link"></a>
-                                </span>
-                                        <span class="tag">
-                                    <span> Playlist 2 &nbsp;&nbsp;</span>
-                                    <a class="tagsinput-remove-link"></a>
-                                </span>
-                                        <div class="tagsinput-add-container" id="tagsinput_addTag">
-                                            <div class="tagsinput-add"></div>
-                                            <input id="tagsinput_tag" value="" data-default=""
-                                                   style="color: rgb(102, 102, 102); width: 7px;">
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>0H 5M 0S</td>
-                            </tr>
-                            <tr>
-                                <td><a href=""><i class="fa fa-pencil"></i></a></td>
-                                <td>SCH000923958</td>
-                                <td>March 24th 5:00 PM</td>
-                                <td>March 24th 9:00 PM</td>
-                                <td>
-                                    Monthly
-                                </td>
-                                <td>
-                                    <div id="tagsinput_tagsinput" class="tagsinput " style="height: 100%;">
-                                <span class="tag">
-                                    <span> GroupName1 &nbsp;&nbsp;</span>
-                                    <a class="tagsinput-remove-link"></a>
-                                </span>
-                                        <span class="tag">
-                                    <span> Playlist 2 &nbsp;&nbsp;</span>
-                                    <a class="tagsinput-remove-link"></a>
-                                </span>
-                                        <div class="tagsinput-add-container" id="tagsinput_addTag">
-                                            <div class="tagsinput-add"></div>
-                                            <input id="tagsinput_tag" value="" data-default=""
-                                                   style="color: rgb(102, 102, 102); width: 7px;">
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>0H 5M 0S</td>
-                            </tr>
-                            </tbody>
-                        </table>
-
-                    </div>
-
-                    <div class="well" style="text-align: center">
-                        No schedules available </br>
-                        <a href="#">Add Playlist   </a>
-                        &&
-                        <a href="#"> Schedule  </a>
-                    </div>
-                </div>
-            </section>
+        <div class="col-md-6 col-fluid">
+            <schedules-list
+                    schedules="screenSchedules"
+                    refresh-schedules-fn = "refreshScreenSchedules()">
+            </schedules-list>
         </div>
 
         <!-- Modal-Add or edit screen details -->

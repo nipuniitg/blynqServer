@@ -9,4 +9,6 @@ urlpatterns = [
     url(r'^addSchedule', views.add_schedule, name='add_schedule'),
     url(r'^getSchedules', views.get_schedules, name='get_schedules'),
     url(r'^deleteSchedule', views.delete_schedule, name='delete_schedule'),
+    url(r'^getScreenSchedulesJson/(?P<screen_id>\d+)', views.get_screen_schedules, name='get_screen_schedules'),
+    url(r'^getPlyalistSchedulesJson/(?P<playlist_id>\d+)', views.get_playlist_schedules, name='get_playlist_schedules'),
 ]
