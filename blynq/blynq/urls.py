@@ -13,7 +13,7 @@ import templateView
 
 
 urlpatterns = [
-    ,url(r'^$', auth_views.divertToLandingPage, name='landing_page')
+    url(r'^$', auth_views.divertToLandingPage, name='landing_page')
     ,url(r'^requestQuote', auth_views.request_quote, name='request_quote')
     ,url(r'^login', auth_views.login, name='login')
     ,url(r'^authentication/', include(authentication_urls))
