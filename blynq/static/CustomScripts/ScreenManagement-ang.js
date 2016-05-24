@@ -1,6 +1,6 @@
 //This file to maintain Screen and Group (SAG) management
 
-var sagApp = angular.module("sagApp",[]).config(function($interpolateProvider) {
+var sagApp = angular.module("sagApp",['sdApp']).config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('{[');
     $interpolateProvider.endSymbol(']}');
     });
@@ -88,10 +88,9 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
             method : "GET",
             url : "getSelectableGroups/" + screen_id
         }).then(function mySucces(response) {
-            var data = angular.copy(response.data);
             if(callback)
             {
-                callback(data);
+                callback(response.data);
             }
         }, function myError(response) {
             console.log(response.statusText);
@@ -113,6 +112,20 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
         });
     };
 
+    var getScreenSchedules  =   function(screen_id, callback){
+        $http({
+            method : "GET",
+            url : "/schedule/getScreenSchedulesJson/" + screen_id
+        }).then(function mySucces(response) {
+            if(callback)
+            {
+                callback(response.data);
+            }
+        }, function myError(response) {
+            console.log(response.statusText);
+        });
+    };
+
     return{
         getAllScreens : getAllScreens,
         getAllGroups : getAllGroups,
@@ -120,6 +133,7 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
         upsertGroup : upsertGroup,
         getSelectableScreens : getSelectableScreens,
         getSelectableGroups : getSelectableGroups
+        ,getScreenSchedules :   getScreenSchedules
     }
 
 }]);
@@ -284,6 +298,11 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope', 
             $scope.screens = allScreens;
         });
         $scope.isNewScreenModal = false;
+        $scope.activeScreenIndex = 0;
+    };
+
+    var setActiveScreenIndex = function(index){
+        $scope.activeScreenIndex =index;
     };
 
     var addGroupsToScreen = function(){
@@ -292,6 +311,7 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope', 
         $scope.selectableGroups = angular.copy(selectableGroups);
       });
     };
+
 
     //public functions
     //screen Details
@@ -375,5 +395,15 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope', 
     onLoad();
 
     //schedules
+    $scope.clickedOnScreen = function(index){
+        setActiveScreenIndex(index);
+        $scope.refreshScreenSchedules();
+    };
+
+    $scope.refreshScreenSchedules = function(){
+        dataAccessFactory.getScreenSchedules($scope.screens[$scope.activeScreenIndex].screen_id, function(returnData){
+            $scope.screenSchedules = returnData;
+        });
+    };
 
 }]);

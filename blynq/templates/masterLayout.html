@@ -47,6 +47,13 @@
     <!-- angular-ui-bootstrap -->
     <script src="{% static 'Libraries/angular-bootstrap/ui-bootstrap-tpls-1.3.2.js' %}"></script>
 
+    <!-- angular Custom Scripts -->
+    <script src="{% static 'CustomScripts/app.js' %}"></script>
+    <script src="{% static 'CustomScripts/ScreenManagement-ang.js' %}"></script>
+    <script src="{% static 'CustomScripts/PlaylistManagement-ang.js' %}"></script>
+    <script src="{% static 'CustomScripts/ContentManagement-ang.js' %}"></script>
+    <script src="{% static 'CustomScripts/ScheduleManagement-ang.js' %}"></script>
+    <script src="{% static 'CustomScripts/shared/confirmDirective.js' %}"></script>
 
     <![endif]-->
 </head>
@@ -173,7 +180,7 @@
     {% endif %}
 
     <!--main content start-->
-    <section id="main-content">
+    <section id="main-content" ng-app="mainApp">
         {% if user.is_authenticated %}
         {% block content %}
         {% endblock content %}

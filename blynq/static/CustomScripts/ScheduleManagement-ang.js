@@ -8,90 +8,18 @@ sdApp.config(function($httpProvider) {
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
 });
-
+////
 //schedule index material
 sdApp.controller('scheduleIndexCtrl', ['$scope','scheduleIndexFactory','$uibModal',
     function($scope,sIF, $uibModal){
 
-    var newScheduleIndex = -1;
-
-    var newScheduleTemplate = {
-        schedule_id : -1,
-        schedule_title : '',
-        schedule_screens : [],
-        schedule_groups : [],
-        schedule_playlists:[],
-        timeline:{
-            is_always   : !0
-            ,start_date  : null
-            ,end_recurring_period :null
-            ,all_day     :!0
-            ,start_time  :null
-            ,end_time    :null
-            ,frequency  :null
-            ,interval   :null
-            ,recurrence_absolute:null
-            ,byweekno   :null
-            ,byweekday  :null
-            ,bymonthday :null
-        }
-    };
-
     var onLoad = function(){
-        refreshSchedules();
+        $scope.refreshSchedules();
     };
 
-    var refreshSchedules = function(){
+    $scope.refreshSchedules = function(){
         sIF.getSchedules(function(data){
             $scope.schedules = data;
-        });
-    };
-
-    var openModalPopup = function(index){
-        var isNewSchedule = index == newScheduleIndex ? !0 : !1;
-        var modalInstance = $uibModal.open({
-          animation: true,
-          templateUrl: '/templates/scheduleManagement/schedule_details.html',
-          controller: 'scheduleDetailsCtrl',
-          size: 'lg'
-          ,backdrop: 'static' //disables modal closing by click on the backdrop.
-          ,resolve: {
-            schedule: function(){
-                if(isNewSchedule)
-                {
-                    return angular.copy(newScheduleTemplate);
-                }
-                else{
-                    return angular.copy($scope.schedules[index]);
-                }
-            }
-          }
-        });
-
-        modalInstance.result.then(function saved(){
-            refreshSchedules();
-        }, function cancelled(){
-            toastr.warning('schedule cancelled')
-        })
-    };
-
-    $scope.addSchedule= function(){
-        openModalPopup(newScheduleIndex);
-    };
-
-    $scope.editSchedule = function(index){
-        openModalPopup(index);
-    };
-
-    $scope.deleteSchedule = function(index){
-        sIF.deleteSchedule($scope.schedules[index].schedule_id, function(returnData){
-            if(returnData.success){
-                toastr.success('Deleted Schedule successfully');
-                refreshSchedules();
-            }
-            else{
-                toastr.warning('There was some error while deleting scheduling.Please refresh and try again.');
-            }
         });
     };
 
@@ -140,6 +68,93 @@ sdApp.factory('scheduleIndexFactory', ['$http', function($http){
     }
 }]);
 // end schedule index material
+
+//schedules-list
+sdApp.directive('schedulesList',['$log','scheduleIndexFactory','$uibModal',
+    function($log, sIF, $uibModal){
+    return{
+        restrict    :   'E'
+        ,scope      :   {
+            schedules : '=schedules'
+            ,refreshSchedules : '&refreshSchedulesFn'
+        }
+        ,templateUrl:   '/templates/scheduleManagement/_schedules_list.html'
+        ,link : function($scope){
+                var newScheduleIndex = -1;
+
+                var newScheduleTemplate = {
+                    schedule_id : -1,
+                    schedule_title : '',
+                    schedule_screens : [],
+                    schedule_groups : [],
+                    schedule_playlists:[],
+                    timeline:{
+                        is_always   : !0
+                        ,start_date  : null
+                        ,end_recurring_period :null
+                        ,all_day     :!0
+                        ,start_time  :null
+                        ,end_time    :null
+                        ,frequency  :null
+                        ,interval   :null
+                        ,recurrence_absolute:null
+                        ,byweekno   :null
+                        ,byweekday  :null
+                        ,bymonthday :null
+                    }
+                };
+
+                var openModalPopup = function(index){
+                    var isNewSchedule = index == newScheduleIndex ? !0 : !1;
+                    var modalInstance = $uibModal.open({
+                      animation: true,
+                      templateUrl: '/templates/scheduleManagement/schedule_details.html',
+                      controller: 'scheduleDetailsCtrl',
+                      size: 'lg'
+                      ,backdrop: 'static' //disables modal closing by click on the backdrop.
+                      ,resolve: {
+                        schedule: function(){
+                            if(isNewSchedule)
+                            {
+                                return angular.copy(newScheduleTemplate);
+                            }
+                            else{
+                                return angular.copy($scope.schedules[index]);
+                            }
+                        }
+                      }
+                    });
+
+                    modalInstance.result.then(function saved(){
+                        $scope.refreshSchedules();
+                    }, function cancelled(){
+                        toastr.warning('schedule cancelled')
+                    })
+                };
+
+                $scope.addSchedule= function(){
+                    openModalPopup(newScheduleIndex);
+                };
+
+                $scope.editSchedule = function(index){
+                    openModalPopup(index);
+                };
+
+                $scope.deleteSchedule = function(index){
+                    sIF.deleteSchedule($scope.schedules[index].schedule_id, function(returnData){
+                        if(returnData.success){
+                            toastr.success('Deleted Schedule successfully');
+                            $scope.refreshSchedules();
+                        }
+                        else{
+                            toastr.warning('There was some error while deleting scheduling.Please refresh and try again.');
+                        }
+                    });
+                };
+        }
+    }
+}]);
+// end schedules-list
 
 
 //schedule Details material
@@ -223,8 +238,6 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
 
     $scope.saveSchedule= function(){
         $log.log($scope.schedule);
-
-
         sDF.upsertScheduleDetails($scope.schedule, function(data){
             if(data.success)
             {
@@ -720,6 +733,22 @@ sdApp.directive("largerThanDate", [function() {
         }
     }
 ]);
+
+sdApp.directive("largerThanTime", [function() {
+        return {
+            require: "ngModel",
+            link: function(e, t, n, i) {
+                e.$watchGroup(["timeline.startTime", "timeline.endTime"], function(e) {
+                    var startTime = e[0] && new Date(e[0])
+                      , endTime = e[1] && new Date(e[1])
+                      , r = !(startTime && endTime && startTime >= endTime);
+                    i.$setValidity("largerThanTime", r)
+                });
+            }
+        }
+    }
+]);
+
 // end timline material
 
 //distribution list material

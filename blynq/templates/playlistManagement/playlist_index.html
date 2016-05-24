@@ -2,9 +2,7 @@
 {% load staticfiles %}
 
 {% block content%}
-<script src="{% static 'CustomScripts/PlaylistManagement-ang.js' %}"></script>
-<section class="wrapper" ng-app="plApp" ng-controller="plCtrl">
-
+<section class="wrapper" ng-controller="plCtrl">
     <div class="row">
         <!-- List of all Playlists -->
         <div class="col-md-2 col-fluid">
@@ -13,7 +11,7 @@
                     <div class="pull-left">Playlists</div>
                     <div class="widget-icons pull-right">
                         <a href="#" data-toggle="modal" data-target="#mdlUpsertPlaylistTitle"
-                           ng-click="addPlaylist()" class="wminimize"><i class="fa fa-plus"></i>AddPlyalist</a>
+                           ng-click="addPlaylist()" class="wminimize"><i class="fa fa-plus"></i>AddPlaylist</a>
                     </div>
                     <div class="clearfix"></div>
                 </div>

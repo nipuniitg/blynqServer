@@ -140,7 +140,12 @@ def upsert_schedule_groups(user_details, schedule, schedule_groups, event_dict):
                 schedule_screen_id = entry.schedule_screen_id
             else:
                 entry = ScheduleScreens.objects.get(schedule_screen_id=schedule_screen_id)
-                Event.objects.filter(id=entry.event.id).update(**event_dict)
+                if entry.event:
+                    Event.objects.filter(id=entry.event.id).update(**event_dict)
+                else:
+                    event = Event(**event_dict)
+                    event.save()
+                    entry.event = event
                 entry.save()
             schedule_screen_id_list.append(schedule_screen_id)
 

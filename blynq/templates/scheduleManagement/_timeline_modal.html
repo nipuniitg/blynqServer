@@ -39,7 +39,6 @@
                                            uib-datepicker-popup
                                            datepicker-options="popUp2dateOptions" datepicker-localdate="true"
                                            close-text="Close" larger-than-date><!-- ngIf: isOpen -->
-                                    <!--TODO: Validate for enddate to be less than start date and activate an error.-->
                                     <span class="input-group-btn">
                                         <button type="button" class="btn btn-default"
                                                 ng-click="openDatepicker('endDate')">
@@ -67,16 +66,21 @@
                         <div class="col-sm-4">
                             <label class="control-label">Start Time</label>
                             <uib-timepicker ng-model="timeline.startTime" ng-change="changed()"
-                                            hour-step="1" minute-step="15" show-meridian="true"></uib-timepicker>
+                                            hour-step="1" minute-step="15" show-meridian="true"
+                                name="startTime"></uib-timepicker>
                         </div>
                         <div class="col-sm-4">
                             <label class="control-label">End Time</label>
                             <div class="time-picker">
                                 <uib-timepicker ng-model="timeline.endTime" ng-change="changed()" hour-step="1"
-                                                minute-step="15" show-meridian="true"></uib-timepicker>
+                                                minute-step="15" show-meridian="true" larger-than-time
+                                    name="endTime"></uib-timepicker>
                             </div>
                         </div>
                     </div>
+                    <p class="text-danger" ng-show="timelineDetails.endTime.$invalid">
+                        End Time must occur after start time.
+                    </p>
                 </section>
                 <!-- end Timing Section -->
                 <!-- Recurrence Section -->

@@ -13,14 +13,15 @@
                           enctype="multipart/form-data">
 
                         <div class="form-group">
-                            <div class="control-label col-md-2">Schedule Name</div>
+                            <div class="control-label col-md-2">Schedule Name*</div>
                             <div class="col-md-10">
-                                <input name="scheduleName" class="form-control" ng-model="schedule.schedule_title">
+                                <input name="scheduleName" class="form-control"
+                                       placeholder="Schedule Title" ng-model="schedule.schedule_title">
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <div class="control-label col-md-2">Screens</div>
+                            <div class="control-label col-md-2">Screens*</div>
                             <div class="col-md-10">
                                 <distribution-list
                                 selected-screens="schedule.schedule_screens"
@@ -31,7 +32,7 @@
                         </div>
 
                         <div class="form-group">
-                            <div class="control-label col-md-2">Playlists</div>
+                            <div class="control-label col-md-2">Playlists*</div>
                             <div class="col-md-10">
                                 <playlist-textbox
                                 selected-playlists="schedule.schedule_playlists">
@@ -40,7 +41,7 @@
                         </div>
 
                         <div class="form-group">
-                            <div class="control-label col-md-2">Timeline</div>
+                            <div class="control-label col-md-2">Timeline*</div>
                                 <timeline-textbox
                                     time-defined="schedule.timeline.is_always"
                                     start-date="schedule.timeline.start_date"

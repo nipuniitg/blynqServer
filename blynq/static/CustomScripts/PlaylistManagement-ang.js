@@ -9,7 +9,7 @@ plApp.config(function($httpProvider) {
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
 });
 
-plApp.factory('dataAccessFactory',['$http','$window', function($http,$window){
+plApp.factory('plDataAccessFactory',['$http','$window', function($http,$window){
 
     var getPlaylists = function(callback){
          $http({
@@ -103,7 +103,7 @@ plApp.factory('dataAccessFactory',['$http','$window', function($http,$window){
 
 }]);
 
-plApp.factory('plFactory',['dataAccessFactory', function(dataAccessFactory)
+plApp.factory('plFactory',['plDataAccessFactory', function(dataAccessFactory)
 {
     //TODO: Refactor the below code. Get the templates from the backend.
     var playlistBluePrint = {
@@ -151,7 +151,7 @@ return{
 
 }]);
 
-plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','dataAccessFactory', function(plFactory,ctFactory, $scope, $window, dataAccessFactory){
+plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAccessFactory', function(plFactory,ctFactory, $scope, $window, dataAccessFactory){
 
     var onLoad = function(){
         //playlist
@@ -169,11 +169,11 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','dataAcce
 
         $scope.is_sortable_disabled = !0;
 
-        getPlaylists();
+        refreshPlaylists();
     };
 
     //private methods
-    var  getPlaylists = function(){
+    var  refreshPlaylists = function(){
         dataAccessFactory.getPlaylists(function(data){
             $scope.playlists = data;
             updateActivePlaylist(0);
