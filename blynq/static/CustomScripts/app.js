@@ -1,6 +1,6 @@
 (function(){
     'use strict';
-    var mainApp =  angular.module('mainApp', ['sdApp', 'plApp','sagApp']).config(function($interpolateProvider) {
+    var mainApp =  angular.module('mainApp', ['sdApp', 'plApp','sagApp','hApp']).config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('{[');
     $interpolateProvider.endSymbol(']}');
     });
