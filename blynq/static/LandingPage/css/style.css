@@ -41,7 +41,7 @@ p { line-height: 22px }
 /*header*/
 .head-section { 
     border-bottom: 1px solid #eee;
-    background-color: #11386b
+    background-color: #122846
  }
 .head-section .navbar {
     margin-bottom: 0;
@@ -61,7 +61,7 @@ p { line-height: 22px }
     margin-right: 0;
     z-index: 199;
 }
-.head-section .navbar-default { background-color: #11386b }
+.head-section .navbar-default { background-color: #122846 }
 .head-section .nav li a,
 .head-section .nav li.active ul.dropdown-menu li a {
     color: #FFF;
@@ -1255,7 +1255,7 @@ ul.tag li a {
 }
 /*footer*/
 .footer {
-    background: #11386b;
+    background: #122846;
     color: #fff;
     padding: 50px 0;
     display: inline-block;
