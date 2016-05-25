@@ -40,7 +40,7 @@
                         </div>
                         <div class="item-container-footer">
                                 <span class="pull-right">
-                                    <a ng-click="deleteContent(folder)">
+                                    <a confirm confirm-fn="deleteContent(folder)" confirm-type="delete">
                                         <i class="fa fa-trash-o pointer"></i>
                                     </a>
                                 </span>
@@ -68,8 +68,9 @@
                         </div>
                         <div class="item-container-footer">
                             <div class=>
-                                <span class="pull-right"><a ng-click="deleteContent(file)">
-                                    <i class="fa fa-trash-o pointer "></i></a></span>
+                                <span class="pull-right">
+                                    <a confirm-fn="deleteContent(file)" confirm confirm-type="delete">
+                                    <i class="fa fa-trash-o pointer"></i></a></span>
                                 <a ng-click="editTitle(file, $index, 'file')"
                                    data-toggle="modal" data-target="#mdlEditContentTitle">
                                     <i class="fa fa-pencil pointer"></i>

@@ -27,8 +27,8 @@
                         ng-class="{active: $index === activePlaylistIndex }"
                         ng-click="clickedOnPlaylist($index)">
                         {[ playlist.playlist_title ]}
-                        <i class="pull-right fa fa-trash-o pointer" ng-click="deletePlaylist($index)"
-                           data-toggle="modal"></i>
+                        <i class="pull-right fa fa-trash-o pointer" confirm-fn="deletePlaylist($index)"
+                           confirm confirm-type="delete" data-toggle="modal"></i>
                         <i class="pull-right fa fa-pencil pointer" data-target="#mdlUpsertPlaylistTitle"
                            data-toggle="modal" ng-click="editPlaylist(playlist, $index)"></i>
                     </li>
