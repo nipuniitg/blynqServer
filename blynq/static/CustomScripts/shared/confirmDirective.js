@@ -39,10 +39,20 @@ angular.module('mainApp').directive('confirm', ['$log','$uibModal', function($lo
             ,cancelFn  : '&'
         }
         ,compile : function compile(elem,attr){
-            if(!attr.modalTitle){attr.modalTitle = 'Warning'}
-            if(!attr.confirmVerbose){attr.confirmVerbose = 'Ok'}
-            if(!attr.cancelVerbose){attr.cancelVerbose = 'cancel'}
-            if(!attr.message){attr.message = 'Are you sure?'}
+            if(attr.confirmType && attr.confirmType=='delete')
+            {
+                attr.modalTitle = 'Warning';
+                attr.confirmVerbose = 'Delete';
+                attr.cancelVerbose = 'No';
+                attr.message = 'Are you sure, you want to delete?'
+            }
+            else{
+                if(!attr.modalTitle){attr.modalTitle = 'Warning'}
+                if(!attr.confirmVerbose){attr.confirmVerbose = 'Ok'}
+                if(!attr.cancelVerbose){attr.cancelVerbose = 'cancel'}
+                if(!attr.message){attr.message = 'Are you sure?'}
+            }
+
             return{
                 post : link
             }
