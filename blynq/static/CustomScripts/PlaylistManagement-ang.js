@@ -214,7 +214,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
             {
                 if($scope.mdlType == plFactory.mdlType['Add'])
                 {
-                    toastr.success('Playlist added successfully');
+                    toastr.success('Playlist added successfully. Now drag and drop content into Playlist items');
                     $scope.playlists.push(data.playlist);
                     updateActivePlaylist($scope.playlists.length-1);
                 }
