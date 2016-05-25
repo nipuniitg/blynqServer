@@ -51,9 +51,6 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
             method : "POST"
             ,url : "upsertScreen"
             ,data : screenDetails
-//            data : {
-//                screenDetailsName : screenDetailsJson
-//            }
         }).then(function mySucces(response) {
             if(callback)
             {
@@ -126,6 +123,25 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
         });
     };
 
+    var deleteGroup = function(group_id, callback){
+        var postData = {
+            group_id : group_id
+        }
+        $http({
+            method : "POST"
+            ,url : "deleteGroup"
+            ,data : postData
+        }).then(function mySucces(response) {
+            if(callback)
+            {
+                callback(response.data);
+            }
+        }, function myError(response) {
+            console.log(response.statusText);
+        });
+
+    }
+
     return{
         getAllScreens : getAllScreens,
         getAllGroups : getAllGroups,
@@ -134,6 +150,7 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
         getSelectableScreens : getSelectableScreens,
         getSelectableGroups : getSelectableGroups
         ,getScreenSchedules :   getScreenSchedules
+        ,deleteGroup : deleteGroup
     }
 
 }]);
@@ -185,7 +202,8 @@ sagApp.factory('groupsFactory',['$http','dataAccessFactory', function($http, dat
     };
 }]);
 
-sagApp.controller('groupCtrl',['groupsFactory', 'dataAccessFactory', '$scope', function(groupsFactory, dataAccessFactory, $scope){
+sagApp.controller('groupCtrl',['groupsFactory', 'dataAccessFactory', '$scope',
+function(groupsFactory, dataAccessFactory, $scope){
 
 
    var onLoad = function(){
@@ -244,6 +262,18 @@ sagApp.controller('groupCtrl',['groupsFactory', 'dataAccessFactory', '$scope', f
 
    $scope.cancelGroupDetailsEdit = function(){
         $scope.isNewGroupModal = false;
+   }
+
+   $scope.deleteGroup = function(index){
+        dataAccessFactory.deleteGroup($scope.groups[index].group_id, function(responseData){
+            if(responseData.success){
+                toastr.success('Group deleted successfully');
+                refreshGroups();
+            }
+            else{
+                toastr.warning('Oops!. There was some error while deleting group. Please refresh again and try.')
+            }
+        });
    }
 
    $scope.moveScreenToSelectable = function(screen){

@@ -27,9 +27,14 @@
                 </div>
 
                 <ul class="list-group" style="height:490px;overflow-y:scroll">
-                    <li ng-repeat="group in groups" class="list-group-item" ng-class="{active: $index === selectedIndex }" ng-click="clickedOnGroup(group, $index)">
+                    <li ng-repeat="group in groups" class="list-group-item" ng-class="{active:$index===selectedIndex}"
+                        ng-click="clickedOnGroup(group, $index)">
                         {[ group.group_name ]}
-                        <i class="pull-right fa fa-pencil pointer" data-toggle="modal" data-target="#mdl-upsertGroup" ng-click="editGroupDetails(group, $index)"></i>
+                        <i class="pull-right fa fa-trash-o" confirm confirm-type="delete"
+                           confirm-fn="deleteGroup($index)"></i>
+                        <i class="pull-right fa fa-pencil pointer" data-toggle="modal" data-target="#mdl-upsertGroup"
+                           ng-click="editGroupDetails(group, $index)"></i>
+                        <span></span>
                     </li>
 
                 </ul>

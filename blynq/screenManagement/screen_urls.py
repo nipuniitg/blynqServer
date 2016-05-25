@@ -14,4 +14,5 @@ urlpatterns = [
     url(r'^addGroup$', views.add_group, name='add_group'),
     url(r'^getSelectableScreens/(?P<group_id>-?\d+)', views.get_selectable_screens_json, name='selectable_screens_json'),
     url(r'^getSelectableGroups/(?P<screen_id>-?\d+)', views.get_selectable_groups_json, name='selectable_groups_json'),
+    url(r'^deleteGroup', views.delete_group, name='delete_group'),
 ]
