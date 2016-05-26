@@ -145,7 +145,7 @@ class FlatJsonSerializer(Serializer):
         return data
 
     def get_playlist_items(self, obj, only_files=False):
-        playlist_items = PlaylistItems.objects.filter(playlist=obj).order_by('-position_index')
+        playlist_items = PlaylistItems.objects.filter(playlist=obj).order_by('position_index')
         contents = []
         # is_folder is removed as player don't require it. If need be you remove this check and keep the is_folder,
         # as the player will anyway ignore this field
