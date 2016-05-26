@@ -1,7 +1,7 @@
 from django.db import models
 from schedule.models import Calendar
 
-from authentication.models import Organization, UserDetails, Address
+from authentication.models import Organization, UserDetails, Address, OwnerPartner
 from customLibrary.views_lib import get_userdetails
 
 
@@ -115,6 +115,7 @@ class Screen(models.Model):
     # TODO: change this location to a foreign key to authentication.Address
     #location = models.ForeignKey(Address, on_delete=models.PROTECT)
     address = models.CharField(max_length=100, blank=True)
+    city = models.CharField(max_length=100)
 
     unique_device_key = models.OneToOneField(ScreenActivationKey)
     activated_on = models.DateTimeField(auto_now_add=True)
@@ -145,4 +146,13 @@ class Screen(models.Model):
 
     @staticmethod
     def get_user_relevant_objects(user_details):
-        return Screen.objects.filter(owned_by=user_details.organization)
+        try:
+            if user_details.organization.organization_type == 'OWNER':
+                return Screen.objects.filter(owned_by=user_details.organization)
+            elif user_details.organization.organization_type == 'CONTENT_PARTNER':
+                owner_ids = OwnerPartner.objects.filter(partner=user_details.organization).values_list('owner_id',
+                                                                                                       flat=True)
+                return Screen.objects.filter(owned_by_id__in=owner_ids)
+        except Exception as e:
+            print "Exception is ", e
+        return []

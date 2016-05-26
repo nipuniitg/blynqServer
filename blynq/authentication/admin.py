@@ -1,4 +1,4 @@
-from authentication.models import Role, Organization, UserDetails
+from authentication.models import Role, Organization, UserDetails, OwnerPartner
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
@@ -32,3 +32,5 @@ class RoleAdmin(VersionAdmin):
 
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(Role)
+
+admin.site.register(OwnerPartner)

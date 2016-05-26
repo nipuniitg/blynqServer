@@ -1,10 +1,12 @@
 import datetime
+import copy
 
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from schedule.models import Event, Rule
+
 # Create your views here.
 from schedule.views import calendar
 
@@ -379,7 +381,298 @@ def check_schedule_conflicts(request, schedule_id):
     return list_to_json(json_data)
 
 
+def update_occurrences(new_schedule, exclusive_occurrences):
+    last_update_time = 'last_updated_time'
+    start_time = 'start_time'
+    end_time = 'end_time'
+    schedule = 'schedule'
+    generated_schedules = []
+    for cur_occur in exclusive_occurrences:
+        if new_schedule[start_time] < cur_occur[start_time]:
+            if new_schedule[end_time] < cur_occur[start_time]:
+                # new_schedule finishes before current occurrence, do nothing
+                continue
+            elif new_schedule[end_time] < cur_occur[end_time]:
+                # new_schedules end time is in-between current occurrence
+                new_schedule[end_time] = cur_occur[start_time]
+            else:
+                # new schedule is a superset of current occurrence
+                extra_schedule = {schedule: new_schedule[schedule], start_time: cur_occur[end_time],
+                                  end_time: new_schedule[end_time], last_update_time: new_schedule[last_update_time]}
+                generated_schedules.append(extra_schedule)
+                new_schedule[end_time] = cur_occur[start_time]
+        elif new_schedule[end_time] < cur_occur[end_time]:
+            # new_schedule lies inside current occurrence, do nothing
+            continue
+        else:
+            new_schedule[start_time] = cur_occur[end_time]
+    exclusive_occurrences.append(new_schedule)
+    for new_schedule in generated_schedules:
+        exclusive_occurrences = update_occurrences(new_schedule, exclusive_occurrences)
+    return exclusive_occurrences
+
+
+# dict_format = {'schedule': schedule, 'start_time': each_occur.start, 'end_time': each_occur.end,
+#                                            'last_updated_time': schedule.last_updated_time}
+def make_occurrences_mutually_exclusive(schedules):
+    # latest updated item takes priority, so use last_updated_time
+    sorted_schedules = sorted(schedules, key=lambda k: k['last_updated_time'], reverse=True)
+    exclusive_occurrences = []
+    for new_schedule in sorted_schedules:
+        exclusive_occurrences = update_occurrences(new_schedule, exclusive_occurrences)
+    return exclusive_occurrences
+
+
+def generate_playlists_json(schedule):
+    # TODO: optimize this
+    playlists_json = []
+    playlists = schedule.playlists.all()
+    for playlist in playlists:
+        single_playlist = playlist_dict(playlist, only_files=True)
+        playlists_json.append(single_playlist)
+    return playlists_json
+
+
+# dict_format = {'schedule': schedule, 'start_time': each_occur.start, 'end_time': each_occur.end,
+#                                            'last_updated_time': schedule.last_updated_time}
+def generate_campaign_dict(schedule_occurrence):
+    schedule = schedule_occurrence['schedule']
+    start_time = schedule_occurrence['start_time']
+    end_time = schedule_occurrence['end_time']
+    campaign_dict = { 'schedule_id': schedule.schedule_id,
+                      'playlists': generate_playlists_json(schedule),
+                      'last_updated_time': schedule.last_updated_time, 'start_time': start_time, 'end_time': end_time }
+    return campaign_dict
+
+
+def merge_partner_playlists(screen_data_json, single_partner_schedules):
+    start_time = 'start_time'
+    end_time = 'end_time'
+    playlists = 'playlists'
+    merged_dicts = []
+    for schedule_occurrence in single_partner_schedules:
+        new_schedule_dict = generate_campaign_dict(schedule_occurrence)
+        screen_data_json = sorted(screen_data_json, key=lambda k: k['start_time'], reverse=False)
+        for campaign_dict in screen_data_json:
+            # Compare start_time and end_time of schedule_occurrence and campaign_dict
+            cur_occur = campaign_dict
+            if new_schedule_dict[start_time] < cur_occur[start_time]:
+                if new_schedule_dict[end_time] <= cur_occur[start_time]:
+                    # new_schedule_dict finishes before current occurrence, do nothing - case 1, 13
+                    break
+                elif new_schedule_dict[end_time] < cur_occur[end_time]:
+                    # new_schedules end time is in-between current occurrence - case 2
+                    merged_dict = copy.deepcopy(cur_occur)
+                    merged_dict[playlists] = merged_dict[playlists] + new_schedule_dict[playlists]
+                    merged_dict[start_time] = cur_occur[start_time]
+                    merged_dict[end_time] = new_schedule_dict[end_time]
+                    merged_dicts.append(merged_dict)
+                    cur_occur[start_time] = merged_dict[end_time]
+                    new_schedule_dict[end_time] = merged_dict[start_time]
+                    break
+                elif new_schedule_dict[end_time] == cur_occur[end_time]:
+                    # new schedule end time is equal to current occurrence end time - case 3
+                    cur_occur[playlists] = cur_occur[playlists] + new_schedule_dict[playlists]
+                    new_schedule_dict[end_time] = cur_occur[start_time]
+                else:
+                    # new schedule is a superset of current occurrence - case 4
+                    new_dict = copy.deepcopy(new_schedule_dict)
+                    new_dict[end_time] = cur_occur[start_time]
+                    merged_dicts.append(new_dict)
+                    cur_occur[playlists] = cur_occur[playlists] + new_schedule_dict[playlists]
+                    new_schedule_dict[start_time] = cur_occur[end_time]
+            elif new_schedule_dict[start_time] == cur_occur[start_time]:
+                if new_schedule_dict[end_time] < cur_occur[end_time]:
+                    # Both start at the same time and new_schedule_dict ends first - case 5
+                    merged_dict = copy.deepcopy(cur_occur)
+                    merged_dict[end_time] = new_schedule_dict[end_time]
+                    merged_dict[playlists] = cur_occur[playlists] + new_schedule_dict[playlists]
+                    new_schedule_dict = merged_dict
+                    cur_occur[start_time] = merged_dict[end_time]
+                    break
+                elif new_schedule_dict[end_time] == cur_occur[end_time]:
+                    # Both start and end at the same time - case 6
+                    cur_occur[playlists] = cur_occur[playlists] + new_schedule_dict[playlists]
+                    new_schedule_dict = None
+                    break
+                else:
+                    # Both start at the same time and current occurrence ends first - case 7
+                    cur_occur[playlists] = cur_occur[playlists] + new_schedule_dict[playlists]
+                    new_schedule_dict[start_time] = cur_occur[end_time]
+            else:
+                if new_schedule_dict[start_time] >= cur_occur[end_time]:
+                    # new_schedule_dict lies after current occurrence is done - case 8,9
+                    # new_schedule_dict start time is greater than or equal to current occurrence end time
+                    continue
+                elif new_schedule_dict[end_time] < cur_occur[end_time]:
+                    # new_schedule_dict lies inside current occurrence - case 10
+                    new_dict = copy.deepcopy(cur_occur)
+                    new_dict[end_time] = new_schedule_dict[start_time]
+                    merged_dicts.append(new_dict)
+                    merged_dict = copy.deepcopy(cur_occur)
+                    merged_dict[playlists] = merged_dict[playlists] + new_schedule_dict[playlists]
+                    merged_dict[start_time] = new_schedule_dict[start_time]
+                    merged_dict[end_time] = new_schedule_dict[end_time]
+                    new_schedule_dict = merged_dict
+                    cur_occur[start_time] = merged_dict[end_time]
+                    break
+                elif new_schedule_dict[end_time] == cur_occur[end_time]:
+                    # both new schedule and current occurrence end at the same time - case 11
+                    merged_dict = copy.deepcopy(cur_occur)
+                    merged_dict[start_time] = new_schedule_dict[start_time]
+                    merged_dict[playlists] = merged_dict[playlists] + new_schedule_dict[playlists]
+                    new_schedule_dict = merged_dict
+                    cur_occur[end_time] = merged_dict[start_time]
+                    break
+                else:
+                    # start_time of new_schedule dict lies between current occurrence and
+                    # end_time of current occurrence lies between new_schedule_dict - case 12
+                    merged_dict = copy.deepcopy(cur_occur)
+                    merged_dict[start_time] = new_schedule_dict[start_time]
+                    merged_dict[end_time] = cur_occur[end_time]
+                    merged_dict[playlists] = merged_dict[playlists] + new_schedule_dict[playlists]
+                    merged_dicts.append(merged_dict)
+                    new_schedule_dict[start_time] = merged_dict[end_time]
+                    cur_occur[end_time] = merged_dict[start_time]
+        if new_schedule_dict:
+            screen_data_json.append(new_schedule_dict)
+    for merged_dict in merged_dicts:
+        screen_data_json.append(merged_dict)
+    return screen_data_json
+
+
+# return format of each element in screen_data_json
+# campaign_dict = {'schedule_id': screen_schedule.schedule.schedule_id,
+#                                          'playlists': playlists_json,
+#                                          'last_updated_time': schedule.last_updated_time,
+#                                          'start_time': each_occur.start,
+#                                          'end_time': each_occur.end}
+def merge_owner_partner_schedules(owner_schedules, per_partner_schedules):
+    screen_data_json = []
+    start_time = 'start_time'
+    end_time = 'end_time'
+    schedule = 'schedule'
+    owner_sorted = sorted(owner_schedules, key=lambda k: k[start_time], reverse=False)
+    per_partner_sorted = {}
+    for organization in per_partner_schedules:
+        per_partner_sorted[organization] = sorted(per_partner_schedules[organization], key=lambda k: k[start_time],
+                                                  reverse=False)
+
+    for schedule_occurence in owner_sorted:
+        campaign_dict = generate_campaign_dict(schedule_occurence)
+        screen_data_json.append(campaign_dict)
+
+    print screen_data_json
+    for organization in per_partner_sorted:
+        single_partner_schedules = per_partner_sorted[organization]
+        screen_data_json = merge_partner_playlists(screen_data_json, single_partner_schedules)
+    screen_data_json = sorted(screen_data_json, key=lambda k: k['last_updated_time'], reverse=False)
+    return screen_data_json
+
+
 def get_screen_data(request, screen_id, last_received, nof_days=7):
+    print "inside get_screen_data"
+    # TODO: replace screen_id with unique_device_key in Screen
+    # user_details, organization = user_and_organization(request)
+    screen_id = int(screen_id)
+    errors = []
+    screen_data_json = []
+    success = False
+    is_modified = False
+    last_received_datetime = default_string_to_datetime(last_received)
+    last_received_date = last_received_datetime.date()
+    try:
+        screen = Screen.objects.get(screen_id=screen_id)
+        # unique_device_key = '' # get this from url
+        # screen = ScreenActivationKey.objects.get(activation_key=unique_device_key).screen
+        calendar = screen.screen_calendar
+        if calendar:
+            current_datetime = timezone.now()
+            calendar_events = calendar.events.exclude(end_recurring_period__lt=current_datetime)
+            start_time = current_datetime.replace(hour=0, minute=0, second=0)
+            time_diff = datetime.timedelta(days=nof_days)
+            end_time = start_time + time_diff
+            if not calendar_events:
+                is_modified = True
+            schedule_for_event = False
+            for event in calendar_events:
+                try:
+                    # Each event should have only one entry in Schedule_Screens
+                    screen_schedule = event.schedulescreens
+                    schedule_for_event = True
+                except Exception as e:
+                    print "Exception is ", e
+                    print 'Event does not exist in the schedule screens'
+                    continue
+                schedule = screen_schedule.schedule
+                if schedule.last_updated_time > last_received_datetime:
+                    is_modified = True
+                    break
+                elif last_received_date == current_datetime.date():
+                    is_modified = False
+                else:
+                    next_day_after_week = last_received_datetime.replace(hour=0, minute=0, second=0) + \
+                                          datetime.timedelta(days=nof_days)
+                    # The player keeps the data of nof_days=7, so if there is no change in the schedules after the
+                    # last_received_datetime and no occurences on the 8th day
+                    occurrences = event.get_occurrences(next_day_after_week, end_time)
+                    if occurrences:
+                        is_modified = True
+                        break
+            owner_schedules = []
+            partner_schedules = {} # dictionary keyed by organization
+            completed_schedule_ids = []
+            if is_modified:
+                for event in calendar_events:
+                    try:
+                        # Each event should have only one entry in Schedule_Screens
+                        screen_schedule = event.schedulescreens
+                    except Exception as e:
+                        print "Exception is ", e
+                        print 'Event does not exist in the schedule screens'
+                        continue
+                    schedule = screen_schedule.schedule
+                    if (not schedule) or schedule.schedule_id in completed_schedule_ids:
+                        continue
+                    else:
+                        completed_schedule_ids.append(schedule.schedule_id)
+                        occurrences = event.get_occurrences(start_time, end_time)
+                        if not occurrences:
+                            continue
+                        for each_occur in occurrences:
+                            dict_format = {'schedule': schedule, 'start_time': each_occur.start,
+                                           'end_time': each_occur.end,
+                                           'last_updated_time': schedule.last_updated_time}
+                            if schedule.organization.organization_type == 'OWNER':
+                                owner_schedules.append(dict_format)
+                            elif schedule.organization.organization_type == 'CONTENT_PARTNER':
+                                if schedule.organization not in partner_schedules.keys():
+                                    partner_schedules[schedule.organization] = []
+                                partner_schedules[schedule.organization].append(dict_format)
+                            else:
+                                raise NotImplementedError
+                owner_schedules = make_occurrences_mutually_exclusive(owner_schedules)
+                per_partner_schedules = {}
+                for organization in partner_schedules:
+                    partner_org_schedule = make_occurrences_mutually_exclusive(partner_schedules[organization])
+                    per_partner_schedules[organization] = partner_org_schedule
+                screen_data_json = merge_owner_partner_schedules(owner_schedules, per_partner_schedules)
+            if not schedule_for_event:
+                is_modified = True
+        else:
+            is_modified = True
+        campaigns_json = {'campaigns': screen_data_json, 'is_modified': is_modified}
+        success = True
+        return list_to_json(campaigns_json)
+    except Exception as e:
+        print "Exception is ", e
+        error = "Error while fetching the occurences or invalid screen identifier"
+        errors.append(error)
+        print error
+    return ajax_response(success=success, errors=errors)
+
+
+def get_screen_data_old(request, screen_id, last_received, nof_days=7):
     print "inside get_screen_data"
     # TODO: replace screen_id with unique_device_key in Screen
     # user_details, organization = user_and_organization(request)

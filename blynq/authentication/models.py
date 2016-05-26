@@ -42,6 +42,16 @@ class Address(models.Model):
         unique_together = (('building_name', 'added_by'))
 
 
+class OwnerPartner(models.Model):
+    owner = models.ForeignKey('Organization', on_delete=models.CASCADE, related_name='owner')
+    partner = models.ForeignKey('Organization', on_delete=models.CASCADE, related_name='partner')
+    playlist_max_time = models.IntegerField(help_text="Max playlist time in seconds allocated to the partner")
+    partner_position_index = models.IntegerField()
+
+    def __unicode__(self):
+        return 'owner: ' + self.owner.name + ' ,partner: ' + self.partner.name
+
+
 '''
 One organization should be Blynq
 '''
@@ -56,6 +66,14 @@ class Organization(models.Model):
     contact = models.CharField(max_length=12, blank=True, null=True)
     total_file_size_limit = models.BigIntegerField(default=STORAGE_LIMIT_PER_ORGANIZATION)
     used_file_size = models.BigIntegerField(default=0)
+    ORGANIZATION_TYPE_CHOICES = (
+        ('OWNER', 'Owner of the Screens'),
+        ('CONTENT_PARTNER', 'Content partner'),
+        ('ADVERTISER', 'Advertiser'),
+    )
+    organization_type = models.CharField(max_length=50, choices=ORGANIZATION_TYPE_CHOICES,
+                                         default=ORGANIZATION_TYPE_CHOICES[0][0])
+    partners = models.ManyToManyField('self', through='OwnerPartner', symmetrical=False)
 
     def __unicode__(self):
         return self.name
