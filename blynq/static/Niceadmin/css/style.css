@@ -1094,11 +1094,11 @@ div[data-role="editor-toolbar"] {
   border-right:1px solid #e6e6e6 ;
   margin-right : 5px;
 }
-.panel .panel-heading ul li {
+/*.panel .panel-heading ul li {
   border-top:1px solid #e6e6e6 ;
   border-left:1px solid #e6e6e6 ;
   border-right:1px solid #e6e6e6 ;
-}
+}*/
 .panel .panel-heading h2 {
   height: 100%;
   width: auto;

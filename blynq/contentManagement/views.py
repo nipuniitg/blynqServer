@@ -216,24 +216,27 @@ def update_content_title(request):
 @login_required
 def move_content(request):
     user_details = get_userdetails(request)
-    success = False
+    success = True
     errors = []
     posted_data = string_to_dict(request.body)
-    content_id = int(posted_data.get('content_id'))
+    content_ids = posted_data.get('content_ids')
     parent_folder_id = int(posted_data.get('parent_folder_id'))
     user_content = Content.get_user_relevant_objects(user_details=user_details)
     try:
-        content = user_content.get(content_id=content_id)
+        parent_folder = user_content.get(content_id=parent_folder_id)
+        # assert parent_folder.is_folder == True
+    except Content.DoesNotExist:
+        success = False
+        error = 'You dont have permission to move the selected content. ' \
+                'Please refresh and try again if you think, you should have permission'
+        return ajax_response(success=success, errors= errors)
+    for content_id in content_ids:
         try:
-            parent_folder = user_content.get(content_id=parent_folder_id)
-            # assert parent_folder.is_folder == True
+            content = user_content.get(content_id=content_id)
             content.parent_folder = parent_folder
             content.save()
-            success=True
         except Content.DoesNotExist:
-            error = 'You dont have permission to move the selected content. ' \
-                'Please refresh and try again if you think, you should have permission'
-    except Content.DoesNotExist:
-        error = 'Error occured while moving the items. please refresh and try again.'
+            success = False
+            error = 'Error occured while moving the items. please refresh and try again.'
     return ajax_response(success=success, errors= errors)
 

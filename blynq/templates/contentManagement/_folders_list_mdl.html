@@ -1,0 +1,45 @@
+<div>
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()" aria-hidden="true"><i class="fa fa-times"></i></button>
+        <h3 class="modal-title">Available Folders</h3>
+    </div>
+    <div class="modal-body">
+        <!-- Folder Path -->
+        <div class="row">
+            <div class="col-md-12">
+                <ol class="breadcrumb">
+                    <li ng-repeat="folder in folderPath" ng-click="navigateToFolder(folder.content_id)">
+                        <a href="">
+                            <i class="fa" ng-class="{'fa-folder-open' : $last, 'fa-folder': !$last}"></i>
+                            {[ folder.title ]}
+                        </a>
+                    </li>
+                </ol>
+            </div>
+        </div>
+        <!-- Folders List -->
+        <div class="row">
+            <div>
+                <ul class="list-group">
+                    <li class="list-group-item" ng-repeat="folder in folders"
+                        ng-click="navigateToFolder(folder.content_id)">
+                        {[ folder.title]}
+                        <span class="pull-right" >
+                            <i class="fa fa-caret-right"></i>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-success btn-fixed-width" ng-click="moveHere()"
+                ng-disabled="">Move Here
+            <i class="fa fa-white fa-check icon-right"></i>
+        </button>
+        <button type="button" class="btn btn-default btn-fixed-width" ng-click="cancel()">
+            Cancel <i class="fa fa-times icon-right"></i>
+        </button>
+    </div>
+</div>

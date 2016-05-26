@@ -1,4 +1,4 @@
-var plApp = angular.module("plApp",['as.sortable']).config(function($interpolateProvider) {
+var plApp = angular.module("plApp",['as.sortable','ui.bootstrap']).config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('{[');
     $interpolateProvider.endSymbol(']}');
     });

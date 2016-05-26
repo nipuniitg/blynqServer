@@ -1,0 +1,8 @@
+<div>
+    <!-- Based on the type of file, implement that viewer-->
+    <div ng-if="file.file_type=='pdf'">
+        <img ng-src="file.url">
+    </div>
+    <!--default-->
+    <img ng-src="{[file.url]}">
+</div>

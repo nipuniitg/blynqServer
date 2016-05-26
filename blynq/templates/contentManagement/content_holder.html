@@ -19,6 +19,17 @@
             <div class="panel panel-default" style="border-right:1px solid grey">
                 <div class="panel-heading">
                     Content
+                    <div class="btn-group pull-right" style="margin-left:5px;" uib-dropdown is-open="status.isopen">
+                        <button id="single-button" type="button" class="btn btn-danger" uib-dropdown-toggle
+                                ng-disabled="disabled">
+                            Action<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+                            <li role="menuitem"><a ng-click="moveContent()">Move to folder</a></li>
+                            <li class="divider"></li>
+                            <li role="menuitem"><a href="#">Delete</a></li>
+                        </ul>
+                    </div>
                     <button class="btn  btn-primary pull-right" style="margin-left:5px;" data-toggle="modal"
                             data-target="#mdlUploadContent">Upload
                     </button>
@@ -28,11 +39,15 @@
                 </div>
                 <div class="panel-body">
                     <!-- Folders -->
-                    <div content-droppable class="item-container-wrap" ng-repeat="folder in folders" data-index="{[$index]}">
+                    <div content-droppable class="item-container-wrap" ng-repeat="folder in folders"
+                         data-index="{[$index]}">
                         <div class="div-draggable-wrap" draggable data-index="{[$index]}"
                              data-isFolder="{[folder.is_folder]}">
                             <div class="item-container-header">
-                                <p>{[ folder.title ]}</p>
+                                {[ folder.title ]}
+                                    <input type="checkbox" class=" pull-right" value="None" name="check"
+                                    ng-checked="checkedFolders.indexOf(index) > -1"
+                                    ng-click="toggleCheck('folder', $index)"/>
                             </div>
                             <div class="folder-container" ng-click="navigateToFolder(folder.content_id)">
                                 <img src="{% static 'images/folder-icon.png' %}">
@@ -57,8 +72,11 @@
                              data-isfolder="{[file.is_folder]}">
                             <div class="item-container-header">
                                 {[ file.title ]}
+                                <input class="pull-right" type="checkbox"
+                                    ng-checked="checkedFolders.indexOf(index) > -1"
+                                    ng-click="toggleCheck('file', $index)"/>
                             </div>
-                            <div class="item-container">
+                            <div class="item-container" ng-click="viewContentInDetail(file)">
                                 <img ng-src="{[ file.url ]}">
                                 <!--TODO CREATE DIVS BASED ON CONTENT TYPE-->
                                 <!--<video controls>
@@ -70,7 +88,7 @@
                             <div class=>
                                 <span class="pull-right">
                                     <a confirm-fn="deleteContent(file)" confirm confirm-type="delete">
-                                    <i class="fa fa-trash-o pointer"></i></a></span>
+                                        <i class="fa fa-trash-o pointer"></i></a></span>
                                 <a ng-click="editTitle(file, $index, 'file')"
                                    data-toggle="modal" data-target="#mdlEditContentTitle">
                                     <i class="fa fa-pencil pointer"></i>

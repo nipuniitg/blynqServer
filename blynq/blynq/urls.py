@@ -26,7 +26,8 @@ urlpatterns = [
     #,url(r'^home/', screen_views.routeToHome, name='homepage'),
     ,url(r'^admin/', include(admin.site.urls))
     ,url(r'^templates/scheduleManagement/(?P<template_name>[\w-]+)',auth_views.getPartailtemplate)
-    ,url(r'^templates/shared/(?P<template_name>[\w-]+)',templateView.getSharedPartailtemplate)
+    ,url(r'^templates/shared/(?P<template_name>[\w-]+)',templateView.get_shared_partail_templates)
+    ,url(r'^templates/contentManagement/(?P<template_name>[\w-]+)', templateView.get_content_partial_templates)
 
 ]
 
