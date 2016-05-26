@@ -13,7 +13,7 @@
             </ol>
         </div>
     </div>
-    <!-- Contents -->
+    <!-- Content Library -->
     <div class="row">
         <div class="col-md-12" style="min-height:400px; overflow-y: scroll">
             <div class="panel panel-default" style="border-right:1px solid grey">
@@ -30,8 +30,10 @@
                             <li role="menuitem"><a href="#">Delete</a></li>
                         </ul>
                     </div>
-                    <button class="btn  btn-primary pull-right" style="margin-left:5px;" data-toggle="modal"
-                            data-target="#mdlUploadContent">Upload
+                    <!--<button class="btn  btn-primary pull-right" style="margin-left:5px;" data-toggle="modal"-->
+                            <!--data-target="#mdlUploadContent">Upload-->
+                    <!--</button>-->
+                    <button class="btn  btn-primary pull-right" style="margin-left:5px;" ng-click="upload()">Upload
                     </button>
                     <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#mdlCreateFolder">Create
                         Folder
@@ -102,8 +104,6 @@
         </div>
     </div>
 
-    <!-- Modal-upload content -->
-    {% include "contentManagement/_contentUploadForm.html" %}
 
     <!-- Modal-create folder -->
     {% include "contentManagement/_createFolderForm.html" %}

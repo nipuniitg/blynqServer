@@ -53,26 +53,6 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
             });
     };
 
-    var uploadContent = function(file, currentFolderId, newContentObj, callback){
-        var fd = new FormData();
-        fd.append('file', file);
-        fd.append('title', newContentObj.title);
-        fd.append('currentFolderId', currentFolderId);
-        uploadUrl ='/content/uploadContent'
-        $http.post(uploadUrl, fd, {
-            transformRequest: angular.identity,
-            headers: {'Content-Type': undefined}
-        }).then(function mySuccess(response){
-                var returnData = response.data;
-                if(callback)
-                {
-                    callback(returnData);
-                }
-            }, function myError(response) {
-                console.log(response.statusText);
-            });
-    };
-
     var createFolder = function(currentFolderId, mdlObj, callback){
         postData ={};
         postData.currentFolderId = currentFolderId;
@@ -146,7 +126,6 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
         deleteContent : deleteContent
         ,getFiles : getFilesJson
         ,getFolders : getFoldersJson
-        ,uploadContent : uploadContent
         ,createFolder : createFolder
         ,updateContentTitle : updateContentTitle
         ,getFolderPath : getFolderPath
@@ -234,8 +213,6 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
         });
     };
 
-
-
     //public or Scope releated functions
     $scope.deleteContent = function(content){
         ctDataAccessFactory.deleteContent(content,  function(data){
@@ -246,21 +223,6 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
             }
             else{
                 toastr.warning("Oops!!There was some error. Please try later.");
-            }
-        });
-    }
-
-    $scope.upload = function(){
-        var file = $scope.myFile;
-        console.log('file is ' );
-        console.dir(file);
-        ctDataAccessFactory.uploadContent(file, $scope.currentFolderId, $scope.mdlNewFileDetailsObj, function(data){
-            if(data.success){
-                $scope.refreshContent($scope.currentFolderId);
-                toastr.success('Upload successful');
-            }
-            else{
-                toastr.warning('Upload failed. Please try after some time.');
             }
         });
     }
@@ -349,7 +311,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
         }
     }
 
-    $scope.moveContent = function(){
+$scope.moveContent = function(){
         if($scope.checkedFolders.length > 0 || $scope.checkedContent.length >0)
         {
             var content_ids =[];
@@ -363,7 +325,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
             }
             var modalInstance = $uibModal.open({
               animation: true
-              ,templateUrl: '/templates/contentManagement/_folders_list_mdl.html'
+              ,templateUrl: '/templates/contentManagement/_move_content_mdl.html'
               ,controller: 'mdlContentMoveCtrl'
               ,size: 'lg'
               ,backdrop: 'static' //disables modal closing by click on the backdrop.
@@ -376,8 +338,14 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
 
             modalInstance.result.then(function moveTo(newParentId){
                 ctDataAccessFactory.moveContent(content_ids, newParentId, function(returnData){
-                    toastr.success('Content Moved Successfully.');
-                    $scope.refreshContent($scope.currentFolderId);
+                    if(returnData.success){
+                        toastr.success('Content Moved Successfully.');
+                        $scope.refreshContent($scope.currentFolderId);
+                    }
+                    else{
+                        toastr.warning('Oops! Some error occured while moving. Please try again later.')
+                    }
+
                 });
             }, function cancelled(){
                 toastr.warning('Move cancelled')
@@ -394,7 +362,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
         var modalInstance = $uibModal.open({
               animation: true
               ,templateUrl: '/templates/contentManagement/_content_view_mdl.html'
-              ,controller: 'contentInDetailMdlCtrl'
+              ,controller: 'mdlContentInDetailCtrl'
               ,size: 'lg'
               //,backdrop: 'static' //disables modal closing by click on the backdrop.
               ,resolve : {
@@ -408,6 +376,29 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
 
         }, function cancelled(){
 
+        });
+    }
+
+    //upload
+    $scope.upload = function(){
+        var modalInstance = $uibModal.open({
+              animation: true
+              ,templateUrl: '/templates/contentManagement/_upload_mdl.html'
+              ,controller: 'mdlUploadContentCtrl'
+              ,size: 'md'
+              ,backdrop: 'static' //disables modal closing by click on the backdrop.
+              ,resolve : {
+                    parentScopeObj : function(){
+                        return {
+                            currentFolderId : $scope.currentFolderId
+                        }
+                    }
+              }
+            });
+
+        modalInstance.result.then(function uploaded(){
+            $scope.refreshContent($scope.currentFolderId);
+        }, function cancelled(){
         });
     }
 
@@ -457,7 +448,6 @@ plApp.controller('mdlContentMoveCtrl', ['content_ids','$scope','$uibModalInstanc
             toastr.error('You are trying to move folder into itself. Please re-check');
         }
         else{
-            toastr.success('You have selected a folder to move content.');
             $uibModalInstance.close($scope.currentFolderId);
         }
     };
@@ -469,7 +459,7 @@ plApp.controller('mdlContentMoveCtrl', ['content_ids','$scope','$uibModalInstanc
     onLoad();
  }]);
 
-plApp.controller('contentInDetailMdlCtrl',['$scope','file','$uibModalInstance',
+plApp.controller('mdlContentInDetailCtrl',['$scope','file','$uibModalInstance',
  function($scope, file, $uibModalInstance){
 
     var onLoad = function(){
@@ -478,6 +468,67 @@ plApp.controller('contentInDetailMdlCtrl',['$scope','file','$uibModalInstance',
 
     onLoad();
 
+}]);
+
+plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentScopeObj','$cookies',
+ function($scope,$uibModalInstance, parentScopeObj, $cookies){
+
+    var onLoad = function(){
+        $scope.currentFolderId = parentScopeObj.currentFolderId;
+        $scope.files=[];
+        $scope.uploadProgressIndicator = 0;
+    };
+
+    $scope.uploadFiles = function(){
+        if($scope.files.length>0)
+        {
+            var formData = new FormData();
+            var filesArr = [];
+
+            for(var i in $scope.files){
+                formData.append('file'+i, $scope.files[i]);
+            }
+            formData.append('currentFolderId', $scope.currentFolderId);
+            formData.append('totalFiles', $scope.files.length);
+
+
+            // ADD LISTENERS.
+            var objXhr = new XMLHttpRequest();
+            var csrftoken = $cookies.get('csrftoken');
+            //using upload is necessary. It triggers the progress bar.
+            objXhr.upload.onprogress = updateProgress;
+            objXhr.addEventListener("load", transferComplete, false);
+
+            // SEND FILE DETAILS TO THE API.
+            objXhr.open("POST", "/content/uploadContent/");
+            objXhr.setRequestHeader("X-CSRFToken", csrftoken);
+            objXhr.send(formData);
+        }else{
+            toastr.warning('Select atleast one file');
+        }
+    }
+
+    var updateProgress = function(e){
+        if(e.lengthComputable)
+        {
+            console.log(e.loaded + ',' + e.total +','+ e.lengthComputable);
+            $scope.$apply(function(){
+                $scope.uploadProgressIndicator = (e.loaded/e.total *100);
+            });
+        }
+    };
+
+    var transferComplete = function(){
+        toastr.success('upload Complete');
+        $uibModalInstance.close();
+    };
+
+    $scope.cancel = function(){
+        $uibModalInstance.dismiss('cancel');
+        toastr.warning('upload aborted');
+    }
+
+    onLoad();
 }]);
 
 plApp.directive('draggable', function(){
@@ -572,18 +623,23 @@ plApp.directive('contentDroppable',['ctDataAccessFactory', function(ctDAF){
     }
 }]);
 
-plApp.directive('fileModel', ['$parse', function ($parse) {
-    return {
-        restrict: 'A',
-        link: function(scope, element, attrs) {
-            var model = $parse(attrs.fileModel);
-            var modelSetter = model.assign;
+//Multiple File Upload directive
+//maintains same scope
+plApp.directive('fileUploadDtv', ['$log', function($log){
+return{
+    restrict : 'A'
+    ,link : function($scope, elem, attrs){
 
-            element.bind('change', function(){
-                scope.$apply(function(){
-                    modelSetter(scope, element[0].files[0]);
+            elem.bind('change', function(){
+                $scope.files=[];
+                $scope.$apply(function () {
+
+                // STORE THE FILE OBJECT IN AN ARRAY.
+                for (var i = 0; i < elem[0].files.length; i++) {
+                    $scope.files.push(elem[0].files[i])
+                }
                 });
             });
-        }
-    };
+    }
+}
 }]);

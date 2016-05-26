@@ -25,25 +25,31 @@ def index(request):
 def upload_content(request):
     errors = []
     success = False
-    user_details = get_userdetails(request)
     try:
-        document = request.FILES['file']
+        user_details = get_userdetails(request)
         posted_data = request.POST
-        title = posted_data.get('title')
+        total_files = int(posted_data.get('totalFiles'))
         parent_folder_id = int(posted_data.get('currentFolderId'))
-        if parent_folder_id == -1:
-            parent_folder = None
-        else:
-            parent_folder = Content.objects.filter(
-                organization=user_details.organization).get(content_id=parent_folder_id)
-        Content.objects.create(title=title,
-                               document=document,
-                               uploaded_by=user_details,
-                               last_modified_by=user_details,
-                               organization=user_details.organization,
-                               parent_folder=parent_folder,
-                               is_folder=False)
+        if total_files <= 0:
+            errors = ['Error in the total files received']
+            print errors[0]
+            return ajax_response(success=success, errors=errors)
+        for i in range(total_files):
+            key = 'file' + str(i)
+            document = request.FILES[key]
+            title = os.path.splitext(document.name)[0]
+            if parent_folder_id == -1:
+                parent_folder = None
+            else:
+                parent_folder = Content.get_user_relevant_objects(user_details).get(content_id=parent_folder_id)
+                assert parent_folder.is_folder
+            content = Content(title=title, document=document, uploaded_by=user_details,
+                              last_modified_by=user_details, organization=user_details.organization,
+                              parent_folder=parent_folder, is_folder=False)
+            content.save()
         success = True
+    except AssertionError:
+        print "Parent folder id is not a folder"
     except Exception as e:
         print "Exception is ", e
         error = 'Error while uploading the file'

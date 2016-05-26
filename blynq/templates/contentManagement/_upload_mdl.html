@@ -1,0 +1,27 @@
+<!-- Modal to upload files into Cloud -->
+<div>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Upload Content</h4>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-2 control-label">File Upload</label>
+                <div class="col-sm-10">
+                    <input type="file" file-upload-dtv class="form-control" multiple>
+                </div>
+            </div>
+        </form>
+        <div class="progress progress-striped active progress-sm">
+            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="70" aria-valuemin="0"
+                 aria-valuemax="100" style="width: {[uploadProgressIndicator]}%">
+                <span class="sr-only">45% Complete</span>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="cancel()">Cancel</button>
+        <button type="button" class="btn btn-success" data-dismiss="modal" ng-click="uploadFiles()">Upload</button>
+    </div>
+</div>
