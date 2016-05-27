@@ -41,7 +41,7 @@ p { line-height: 22px }
 /*header*/
 .head-section { 
     border-bottom: 1px solid #eee;
-    background-color: #11386e
+    background-color: #122846
  }
 .head-section .navbar {
     margin-bottom: 0;
@@ -61,7 +61,7 @@ p { line-height: 22px }
     margin-right: 0;
     z-index: 199;
 }
-.head-section .navbar-default { background-color: #11386b }
+.head-section .navbar-default { background-color: #122846 }
 .head-section .nav li a,
 .head-section .nav li.active ul.dropdown-menu li a {
     color: #FFF;
@@ -140,10 +140,10 @@ ul.dropdown-menu { border: none }
     -o-transition: all .3s ease;
     transition: all .3s ease;
 }
-.head-section .navbar { min-height: 85px }
+.head-section .navbar { min-height: 70px }
 .head-section .navbar-nav > li {
-    padding-bottom: 25px;
-    padding-top: 30px;
+    padding-bottom: 10px;
+    padding-top: 20px;
 }
 .head-section ul.navbar-nav li:last-child() { margin-left: 10px !important }
 .head-section  .navbar-nav > li > a {
@@ -1255,7 +1255,7 @@ ul.tag li a {
 }
 /*footer*/
 .footer {
-    background: #34495e;
+    background: #122846;
     color: #fff;
     padding: 50px 0;
     display: inline-block;
@@ -1459,6 +1459,21 @@ ul.page-footer-list li i { padding-right: 10px }
     transition: all .3s ease;
 }
 .h-service-content a:hover { color: #16a085 }
+/* About Us*/
+#about-us{text-align: center}
+#about-us h2 {
+    margin-bottom: 65px;
+    text-transform: uppercase;
+    margin-top: 45px;
+    padding-bottom: 5px;
+    text-align: center;
+    font-size: 25px;
+}
+#about-us .au-content{
+    margin-bottom: 65px;
+    margin-top : 30px;
+    padding-bottom : 20px
+}
 /*recent work*/
 .recent h3{
     text-align: center;
@@ -1492,7 +1507,7 @@ ul.page-footer-list li i { padding-right: 10px }
 /*property*/
 .property {
     padding: 80px 0;
-    margin-bottom: 60px;
+    /*margin-bottom: 60px;*/
     background-color: #fafafa;
 }
 .bg-lg { background:#f9f9f3  }
