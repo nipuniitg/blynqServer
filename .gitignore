@@ -12,6 +12,8 @@ blynq/.idea/misc.xml
 blynq/.idea/modules.xml
 blynq/.idea/vcs.xml
 blynq/.idea/workspace.xml
+blynq/*/*.pyc
+blynq/*/*/*.pyc
 blynq/authentication/__init__.pyc
 blynq/authentication/admin.pyc
 blynq/authentication/authentication_urls.pyc
