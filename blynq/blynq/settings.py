@@ -25,7 +25,10 @@ SECRET_KEY = '1ig8fo2929x)i=c7k$z0qe#@1n())0o2rt7*45^j^td5_duj$m'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+if DEBUG:
+    ALLOWED_HOSTS = []
+else:
+    ALLOWED_HOSTS = ['http://www.blynq.in', 'www.blynq.in', 'blynq.in']
 
 
 # Application definition
