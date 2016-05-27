@@ -44,14 +44,21 @@ class Migration(migrations.Migration):
                 ('aspect_ratio', models.CharField(max_length=20, null=True, blank=True)),
                 ('resolution', models.CharField(max_length=20, null=True, blank=True)),
                 ('address', models.CharField(max_length=100, blank=True)),
-                ('device_identification_id', models.CharField(max_length=20, null=True, blank=True)),
-                ('activation_key', models.CharField(max_length=16, null=True, blank=True)),
-                ('activated_on', models.DateField(null=True, blank=True)),
+                ('activated_on', models.DateTimeField(auto_now_add=True)),
                 ('business_type', models.CharField(default=b'PRIVATE', max_length=20, choices=[(b'PRIVATE', b'The screens is bought for private use.'), (b'PUBLIC-PRIVATE', b'Only one organization can display advertisement on this screen.'), (b'PUBLIC-SHARED', b'Multiple organization can display advertisement on this screen in slots.')])),
                 ('activated_by', models.ForeignKey(blank=True, to='authentication.UserDetails', null=True)),
                 ('groups', models.ManyToManyField(to='screenManagement.Group', through='screenManagement.GroupScreens', blank=True)),
                 ('owned_by', models.ForeignKey(to='authentication.Organization', null=True)),
                 ('screen_calendar', models.ForeignKey(blank=True, to='schedule.Calendar', null=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='ScreenActivationKey',
+            fields=[
+                ('screen_activation_id', models.AutoField(serialize=False, primary_key=True)),
+                ('activation_key', models.CharField(unique=True, max_length=16)),
+                ('device_serial_num', models.CharField(unique=True, max_length=20)),
+                ('in_use', models.BooleanField(default=False)),
             ],
         ),
         migrations.CreateModel(
@@ -84,6 +91,11 @@ class Migration(migrations.Migration):
             model_name='screen',
             name='status',
             field=models.ForeignKey(to='screenManagement.ScreenStatus', on_delete=django.db.models.deletion.PROTECT),
+        ),
+        migrations.AddField(
+            model_name='screen',
+            name='unique_device_key',
+            field=models.OneToOneField(to='screenManagement.ScreenActivationKey'),
         ),
         migrations.AddField(
             model_name='groupscreens',

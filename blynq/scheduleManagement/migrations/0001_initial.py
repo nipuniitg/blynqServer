@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
             name='ScheduleScreens',
             fields=[
                 ('schedule_screen_id', models.AutoField(serialize=False, primary_key=True)),
-                ('event', models.ForeignKey(related_name='schedulescreens', on_delete=django.db.models.deletion.SET_NULL, to='schedule.Event', null=True)),
+                ('event', models.OneToOneField(related_name='schedulescreens', null=True, on_delete=django.db.models.deletion.SET_NULL, to='schedule.Event')),
             ],
         ),
     ]

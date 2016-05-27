@@ -362,7 +362,7 @@ def add_screen_location(request):
         screen_location_form = AddScreenLocation(data=request.POST)
         if screen_location_form.is_valid():
             try:
-                user_details = UserDetails.objects.get(username=request.user.username)
+                user_details = get_userdetails(request)
             except Exception as e:
                 print "Exception is ", e
                 print 'Error: username %s does not exist' % str(request.user.username)

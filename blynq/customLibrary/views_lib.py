@@ -19,7 +19,7 @@ def ajax_response(success=False, errors=[], obj_dict=None):
 
 def get_userdetails(request):
     try:
-        user_details = UserDetails.objects.get(username=request.user.username)
+        user_details = UserDetails.objects.get(user__username=request.user.username)
     except UserDetails.DoesNotExist:
         raise Http404("No UserDetails matches the given query. If you're logged in as django superuser please logout"
                       " and re-login as normal user")

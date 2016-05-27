@@ -84,7 +84,8 @@ class Role(models.Model):
         return self.role_name
 
 
-class UserDetails(User):
+class UserDetails(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     mobile_number = models.CharField(max_length=12)
     role = models.ForeignKey(Role)
@@ -93,10 +94,10 @@ class UserDetails(User):
     objects = UserManager()
 
     def __unicode__(self):
-        return self.username
+        return self.user.username
 
     def natural_key(self):
-        return self.username
+        return self.user.username
 
 
 class RequestedQuote(models.Model):
