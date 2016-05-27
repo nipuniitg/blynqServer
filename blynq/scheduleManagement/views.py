@@ -5,6 +5,8 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from schedule.models import Event, Rule
+from django.views.decorators.csrf import csrf_exempt
+
 # Create your views here.
 # from schedule.views import calendar
 
@@ -323,12 +325,13 @@ def upsert_schedule(request):
     return ajax_response(success=success, errors=errors)
 
 
+@csrf_exempt
 def device_key_active(request):
-    posted_data = string_to_dict(request.body)
-    activation_key = posted_data.get('device_key')
     success = False
     errors = []
     try:
+        posted_data = string_to_dict(request.body)
+        activation_key = posted_data.get('device_key')
         screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key, in_use=True)
         success = True
     except ScreenActivationKey.DoesNotExist:
@@ -337,7 +340,7 @@ def device_key_active(request):
     return ajax_response(success=success, errors=errors)
 
 
-
+@csrf_exempt
 def get_screen_data(request, nof_days=7):
     print "inside get_screen_data"
     # user_details, organization = user_and_organization(request)
