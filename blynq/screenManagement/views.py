@@ -180,6 +180,21 @@ def delete_group(request):
     return ajax_response(success=success, errors=errors)
 
 
+def activation_key_valid(request):
+    user_details = get_userdetails(request)
+    posted_data = string_to_dict(request.body)
+    activation_key = posted_data.get('activation_key')
+    success = False
+    errors = []
+    try:
+        screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key, in_use=False)
+        success = True
+    except ScreenActivationKey.DoesNotExist:
+        errors = ['Invalid activation key, try another or contact support']
+        success = False
+    return ajax_response(success=success, errors=errors)
+
+
 # Replace upsert_screen with upsert_screen1 after Prasanth implements the AddScreenForm
 @login_required
 def upsert_screen1(request):

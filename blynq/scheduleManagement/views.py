@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from schedule.models import Event, Rule
 # Create your views here.
-from schedule.views import calendar
+# from schedule.views import calendar
 
 from customLibrary.serializers import playlist_dict, schedule_dict
 from customLibrary.views_lib import get_userdetails, ajax_response, list_to_json, string_to_dict, list_to_comma_string, \
@@ -323,21 +323,36 @@ def upsert_schedule(request):
     return ajax_response(success=success, errors=errors)
 
 
-def get_screen_data(request, screen_id, last_received, nof_days=7):
+def device_key_active(request):
+    posted_data = string_to_dict(request.body)
+    activation_key = posted_data.get('device_key')
+    success = False
+    errors = []
+    try:
+        screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key, in_use=True)
+        success = True
+    except ScreenActivationKey.DoesNotExist:
+        errors = ['Invalid activation key, try another or contact support']
+        success = False
+    return ajax_response(success=success, errors=errors)
+
+
+
+def get_screen_data(request, nof_days=7):
     print "inside get_screen_data"
-    # TODO: replace screen_id with unique_device_key in Screen
     # user_details, organization = user_and_organization(request)
-    screen_id = int(screen_id)
     errors = []
     screen_data_json = []
     success = False
     is_modified = False
+    posted_data = string_to_dict(request.body)
+    last_received = posted_data.get('last_received')
+    unique_device_key = posted_data.get('device_key')
     last_received_datetime = default_string_to_datetime(last_received)
     last_received_date = last_received_datetime.date()
     try:
-        screen = Screen.objects.get(screen_id=screen_id)
-        # unique_device_key = '' # get this from url
-        # screen = ScreenActivationKey.objects.get(activation_key=unique_device_key).screen
+        # screen = Screen.objects.get(screen_id=screen_id)
+        screen = ScreenActivationKey.objects.get(activation_key=unique_device_key, in_use=True).screen
         calendar = screen.screen_calendar
         if calendar:
             current_datetime = timezone.now()
@@ -459,18 +474,18 @@ def get_schedules(request):
     return list_to_json(all_schedules)
 
 
-def get_screen_calendar(request, screen_id):
-    user_details = get_userdetails(request)
-    context_dic = {}
-    try:
-        screen = Screen.get_user_relevant_objects(user_details=user_details).get(screen_id=screen_id)
-        screen_calendar = screen.screen_calendar
-        calendar_slug = screen_calendar.slug
-        context_dic['calendar'] = screen_calendar
-    except Exception as e:
-        print "Exception is ", e
-        return render(request, 'schedule/calendar.html')
-    return calendar(request, calendar_slug=calendar_slug)
+# def get_screen_calendar(request, screen_id):
+#     user_details = get_userdetails(request)
+#     context_dic = {}
+#     try:
+#         screen = Screen.get_user_relevant_objects(user_details=user_details).get(screen_id=screen_id)
+#         screen_calendar = screen.screen_calendar
+#         calendar_slug = screen_calendar.slug
+#         context_dic['calendar'] = screen_calendar
+#     except Exception as e:
+#         print "Exception is ", e
+#         return render(request, 'schedule/calendar.html')
+#     return calendar(request, calendar_slug=calendar_slug)
 
 
 @login_required
