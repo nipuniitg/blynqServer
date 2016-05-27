@@ -1471,8 +1471,11 @@ ul.page-footer-list li i { padding-right: 10px }
 }
 #about-us .au-content{
     margin-bottom: 65px;
-    margin-top : 30px;
+    margin-top : 10px;
     padding-bottom : 20px
+}
+#about-us .au-content p{
+    font-size : 18px;
 }
 /*recent work*/
 .recent h3{
