@@ -1459,6 +1459,21 @@ ul.page-footer-list li i { padding-right: 10px }
     transition: all .3s ease;
 }
 .h-service-content a:hover { color: #16a085 }
+/* About Us*/
+#about-us{text-align: center}
+#about-us h2 {
+    margin-bottom: 65px;
+    text-transform: uppercase;
+    margin-top: 45px;
+    padding-bottom: 5px;
+    text-align: center;
+    font-size: 25px;
+}
+#about-us .au-content{
+    margin-bottom: 65px;
+    margin-top : 30px;
+    padding-bottom : 20px
+}
 /*recent work*/
 .recent h3{
     text-align: center;
