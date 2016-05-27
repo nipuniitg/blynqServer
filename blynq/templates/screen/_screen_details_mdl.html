@@ -1,0 +1,94 @@
+<!-- Add New Screen or Edit Screen Details Modal -->
+<div>
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()" aria-hidden="true"><i class="fa fa-times"></i></button>
+        <h3 class="modal-title">Screen Details</h3>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal" role="form" name="screenDetailsForm">
+            <div class="form-group">
+                <label for="screen_name" class="col-md-2">
+                    Screen Name*
+                </label>
+                <div class="col-md-6">
+                    <input type="text" placeholder="Screen Name" id="screen_name" name="screen_name"
+                           ng-model="screenDetails.screen_name" class="form-control" required>
+                </div>
+                <div class="col-md-6 col-md-offset-2" ng-show="screenDetailsForm.screen_name.$touched &&
+                                screenDetailsForm.screen_name.$invalid">
+                    <span>This field is required.</span>
+                </div>
+            </div>
+            <div ng-if="showActivationKeyField">
+                <div class="form-group">
+                    <label for="activation_key" class="col-md-2">
+                        Activation Key*(provided by BlynQ)
+                    </label>
+                    <div class="col-md-6">
+                        <input type="text" placeholder="H8N9-23NK-2OIN-QELI" id="activation_key" name="activation_key"
+                               ng-model="screenDetails.activation_key" class="form-control" required>
+                    </div>
+                    <div class="col-md-6 col-md-offset-2" ng-show="screenDetailsForm.activation_key.$touched &&
+                                screenDetailsForm.activation_key.$invalid">
+                        <span>This field is required.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="aspect_ratio" class="col-md-2">
+                    Aspect Ratio*
+                </label>
+                <div class="col-md-6">
+                    <input type="text" placeholder="16:9" id="aspect_ratio" name="aspect_ratio"
+                           ng-model="screenDetails.aspect_ratio" class="form-control" required>
+                </div>
+                <div class="col-md-6 col-md-offset-2" ng-show="screenDetailsForm.aspect_ratio.$touched &&
+                                screenDetailsForm.aspect_ratio.$invalid">
+                    <span>This field is required.</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="screen_size" class="col-md-2">
+                    Screen Size(in inches)
+                </label>
+                <div class="col-md-6">
+                    <input type="text" placeholder="32" id="screen_size" name="screen_size"
+                           ng-model="screenDetails.screen_size" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="resolution" class="col-md-2">
+                    Resolution
+                </label>
+                <div class="col-md-6">
+                    <input type="text" placeholder="1190*768" id="resolution" name="resolution"
+                           ng-model="screenDetails.resolution" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="groups" class="col-md-2">
+                    Groups
+                </label>
+                <div id="groups" class="tagsinput">
+                    <span class="tag" ng-repeat="group in screenDetails.groups">
+                        <span> {[group.group_name]} &nbsp;&nbsp;</span>
+                        <a class="tagsinput-remove-link"
+                           ng-click="removeGroup($index)"></a>
+                    </span>
+                    <div class="tagsinput-add-container">
+                        <div class="tagsinput-add"
+                             ng-click="openGroupSelectorModal()"></div>
+                        <input value="" data-default=""
+                               style="color: rgb(102, 102, 102); width: 7px;">
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
+        <button type="button" class="btn btn-success" ng-click="upsertScreen()"
+            ng-disabled="screenDetailsForm.$invalid">{[ saveButtonVerbose ]}</button>
+    </div>
+</div>

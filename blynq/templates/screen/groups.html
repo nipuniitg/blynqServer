@@ -12,7 +12,7 @@
                 <div class="panel-heading ">
                     <div class="pull-left">Groups</div>
                     <div class="widget-icons pull-right">
-                        <a href="#" data-toggle="modal" data-target="#mdl-upsertGroup" class="wminimize"
+                        <a href="#" ng-click="addNewGroup()" class="wminimize"
                             ng-click="addNewGroup()"><i
                                 class="fa fa-plus"></i>Add Group</a>
                     </div>
@@ -32,8 +32,8 @@
                         {[ group.group_name ]}
                         <i class="pull-right fa fa-trash-o" confirm confirm-type="delete"
                            confirm-fn="deleteGroup($index)"></i>
-                        <i class="pull-right fa fa-pencil pointer" data-toggle="modal" data-target="#mdl-upsertGroup"
-                           ng-click="editGroupDetails(group, $index)"></i>
+                        <i class="pull-right fa fa-pencil pointer"
+                           ng-click="editGroupDetails($index)"></i>
                         <span></span>
                     </li>
 
@@ -249,10 +249,6 @@
                 </div>
             </section>
         </div>
-
-
-        <!-- Modal-Upsert Group Details -->
-        {% include "screen/_groupDetailsForm.html" %}
 
     </div>
 

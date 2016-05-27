@@ -1,0 +1,50 @@
+<div id="">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()" aria-hidden="true"><i class="fa fa-times"></i></button>
+        <h3 class="modal-title">Select Groups</h3>
+    </div>
+
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel">
+                    <div class="panel-body" style="max-height:400px;overflow:scroll">
+                        <table class="table bootstrap-datatable countries">
+                            <thead>
+                            <tr>
+                                <th>Select</th>
+                                <th>Group Name</th>
+                                <th>Description</th>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th><input type="form-control" ng-model="searchGroups.group_name"
+                                           placeholder="search Name"></th>
+                                <th><input type="form-control" ng-model="searchGroups.description"
+                                           placeholder="search Address"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="group in allGroups">
+                                <td><input type="checkbox" ng-model="group.selected"></td>
+                                <td>{[ group.group_name ]}</td>
+                                <td>{[ group.description]}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-fixed-width" ng-click="update()"
+                ng-disabled="">Select
+            <i class="fa fa-white fa-check icon-right"></i>
+        </button>
+        <button type="button" class="btn btn-default btn-fixed-width" ng-click="cancel()">
+            Cancel <i class="fa fa-times icon-right"></i>
+        </button>
+    </div>
+</div>

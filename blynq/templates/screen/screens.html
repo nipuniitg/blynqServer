@@ -9,7 +9,7 @@
             <section class="panel panel-default">
                 <header class="panel-heading">Screens
                     <div class="widget-icons pull-right">
-                        <a data-toggle="modal" data-target="#myModal" ng-click="addNewScreen()"><i class="fa fa-plus"></i>Add Screen</a>
+                        <a ng-click="addNewScreen()"><i class="fa fa-plus"></i>Add Screen</a>
                     </div>
                 </header>
                 <div class="table-responsive" style="height: 520px">
@@ -36,7 +36,7 @@
                         </thead>
                         <tbody style=" height: 230px;overflow-y: auto;width: 100%;">
                         <tr ng-repeat="screen in screens | filter: searchScreens" ng-click="clickedOnScreen($index)">
-                            <td><a href="#" data-toggle="modal" data-target="#myModal" ng-click="editScreenDetails($index)"><i class="fa fa-pencil pointer"></i> </a></td>
+                            <td><a href="#" ng-click="editScreenDetails($index)"><i class="fa fa-pencil pointer"></i> </a></td>
                             <td><i class="fa fa-circle online"></i>{[ screen.status ]} </td>
                             <td class="fix">{[ screen.screen_name ]}</td>
                             <td class="fix">{[ screen.address ]}</td>
@@ -59,7 +59,6 @@
                 </div>
             </section>
         </div>
-
         <!-- List of all schedules for the selected screen -->
         <div class="col-md-6 col-fluid">
             <schedules-list
@@ -67,49 +66,6 @@
                     refresh-schedules-fn = "refreshScreenSchedules()">
             </schedules-list>
         </div>
-
-        <!-- Modal-Add or edit screen details -->
-        {% include "screen/_screenDetailsForm.html" %}
-
-        <!-- Modal-Add groups to screen -->
-        <div id="mdl-AddGroups" class="modal fade" role="dialog" data-backdrop="static">
-                    <div class="modal-dialog">
-                        <!-- Modal content-->
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <h4 class="modal-title">Modal Header</h4>
-                            </div>
-                            <div class="modal-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <section class="panel panel-default">
-                                            <header class="panel-heading">Selectable Groups</header>
-                                            <ul class="list-group">
-                                                <li class="list-group-item" ng-repeat="group in selectableGroups">
-                                                    <a href="" ng-click="moveGroupToSelected(group)"><i class="fa fa-plus-circle"></i> </a> {[ group.group_name ]}
-                                                </li>
-                                            </ul>
-                                        </section>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <section class="panel panel-default">
-                                            <header class="panel-heading">Selected Groups</header>
-                                            <ul class="list-group">
-                                                <li class="list-group-item" ng-repeat="group in modalScreenDetailsObj.groups ">
-                                                    <a href="#" ng-click="moveGroupToSelectable(group)"><i class="fa fa-minus-circle"></i> </a> {[ group.group_name ]}
-                                                </li>
-                                            </ul>
-                                        </section>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <a  href="#"  class="btn btn-default" data-dismiss="modal" ng-click="saveGroups()">ok</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
     </div>
 
 

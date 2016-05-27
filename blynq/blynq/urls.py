@@ -28,6 +28,7 @@ urlpatterns = [
     ,url(r'^templates/scheduleManagement/(?P<template_name>[\w-]+)',auth_views.getPartailtemplate)
     ,url(r'^templates/shared/(?P<template_name>[\w-]+)',templateView.get_shared_partail_templates)
     ,url(r'^templates/contentManagement/(?P<template_name>[\w-]+)', templateView.get_content_partial_templates)
+    ,url(r'^templates/screen/(?P<template_name>[\w-]+)', templateView.get_screen_partial_templates)
 
 ]
 

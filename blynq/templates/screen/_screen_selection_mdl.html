@@ -1,0 +1,50 @@
+<div id="distributionSelectorModal">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()" aria-hidden="true"><i class="fa fa-times"></i></button>
+        <h3 class="modal-title">Select Screens</h3>
+    </div>
+
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel">
+                    <div class="panel-body" style="max-height:400px;overflow:scroll">
+                        <table class="table bootstrap-datatable">
+                            <thead>
+                            <tr>
+                                <th>Select</th>
+                                <th>Screen Name</th>
+                                <th>Address</th>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th><input type="form-control" ng-model="searchScreens.screen_name"
+                                           placeholder="search Name"></th>
+                                <th><input type="form-control" ng-model="searchScreens.address"
+                                           placeholder="search Address"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="screen in allScreens| filter:searchScreens">
+                                <td><input type="checkbox" ng-model="screen.selected" ng-click="alert('selected')"></td>
+                                <td>{[screen.screen_name]}</td>
+                                <td>{[screen.address]}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-fixed-width" ng-click="update()"
+                ng-disabled="">Select
+            <i class="fa fa-white fa-check icon-right"></i>
+        </button>
+        <button type="button" class="btn btn-default btn-fixed-width" ng-click="cancel()">
+            Cancel <i class="fa fa-times icon-right"></i>
+        </button>
+    </div>
+</div>
