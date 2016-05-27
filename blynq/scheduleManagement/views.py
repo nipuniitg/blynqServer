@@ -335,7 +335,7 @@ def device_key_active(request):
         screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key, in_use=True)
         success = True
     except ScreenActivationKey.DoesNotExist:
-        errors = ['Invalid activation key, try another or contact support']
+        errors = 'Invalid activation key, try another or contact support'
         success = False
     return ajax_response(success=success, errors=errors)
 
@@ -431,9 +431,8 @@ def get_screen_data(request, nof_days=7):
         return list_to_json(campaigns_json)
     except Exception as e:
         print "Exception is ", e
-        error = "Error while fetching the occurences or invalid screen identifier"
-        errors.append(error)
-        print error
+        errors = "Error while fetching the occurences or invalid screen identifier"
+        print errors
     return ajax_response(success=success, errors=errors)
 
 
