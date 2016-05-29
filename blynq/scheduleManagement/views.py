@@ -16,6 +16,7 @@ from customLibrary.views_lib import get_userdetails, ajax_response, list_to_json
 from playlistManagement.models import Playlist
 from scheduleManagement.models import Schedule, ScheduleScreens, SchedulePlaylists
 from screenManagement.models import Screen, Group, ScreenActivationKey
+from screenManagement.views import debugFileLog
 
 
 @login_required
@@ -327,17 +328,43 @@ def upsert_schedule(request):
 
 @csrf_exempt
 def device_key_active(request):
+    """
+    :param request:
+    :return: Json dict of success and error, success will be True if the activation_key sent in the post request
+     is not in_use and verified.
+     If the activation_key is not in the database, then adding it here and manually check the verified through the
+     admin portal
+    """
     success = False
-    errors = []
+    error = ''
+    posted_data = string_to_dict(request.body)
+    activation_key = posted_data.get('device_key')
+    if not activation_key:
+        error = 'Activation key not found'
+        return ajax_response(success=success, errors=error)
     try:
-        posted_data = string_to_dict(request.body)
-        activation_key = posted_data.get('device_key')
-        screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key, in_use=True)
-        success = True
+        screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key)
+        if not screen_activation_key.verified:
+            error = 'New device with device key %s is asking for activation. ' % activation_key
+            error += 'Check the verified boolean if the device is valid.'
+            debugFileLog.warning(error)
+        elif screen_activation_key.in_use:
+            error = 'Device activation key %s is already in use.' % activation_key
+            debugFileLog.warning(error)
+        else:
+            success = True
     except ScreenActivationKey.DoesNotExist:
-        errors = 'Invalid activation key, try another or contact support'
+        error = 'Activation key %s doesn\'t exist in the database.\n ' % activation_key
+        error += 'Adding it, check the verified boolean if the device is valid.\n'
+        debugFileLog.warning(error)
+        try:
+            screen_activation_key = ScreenActivationKey(activation_key=activation_key)
+            screen_activation_key.save()
+        except Exception as e:
+            db_error = 'Adding the above activation_key to the database failed with the exception {0} \n'.format(str(e))
+            debugFileLog.Error(db_error)
         success = False
-    return ajax_response(success=success, errors=errors)
+    return ajax_response(success=success, errors=error)
 
 
 @csrf_exempt

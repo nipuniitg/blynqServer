@@ -4,7 +4,6 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import render
 from schedule.models import Calendar
-
 from JsonTestData import TestDataClass
 from authentication.models import UserDetails, Organization, Address
 from customLibrary.serializers import FlatJsonSerializer as json_serializer
@@ -18,6 +17,7 @@ import logging
 # Get an instance of a logger
 consoleLog = logging.getLogger('consoleLog')
 debugFileLog = logging.getLogger('debugFileLog')
+
 
 # Create your views here.
 
@@ -64,7 +64,7 @@ def add_group(request):
     context_dic['submitButton'] = "Submit"
     context_dic['success'] = success
     context_dic['target'] = reverse('add_group')
-    return render(request,'Shared/displayForm.html', context_dic)
+    return render(request, 'Shared/displayForm.html', context_dic)
 
 
 def insert_group_screen(screen, group):
@@ -95,18 +95,20 @@ def remove_group_screens(screen=None, group=None, group_screen_id_list=[]):
     else:
         removed_group_screens = []
     for each_group_screen in removed_group_screens:
-            schedule_screens = ScheduleScreens.objects.filter(group=each_group_screen.group, screen=each_group_screen.screen)
-            for each_schedule_screen in schedule_screens:
-                event = each_schedule_screen.event
-                if event:
-                    if event.rule:
-                        event.rule.delete()
-                    event.delete()
-            if schedule_screens:
-                rows_deleted = schedule_screens.delete()
+        schedule_screens = ScheduleScreens.objects.filter(group=each_group_screen.group,
+                                                          screen=each_group_screen.screen)
+        for each_schedule_screen in schedule_screens:
+            event = each_schedule_screen.event
+            if event:
+                if event.rule:
+                    event.rule.delete()
+                event.delete()
+        if schedule_screens:
+            rows_deleted = schedule_screens.delete()
     if removed_group_screens:
         removed_group_screens.delete()
     return True
+
 
 @login_required
 def upsert_group(request):
@@ -137,7 +139,7 @@ def upsert_group(request):
                         screen = Screen.get_user_relevant_objects(user_details=user_details).get(screen_id=screen_id)
                         group_screen = GroupScreens.objects.create(screen=screen, group=group, created_by=user_details)
                         group_screen_id = group_screen.group_screen_id
-                        success_insert =  insert_group_screen(group=group, screen=screen)
+                        success_insert = insert_group_screen(group=group, screen=screen)
                         if not success_insert:
                             error = 'error while removing inserting screens to group'
                             print error
@@ -197,7 +199,7 @@ def activation_key_valid(request):
 
 # Replace upsert_screen with upsert_screen1 after Prasanth implements the AddScreenForm
 @login_required
-def upsert_screen1(request):
+def upsert_screen(request):
     user_details = get_userdetails(request)
     posted_data = string_to_dict(request.body)
     success = False
@@ -220,12 +222,15 @@ def upsert_screen1(request):
         else:
             screen = Screen.objects.get(screen_id=screen_id)
         screen.screen_size = int(posted_data.get('screen_size'))
-        screen.address=posted_data.get('address')
-        screen.aspect_ratio=posted_data.get('aspect_ratio')
-        screen.resolution=posted_data.get('resolution')
-        screen.owned_by=user_details.organization
+        screen.address = posted_data.get('address')
+        city_id = int(posted_data.get('city_id'))
+        if city_id != -1:
+            screen.city_id = posted_data.get('city_id')
+        screen.aspect_ratio = posted_data.get('aspect_ratio')
+        screen.resolution = posted_data.get('resolution')
+        screen.owned_by = user_details.organization
         status = default_screen_status()
-        screen.status=status
+        screen.status = status
         screen.save()
         group_screen_id_list = []
         for group in posted_data.get('groups'):
@@ -263,77 +268,6 @@ def upsert_screen1(request):
     return ajax_response(success=success, errors=errors)
 
 
-@login_required
-def upsert_screen(request):
-    posted_data = string_to_dict(request.body)
-    success = False
-    errors = []
-    if request.method == 'POST':
-        add_screen_form = AddScreenForm(data=posted_data)
-        if add_screen_form.is_valid():
-            user_details = get_userdetails(request)
-            form_data = add_screen_form.cleaned_data
-            try:
-                # TODO: The logic for activation_key is pending and update the fields activated_by and activated_on
-                status = default_screen_status()
-                screen_id = posted_data['screen_id']
-                if screen_id == -1:
-                    screen = Screen(screen_name=form_data.get('screen_name'))
-                else:
-                    screen = Screen.objects.get(screen_id=screen_id)
-                    screen.screen_name = form_data.get('screen_name')
-                screen.screen_size = form_data.get('screen_size')
-                activation_key=form_data.get('activation_key')
-                # TODO: Remove hard-coding and Integrate this with the android unique key
-                if activation_key != "0123456789":
-                    errors.append('Not a valid activation key, Please contact support@blynq.in in case of issues')
-                    return ajax_response(success=success, errors=errors)
-                screen.activation_key = activation_key
-                screen.address=form_data.get('address')
-                screen.aspect_ratio=form_data.get('aspect_ratio')
-                screen.resolution=form_data.get('resolution')
-                screen.owned_by=user_details.organization
-                screen.status=status
-                screen.save()
-                group_screen_id_list = []
-                for group in posted_data.get('groups'):
-                    group_screen_id = int(group.get('group_screen_id'))
-                    if group.group_screen_id == -1:
-                        group_entry = Group.objects.get(group_id=group.get('group_id'))
-                        group_screen = GroupScreens.objects.create(group=group_entry, screen=screen, created_by=user_details)
-                        group_screen_id = group.group_screen_id
-                        success_insert = insert_group_screen(screen=screen, group=group_entry)
-                        if not success_insert:
-                            error = 'error while inserting group to screen'
-                            print error
-                            return ajax_response(success=success_insert, errors=[error])
-                    group_screen_id_list.append(group_screen_id)
-
-                success_removal = remove_group_screens(screen=screen, group_screen_id_list=group_screen_id_list)
-                if not success_removal:
-                    error = 'error while removing deleted groups from screen'
-                    print error
-                    return ajax_response(success=success_removal, errors=[error])
-
-                # Adding a calendar for each screen
-                if not screen.screen_calendar:
-                    calendar = Calendar(name=screen.screen_name + str(screen.screen_id))
-                    calendar.save()
-                    screen.screen_calendar = calendar
-                    screen.save()
-                # TODO: The above case only handles the PRIVATE businessType, add a check
-                success = True
-            except Exception as e:
-                print "Exception is ", e
-                errors = ['Error while adding the screen details to database']
-                print errors[0]
-        else:
-            print 'Add/Edit Screen Form is not valid'
-            print add_screen_form.errors
-            errors = add_screen_form.errors
-    return ajax_response(success=success, errors=errors)
-
-
 # TODO: Understand the difference between natural_key method and get_by_natural_key method in
 # https://docs.djangoproject.com/en/1.9/topics/serialization/
 def get_groups_json(request):
@@ -341,23 +275,25 @@ def get_groups_json(request):
     user_details = get_userdetails(request)
     groups_data = Group.get_user_relevant_objects(user_details=user_details)
     # json_data = serializers.serialize("json", groups_data, fields=('group_id','group_name', 'description', 'screen'))
-    json_data = json_serializer().serialize(groups_data, fields=('group_id','group_name', 'description', 'screen'))
+    json_data = json_serializer().serialize(groups_data, fields=('group_id', 'group_name', 'description', 'screen'))
     return HttpResponse(json_data, content_type='application/json')
 
 
 def get_screens_json(request):
     user_details = get_userdetails(request)
     screen_data = Screen.get_user_relevant_objects(user_details)
-    json_data = json_serializer().serialize(screen_data, fields=('screen_id', 'screen_name', 'address', 'status',
-                                                                 'groups', 'screen_size', 'resolution'))
+    json_data = json_serializer().serialize(screen_data, fields=('screen_id', 'screen_name', 'address', 'city',
+                                                                 'status', 'groups', 'screen_size', 'resolution'))
     return HttpResponse(json_data, content_type='application/json')
 
 
 def get_selectable_screens_json(request, group_id=-1):
     user_details = get_userdetails(request)
     screen_data = Screen.get_user_relevant_objects(user_details).exclude(groups__pk=group_id)
-    json_data = json_serializer().serialize(screen_data, fields=('screen_id', 'screen_name', 'address', 'status',
-                                                                 'groups', 'screen_size', 'resolution', 'group_screen_id'))
+    json_data = json_serializer().serialize(screen_data,
+                                            fields=('screen_id', 'screen_name', 'address', 'city', 'status',
+                                                    'groups', 'screen_size', 'resolution',
+                                                    'group_screen_id'))
     return HttpResponse(json_data, content_type='application/json')
 
 
@@ -385,14 +321,14 @@ def add_screen_location(request):
             form_data = screen_location_form.cleaned_data
             try:
                 location = Address.objects.create(building_name=form_data.get('building_name'),
-                                                address_line1=form_data.get('address_line1'),
-                                                address_line2=form_data.get('address_line2'),
-                                                area=form_data.get('area'),
-                                                landmark=form_data.get('landmark'),
-                                                city=form_data.get('city'),
-                                                pincode=form_data.get('pincode'),
-                                                added_by=user_details
-                                                )
+                                                  address_line1=form_data.get('address_line1'),
+                                                  address_line2=form_data.get('address_line2'),
+                                                  area=form_data.get('area'),
+                                                  landmark=form_data.get('landmark'),
+                                                  city=form_data.get('city'),
+                                                  pincode=form_data.get('pincode'),
+                                                  added_by=user_details
+                                                  )
                 # TODO: Add an entry of the above screen in the OrganizationScreen
                 # TODO: The above case only handles the PRIVATE businessType
                 # OrganizationScreen.objects.create(organization=organization,
@@ -413,7 +349,7 @@ def add_screen_location(request):
     context_dic['submitButton'] = "Submit"
     context_dic['success'] = success
     context_dic['target'] = reverse('add_screen_location')
-    return render(request,'Shared/displayForm.html', context_dic)
+    return render(request, 'Shared/displayForm.html', context_dic)
 
 
 @login_required
@@ -452,7 +388,7 @@ def add_screen_specs(request):
     context_dic['submitButton'] = "Submit"
     context_dic['success'] = success
     context_dic['target'] = reverse('add_screen_specs')
-    return render(request,'Shared/displayForm.html', context_dic)
+    return render(request, 'Shared/displayForm.html', context_dic)
 
 
 def routeToHome(request):
@@ -463,11 +399,10 @@ def routeToHome(request):
 def screen_index(request):
     context_dic = {}
     context_dic['form'] = AddScreenForm(form_name='formAddScreen', scope_prefix='modalScreenDetailsObj')
-    return render(request,'screen/screens.html', context_dic)
+    return render(request, 'screen/screens.html', context_dic)
 
 
 def group_index(request):
-    context_dic ={}
+    context_dic = {}
     context_dic['form'] = AddGroup(form_name='formGroup', scope_prefix='modalGroupDetailsObj')
     return render(request, 'screen/groups.html', context_dic)
-

@@ -1,7 +1,7 @@
 from django.db import models
 from schedule.models import Calendar
 
-from authentication.models import Organization, UserDetails, Address
+from authentication.models import Organization, UserDetails, Address, City
 from customLibrary.views_lib import get_userdetails
 
 
@@ -49,20 +49,21 @@ class ScreenSpecs(models.Model):
         return self.brand + ' ' + self.model_num
 
     class Meta:
-        unique_together = (('brand', 'model_num'))
+        unique_together = ('brand', 'model_num')
 
     def natural_key(self):
-        return ((self.brand, self.model_num, self.display_type))
+        return self.brand, self.model_num, self.display_type
 
 
 class ScreenActivationKey(models.Model):
     screen_activation_id = models.AutoField(primary_key=True)
     activation_key = models.CharField(max_length=16, unique=True)
-    device_serial_num = models.CharField(max_length=20, unique=True)
+    device_serial_num = models.CharField(max_length=20, unique=True, null=True)
     in_use = models.BooleanField(default=False)
+    verified = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return 'serial number ' + self.device_serial_num + ' key ' + self.activation_key
+        return 'serial number ' + str(self.device_serial_num) + ' key ' + str(self.activation_key)
 
 
 class Group(models.Model):
@@ -115,6 +116,7 @@ class Screen(models.Model):
     # TODO: change this location to a foreign key to authentication.Address
     #location = models.ForeignKey(Address, on_delete=models.PROTECT)
     address = models.CharField(max_length=100, blank=True)
+    city = models.ForeignKey(City, blank=True, null=True)
 
     unique_device_key = models.OneToOneField(ScreenActivationKey)
     activated_on = models.DateTimeField(auto_now_add=True)
@@ -133,7 +135,7 @@ class Screen(models.Model):
     )
     business_type = models.CharField(max_length=20, choices=BUSINESS_TYPE_CHOICES, default=BUSINESS_TYPE_CHOICES[0][0])
 
-    status = models.ForeignKey(ScreenStatus, on_delete=models.PROTECT)
+    status = models.ForeignKey(ScreenStatus, on_delete=models.PROTECT, null=True)
     groups = models.ManyToManyField(Group, blank=True, through=GroupScreens)
 
     # Each screen should have a separate calendar
