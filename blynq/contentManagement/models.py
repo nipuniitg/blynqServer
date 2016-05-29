@@ -9,6 +9,7 @@ import hashlib
 
 # Create your models here.
 from authentication.models import UserDetails, Organization
+from customLibrary.views_lib import debugFileLog
 
 
 class ContentType(models.Model):
@@ -116,7 +117,7 @@ class Content(models.Model):
     sha1_hash = models.CharField(_('sha1'), max_length=40, blank=True, default='')
     original_filename = models.CharField(_('original filename'), max_length=100, blank=True, null=True)
     # file_type = models.ForeignKey(ContentType, null=True, on_delete=models.PROTECT)
-    document_type = models.CharField(max_length=50, default='image/jpg')
+    document_type = models.CharField(max_length=50, default='image/jpg', null=True)
 
     # folder = models.ForeignKey(Folder, verbose_name=_('folder'), related_name='all_files',
     #                            null=True, blank=True)
@@ -140,6 +141,7 @@ class Content(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.document:
+            self.document_type = 'folder'
             super(Content, self).save(*args, **kwargs)
         else:
             import mimetypes
@@ -150,8 +152,8 @@ class Content(models.Model):
                 self.organization.save()
                 super(Content, self).save(*args, **kwargs)
             else:
-                print "The organization " + self.organization.name + " total file size limit exceeded"
-                print "Can't upload file"
+                debugFileLog.warning("The organization " + self.organization.name + " total file size limit exceeded")
+                debugFileLog.error("Can't upload file")
 
     def __unicode__(self):
         return self.title

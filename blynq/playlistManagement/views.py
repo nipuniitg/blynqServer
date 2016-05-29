@@ -1,16 +1,15 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from JsonTestData import TestDataClass
-from django.http import JsonResponse, HttpResponse
 
 from contentManagement.models import Content
+from contentManagement.serializers import ContentSerializer
 from contentManagement.views import get_files_recursively
-from customLibrary.views_lib import get_userdetails, string_to_dict, ajax_response
-from customLibrary.serializers import FlatJsonSerializer, playlist_dict
+from customLibrary.views_lib import get_userdetails, string_to_dict, ajax_response, list_to_json
 from playlistManagement.models import Playlist, PlaylistItems
 
 
 # Create your views here.
+from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import SchedulePlaylists
 
 
@@ -77,7 +76,10 @@ def upsert_playlist(request):
         for each_schedule_playlist in schedule_playlists:
             schedule = each_schedule_playlist.schedule
             schedule.save()
-        obj_dict = {'playlist': playlist_dict(playlist)}
+        json_data = PlaylistSerializer().serialize([playlist],
+                                                   fields=('playlist_id', 'playlist_title', 'playlist_items'))
+        assert len(json_data) > 0
+        obj_dict = {'playlist': json_data[0]}
         success = True
     except Exception as e:
         print "Exception is ", e
@@ -89,20 +91,61 @@ def upsert_playlist(request):
 
 
 def get_playlists(request):
+    """
+    :param request:
+    :return:
+    [
+        {
+            playlist_items: [
+                {
+                    display_time: 15,
+                    title: "sachin",
+                    url: "http://127.0.0.1:8000/media/usercontent/1/sachin.jpg",
+                    playlist_item_id: 3,
+                    is_folder: false,
+                    content_id: 3
+                },
+                {
+                    display_time: 15,
+                    title: "sachin",
+                    url: "http://127.0.0.1:8000/media/usercontent/1/sachin.jpg",
+                    playlist_item_id: 4,
+                    is_folder: false,
+                    content_id: 3
+                }
+            ],
+            playlist_id: 1,
+            playlist_title: "first playlist"
+        }
+    ]
+    """
     user_details = get_userdetails(request)
     user_playlists = Playlist.get_user_relevant_objects(user_details=user_details)
-    json_data = FlatJsonSerializer().serialize(user_playlists,
+    json_data = PlaylistSerializer().serialize(user_playlists,
                                                fields=('playlist_id', 'playlist_title','playlist_items'))
-    return HttpResponse(json_data, content_type='application/json')
-
+    return list_to_json(json_data)
 
 def get_files_recursively_json(request, parent_folder_id):
+    """
+    :param request:
+    :param parent_folder_id:
+    :return:
+    [
+        {
+            url: "http://127.0.0.1:8000/media/usercontent/1/fuck_you_bitches.jpg",
+            content_id: 1,
+            document: "usercontent/1/fuck_you_bitches.jpg",
+            title: "fuck_you_bitches"
+        }
+    ]
+    """
+
     all_files_content_ids = get_files_recursively(request, parent_folder_id=parent_folder_id)
     user_details = get_userdetails(request)
     user_content = Content.get_user_relevant_objects(user_details=user_details)
     all_files = user_content.filter(content_id__in=all_files_content_ids)
-    json_content = FlatJsonSerializer().serialize(all_files, fields=('title', 'document', 'content_id'))
-    return HttpResponse(json_content, content_type='application/json')
+    json_data = ContentSerializer().serialize(all_files, fields=('title', 'document', 'document_type', 'content_id'))
+    return list_to_json(json_data)
 
 
 def delete_playlist(request):

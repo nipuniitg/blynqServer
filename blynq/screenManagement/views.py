@@ -1,33 +1,21 @@
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse
-from django.http import JsonResponse
 from django.shortcuts import render
 from schedule.models import Calendar
-from JsonTestData import TestDataClass
-from authentication.models import UserDetails, Organization, Address
-from customLibrary.serializers import FlatJsonSerializer as json_serializer
-from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict
+
+from authentication.models import Address
+from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, list_to_json, debugFileLog
 from scheduleManagement.models import ScheduleScreens
 from screenManagement.forms import AddScreenForm, AddScreenLocation, AddScreenSpecs, AddGroup
 from screenManagement.models import Screen, ScreenStatus, ScreenSpecs, Group, GroupScreens, ScreenActivationKey
+
 # import the logging library
-import logging
 
 # Get an instance of a logger
-consoleLog = logging.getLogger('consoleLog')
-debugFileLog = logging.getLogger('debugFileLog')
+from screenManagement.serializers import ScreenSerializer, GroupSerializer
 
 
 # Create your views here.
-
-
-def default_organization():
-    return Organization.objects.all()[0]
-
-
-def default_userdetails():
-    return UserDetails.objects.all()[0]
 
 
 def default_screen_status():
@@ -274,34 +262,34 @@ def get_groups_json(request):
     debugFileLog.info("inside get_groups_json")
     user_details = get_userdetails(request)
     groups_data = Group.get_user_relevant_objects(user_details=user_details)
-    # json_data = serializers.serialize("json", groups_data, fields=('group_id','group_name', 'description', 'screen'))
-    json_data = json_serializer().serialize(groups_data, fields=('group_id', 'group_name', 'description', 'screen'))
-    return HttpResponse(json_data, content_type='application/json')
+    json_data = GroupSerializer().serialize(groups_data, fields=('group_id', 'group_name', 'description', 'screens'))
+    return list_to_json(json_data)
 
 
 def get_screens_json(request):
     user_details = get_userdetails(request)
     screen_data = Screen.get_user_relevant_objects(user_details)
-    json_data = json_serializer().serialize(screen_data, fields=('screen_id', 'screen_name', 'address', 'city',
-                                                                 'status', 'groups', 'screen_size', 'resolution'))
-    return HttpResponse(json_data, content_type='application/json')
+    json_data = ScreenSerializer().serialize(screen_data,
+                                             fields=('screen_id', 'screen_name', 'address', 'city',
+                                                     'status', 'groups', 'screen_size', 'resolution'),
+                                             use_natural_foreign_keys=True)
+    return list_to_json(json_data)
 
 
 def get_selectable_screens_json(request, group_id=-1):
     user_details = get_userdetails(request)
     screen_data = Screen.get_user_relevant_objects(user_details).exclude(groups__pk=group_id)
-    json_data = json_serializer().serialize(screen_data,
-                                            fields=('screen_id', 'screen_name', 'address', 'city', 'status',
-                                                    'groups', 'screen_size', 'resolution',
-                                                    'group_screen_id'))
-    return HttpResponse(json_data, content_type='application/json')
+    json_data = ScreenSerializer().serialize(screen_data, fields=('screen_id', 'screen_name', 'address', 'city', 'status',
+                                                   'groups', 'screen_size', 'resolution', 'group_screen_id'),
+                                           use_natural_foreign_keys=True)
+    return list_to_json(json_data)
 
 
 def get_selectable_groups_json(request, screen_id=-1):
     user_details = get_userdetails(request)
     groups_data = Group.objects.filter(organization=user_details.organization).exclude(screen__pk=screen_id)
-    json_data = json_serializer().serialize(groups_data, fields=('group_id', 'group_name', 'group_screen_id'))
-    return HttpResponse(json_data, content_type='application/json')
+    json_data = GroupSerializer().serialize(groups_data, fields=('group_id', 'group_name', 'group_screen_id'))
+    return list_to_json(json_data)
 
 
 # Unused functions
@@ -310,6 +298,7 @@ def add_screen_location(request):
     context_dic = {}
     success = False
     if request.method == 'POST':
+        user_details = get_userdetails(request)
         screen_location_form = AddScreenLocation(data=request.POST)
         if screen_location_form.is_valid():
             try:
@@ -317,7 +306,6 @@ def add_screen_location(request):
             except Exception as e:
                 print "Exception is ", e
                 print 'Error: username %s does not exist' % str(request.user.username)
-                user_details = default_userdetails()
             form_data = screen_location_form.cleaned_data
             try:
                 location = Address.objects.create(building_name=form_data.get('building_name'),

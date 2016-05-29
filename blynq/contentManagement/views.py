@@ -1,6 +1,7 @@
 import os
 
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import render
 # from django.db.models import Q
@@ -8,8 +9,8 @@ import json
 from blynq.settings import MEDIA_ROOT
 from contentManagement.forms import UploadContentForm
 # Create your views here.
+from contentManagement.serializers import ContentSerializer
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, list_to_json
-from customLibrary.serializers import FlatJsonSerializer
 from contentManagement.models import Content
 
 
@@ -80,6 +81,7 @@ def delete_content(request):
     user_content = Content.get_user_relevant_objects(user_details=user_details)
     posted_data = string_to_dict(request.body)
     content_id = int(posted_data.get('content_id'))
+    transaction.set_autocommit(False)
     try:
         required_content = user_content.get(content_id=int(content_id))
         if required_content.is_folder:
@@ -90,6 +92,10 @@ def delete_content(request):
     except Exception as e:
         print "Exception is ", e
         success = False
+    if success:
+        transaction.commit()
+    else:
+        transaction.rollback()
     return ajax_response(success=success)
 
 
@@ -179,20 +185,50 @@ def get_content_helper(request, parent_folder_id=-1, is_folder=False):
             parent_folder = user_content.get(content_id=parent_folder_id)
             user_content = user_content.filter(parent_folder=parent_folder)
         user_content = user_content.filter(is_folder=is_folder)
-        json_content = FlatJsonSerializer().serialize(user_content, fields=('title', 'document', 'content_id',
-                                                                            'is_folder'))
+        json_data = ContentSerializer().serialize(user_content, fields=('title', 'document', 'document_type',
+                                                                        'content_id', 'is_folder'))
     except Exception as e:
         print "Exception is ", e
-        json_content = []
+        json_data = []
         error = "Error while fetching the content or invalid parent folder id"
-    return HttpResponse(json_content, content_type='application/json')
+    return list_to_json(json_data)
 
 
 def get_folders_json(request, parent_folder_id=-1):
+    """
+    :param request:
+    :param parent_folder_id:
+    :return:
+    [
+        {
+            url: "",
+            content_id: 2,
+            document: "",
+            is_folder: true,
+            title: "temp folder"
+        }
+    ]
+    """
+
     return get_content_helper(request, parent_folder_id=parent_folder_id, is_folder=True)
 
 
 def get_files_json(request, parent_folder_id=-1):
+    """
+    :param request:
+    :param parent_folder_id:
+    :return:
+    [
+        {
+            url: "http://127.0.0.1:8000/media/usercontent/1/image1.jpg",
+            content_id: 1,
+            document: "usercontent/1/image1.jpg",
+            is_folder: false,
+            title: "image1"
+        }
+    ]
+    """
+
     return get_content_helper(request, parent_folder_id=parent_folder_id, is_folder=False)
 
 

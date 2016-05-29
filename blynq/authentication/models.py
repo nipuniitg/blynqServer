@@ -10,14 +10,14 @@ from blynq.settings import STORAGE_LIMIT_PER_ORGANIZATION
 # Not being used
 class City(models.Model):
     city_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50, unique=True)
+    city_name = models.CharField(max_length=50, unique=True)
     state = models.CharField(max_length=50)
 
     def __unicode__(self):
-        return self.name + ', ' + self.state
+        return self.city_name + ', ' + self.state
 
     def natural_key(self):
-        return ((self.name, self.state))
+        return {'city_id': self.city_id, 'city_name': self.city_name }
 
 
 # Not being used

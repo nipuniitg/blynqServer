@@ -1,20 +1,22 @@
 import datetime
 
-from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from schedule.models import Event, Rule
 from django.views.decorators.csrf import csrf_exempt
+from django.db import transaction
 
 # Create your views here.
 # from schedule.views import calendar
 
-from customLibrary.serializers import playlist_dict, schedule_dict
+from customLibrary.serializers import playlist_dict
 from customLibrary.views_lib import get_userdetails, ajax_response, list_to_json, string_to_dict, list_to_comma_string, \
-    default_string_to_datetime, get_utc_datetime
+    default_string_to_datetime, get_utc_datetime, debugFileLog
 from playlistManagement.models import Playlist
+from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import Schedule, ScheduleScreens, SchedulePlaylists
+from scheduleManagement.serializers import ScheduleSerializer
 from screenManagement.models import Screen, Group, ScreenActivationKey
 from screenManagement.views import debugFileLog
 
@@ -277,6 +279,7 @@ def event_dict_from_timeline(timeline, schedule):
 @login_required
 def upsert_schedule(request):
     print "inside upsert_schedule"
+    transaction.set_autocommit(False)
     errors = []
     success = False
     user_details = get_userdetails(request)
@@ -289,8 +292,6 @@ def upsert_schedule(request):
         schedule_screens = posted_data.get('schedule_screens')
         schedule_groups = posted_data.get('schedule_groups')
         timeline = posted_data.get('timeline')
-        print 'timeline is'
-        print timeline
         user_schedules = Schedule.get_user_relevant_objects(user_details=user_details)
 
         # upsert schedule
@@ -323,6 +324,10 @@ def upsert_schedule(request):
         error = 'Error while upserting content to schedule'
         errors.append(error)
         print errors
+    if success:
+        transaction.commit()
+    else:
+        transaction.rollback()
     return ajax_response(success=success, errors=errors)
 
 
@@ -438,10 +443,8 @@ def get_screen_data(request, nof_days=7):
                         continue
                     # TODO: optimize this
                     playlists = schedule.playlists.all()
-                    playlists_json = []
-                    for playlist in playlists:
-                        playlist_json = playlist_dict(playlist, only_files=True)
-                        playlists_json.append(playlist_json)
+                    playlists_json = PlaylistSerializer().serialize(playlists, fields=('playlist_id', 'playlist_title',
+                                                                                       'playlist_items'))
                     for each_occur in occurrences:
                         campaign_dict = {'schedule_id': screen_schedule.schedule.schedule_id,
                                          'playlists': playlists_json,
@@ -470,11 +473,15 @@ def get_screen_schedules(request, screen_id):
     screen_schedule_id_list = ScheduleScreens.objects.filter(screen_id=screen_id).values_list(
         'schedule_id', flat=True).distinct()
     screen_schedules = Schedule.get_user_relevant_objects(user_details).filter(schedule_id__in=screen_schedule_id_list)
-    relevant_schedules = []
-    for schedule in screen_schedules:
-        schedule_dictionary = schedule_dict(schedule)
-        relevant_schedules.append(schedule_dictionary)
-    return list_to_json(relevant_schedules)
+    # relevant_schedules = []
+    # for schedule in screen_schedules:
+    #     schedule_dictionary = schedule_dict(schedule)
+    #     relevant_schedules.append(schedule_dictionary)
+    # return list_to_json(relevant_schedules)
+    json_data = ScheduleSerializer().serialize(screen_schedules, fields=('schedule_id', 'schedule_title',
+                                                                         'schedule_playlists', 'timeline',
+                                                                         'schedule_screens', 'schedule_groups'))
+    return list_to_json(json_data)
 
 
 def get_playlist_schedules(request, playlist_id):
@@ -485,22 +492,31 @@ def get_playlist_schedules(request, playlist_id):
         'schedule_id', flat=True).distinct()
     playlist_schedules = Schedule.get_user_relevant_objects(user_details=user_details).filter(
         schedule_id__in=playlist_schedule_id_list)
-    relevant_schedules = []
-    for schedule in playlist_schedules:
-        schedule_dictionary = schedule_dict(schedule)
-        relevant_schedules.append(schedule_dictionary)
-    return list_to_json(relevant_schedules)
+    # relevant_schedules = []
+    # for schedule in playlist_schedules:
+    #     schedule_dictionary = schedule_dict(schedule)
+    #     relevant_schedules.append(schedule_dictionary)
+    # return list_to_json(relevant_schedules)
+    json_data = ScheduleSerializer().serialize(playlist_schedules, fields=('schedule_id', 'schedule_title',
+                                                                           'schedule_playlists', 'timeline',
+                                                                           'schedule_screens', 'schedule_groups'))
+    return list_to_json(json_data)
 
 
 def get_schedules(request):
     print "inside get_schedules"
     user_details = get_userdetails(request)
     user_schedules = Schedule.get_user_relevant_objects(user_details)
-    all_schedules = []
-    for schedule in user_schedules:
-        schedule_dictionary = schedule_dict(schedule)
-        all_schedules.append(schedule_dictionary)
-    return list_to_json(all_schedules)
+
+    json_data = ScheduleSerializer().serialize(
+        user_schedules, fields=('schedule_id', 'schedule_title', 'schedule_playlists', 'schedule_screens',
+                                'schedule_groups', 'timeline'))
+    # all_schedules = []
+    # for schedule in user_schedules:
+    #     schedule_dictionary = schedule_dict(schedule)
+    #     all_schedules.append(schedule_dictionary)
+    # return list_to_json(all_schedules)
+    return list_to_json(json_data)
 
 
 # def get_screen_calendar(request, screen_id):
@@ -520,6 +536,7 @@ def get_schedules(request):
 @login_required
 def delete_schedule(request):
     print "inside delete schedule"
+    transaction.set_autocommit(False)
     user_details = get_userdetails(request)
     errors = []
     success = False
@@ -534,4 +551,8 @@ def delete_schedule(request):
         print "Exception is ", e
         success = False
         errors = ['Sorry, you do not have access to this schedule']
+    if success:
+        transaction.commit()
+    else:
+        transaction.rollback()
     return ajax_response(success=success, errors=errors)

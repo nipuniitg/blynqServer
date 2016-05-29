@@ -1,5 +1,7 @@
 # import django.utils.timezone.datetime as datetime
 import datetime
+import logging
+
 from django.http import JsonResponse, Http404
 from django.utils import timezone
 import json, pytz
@@ -79,3 +81,7 @@ def get_ist_time_str(utc_datetime):
     ist_datetime = get_ist_datetime(utc_datetime=utc_datetime)
     ist_time = ist_datetime.strftime(time_fmt)
     return ist_time
+
+
+debugFileLog = logging.getLogger('debugFileLog')
+consoleLog = logging.getLogger('consoleLog')

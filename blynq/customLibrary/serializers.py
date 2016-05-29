@@ -138,6 +138,8 @@ class FlatJsonSerializer(Serializer):
                     data['url'] = ''
                 else:
                     data['url'] = settings.MEDIA_HOST + obj.document.url
+            if field == 'document_type':
+                data['document_type'] = obj.document_type
             if field == 'title':
                 data['title'] = obj.title
             if field == 'is_folder':
@@ -150,9 +152,9 @@ class FlatJsonSerializer(Serializer):
         # is_folder is removed as player don't require it. If need be you remove this check and keep the is_folder,
         # as the player will anyway ignore this field
         if only_files:
-            content_fields=('title', 'document', 'content_id')
+            content_fields=('title', 'document', 'document_type', 'content_id')
         else:
-            content_fields=('title', 'document', 'content_id', 'is_folder')
+            content_fields=('title', 'document', 'document_type', 'content_id', 'is_folder')
         for playlist_item in playlist_items:
             if only_files and playlist_item.content.is_folder:
                 continue
