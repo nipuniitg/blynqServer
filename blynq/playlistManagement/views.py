@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
@@ -20,6 +21,7 @@ def index(request):
 
 # This function is for inserting, updating and deleting content from a playlist
 def upsert_playlist(request):
+    transaction.set_autocommit(False)
     errors = []
     success = False
     user_details = get_userdetails(request)
@@ -87,6 +89,10 @@ def upsert_playlist(request):
         print error
         errors.append(error)
         obj_dict = None
+    if success:
+        transaction.commit()
+    else:
+        transaction.rollback()
     return ajax_response(success=success, errors=errors, obj_dict=obj_dict)
 
 

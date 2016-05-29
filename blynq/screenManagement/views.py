@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.db import transaction
 from django.shortcuts import render
 from schedule.models import Calendar
 
@@ -57,13 +58,17 @@ def add_group(request):
 
 def insert_group_screen(screen, group):
     group_schedules = ScheduleScreens.objects.filter(screen__isnull=True, group=group)
-    for each_group_schedule in group_schedules:
-        screen_event = each_group_schedule.event
-        screen_event.pk = None
-        screen_event.calendar = screen.screen_calendar
-        screen_event.save()
-        ScheduleScreens.object.create(screen=screen, schedule=each_group_schedule.schedule,
-                                      group=group, event=screen_event)
+    try:
+        for each_group_schedule in group_schedules:
+            screen_event = each_group_schedule.event
+            screen_event.pk = None
+            screen_event.calendar = screen.screen_calendar
+            screen_event.save()
+            ScheduleScreens.object.create(screen=screen, schedule=each_group_schedule.schedule,
+                                          group=group, event=screen_event)
+    except Exception as e:
+        print "Exception is ", e
+        return False
     return True
 
 
@@ -82,24 +87,29 @@ def remove_group_screens(screen=None, group=None, group_screen_id_list=[]):
             group_screen_id__in=group_screen_id_list)
     else:
         removed_group_screens = []
-    for each_group_screen in removed_group_screens:
-        schedule_screens = ScheduleScreens.objects.filter(group=each_group_screen.group,
-                                                          screen=each_group_screen.screen)
-        for each_schedule_screen in schedule_screens:
-            event = each_schedule_screen.event
-            if event:
-                if event.rule:
-                    event.rule.delete()
-                event.delete()
-        if schedule_screens:
-            rows_deleted = schedule_screens.delete()
-    if removed_group_screens:
-        removed_group_screens.delete()
+    try:
+        for each_group_screen in removed_group_screens:
+            schedule_screens = ScheduleScreens.objects.filter(group=each_group_screen.group,
+                                                              screen=each_group_screen.screen)
+            for each_schedule_screen in schedule_screens:
+                event = each_schedule_screen.event
+                if event:
+                    if event.rule:
+                        event.rule.delete()
+                    event.delete()
+            if schedule_screens:
+                rows_deleted = schedule_screens.delete()
+        if removed_group_screens:
+            removed_group_screens.delete()
+    except Exception as e:
+        print "Exception is ", e
+        return False
     return True
 
 
 @login_required
 def upsert_group(request):
+    transaction.set_autocommit(False)
     posted_data = string_to_dict(request.body)
     success = False
     errors = []
@@ -131,6 +141,7 @@ def upsert_group(request):
                         if not success_insert:
                             error = 'error while removing inserting screens to group'
                             print error
+                            transaction.rollback()
                             return ajax_response(success=success_insert, errors=[error])
                     group_screen_id_list.append(group_screen_id)
 
@@ -138,6 +149,7 @@ def upsert_group(request):
                 if not success_removal:
                     error = 'error while removing deleted screens from group'
                     print error
+                    transaction.rollback()
                     return ajax_response(success=success_removal, errors=[error])
 
                 success = True
@@ -149,6 +161,10 @@ def upsert_group(request):
             print 'Add/Edit Group Form is not valid'
             print add_group_form.errors
             errors = add_group_form.errors
+    if success:
+        transaction.commit()
+    else:
+        transaction.rollback()
     return ajax_response(success=success, errors=errors)
 
 
@@ -188,6 +204,7 @@ def activation_key_valid(request):
 # Replace upsert_screen with upsert_screen1 after Prasanth implements the AddScreenForm
 @login_required
 def upsert_screen(request):
+    transaction.set_autocommit(False)
     user_details = get_userdetails(request)
     posted_data = string_to_dict(request.body)
     success = False
@@ -231,6 +248,7 @@ def upsert_screen(request):
                 if not success_insert:
                     error = 'error while inserting group to screen'
                     print error
+                    transaction.rollback()
                     return ajax_response(success=success_insert, errors=[error])
             group_screen_id_list.append(group_screen_id)
 
@@ -238,6 +256,7 @@ def upsert_screen(request):
         if not success_removal:
             error = 'error while removing deleted groups from screen'
             print error
+            transaction.rollback()
             return ajax_response(success=success_removal, errors=[error])
 
         # Adding a calendar for each screen
@@ -253,6 +272,10 @@ def upsert_screen(request):
         errors = ['Error while adding the screen details to database']
         print errors[0]
         success = False
+    if success:
+        transaction.commit()
+    else:
+        transaction.rollback()
     return ajax_response(success=success, errors=errors)
 
 
