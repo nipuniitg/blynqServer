@@ -234,11 +234,33 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
 
     var isNewSchedule = schedule.schedule_id == -1 ? !0 : !1
 
-    $scope.title = isNewSchedule? 'Add Schedule' : 'Edit Schedule'
+    $scope.title = isNewSchedule? 'Add Schedule' : 'Edit Schedule';
+
+    var validateSchedule = function(){
+        if($scope.schedule.playlists.length<1)
+        {
+            toastr.warning('Please select atleast one playlist');
+            return false
+        }
+        if($scope.schedule.screens.length < 1 && $scope.schedule.groups.length < 1 )
+        {
+            toastr.warning('Please select atleast one screen or group');
+            return false
+        }
+
+        if($scope.scheduleDetailsForm.$valid)
+        {
+            return true;
+        }
+        else{
+            toastr.warning('Plese fill all required fields');
+        }
+    }
 
     $scope.saveSchedule= function(){
         $log.log($scope.schedule);
-        sDF.upsertScheduleDetails($scope.schedule, function(data){
+        if(validateSchedule){
+            sDF.upsertScheduleDetails($scope.schedule, function(data){
             if(data.success)
             {
                 if(isNewSchedule)
@@ -255,7 +277,7 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
                 toastr.warning('Oops!.There was some error while updating the schedule.');
             }
         });
-
+        }
     };
 
     $scope.cancel = function(){
