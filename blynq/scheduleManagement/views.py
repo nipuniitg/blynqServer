@@ -70,136 +70,115 @@ def generate_rule_params(interval=1, bymonthday=None, byweekday=None, byweekno=N
 
 def upsert_schedule_screens(user_details, schedule, schedule_screens, event_dict):
     print "inside upsert_schedule_screens"
-    success = False
     error = ''
-    try:
-        schedule_screen_id_list = []
-        for item in schedule_screens:
-            schedule_screen_id = int(item.get('schedule_screen_id'))
-            if schedule_screen_id == -1:
-                screen_id = int(item.get('screen_id'))
-                screen = Screen.get_user_relevant_objects(user_details).get(screen_id=screen_id)
-                event = Event(**event_dict)
-                event.calendar = screen.screen_calendar
-                event.save()
-                entry = ScheduleScreens.objects.create(screen=screen, schedule=schedule, event=event)
-                schedule_screen_id = entry.schedule_screen_id
-            else:
-                entry = ScheduleScreens.objects.get(schedule_screen_id=schedule_screen_id)
-                events = Event.objects.filter(id=entry.event.id)
-                for event in events:
-                    if event.rule:
-                        rule = event.rule
-                        event.rule = None
-                        event.save()
-                        rule.delete()
-                events.update(**event_dict)
-                entry.save()
-            schedule_screen_id_list.append(schedule_screen_id)
-
-        # Remove screens not in the schedule
-        removed_schedule_screens = ScheduleScreens.objects.filter(schedule=schedule, group__isnull=True).exclude(
-            schedule_screen_id__in=schedule_screen_id_list)
-        for each_schedule_screen in removed_schedule_screens:
-            if each_schedule_screen.event:
-                if each_schedule_screen.event.rule:
-                    rule = each_schedule_screen.event.rule
-                    each_schedule_screen.event.rule = None
+    schedule_screen_id_list = []
+    for item in schedule_screens:
+        schedule_screen_id = int(item.get('schedule_screen_id'))
+        if schedule_screen_id == -1:
+            screen_id = int(item.get('screen_id'))
+            screen = Screen.get_user_relevant_objects(user_details).get(screen_id=screen_id)
+            event = Event(**event_dict)
+            event.calendar = screen.screen_calendar
+            event.save()
+            entry = ScheduleScreens.objects.create(screen=screen, schedule=schedule, event=event)
+            schedule_screen_id = entry.schedule_screen_id
+        else:
+            entry = ScheduleScreens.objects.get(schedule_screen_id=schedule_screen_id)
+            events = Event.objects.filter(id=entry.event.id)
+            for event in events:
+                if event.rule:
+                    rule = event.rule
+                    event.rule = None
+                    event.save()
                     rule.delete()
-                event = each_schedule_screen.event
-                each_schedule_screen.event = None
-                event.delete()
-        if removed_schedule_screens:
-            removed_schedule_screens.delete()
-        success = True
-        return success, error
-    except Exception as e:
-        print "Exception is ", e
-        error = 'Error while upserting screens in schedule'
-        print error
-        return success, error
+            events.update(**event_dict)
+            entry.save()
+        schedule_screen_id_list.append(schedule_screen_id)
+
+    # Remove screens not in the schedule
+    removed_schedule_screens = ScheduleScreens.objects.filter(schedule=schedule, group__isnull=True).exclude(
+        schedule_screen_id__in=schedule_screen_id_list)
+    for each_schedule_screen in removed_schedule_screens:
+        if each_schedule_screen.event:
+            if each_schedule_screen.event.rule:
+                rule = each_schedule_screen.event.rule
+                each_schedule_screen.event.rule = None
+                rule.delete()
+            event = each_schedule_screen.event
+            each_schedule_screen.event = None
+            event.delete()
+    if removed_schedule_screens:
+        removed_schedule_screens.delete()
+    success = True
+    return success, error
 
 
 def upsert_schedule_groups(user_details, schedule, schedule_groups, event_dict):
     print "inside upsert_schedule_groups"
-    success = False
     error = ''
-    try:
-        schedule_screen_id_list = []
-        for item in schedule_groups:
-            schedule_screen_id = int(item.get('schedule_screen_id'))
-            if schedule_screen_id == -1:
-                group_id = int(item.get('group_id'))
-                group = Group.get_user_relevant_objects(user_details).get(group_id=group_id)
-                # Adding one screen=NULL entry to handle the case of scheduling empty groups and later adding screens
-                # into that empty group
+    schedule_screen_id_list = []
+    for item in schedule_groups:
+        schedule_screen_id = int(item.get('schedule_screen_id'))
+        if schedule_screen_id == -1:
+            group_id = int(item.get('group_id'))
+            group = Group.get_user_relevant_objects(user_details).get(group_id=group_id)
+            # Adding one screen=NULL entry to handle the case of scheduling empty groups and later adding screens
+            # into that empty group
+            event = Event(**event_dict)
+            event.save()
+            entry = ScheduleScreens.objects.create(schedule=schedule, group=group, event=event)
+            for screen in group.screen_set.all():
+                screen_event = Event(**event_dict)
+                screen_event.calendar = screen.screen_calendar
+                screen_event.save()
+                entry = ScheduleScreens.objects.create(screen=screen, schedule=schedule, group=group,
+                                                       event=screen_event)
+            schedule_screen_id = entry.schedule_screen_id
+        else:
+            entry = ScheduleScreens.objects.get(schedule_screen_id=schedule_screen_id)
+            if entry.event:
+                Event.objects.filter(id=entry.event.id).update(**event_dict)
+            else:
                 event = Event(**event_dict)
                 event.save()
-                entry = ScheduleScreens.objects.create(schedule=schedule, group=group, event=event)
-                for screen in group.screen_set.all():
-                    screen_event = Event(**event_dict)
-                    screen_event.calendar = screen.screen_calendar
-                    screen_event.save()
-                    entry = ScheduleScreens.objects.create(screen=screen, schedule=schedule, group=group,
-                                                           event=screen_event)
-                schedule_screen_id = entry.schedule_screen_id
-            else:
-                entry = ScheduleScreens.objects.get(schedule_screen_id=schedule_screen_id)
-                if entry.event:
-                    Event.objects.filter(id=entry.event.id).update(**event_dict)
-                else:
-                    event = Event(**event_dict)
-                    event.save()
-                    entry.event = event
-                entry.save()
-            schedule_screen_id_list.append(schedule_screen_id)
+                entry.event = event
+            entry.save()
+        schedule_screen_id_list.append(schedule_screen_id)
 
-        # Remove groups not in the schedule
-        removed_schedule_groups = ScheduleScreens.objects.filter(schedule=schedule, group__isnull=False).exclude(
-            schedule_screen_id__in=schedule_screen_id_list)
-        for schedule_group in removed_schedule_groups:
-            schedule_group.delete()
-        success = True
-        return success, error
-    except Exception as e:
-        print "Exception is ", e
-        error = 'Error while upserting groups in schedule'
-        print error
-        return success, error
+    # Remove groups not in the schedule
+    removed_schedule_groups = ScheduleScreens.objects.filter(schedule=schedule, group__isnull=False).exclude(
+        schedule_screen_id__in=schedule_screen_id_list)
+    for schedule_group in removed_schedule_groups:
+        schedule_group.delete()
+    success = True
+    return success, error
 
 
 # upsert schedule playlists
 def upsert_schedule_playlists(user_details, schedule, schedule_playlists):
     print "inside upsert_schedule_playlists"
-    success = False
     error = ''
-    try:
-        schedule_playlist_id_list = []
-        for pos_index, item in enumerate(schedule_playlists):
-            schedule_playlist_id = int(item.get('schedule_playlist_id'))
-            playlist_id = int(item.get('playlist_id'))
-            playlist = Playlist.get_user_relevant_objects(user_details).get(playlist_id=playlist_id)
-            if schedule_playlist_id == -1:
-                entry = SchedulePlaylists.objects.create(schedule=schedule, playlist=playlist, position_index=pos_index)
-                schedule_playlist_id = entry.schedule_playlist_id
-            else:
-                entry = SchedulePlaylists.objects.get(schedule_playlist_id=schedule_playlist_id)
-                entry.position_index = pos_index
-                entry.save()
-            schedule_playlist_id_list.append(schedule_playlist_id)
+    schedule_playlist_id_list = []
+    for pos_index, item in enumerate(schedule_playlists):
+        schedule_playlist_id = int(item.get('schedule_playlist_id'))
+        playlist_id = int(item.get('playlist_id'))
+        playlist = Playlist.get_user_relevant_objects(user_details).get(playlist_id=playlist_id)
+        if schedule_playlist_id == -1:
+            entry = SchedulePlaylists.objects.create(schedule=schedule, playlist=playlist, position_index=pos_index)
+            schedule_playlist_id = entry.schedule_playlist_id
+        else:
+            entry = SchedulePlaylists.objects.get(schedule_playlist_id=schedule_playlist_id)
+            entry.position_index = pos_index
+            entry.save()
+        schedule_playlist_id_list.append(schedule_playlist_id)
 
-        # Remove playlists not in playlist_schedules
-        removed_playlist_schedules = SchedulePlaylists.objects.filter(schedule=schedule).exclude(
-            schedule_playlist_id__in=schedule_playlist_id_list)
-        for playlist_schedule in removed_playlist_schedules:
-            playlist_schedule.delete()
-        success = True
-        return success, error
-    except Exception as e:
-        print "Exception is ", e
-        error = 'Error while upserting playlists in schedule'
-        print error
-        return success, error
+    # Remove playlists not in playlist_schedules
+    removed_playlist_schedules = SchedulePlaylists.objects.filter(schedule=schedule).exclude(
+        schedule_playlist_id__in=schedule_playlist_id_list)
+    for playlist_schedule in removed_playlist_schedules:
+        playlist_schedule.delete()
+    success = True
+    return success, error
 
 
 def generate_rule(timeline, name, description):
@@ -276,58 +255,56 @@ def event_dict_from_timeline(timeline, schedule):
         return event_dict
 
 
+@transaction.atomic
 @login_required
 def upsert_schedule(request):
     print "inside upsert_schedule"
-    transaction.set_autocommit(False)
     errors = []
     success = False
     user_details = get_userdetails(request)
     try:
-        # Extract data from request.body
-        posted_data = string_to_dict(request.body)
-        schedule_id = int(posted_data.get('schedule_id'))
-        schedule_title = posted_data.get('schedule_title')
-        schedule_playlists = posted_data.get('schedule_playlists')
-        schedule_screens = posted_data.get('schedule_screens')
-        schedule_groups = posted_data.get('schedule_groups')
-        timeline = posted_data.get('timeline')
-        user_schedules = Schedule.get_user_relevant_objects(user_details=user_details)
+        with transaction.atomic():
+            # Extract data from request.body
+            posted_data = string_to_dict(request.body)
+            schedule_id = int(posted_data.get('schedule_id'))
+            schedule_title = posted_data.get('schedule_title')
+            schedule_playlists = posted_data.get('schedule_playlists')
+            schedule_screens = posted_data.get('schedule_screens')
+            schedule_groups = posted_data.get('schedule_groups')
+            timeline = posted_data.get('timeline')
+            user_schedules = Schedule.get_user_relevant_objects(user_details=user_details)
 
-        # upsert schedule
-        if schedule_id == -1:
-            schedule = Schedule(schedule_title=schedule_title, created_by=user_details,
-                                last_updated_by=user_details, organization=user_details.organization)
-        else:
-            schedule = user_schedules.get(schedule_id=schedule_id)
-            schedule.schedule_title = schedule_title
-            schedule.last_updated_by = user_details
-        schedule.save()
+            # upsert schedule
+            if schedule_id == -1:
+                schedule = Schedule(schedule_title=schedule_title, created_by=user_details,
+                                    last_updated_by=user_details, organization=user_details.organization)
+            else:
+                schedule = user_schedules.get(schedule_id=schedule_id)
+                schedule.schedule_title = schedule_title
+                schedule.last_updated_by = user_details
+            schedule.save()
 
-        success, error = upsert_schedule_playlists(user_details=user_details, schedule=schedule,
-                                                   schedule_playlists=schedule_playlists)
-        errors.append(error)
+            success, error = upsert_schedule_playlists(user_details=user_details, schedule=schedule,
+                                                       schedule_playlists=schedule_playlists)
+            errors.append(error)
 
-        # Upsert Groups and Screens in a schedule
-        event_dict = event_dict_from_timeline(timeline, schedule)
-        success_screens, error = upsert_schedule_screens(user_details=user_details, schedule=schedule,
-                                                         schedule_screens=schedule_screens, event_dict=event_dict)
-        success = success and success_screens
-        errors.append(error)
+            # Upsert Groups and Screens in a schedule
+            event_dict = event_dict_from_timeline(timeline, schedule)
+            success_screens, error = upsert_schedule_screens(user_details=user_details, schedule=schedule,
+                                                             schedule_screens=schedule_screens, event_dict=event_dict)
+            success = success and success_screens
+            errors.append(error)
 
-        success_groups, error = upsert_schedule_groups(user_details=user_details, schedule=schedule,
-                                                       schedule_groups=schedule_groups, event_dict=event_dict)
-        success = success and success_groups
-        errors.append(error)
+            success_groups, error = upsert_schedule_groups(user_details=user_details, schedule=schedule,
+                                                           schedule_groups=schedule_groups, event_dict=event_dict)
+            success = success and success_groups
+            errors.append(error)
     except Exception as e:
+        success = False
         print "Exception is ", e
         error = 'Error while upserting content to schedule'
         errors.append(error)
         print errors
-    if success:
-        transaction.commit()
-    else:
-        transaction.rollback()
     return ajax_response(success=success, errors=errors)
 
 
@@ -473,11 +450,6 @@ def get_screen_schedules(request, screen_id):
     screen_schedule_id_list = ScheduleScreens.objects.filter(screen_id=screen_id).values_list(
         'schedule_id', flat=True).distinct()
     screen_schedules = Schedule.get_user_relevant_objects(user_details).filter(schedule_id__in=screen_schedule_id_list)
-    # relevant_schedules = []
-    # for schedule in screen_schedules:
-    #     schedule_dictionary = schedule_dict(schedule)
-    #     relevant_schedules.append(schedule_dictionary)
-    # return list_to_json(relevant_schedules)
     json_data = ScheduleSerializer().serialize(screen_schedules, fields=('schedule_id', 'schedule_title',
                                                                          'schedule_playlists', 'timeline',
                                                                          'schedule_screens', 'schedule_groups'))
@@ -492,11 +464,6 @@ def get_playlist_schedules(request, playlist_id):
         'schedule_id', flat=True).distinct()
     playlist_schedules = Schedule.get_user_relevant_objects(user_details=user_details).filter(
         schedule_id__in=playlist_schedule_id_list)
-    # relevant_schedules = []
-    # for schedule in playlist_schedules:
-    #     schedule_dictionary = schedule_dict(schedule)
-    #     relevant_schedules.append(schedule_dictionary)
-    # return list_to_json(relevant_schedules)
     json_data = ScheduleSerializer().serialize(playlist_schedules, fields=('schedule_id', 'schedule_title',
                                                                            'schedule_playlists', 'timeline',
                                                                            'schedule_screens', 'schedule_groups'))
@@ -511,11 +478,6 @@ def get_schedules(request):
     json_data = ScheduleSerializer().serialize(
         user_schedules, fields=('schedule_id', 'schedule_title', 'schedule_playlists', 'schedule_screens',
                                 'schedule_groups', 'timeline'))
-    # all_schedules = []
-    # for schedule in user_schedules:
-    #     schedule_dictionary = schedule_dict(schedule)
-    #     all_schedules.append(schedule_dictionary)
-    # return list_to_json(all_schedules)
     return list_to_json(json_data)
 
 
@@ -533,26 +495,23 @@ def get_schedules(request):
 #     return calendar(request, calendar_slug=calendar_slug)
 
 
+@transaction.atomic
 @login_required
 def delete_schedule(request):
     print "inside delete schedule"
-    transaction.set_autocommit(False)
     user_details = get_userdetails(request)
     errors = []
     success = False
     try:
-        posted_data = string_to_dict(request.body)
-        print 'body is ', request.body
-        schedule_id = int(posted_data.get('schedule_id'))
-        schedule = Schedule.get_user_relevant_objects(user_details=user_details).get(schedule_id=schedule_id)
-        schedule.delete()
-        success = True
+        with transaction.atomic():
+            posted_data = string_to_dict(request.body)
+            print 'body is ', request.body
+            schedule_id = int(posted_data.get('schedule_id'))
+            schedule = Schedule.get_user_relevant_objects(user_details=user_details).get(schedule_id=schedule_id)
+            schedule.delete()
+            success = True
     except Exception as e:
         print "Exception is ", e
         success = False
         errors = ['Sorry, you do not have access to this schedule']
-    if success:
-        transaction.commit()
-    else:
-        transaction.rollback()
     return ajax_response(success=success, errors=errors)

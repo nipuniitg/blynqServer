@@ -74,6 +74,7 @@ def delete_file_helper(content):
     content.delete()
 
 
+@transaction.atomic
 @login_required
 def delete_content(request):
     user_details = get_userdetails(request)
@@ -81,21 +82,17 @@ def delete_content(request):
     user_content = Content.get_user_relevant_objects(user_details=user_details)
     posted_data = string_to_dict(request.body)
     content_id = int(posted_data.get('content_id'))
-    transaction.set_autocommit(False)
     try:
-        required_content = user_content.get(content_id=int(content_id))
-        if required_content.is_folder:
-            delete_folder_helper(req_content=required_content, user_content=user_content)
-        else:
-            delete_file_helper(required_content)
-        success = True
+        with transaction.atomic():
+            required_content = user_content.get(content_id=int(content_id))
+            if required_content.is_folder:
+                delete_folder_helper(req_content=required_content, user_content=user_content)
+            else:
+                delete_file_helper(required_content)
+            success = True
     except Exception as e:
         print "Exception is ", e
         success = False
-    if success:
-        transaction.commit()
-    else:
-        transaction.rollback()
     return ajax_response(success=success)
 
 
