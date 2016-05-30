@@ -228,7 +228,7 @@ def event_for_allday(schedule, timeline):
     end_recurring_period_date = timeline.get('end_recurring_period')
     end_recurring_period = get_utc_datetime(ist_date=end_recurring_period_date, ist_time=end_time)
     rule = generate_rule(timeline=timeline, name=schedule.schedule_title, description=schedule.schedule_title)
-    event_dict = {'start': start, 'end': end, 'title': schedule.schedule_title, 'creator': schedule.created_by,
+    event_dict = {'start': start, 'end': end, 'title': schedule.schedule_title, 'creator': schedule.created_by.user,
                   'rule': rule, 'end_recurring_period': end_recurring_period}
     return event_dict
 
@@ -239,7 +239,7 @@ def event_for_always(schedule):
     end = timezone.now().replace(hour=23, minute=59, second=59)
     rule = Rule(name=schedule.schedule_title, description=schedule.schedule_title, frequency='DAILY')
     rule.save()
-    event_dict = {'start': start, 'end': end, 'title': schedule.schedule_title, 'creator': schedule.created_by,
+    event_dict = {'start': start, 'end': end, 'title': schedule.schedule_title, 'creator': schedule.created_by.user,
                   'rule': rule, 'end_recurring_period': None}
     return event_dict
 
@@ -271,7 +271,7 @@ def event_dict_from_timeline(timeline, schedule):
         end_recurring_period = timeline.get('end_recurring_period')
         end_recurring_period = get_utc_datetime(ist_date=end_recurring_period, ist_time=end_recurring_period_time)
         rule = generate_rule(timeline, name=schedule.schedule_title, description=schedule.schedule_title)
-        event_dict = {'start': start, 'end': end, 'title': schedule.schedule_title, 'creator': schedule.created_by,
+        event_dict = {'start': start, 'end': end, 'title': schedule.schedule_title, 'creator': schedule.created_by.user,
                       'rule': rule, 'end_recurring_period': end_recurring_period}
         return event_dict
 
