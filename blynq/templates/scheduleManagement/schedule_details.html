@@ -9,14 +9,18 @@
             <div class="panel panel-default" style="border-right:1px solid grey">
                 <div class="panel-heading">Schedule Details</div>
                 <div class="panel-body">
-                    <form id="form_schedule_details" name="scheduleDetails" class="form-horizontal"
+                    <form id="form_schedule_details" name="scheduleDetailsForm" class="form-horizontal"
                           enctype="multipart/form-data">
 
                         <div class="form-group">
                             <div class="control-label col-md-2">Schedule Name*</div>
                             <div class="col-md-10">
                                 <input name="scheduleName" class="form-control"
-                                       placeholder="Schedule Title" ng-model="schedule.schedule_title">
+                                       placeholder="Schedule Title" ng-model="schedule.schedule_title" required>
+                            </div>
+                            <div class="col-md-6 col-md-offset-2" ng-show="scheduleDetailsForm.schedule_title.$touched &&
+                                scheduleDetailsForm.schedule_title.$invalid">
+                                <span>This field is required.</span>
                             </div>
                         </div>
 
@@ -24,9 +28,9 @@
                             <div class="control-label col-md-2">Screens*</div>
                             <div class="col-md-10">
                                 <distribution-list
-                                selected-screens="schedule.schedule_screens"
-                                selected-groups ="schedule.schedule_groups">
-                            </distribution-list>
+                                    selected-screens="schedule.schedule_screens"
+                                    selected-groups ="schedule.schedule_groups">
+                                </distribution-list>
                             </div>
 
                         </div>
