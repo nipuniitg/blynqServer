@@ -310,7 +310,7 @@ function(groupsFactory, dataAccessFactory, $scope,$uibModal){
     var newGroupIndex = -1
 
     $scope.addNewGroup = function(){
-        openGroupDetailsMdl(newScreenIndex);
+        openGroupDetailsMdl(newGroupIndex);
     }
 
     $scope.editGroupDetails = function(index){
@@ -362,7 +362,6 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
     //private functions
     var onLoad = function(){
         $scope.refreshScreens();
-        $scope.isNewScreenModal = false;
         $scope.activeScreenIndex = 0;
     };
 
@@ -385,13 +384,6 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
             $scope.screens = allScreens;
         });
      }
-
-    $scope.removeGroupTagforScreen = function(index)
-    {
-        $scope.modalScreenDetailsObj.groups.splice(index,1);
-    }
-
-    //groups
 
     onLoad();
 
@@ -441,7 +433,7 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
         });
 
         modalInstance.result.then(function saved(){
-            if(isNewScreenModal){
+            if(isNewScreen){
                 toastr('screen Added Successfully');
             }
             else{
