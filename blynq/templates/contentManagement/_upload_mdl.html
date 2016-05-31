@@ -16,7 +16,18 @@
         <div class="progress progress-striped active progress-sm">
             <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="70" aria-valuemin="0"
                  aria-valuemax="100" style="width: {[uploadProgressIndicator]}%">
-                <span class="sr-only">45% Complete</span>
+                <span class="sr-only">{[uploadProgressIndicator ]} complete</span>
+            </div>
+        </div>
+
+        <div class="row" ng-show="invalidFiles.length>0">
+            <div class="col-md-12">
+                <h4>Invalid Files</h4>
+                <ul>
+                    <li ng-repeat="file in invalidFiles">
+                        {[ file.name ]}
+                    </li>
+                </ul>
             </div>
         </div>
     </div>

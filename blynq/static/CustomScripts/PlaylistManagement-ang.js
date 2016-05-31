@@ -1,4 +1,4 @@
-var plApp = angular.module("plApp",['as.sortable','ui.bootstrap','ngCookies']).config(function($interpolateProvider) {
+var plApp = angular.module("plApp",['as.sortable','ui.bootstrap','ngCookies','ngPDFViewer']).config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('{[');
     $interpolateProvider.endSymbol(']}');
     });

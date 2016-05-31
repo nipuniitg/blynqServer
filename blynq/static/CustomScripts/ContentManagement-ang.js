@@ -188,6 +188,11 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
         $scope.refreshContent($scope.currentFolderId);
     };
 
+    $scope.fileIcons = {
+        pdf : '/static/images/pdf_logo.png'
+        ,video : '/static/images/video_icon.png'
+    };
+
     $scope.refreshContent = function(folderId){
 
         ctFactory.getFolders(folderId, function(data)
@@ -311,7 +316,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
         }
     }
 
-$scope.moveContent = function(){
+    $scope.moveContent = function(){
         if($scope.checkedFolders.length > 0 || $scope.checkedContent.length >0)
         {
             var content_ids =[];
@@ -361,9 +366,11 @@ $scope.moveContent = function(){
     $scope.viewContentInDetail = function(file){
         var modalInstance = $uibModal.open({
               animation: true
+              //,backdrop : false
               ,templateUrl: '/templates/contentManagement/_content_view_mdl.html'
               ,controller: 'mdlContentInDetailCtrl'
               ,size: 'lg'
+              //,windowTemplateUrl : '/templates/shared/_mdl_window_clear.html'
               //,backdrop: 'static' //disables modal closing by click on the backdrop.
               ,resolve : {
                     file : function(){
@@ -479,8 +486,37 @@ plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentS
         $scope.uploadProgressIndicator = 0;
     };
 
-    $scope.uploadFiles = function(){
+    var validFileTypes = ['image/png','image/jpg','image/jpeg','application/pdf','video'];
+
+    $scope.validateFiles = function(){
+        $scope.invalidFiles = [];
+        var invalid = false;
         if($scope.files.length>0)
+        {
+            for(var i in $scope.files){
+                if(validFileTypes.indexOf($scope.files[i].type)<0)
+                {
+                    $scope.$apply(function(){$scope.invalidFiles.push($scope.files[i])});
+                    invalid = true;
+                }
+
+            }
+            if(invalid){
+                toastr.warning('There are some invalid files.Please remove them and try again');
+                return false
+            }
+            else{
+                return true
+            }
+        }else{
+            toastr.warning('Select atleast one file');
+            return false
+        }
+
+    }
+
+    $scope.uploadFiles = function(){
+        if($scope.validateFiles())
         {
             var formData = new FormData();
             var filesArr = [];
@@ -503,8 +539,6 @@ plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentS
             objXhr.open("POST", "/content/uploadContent/");
             objXhr.setRequestHeader("X-CSRFToken", csrftoken);
             objXhr.send(formData);
-        }else{
-            toastr.warning('Select atleast one file');
         }
     }
 
@@ -639,7 +673,30 @@ return{
                     $scope.files.push(elem[0].files[i])
                 }
                 });
+                $scope.validateFiles();
             });
     }
 }
 }]);
+
+plApp.directive('pdfSection', ['PDFViewerService', function(pdf){
+    return{
+        restrict : 'E'
+        ,link   : function($scope, elem, attr){
+            $scope.viewer = pdf.Instance("viewer");
+
+            $scope.nextPage = function() {
+                $scope.viewer.nextPage();
+            };
+
+            $scope.prevPage = function() {
+                $scope.viewer.prevPage();
+            };
+
+            $scope.pageLoaded = function(curPage, totalPages) {
+                $scope.currentPage = curPage;
+                $scope.totalPages = totalPages;
+            };
+        }
+    }
+}])
