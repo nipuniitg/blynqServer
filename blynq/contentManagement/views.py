@@ -70,8 +70,17 @@ def delete_folder_helper(req_content, user_content):
 
 
 def delete_file_helper(content):
-    os.remove(MEDIA_ROOT + '/' + content.document.name)
+    file_name = content.document.name
+    if content.document:
+        organization = content.organization
+        organization.used_file_size = organization.used_file_size - content.document.size
+        if organization.used_file_size < 0:
+            organization.used_file_size = 0
+            organization.save()
     content.delete()
+    path = MEDIA_ROOT + '/' + file_name
+    if os.path.isfile(path):
+        os.remove(path)
 
 
 @transaction.atomic

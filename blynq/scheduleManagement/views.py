@@ -456,6 +456,19 @@ def get_screen_schedules(request, screen_id):
     return list_to_json(json_data)
 
 
+def get_group_schedules(request, group_id):
+    print "inside get_group_schedules"
+    screen_id = int(group_id)
+    user_details = get_userdetails(request)
+    group_schedule_id_list = ScheduleScreens.objects.filter(group_id=group_id).values_list(
+        'schedule_id', flat=True).distinct()
+    screen_schedules = Schedule.get_user_relevant_objects(user_details).filter(schedule_id__in=group_schedule_id_list)
+    json_data = ScheduleSerializer().serialize(screen_schedules, fields=('schedule_id', 'schedule_title',
+                                                                         'schedule_playlists', 'timeline',
+                                                                         'schedule_screens', 'schedule_groups'))
+    return list_to_json(json_data)
+
+
 def get_playlist_schedules(request, playlist_id):
     print "inside get_playlist_schedules"
     playlist_id = int(playlist_id)

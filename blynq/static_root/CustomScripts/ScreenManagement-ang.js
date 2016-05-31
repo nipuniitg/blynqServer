@@ -112,7 +112,7 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
     var getScreenSchedules  =   function(screen_id, callback){
         $http({
             method : "GET",
-            url : "/schedule/getScreenSchedulesJson/" + screen_id
+            url : "/schedule/getScreenSchedules/" + screen_id
         }).then(function mySucces(response) {
             if(callback)
             {

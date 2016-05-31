@@ -3,7 +3,7 @@ from django.core.serializers.python import Serializer
 from customLibrary.views_lib import get_ist_date_str, get_ist_time_str
 from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import SchedulePlaylists, ScheduleScreens
-from screenManagement.serializers import ScreenSerializer
+from screenManagement.serializers import ScreenSerializer, GroupSerializer
 
 
 class SchedulePlaylistsSerializer(Serializer):
@@ -36,8 +36,8 @@ class ScheduleScreensSerializer(Serializer):
             self.add_dict_to_current(json_data)
             del self._current['screen']
         if 'group' in self.selected_fields:
-            json_data = ScreenSerializer().serialize([obj.group],
-                                                     fields=('group_id', 'group_name', 'description', 'screen'))
+            json_data = GroupSerializer().serialize([obj.group],
+                                                    fields=('group_id', 'group_name', 'description', 'screen'))
             self.add_dict_to_current(json_data)
             del self._current['group']
         self.objects.append(self._current)
