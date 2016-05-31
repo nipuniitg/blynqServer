@@ -107,9 +107,9 @@ def remove_group_screens(screen=None, group=None, group_screen_id_list=[]):
     return True
 
 
+@transaction.atomic
 @login_required
 def upsert_group(request):
-    transaction.set_autocommit(False)
     posted_data = string_to_dict(request.body)
     success = False
     errors = []
@@ -119,40 +119,38 @@ def upsert_group(request):
             user_details = get_userdetails(request)
             form_data = add_group_form.cleaned_data
             try:
-                group_id = posted_data['group_id']
-                if group_id == -1:
-                    group = Group(group_name=form_data.get('group_name'), organization=user_details.organization,
-                                  created_by=user_details)
-                else:
-                    group = Group.get_user_relevant_objects(user_details).get(group_id=group_id)
-                    group.group_name = form_data.get('group_name')
-                group.description = form_data.get('description')
-                group.save()
-                screens = posted_data.get('screens')
-                group_screen_id_list = []
-                for each_screen in screens:
-                    group_screen_id = each_screen.get('group_screen_id')
-                    if group_screen_id == -1:
-                        screen_id = each_screen.get('screen_id')
-                        screen = Screen.get_user_relevant_objects(user_details=user_details).get(screen_id=screen_id)
-                        group_screen = GroupScreens.objects.create(screen=screen, group=group, created_by=user_details)
-                        group_screen_id = group_screen.group_screen_id
-                        success_insert = insert_group_screen(group=group, screen=screen)
-                        if not success_insert:
-                            error = 'error while removing inserting screens to group'
-                            print error
-                            transaction.rollback()
-                            return ajax_response(success=success_insert, errors=[error])
-                    group_screen_id_list.append(group_screen_id)
+                with transaction.atomic():
+                    group_id = posted_data['group_id']
+                    if group_id == -1:
+                        group = Group(group_name=form_data.get('group_name'), organization=user_details.organization,
+                                      created_by=user_details)
+                    else:
+                        group = Group.get_user_relevant_objects(user_details).get(group_id=group_id)
+                        group.group_name = form_data.get('group_name')
+                    group.description = form_data.get('description')
+                    group.save()
+                    screens = posted_data.get('screens')
+                    group_screen_id_list = []
+                    for each_screen in screens:
+                        group_screen_id = each_screen.get('group_screen_id')
+                        if group_screen_id == -1:
+                            screen_id = each_screen.get('screen_id')
+                            screen = Screen.get_user_relevant_objects(user_details=user_details).get(screen_id=screen_id)
+                            group_screen = GroupScreens.objects.create(screen=screen, group=group, created_by=user_details)
+                            group_screen_id = group_screen.group_screen_id
+                            success_insert = insert_group_screen(group=group, screen=screen)
+                            if not success_insert:
+                                error = 'error while removing inserting screens to group'
+                                debugFileLog.error(error)
+                                raise Exception(error)
+                        group_screen_id_list.append(group_screen_id)
 
-                success_removal = remove_group_screens(group=group, group_screen_id_list=group_screen_id_list)
-                if not success_removal:
-                    error = 'error while removing deleted screens from group'
-                    print error
-                    transaction.rollback()
-                    return ajax_response(success=success_removal, errors=[error])
-
-                success = True
+                    success_removal = remove_group_screens(group=group, group_screen_id_list=group_screen_id_list)
+                    if not success_removal:
+                        error = 'error while removing deleted screens from group'
+                        debugFileLog.error(error)
+                        raise Exception(error)
+                    success = True
             except Exception as e:
                 print "Exception is ", e
                 errors = ['Error while adding the group details to database']
@@ -161,13 +159,11 @@ def upsert_group(request):
             print 'Add/Edit Group Form is not valid'
             print add_group_form.errors
             errors = add_group_form.errors
-    if success:
-        transaction.commit()
-    else:
-        transaction.rollback()
     return ajax_response(success=success, errors=errors)
 
 
+@transaction.atomic
+@login_required
 def delete_group(request):
     user_details = get_userdetails(request)
     posted_data = string_to_dict(request.body)
@@ -175,9 +171,10 @@ def delete_group(request):
     success = False
     errors = []
     try:
-        user_content = Group.get_user_relevant_objects(user_details).get(group_id=group_id)
-        user_content.delete()
-        success = True
+        with transaction.atomic():
+            user_content = Group.get_user_relevant_objects(user_details).get(group_id=group_id)
+            user_content.delete()
+            success = True
     except Exception as e:
         print "Exception is ", e
         error = "Error while deleting the group"
@@ -202,80 +199,75 @@ def activation_key_valid(request):
 
 
 # Replace upsert_screen with upsert_screen1 after Prasanth implements the AddScreenForm
+@transaction.atomic
 @login_required
 def upsert_screen(request):
-    transaction.set_autocommit(False)
     user_details = get_userdetails(request)
     posted_data = string_to_dict(request.body)
     success = False
     errors = []
     try:
-        screen_id = int(posted_data.get('screen_id'))
-        if screen_id == -1:
-            activation_key = posted_data.get('activation_key')
-            try:
-                screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key, in_use=False)
-                screen = Screen(screen_name=posted_data.get('screen_name'), unique_device_key=screen_activation_key,
-                                activated_by=user_details)
-                screen.save()
-                screen_activation_key.in_use = True
-                screen_activation_key.save()
-            except Exception as e:
-                print "Not a valid activation key"
-                print "Exception is ", e
-                return ajax_response(success=False, errors=['Not a valid activation key, contact support@blynq.in'])
-        else:
-            screen = Screen.objects.get(screen_id=screen_id)
-        screen.screen_size = int(posted_data.get('screen_size'))
-        screen.address = posted_data.get('address')
-        city_id = int(posted_data.get('city_id'))
-        if city_id != -1:
-            screen.city_id = posted_data.get('city_id')
-        screen.aspect_ratio = posted_data.get('aspect_ratio')
-        screen.resolution = posted_data.get('resolution')
-        screen.owned_by = user_details.organization
-        status = default_screen_status()
-        screen.status = status
-        screen.save()
-        group_screen_id_list = []
-        for group in posted_data.get('groups'):
-            group_screen_id = int(group.get('group_screen_id'))
-            if group.group_screen_id == -1:
-                group_entry = Group.objects.get(group_id=int(group.get('group_id')))
-                group_screen = GroupScreens.objects.create(group=group_entry, screen=screen, created_by=user_details)
-                group_screen_id = group.group_screen_id
-                success_insert = insert_group_screen(screen=screen, group=group_entry)
-                if not success_insert:
-                    error = 'error while inserting group to screen'
-                    print error
-                    transaction.rollback()
-                    return ajax_response(success=success_insert, errors=[error])
-            group_screen_id_list.append(group_screen_id)
-
-        success_removal = remove_group_screens(screen=screen, group_screen_id_list=group_screen_id_list)
-        if not success_removal:
-            error = 'error while removing deleted groups from screen'
-            print error
-            transaction.rollback()
-            return ajax_response(success=success_removal, errors=[error])
-
-        # Adding a calendar for each screen
-        if not screen.screen_calendar:
-            calendar = Calendar(name=screen.screen_name + str(screen.screen_id))
-            calendar.save()
-            screen.screen_calendar = calendar
+        with transaction.atomic():
+            screen_id = int(posted_data.get('screen_id'))
+            if screen_id == -1:
+                activation_key = posted_data.get('activation_key')
+                try:
+                    screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key, in_use=False)
+                    screen = Screen(screen_name=posted_data.get('screen_name'), unique_device_key=screen_activation_key,
+                                    activated_by=user_details)
+                    screen.save()
+                    screen_activation_key.in_use = True
+                    screen_activation_key.save()
+                except Exception as e:
+                    print "Not a valid activation key"
+                    print "Exception is ", e
+                    return ajax_response(success=False, errors=['Not a valid activation key, contact support@blynq.in'])
+            else:
+                screen = Screen.objects.get(screen_id=screen_id)
+            screen.screen_size = int(posted_data.get('screen_size'))
+            screen.address = posted_data.get('address')
+            city_id = int(posted_data.get('city_id'))
+            if city_id != -1:
+                screen.city_id = posted_data.get('city_id')
+            screen.aspect_ratio = posted_data.get('aspect_ratio')
+            screen.resolution = posted_data.get('resolution')
+            screen.owned_by = user_details.organization
+            status = default_screen_status()
+            screen.status = status
             screen.save()
-        # TODO: The above case only handles the PRIVATE businessType, add a check
-        success = True
+            group_screen_id_list = []
+            for group in posted_data.get('groups'):
+                group_screen_id = int(group.get('group_screen_id'))
+                if group.group_screen_id == -1:
+                    group_entry = Group.objects.get(group_id=int(group.get('group_id')))
+                    group_screen = GroupScreens.objects.create(group=group_entry, screen=screen, created_by=user_details)
+                    group_screen_id = group.group_screen_id
+                    success_insert = insert_group_screen(screen=screen, group=group_entry)
+                    if not success_insert:
+                        error = 'error while inserting group to screen'
+                        debugFileLog.error(error)
+                        raise Exception(error)
+                group_screen_id_list.append(group_screen_id)
+
+            success_removal = remove_group_screens(screen=screen, group_screen_id_list=group_screen_id_list)
+            if not success_removal:
+                error = 'error while removing deleted groups from screen'
+                debugFileLog.error(error)
+                raise Exception(error)
+
+            # Adding a calendar for each screen
+            if not screen.screen_calendar:
+                calendar = Calendar(name=screen.screen_name + str(screen.screen_id))
+                calendar.save()
+                screen.screen_calendar = calendar
+                screen.save()
+            # TODO: The above case only handles the PRIVATE businessType, add a check
+            success = True
     except Exception as e:
         print "Exception is ", e
         errors = ['Error while adding the screen details to database']
         print errors[0]
         success = False
-    if success:
-        transaction.commit()
-    else:
-        transaction.rollback()
     return ajax_response(success=success, errors=errors)
 
 
