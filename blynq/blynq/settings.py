@@ -189,4 +189,10 @@ else:
     MEDIA_HOST = 'http://www.blynq.in'
 
 
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.zoho.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'django@blynq.in'
+EMAIL_HOST_PASSWORD = 'Asdf;lkj'
+
 
