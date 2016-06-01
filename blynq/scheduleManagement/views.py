@@ -10,7 +10,6 @@ from django.db import transaction
 # Create your views here.
 # from schedule.views import calendar
 
-from customLibrary.serializers import playlist_dict
 from customLibrary.views_lib import get_userdetails, ajax_response, list_to_json, string_to_dict, list_to_comma_string, \
     default_string_to_datetime, get_utc_datetime, debugFileLog
 from playlistManagement.models import Playlist
@@ -99,14 +98,7 @@ def upsert_schedule_screens(user_details, schedule, schedule_screens, event_dict
     removed_schedule_screens = ScheduleScreens.objects.filter(schedule=schedule, group__isnull=True).exclude(
         schedule_screen_id__in=schedule_screen_id_list)
     for each_schedule_screen in removed_schedule_screens:
-        if each_schedule_screen.event:
-            if each_schedule_screen.event.rule:
-                rule = each_schedule_screen.event.rule
-                each_schedule_screen.event.rule = None
-                rule.delete()
-            event = each_schedule_screen.event
-            each_schedule_screen.event = None
-            event.delete()
+        each_schedule_screen.delete_event()
     if removed_schedule_screens:
         removed_schedule_screens.delete()
     success = True
@@ -126,14 +118,16 @@ def upsert_schedule_groups(user_details, schedule, schedule_groups, event_dict):
             # into that empty group
             event = Event(**event_dict)
             event.save()
-            entry = ScheduleScreens.objects.create(schedule=schedule, group=group, event=event)
+            entry = ScheduleScreens(schedule=schedule, group=group, event=event)
+            entry.save()
+            schedule_screen_id_list.append(entry.schedule_screen_id)
             for screen in group.screen_set.all():
                 screen_event = Event(**event_dict)
                 screen_event.calendar = screen.screen_calendar
                 screen_event.save()
-                entry = ScheduleScreens.objects.create(screen=screen, schedule=schedule, group=group,
-                                                       event=screen_event)
-            schedule_screen_id = entry.schedule_screen_id
+                entry = ScheduleScreens(screen=screen, schedule=schedule, group=group, event=screen_event)
+                entry.save()
+                schedule_screen_id_list.append(entry.schedule_screen_id)
         else:
             entry = ScheduleScreens.objects.get(schedule_screen_id=schedule_screen_id)
             if entry.event:
@@ -143,13 +137,15 @@ def upsert_schedule_groups(user_details, schedule, schedule_groups, event_dict):
                 event.save()
                 entry.event = event
             entry.save()
-        schedule_screen_id_list.append(schedule_screen_id)
+            schedule_screen_id_list.append(schedule_screen_id)
 
     # Remove groups not in the schedule
     removed_schedule_groups = ScheduleScreens.objects.filter(schedule=schedule, group__isnull=False).exclude(
         schedule_screen_id__in=schedule_screen_id_list)
     for schedule_group in removed_schedule_groups:
-        schedule_group.delete()
+        schedule_group.delete_event()
+    if removed_schedule_groups:
+        removed_schedule_groups.delete()
     success = True
     return success, error
 
@@ -518,9 +514,11 @@ def delete_schedule(request):
     try:
         with transaction.atomic():
             posted_data = string_to_dict(request.body)
-            print 'body is ', request.body
             schedule_id = int(posted_data.get('schedule_id'))
             schedule = Schedule.get_user_relevant_objects(user_details=user_details).get(schedule_id=schedule_id)
+            schedule_screens = ScheduleScreens.objects.filter(schedule=schedule)
+            for each_schedule_screen in schedule_screens:
+                each_schedule_screen.delete_event()
             schedule.delete()
             success = True
     except Exception as e:

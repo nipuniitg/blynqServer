@@ -79,7 +79,6 @@ def get_schedule_timeline(schedule):
     return default_timeline()
 
 
-
 class ScheduleSerializer(Serializer):
     def end_object(self, obj):
         self._current['schedule_id'] = obj._get_pk_val()
@@ -94,9 +93,9 @@ class ScheduleSerializer(Serializer):
                 schedule_screens, fields=('schedule_screen_id','screen'))
             self._current['schedule_screens'] = json_data
         if 'schedule_groups' in self.selected_fields:
-            schedule_screens = ScheduleScreens.objects.filter(schedule=obj, group__isnull=False)
+            schedule_groups = ScheduleScreens.objects.filter(schedule=obj, screen__isnull=True, group__isnull=False)
             json_data = ScheduleScreensSerializer().serialize(
-                schedule_screens, fields=('schedule_screen_id','group'))
+                schedule_groups, fields=('schedule_screen_id','group'))
             self._current['schedule_groups'] = json_data
         if 'timeline' in self.selected_fields:
             self._current['timeline'] = get_schedule_timeline(obj)

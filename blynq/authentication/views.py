@@ -86,12 +86,12 @@ def request_quote(request):
         if request_quote_form.is_valid():
             try:
                 request_quote_form.save()
-                message = 'Name: ' + posted_data.get('name') + '\n'
-                message += 'E-mail: ' + posted_data.get('email') + '\n'
-                message += 'Mobile Number: ' + str(posted_data.get('mobile_number')) + '\n'
-                message += 'Number of Devices: ' + str(posted_data.get('num_of_devices')) + '\n'
-                message += 'Additional Details: ' + posted_data.get('additional_details') + '\n'
-                send_mail_blynq(subject='Quote Requested', message=message)
+                message = 'Name: ' + posted_data.get('name') + '\n\n'
+                message += 'E-mail: ' + posted_data.get('email') + '\n\n'
+                message += 'Mobile Number: ' + str(posted_data.get('mobile_number')) + '\n\n'
+                message += 'Number of Devices: ' + str(posted_data.get('num_of_devices')) + '\n\n'
+                message += 'Additional Details: ' + posted_data.get('additional_details') + '\n\n'
+                send_mail_blynq(subject='[Auto-Generated] Quote Requested', message=message)
                 success = True
             except Exception as e:
                 print "Exception is ", e

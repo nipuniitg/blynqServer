@@ -36,6 +36,18 @@ class ScheduleScreens(models.Model):
             description = description + ' - group ' + self.group.group_name
         return description
 
+    def delete_event(self):
+        if self.event:
+            event = self.event
+            if event.rule:
+                rule = event.rule
+                event.rule = None
+                event.save()
+                rule.delete()
+            self.event = None
+            self.save()
+            event.delete()
+
     # class Meta:
     #     unique_together = (('screen', 'schedule', 'group'))
 

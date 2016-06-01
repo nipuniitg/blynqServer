@@ -37,8 +37,9 @@ def upsert_playlist(request):
 
             # upsert playlist
             if playlist_id == -1:
-                playlist = Playlist.objects.create(playlist_title=playlist_title, created_by=user_details,
-                                                   last_updated_by=user_details, organization=user_details.organization)
+                playlist = Playlist(playlist_title=playlist_title, created_by=user_details,
+                                    last_updated_by=user_details, organization=user_details.organization)
+                playlist.save()
                 playlist_id = playlist.playlist_id
             else:
                 playlist = user_playlists.get(playlist_id=playlist_id)
