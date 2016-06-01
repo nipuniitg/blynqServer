@@ -88,9 +88,9 @@ def request_quote(request):
                 request_quote_form.save()
                 message = 'Name: ' + posted_data.get('name') + '\n'
                 message += 'E-mail: ' + posted_data.get('email') + '\n'
-                message += 'Mobile Number: ' + posted_data.get('mobile_number')
-                message += 'Number of Devices: ' + posted_data.get('num_of_devices')
-                message += 'Additional Details: ' + posted_data.get('additional_details')
+                message += 'Mobile Number: ' + str(posted_data.get('mobile_number')) + '\n'
+                message += 'Number of Devices: ' + str(posted_data.get('num_of_devices')) + '\n'
+                message += 'Additional Details: ' + posted_data.get('additional_details') + '\n'
                 send_mail_blynq(subject='Quote Requested', message=message)
                 success = True
             except Exception as e:

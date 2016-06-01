@@ -296,7 +296,7 @@
                             Name
                         </label>
                         <div class="col-md-6 wow fadeInRight">
-                            <input type="text" placeholder="" id="name" name="requestorName"
+                            <input type="text" placeholder="Name" id="name" name="requestorName"
                                    ng-model = "requestQuoteFormDetails.name" class="form-control" required>
                         </div>
                         <div class="col-md-6 col-md-offset-2" ng-show="requestQuoteForm.requestorName.$touched &&
@@ -309,7 +309,7 @@
                             Email
                         </label>
                         <div class="col-md-6 wow fadeInRight">
-                            <input type="email" placeholder="" id="email" ng-model="requestQuoteFormDetails.email"
+                            <input type="email" placeholder="email@example.com" id="email" ng-model="requestQuoteFormDetails.email"
                                    name="requestorEmail" class="form-control" required>
                         </div>
                         <div class="col-md-6 col-md-offset-2" ng-show="requestQuoteForm.requestorEmail.$touched &&
@@ -322,7 +322,7 @@
                             Phone
                         </label>
                         <div class="col-md-6 wow fadeInRight">
-                            <input type="number" id="phone" ng-model="requestQuoteFormDetails.mobile_number"
+                            <input type="text" id="phone" placeholder="8122846970" ng-model="requestQuoteFormDetails.mobile_number"
                                    name="requestorPhoneNumber" class="form-control" required>
                         </div>
                         <div class="col-md-6 col-md-offset-2" ng-show="requestQuoteForm.requestorPhoneNumber.$touched &&
@@ -335,7 +335,7 @@
                             Num. of Devices
                         </label>
                         <div class="col-md-6 wow fadeInRight">
-                            <input type="number" id="noOfDevices" ng-model="requestQuoteFormDetails.num_of_devices"
+                            <input type="number" placeholder="10" id="noOfDevices" ng-model="requestQuoteFormDetails.num_of_devices"
                                    name="num_of_devices" class="form-control" required>
                         </div>
                         <div class="col-md-6 col-md-offset-2" ng-show="requestQuoteForm.num_of_devices.$touched &&
@@ -348,7 +348,7 @@
                             Additional Details
                         </label>
                         <div class="col-md-6 wow fadeInRight">
-                            <textarea placeholder="" id="additional_details"
+                            <textarea placeholder="Messaage goes here" id="additional_details"
                                       ng-model="requestQuoteFormDetails.additional_details"
                                       name="message" class="form-control">
                             </textarea>
