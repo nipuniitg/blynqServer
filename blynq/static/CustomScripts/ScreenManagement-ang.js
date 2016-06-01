@@ -277,7 +277,11 @@ function(groupsFactory, dataAccessFactory, $scope,$uibModal){
 
    var onLoad = function(){
           refreshGroups();
-          $scope.selectedIndex = 0;
+          setActiveGroupIndex(0);
+   }
+
+   var setActiveGroupIndex = function(index){
+        $scope.activeGroupIndex = index;
    }
 
    var refreshGroups = function(){
@@ -300,7 +304,7 @@ function(groupsFactory, dataAccessFactory, $scope,$uibModal){
 
     //shcedules
     $scope.clickedOnGroup= function(group, index){
-        $scope.selectedIndex = index;
+        setActiveGroupIndex(index);
         $scope.screensInSelectedGroup = group.screens;
     }
 
@@ -339,12 +343,6 @@ function(groupsFactory, dataAccessFactory, $scope,$uibModal){
         });
 
         modalInstance.result.then(function saved(){
-            if(isNewGroup){
-                toastr('group Added Successfully');
-            }
-            else{
-                toastr.success('group Updated SuccessFully');
-            }
             refreshGroups();
         }, function cancelled(){
             toastr.warning('Screen Update cancelled')
