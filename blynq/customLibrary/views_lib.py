@@ -2,10 +2,10 @@
 import datetime
 import logging
 
+from django.core.mail import send_mail
 from django.http import JsonResponse, Http404
 from django.utils import timezone
 import json, pytz
-
 from authentication.models import UserDetails
 
 
@@ -43,9 +43,17 @@ def list_to_comma_string(list):
     return ','.join(map(str, list))
 
 
+def send_mail_blynq(to=['hello@blynq.in'], subject='', message=''):
+    try:
+        send_mail(subject=subject, message=message, from_email='django@blynq.in', recipient_list=to,
+                  fail_silently=False)
+    except Exception as e:
+        debugFileLog.error('Error while sending mail to ' + ','.join(to))
+
+
 # Format of the string is 31012016095455
 def default_string_to_datetime(str):
-    dt=datetime.datetime.strptime(str,'%d%m%Y%H%M%S')
+    dt = datetime.datetime.strptime(str, '%d%m%Y%H%M%S')
     dt = timezone.make_aware(dt, timezone.get_default_timezone())
     return dt
 
@@ -64,10 +72,10 @@ def get_ist_datetime(utc_datetime):
 
 def get_utc_datetime(ist_date, ist_time):
     ist_datetime = ist_date + ' ' + ist_time
-    local = pytz.timezone ("Asia/Kolkata")
-    naive = datetime.datetime.strptime (ist_datetime, datetime_fmt)
+    local = pytz.timezone("Asia/Kolkata")
+    naive = datetime.datetime.strptime(ist_datetime, datetime_fmt)
     local_dt = local.localize(naive, is_dst=None)
-    utc_dt = local_dt.astimezone (pytz.utc)
+    utc_dt = local_dt.astimezone(pytz.utc)
     return utc_dt
 
 
