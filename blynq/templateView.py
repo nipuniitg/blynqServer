@@ -19,3 +19,8 @@ def get_screen_partial_templates(request, template_name):
     path = 'screen/'
     extn = '.html'
     return render(request, (path+template_name+extn))
+
+def get_playlist_partial_templates(request, template_name):
+    path = 'playlistManagement/'
+    extn = '.html'
+    return render(request, (path+template_name+extn))
