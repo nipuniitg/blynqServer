@@ -87,7 +87,7 @@
 
         <!--logo start-->
         <div>
-            <a href="index.html" class="logo" style="height:60px;width:150px">
+            <a href="{% url 'homepage' %}" class="logo" style="height:60px;width:150px">
             <img src="{%static 'LandingPage/img/Website_logo.png'%}" style="max-height:100%;max-width:100%">
         </a>
         </div>
@@ -145,13 +145,6 @@
                     </a>
                 </li>
 
-                <li class="">
-                    <a href="{% url 'schedule_index' %}" class="">
-                        <i class="fa fa-paper-plane-o"></i>
-                        <span>Schedule</span>
-                    </a>
-                </li>
-
                 <li class="sub-menu">
                     <a href="javascript:;" class="">
                         <i class="icon_desktop"></i>
@@ -165,39 +158,45 @@
                 </li>
 
                 <li>
+                    <a class="" href="{% url 'playlist_index' %}">
+                        <i class="fa fa-film"></i>
+                        <span>Playlists</span>
+
+                    </a>
+                </li>
+
+                <li class="">
+                    <a href="{% url 'schedule_index' %}" class="">
+                        <i class="fa fa-paper-plane-o"></i>
+                        <span>Schedule</span>
+                    </a>
+                </li>
+
+
+                <li>
                     <a class="" href="{% url 'content_index' %}">
                         <i class="fa fa-folder-open-o"></i>
                         <span>Content Library</span>
                     </a>
                 </li>
 
-                <li>
-                    <a class="" href="{% url 'playlist_index' %}">
-                        <i class="fa fa-film"></i>
-                        <span>Playlists</span>
 
-                    </a>
 
-                </li>
+                <!--<li>-->
+                    <!--<a href="javascript:;" class="">-->
+                        <!--<i class="fa fa-users"></i>-->
+                        <!--<span>Users</span>-->
+                        <!--<span class="menu-arrow arrow_carrot-right"></span>-->
+                    <!--</a>-->
+                <!--</li>-->
 
-                <li class="sub-menu">
-                    <a href="javascript:;" class="">
-                        <i class="fa fa-users"></i>
-                        <span>Users</span>
-                        <span class="menu-arrow arrow_carrot-right"></span>
-                    </a>
-                    <ul class="sub">
-                        <li><a class="" href="basic_table.html">Basic Table</a></li>
-                    </ul>
-                </li>
-
-                <li class="">
-                    <a href="" class="">
-                        <i class="icon_documents_alt"></i>
-                        <span>Help</span>
-                        <span class="menu-arrow arrow_carrot-right"></span>
-                    </a>
-                </li>
+                <!--<li class="">-->
+                    <!--<a href="" class="">-->
+                        <!--<i class="icon_documents_alt"></i>-->
+                        <!--<span>Help</span>-->
+                        <!--<span class="menu-arrow arrow_carrot-right"></span>-->
+                    <!--</a>-->
+                <!--</li>-->
 
             </ul>
             <!-- sidebar menu end-->
