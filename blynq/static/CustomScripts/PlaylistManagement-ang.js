@@ -151,7 +151,8 @@ return{
 
 }]);
 
-plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAccessFactory', function(plFactory,ctFactory, $scope, $window, dataAccessFactory){
+plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAccessFactory','$uibModal',
+ function(plFactory,ctFactory, $scope, $window, dataAccessFactory,$uibModal){
 
     var onLoad = function(){
         //playlist
@@ -197,45 +198,6 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
 
 
     //methods
-    //----add / edit playlist (title)
-    $scope.addPlaylist = function(){
-        $scope.mdlPlaylist = angular.copy(plFactory.playlistBluePrint);
-        $scope.mdlType = plFactory.mdlType['Add'];
-    };
-
-    $scope.editPlaylist = function(playlist, index){
-        $scope.mdlPlaylist = angular.copy(playlist);
-        $scope.mdlType = plFactory.mdlType['Edit'];
-    }
-
-    $scope.upsertPlaylist = function(){
-        dataAccessFactory.upsertPlaylist($scope.mdlPlaylist, function(data){
-            if(data.success)
-            {
-                if($scope.mdlType == plFactory.mdlType['Add'])
-                {
-                    toastr.success('Playlist added successfully. Now drag and drop content into Playlist items');
-                    $scope.playlists.push(data.playlist);
-                    updateActivePlaylist($scope.playlists.length-1);
-                }
-                else
-                {
-                    $scope.playlists[$scope.activePlaylistIndex].playlist_title = data.playlist.playlist_title;
-                    toastr.success('Playlist name updated successfully');
-                }
-                $scope.playlistQueueEditMode = true;
-            }
-            else{
-                toastr.warning('Oops!! Some error occured. Please try again.');
-            }
-        });
-
-
-        //ajax save activePlaylistObj(only name will be there). and add it to the playlists
-        //$scope.playlists.push(angular.copy($scope.activePlaylistObj));
-
-    }
-
     $scope.deletePlaylist = function(index){
         dataAccessFactory.deletePlaylist($scope.playlists[index], function(data){
             if(data.success)
@@ -250,6 +212,84 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
             }
         });
     };
+
+    var newPlaylistIndex = -1;
+
+    $scope.addPlaylist = function(){
+        openPlaylistTitleMdl(newPlaylistIndex);
+    }
+
+    $scope.editPlaylist = function(index){
+        openPlaylistTitleMdl(index);
+    }
+
+    var openPlaylistTitleMdl = function(index){
+        var isNewPlaylist = index == newPlaylistIndex ? !0 : !1;
+
+        var modalInstance = $uibModal.open({
+              animation: true
+              ,templateUrl: '/templates/playlistManagement/_playlist_title_mdl.html'
+              ,controller: function($scope, $uibModalInstance, playlistObj, plDataAccessFactory){
+                    var isNewPlaylist = playlistObj.playlist_id == -1 ? !0 : !1;
+                    var onLoad = function(){
+                        $scope.playlist = playlistObj;
+                        $scope.mdlVerbose = isNewPlaylist ? 'Add' : 'Update'
+                    };
+
+                    onLoad();
+
+                    $scope.upsertPlaylist = function(){
+                        console.log($scope.playlist)
+                        plDataAccessFactory.upsertPlaylist($scope.playlist, function(returnData){
+                            if(returnData.success){
+                                if(isNewPlaylist){
+                                    toastr.success('Playlist added successfully');
+                                }
+                                else{
+                                    toastr.success('Playlist updated successfully.')
+                                }
+                                $uibModalInstance.close(returnData.playlist);
+                            }
+                            else{
+                                toastr.warning('Oops! There was some error while updating the details. Please try again later.')
+                            }
+                        });
+                    };
+
+                    $scope.cancel = function(){
+                        $uibModalInstance.dismiss();
+                    }
+              }
+              ,size: 'md'
+              ,backdrop: 'static' //disables modal closing by click on the backdrop.
+              ,resolve: {
+                playlistObj: function(){
+                    if(isNewPlaylist)
+                    {
+                        return angular.copy(plFactory.playlistBluePrint);
+                    }
+                    else{
+                        return angular.copy($scope.playlists[index]);
+                    }
+                }
+              }
+        });
+
+        modalInstance.result.then(function saved(upsertedPlaylist){
+            if(isNewPlaylist){
+                $scope.playlists.push(angular.copy(upsertedPlaylist));
+                updateActivePlaylist($scope.playlists.length-1);
+            }
+            else{
+                $scope.playlists[$scope.activePlaylistIndex].playlist_title = upsertedPlaylist.playlist_title;
+            }
+            $scope.playlistQueueEditMode = true;
+        }, function cancelled(){
+
+        })
+
+    }
+
     //---- add / edit plyalist
 
 

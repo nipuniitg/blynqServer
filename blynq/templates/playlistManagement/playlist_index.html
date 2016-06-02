@@ -10,8 +10,8 @@
                 <div class="panel-heading ">
                     <div class="pull-left">Playlists</div>
                     <div class="widget-icons pull-right">
-                        <a href="#" data-toggle="modal" data-target="#mdlUpsertPlaylistTitle"
-                           ng-click="addPlaylist()" class="wminimize"><i class="fa fa-plus"></i>AddPlaylist</a>
+                        <a href="#" ng-click="addPlaylist()" class="wminimize">
+                            <i class="fa fa-plus"></i>AddPlaylist</a>
                     </div>
                     <div class="clearfix"></div>
                 </div>
@@ -30,8 +30,7 @@
                             {[ playlist.playlist_title ]}
                             <i class="pull-right fa fa-trash-o pointer" confirm-fn="deletePlaylist($index)"
                                confirm confirm-type="delete" data-toggle="modal"></i>
-                            <i class="pull-right fa fa-pencil pointer" data-target="#mdlUpsertPlaylistTitle"
-                               data-toggle="modal" ng-click="editPlaylist(playlist, $index)"></i>
+                            <i class="pull-right fa fa-pencil pointer" ng-click="editPlaylist($index)"></i>
                         </li>
                     </ul>
                 </div>
