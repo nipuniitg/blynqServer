@@ -12,7 +12,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/" style="height:60px;width:150px">
+            <a class="navbar-brand" itemprop="url"  href="http://blynq.in" style="height:60px;width:150px">
                 <img src="{%static 'LandingPage/img/Website_logo.png'%}" style="height:100%;width:100%">
             </a>
         </div>
@@ -238,7 +238,7 @@
                             Step-2
                         </h3>
                         <p>
-                            Login at <a href="/login">Blynq</a>
+                            Login at <a itemprop="url" href="http://blynq.in/login">Blynq</a>
                             <br>
                             <!--<a href="#">-->
                                 <!--Learn more-->
@@ -387,8 +387,8 @@
 
             <div class="col-md-offset-2 col-md-8">
                 <div class="wow fadeInUp au-content">
-                    <p>
-                        BlynQ Technologies is breaking the cycle of traditional content display solutions with a robust,
+                    <p itemprop="description">
+                        <span itemprop="name">BlynQ Technologies</span> is breaking the cycle of traditional content display solutions with a robust,
                         scalable, powerful and cost effective technology solution. Incubated with IIT Guwahati Technology
                         Incubation Center, company is started by IIT Guwahati alumni. We aspire to be unique and best
                         providers of digitised content display solutions - conceptually interesting, visually elegant and
@@ -422,11 +422,20 @@
                     Contact Us
                 </h1>
                 <address>
-                    <p><i class="fa fa-globe pr-10"></i>Registered Address: G-1, Mount Fort Appartments,Pragathi Nagar, Hyderabad</p>
+                    <p itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
+                        <i class="fa fa-globe pr-10"></i>
+                        Registered Address:
+                        <span itemprop="streetAddress">G-1, Mount Fort Appartments,Pragathi Nagar,</span>
+                        <span itemprop="addressLocality">Hyderabad</span>
+                    </p>
                     <p><i class="fa fa-globe pr-10"></i>Office Address: 005, Technology Incubation Center, IIT Guwahati, Assam</p>
                     <p><i class="fa fa-mobile pr-10"></i>Mobile : +91-8122846970 </p>
-                    <p><i class="fa fa-phone pr-10"></i>Phone : 040-4027 1088 </p>
-                    <p><i class="fa fa-envelope pr-10"></i>Email : <a href="javascript:;">hello@blynq.in</a></p>
+                    <p><i class="fa fa-phone pr-10"></i>
+                        Phone : <span itemprop="telephone">040-4027 1088</span> </p>
+                    <p><i class="fa fa-envelope pr-10"></i>Email : <a href="javascript:;">
+                        <span itemprop="email">hello(at)blynq.in</span>
+                    </a>
+                    </p>
                 </address>
             </div>
             <!--<div class="col-lg-3 col-sm-3 wow fadeInUp" data-wow-duration="2s" data-wow-delay=".3s">-->
