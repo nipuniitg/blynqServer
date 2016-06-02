@@ -1,5 +1,5 @@
 {% load staticfiles %}
-<section ng-controller="ctCtrl">
+<section ng-controller="ctCtrl" class="fill">
     <!-- Folder Path -->
     <div class="row">
         <div class="col-md-12">
@@ -14,9 +14,9 @@
         </div>
     </div>
     <!-- Content Library -->
-    <div class="row">
-        <div class="col-md-12" style="min-height:400px; overflow-y: scroll">
-            <div class="panel panel-default" style="border-right:1px solid grey">
+    <div class="row content-container">
+        <div class="col-md-12 fill">
+            <div class="panel panel-default fill" >
                 <div class="panel-heading">
                     Content
                     <div class="btn-group pull-right" style="margin-left:5px;" uib-dropdown is-open="status.isopen">
@@ -39,7 +39,7 @@
                         Folder
                     </button>
                 </div>
-                <div class="panel-body">
+                <div class="panel-body fill overflow-y" >
                     <!-- Folders -->
                     <div content-droppable class="item-container-wrap" ng-repeat="folder in folders"
                          data-index="{[$index]}">
@@ -110,7 +110,7 @@
     <!-- Modal-create folder -->
     {% include "contentManagement/_createFolderForm.html" %}
 
-    <!-- Modal- -->
+    <!-- Modal-->
     {% include "contentManagement/_editContentTitle.html" %}
 
 

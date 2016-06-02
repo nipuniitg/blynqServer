@@ -2,11 +2,11 @@
 {% load staticfiles %}
 
 {% block content%}
-<section class="wrapper" ng-controller="plCtrl">
-    <div class="row">
+<section class="wrapper fixed-wrapper" ng-controller="plCtrl">
+    <div class="row fill">
         <!-- List of all Playlists -->
-        <div class="col-md-2 col-fluid">
-            <div class="panel panel-default" style="border-right:1px solid grey">
+        <div class="col-md-2 col-fluid fill">
+            <div class="panel panel-default">
                 <div class="panel-heading ">
                     <div class="pull-left">Playlists</div>
                     <div class="widget-icons pull-right">
@@ -22,23 +22,25 @@
                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
                     </div>
                 </div>
-                <ul class="list-group" style="height:490px;overflow-y:scroll">
-                    <li ng-repeat="playlist in playlists | filter: searchPlaylists" class="list-group-item"
-                        ng-class="{active: $index === activePlaylistIndex }"
-                        ng-click="clickedOnPlaylist($index)">
-                        {[ playlist.playlist_title ]}
-                        <i class="pull-right fa fa-trash-o pointer" confirm-fn="deletePlaylist($index)"
-                           confirm confirm-type="delete" data-toggle="modal"></i>
-                        <i class="pull-right fa fa-pencil pointer" data-target="#mdlUpsertPlaylistTitle"
-                           data-toggle="modal" ng-click="editPlaylist(playlist, $index)"></i>
-                    </li>
-                </ul>
+                <div class="listContainer">
+                    <ul class="list-group ">
+                        <li ng-repeat="playlist in playlists | filter: searchPlaylists" class="list-group-item"
+                            ng-class="{active: $index === activePlaylistIndex }"
+                            ng-click="clickedOnPlaylist($index)">
+                            {[ playlist.playlist_title ]}
+                            <i class="pull-right fa fa-trash-o pointer" confirm-fn="deletePlaylist($index)"
+                               confirm confirm-type="delete" data-toggle="modal"></i>
+                            <i class="pull-right fa fa-pencil pointer" data-target="#mdlUpsertPlaylistTitle"
+                               data-toggle="modal" ng-click="editPlaylist(playlist, $index)"></i>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
 
         <!-- List of Playlist Queue Items -->
-        <div id="div-playlistQueue" class="col-md-2 col-fluid" style="z-index:0">
-            <div class="panel panel-default" style="border-right:1px solid grey">
+        <div id="div-playlistQueue" class="col-md-2 col-fluid fill">
+            <div class="panel panel-default">
                 <div class="panel-heading ">
                     <div class="pull-left">Playlist Items</div>
                     <div class="widget-icons pull-right" ng-show="!playlistQueueEditMode">
@@ -61,9 +63,8 @@
                     </div>
                 </div>
                 <div droppable add-content-function="addContentToPlaylistItems"
-                     add-folder-function="addFolderContentToPlaylistItems"
-                >
-                    <ul id="ul-playlistQueue" class="list-group" style="height:490px;overflow-y:scroll"
+                     add-folder-function="addFolderContentToPlaylistItems" class="listContainer">
+                    <ul id="ul-playlistQueue" class="list-group"
                         data-as-sortable=""
                         is-disabled="is_sortable_disabled"
                         data-ng-model="activePlaylistObj.playlist_items">
@@ -74,7 +75,7 @@
                             style="padding:2px 5px"
                             data-as-sortable-item>
                             <div data-as-sortable-item-handle>
-                                <i class="fa fa-ellipsis-v" ></i>
+                                <i class="fa fa-ellipsis-v"></i>
                                 {[ item.title ]}
                                 <i class="pull-right fa fa-times pointer" ng-click="reomveQueueItem($index)"
                                    ng-show="playlistQueueEditMode"></i>
@@ -90,16 +91,16 @@
         </div>
 
         <!-- Item Details form -->
-        <div class="col-md-4 col-fluid" ng-show="showQueueItemDetails">
-            <div class="panel panel-default" style="border-right:1px solid grey">
+        <div class="col-md-4 col-fluid fill" ng-show="showQueueItemDetails">
+            <div class="panel panel-default">
                 <div class="panel-heading ">
                     <div class="pull-left">Item Details</div>
                 </div>
-                <div class="panel-body">
+                <div class="panel-body fill">
                     <div class="item-container" style="width:50%; margin:0 auto">
                         <img ng-src="{[ activePlaylistItem.url ]}">
                     </div>
-                    <form class="form-horizontal" role="form" style="height: 400px;overflow-y:scroll">
+                    <form class="form-horizontal" role="form">
                         <div class="form-group">
                             <label class="col-md-3 control-label">Item Name</label>
                             <div class="col-md-9">
@@ -127,7 +128,7 @@
                         <div class="form-group" ng-show="playlistQueueEditMode">
                             <label class="col-md-3 control-label">Duration</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" placeholder="3h 5m 29s"
+                                <input type="text" class="form-control" placeholder="30"
                                        ng-model="activePlaylistItem.display_time">
                             </div>
                         </div>
@@ -155,7 +156,7 @@
         </div>
 
         <!-- Content div -->
-        <div class="col-md-8" ng-show="!showQueueItemDetails">
+        <div class="col-md-8 fill" ng-show="!showQueueItemDetails">
             {% include 'contentManagement/content_holder.html' %}
         </div>
     </div>

@@ -77,6 +77,7 @@ sdApp.directive('schedulesList',['$log','scheduleIndexFactory','$uibModal',
         ,scope      :   {
             schedules : '=schedules'
             ,refreshSchedules : '&refreshSchedulesFn'
+            ,title : '@'
         }
         ,templateUrl:   '/templates/scheduleManagement/_schedules_list.html'
         ,link : function($scope){
@@ -237,12 +238,12 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
     $scope.title = isNewSchedule? 'Add Schedule' : 'Edit Schedule';
 
     var validateSchedule = function(){
-        if($scope.schedule.playlists.length<1)
+        if($scope.schedule.schedule_playlists.length<1)
         {
             toastr.warning('Please select atleast one playlist');
             return false
         }
-        if($scope.schedule.screens.length < 1 && $scope.schedule.groups.length < 1 )
+        if($scope.schedule.schedule_screens.length < 1 && $scope.schedule.schedule_groups.length < 1 )
         {
             toastr.warning('Please select atleast one screen or group');
             return false
@@ -259,7 +260,7 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
 
     $scope.saveSchedule= function(){
         $log.log($scope.schedule);
-        if(validateSchedule){
+        if(validateSchedule()){
             sDF.upsertScheduleDetails($scope.schedule, function(data){
             if(data.success)
             {

@@ -2,12 +2,12 @@
 {% load staticfiles %}
 
 {% block content%}
-<script src="{% static 'CustomScripts/ScheduleManagement-ang.js' %}"></script>
-<section class="wrapper" ng-controller="scheduleIndexCtrl">
-    <div class="row">
-        <div class="col-md-12 col-fluid">
+<section class="wrapper fixed-wrapper" ng-controller="scheduleIndexCtrl">
+    <div class="row fill">
+        <div class="col-md-12 col-fluid fill">
             <schedules-list schedules="schedules"
-                            refresh-schedules-fn="refreshSchedules()">
+                            refresh-schedules-fn="refreshSchedules()"
+                            title="All Schedules">
             </schedules-list>
         </div>
     </div>

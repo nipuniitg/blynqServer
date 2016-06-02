@@ -1,14 +1,14 @@
 {% load staticfiles %}
 <section class="panel panel-default">
     <div class="panel-heading">
-        {[ schedulesTitle ]}
+        {[ title ]}
         <a class="btn  btn-primary pull-right" ng-click="addSchedule()">
             <i class="fa fa-plus"></i>
             Add Schedule
         </a>
     </div>
     <!-- relevant schedules list-->
-    <div ng-if="schedules.length>0" class="table-responsive" style="height:500px">
+    <div ng-if="schedules.length>0" class="table-responsive fill">
         <table class="table  table-hover table-advanced table-striped ">
             <thead>
             <tr>
@@ -32,8 +32,8 @@
             <tr ng-repeat="schedule in schedules">
                 <td><a ng-click="editSchedule($index)"><i class="fa fa-pencil"></i></a></td>
                 <!--<td><a ng-click="deleteSchedule($index)"><i class="fa fa-trash-o"></i></a></td>-->
-                <td><a confirm modal-title="Confirm" message="Are you sure, you want to delete"
-                confirm-fn="deleteSchedule($index)"><i class="fa fa-trash-o"></i></a>
+                <td><a confirm confirm confirm-type="delete" confirm-fn="deleteSchedule($index)">
+                    <i class="fa fa-trash-o"></i></a>
                 </td>
                 <td>{[ schedule.schedule_title ]}</td>
                 <td>
@@ -62,7 +62,7 @@
     <div ng-if="schedules.length==0">
         <div class="row">
             <div class="col-md-offset-2 col-md-8">
-                <div class="well">
+                <div class="well" style="margin:10px">
                     <p>There are no planned schedules. Add <a href="{% url 'playlist_index' %}">playlist</a>
                         and <a ng-click="addSchedule()">schedule</a>
                     </p>

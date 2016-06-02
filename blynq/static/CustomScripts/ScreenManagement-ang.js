@@ -123,6 +123,20 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
         });
     };
 
+    var getGroupSchedules  =   function(group_id, callback){
+        $http({
+            method : "GET",
+            url : "/schedule/getGroupSchedules/" + group_id
+        }).then(function mySucces(response) {
+            if(callback)
+            {
+                callback(response.data);
+            }
+        }, function myError(response) {
+            console.log(response.statusText);
+        });
+    };
+
     var deleteGroup = function(group_id, callback){
         var postData = {
             group_id : group_id
@@ -150,6 +164,7 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
         getSelectableScreens : getSelectableScreens,
         getSelectableGroups : getSelectableGroups
         ,getScreenSchedules :   getScreenSchedules
+        ,getGroupSchedules : getGroupSchedules
         ,deleteGroup : deleteGroup
     }
 
@@ -287,6 +302,7 @@ function(groupsFactory, dataAccessFactory, $scope,$uibModal){
    var refreshGroups = function(){
         groupsFactory.getAllGroups(function(groups){
                 $scope.groups = groups;
+                $scope.refreshGroupSchedules();
           });
    };
 
@@ -307,6 +323,12 @@ function(groupsFactory, dataAccessFactory, $scope,$uibModal){
         setActiveGroupIndex(index);
         $scope.screensInSelectedGroup = group.screens;
     }
+
+    $scope.refreshGroupSchedules = function(){
+        dataAccessFactory.getGroupSchedules($scope.groups[$scope.activeGroupIndex].group_id, function(returnData){
+            $scope.groupSchedules = returnData;
+        });
+    };
 
 
 
@@ -380,7 +402,9 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
         screensFactory.getAllScreens(function(allScreens)
         {
             $scope.screens = allScreens;
+            $scope.refreshScreenSchedules();
         });
+
      }
 
     onLoad();
