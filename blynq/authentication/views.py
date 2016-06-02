@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from authentication.models import UserDetails, Organization, Role
 from blynq import settings
-from customLibrary.views_lib import string_to_dict, ajax_response, get_userdetails, send_mail_blynq
+from customLibrary.views_lib import string_to_dict, ajax_response, get_userdetails, send_mail_blynq, list_to_json
 from scheduleManagement.models import Schedule
 from screenManagement.models import Screen
 
@@ -122,7 +122,7 @@ def organization_homepage_summary(request):
         print "Exception is ", e
         context_dic['used_storage'] = 0
         context_dic['total_storage'] = settings.STORAGE_LIMIT_PER_ORGANIZATION
-    return context_dic
+    return list_to_json(context_dic)
 
 
 # def logout(request):
