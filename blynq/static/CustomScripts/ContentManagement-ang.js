@@ -237,27 +237,49 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
     };
 
     //----createFolderfunctions
-    var clearCreateFolderModalObj = function(){
-        $scope.mdlNewFolderObj.title = '';
-    }
-
-    $scope.cancelCreateFolder = function()
-    {
-        clearCreateFolderModalObj();
-    }
-
     $scope.createFolder = function(){
-        ctDataAccessFactory.createFolder($scope.currentFolderId, $scope.mdlNewFolderObj, function(data){
-            if(data.success)
-            {
-                $scope.refreshContent($scope.currentFolderId);
-                toastr.success('Folder created Successfully');
-            }
-            else{
-                toastr.warning('Oops!!There was some error while creating folder. Please try again.');
-            }
-            clearCreateFolderModalObj();
+        var modalInstance = $uibModal.open({
+              animation: true
+              ,templateUrl: '/templates/contentManagement/_create_folder_mdl.html'
+              ,size: 'md'
+              ,backdrop: 'static' //disables modal closing by click on the backdrop.
+              ,resolve :{
+                currentFolderId : function(){
+                    return $scope.currentFolderId
+                }
+              }
+              ,controller: function($scope, $uibModalInstance, ctDataAccessFactory, currentFolderId){
+                  var onLoad = function(){
+                    $scope.folderObj = {};
+                    $scope.folderObj.title = '';
+                  }
+                  $scope.create = function(){
+                        ctDataAccessFactory.createFolder(currentFolderId, $scope.folderObj, function(data){
+                            if(data.success)
+                            {
+                                toastr.success('Folder created Successfully');
+                                $uibModalInstance.close();
+                            }
+                            else{
+                                toastr.warning('Oops!!There was some error while creating folder. Please try again.');
+                            }
+                        });
+                  }
+
+                  $scope.cancel = function(){
+                    $uibModalInstance.dismiss();
+                  }
+
+                  onLoad();
+              }
         });
+
+        modalInstance.result.then(function folderCreated(){
+            $scope.refreshContent($scope.currentFolderId);
+        }, function cancelled(){
+
+        });
+
     }
     //----createFolderfunctions
 
@@ -265,7 +287,48 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
     //----editContentTitle
 
     $scope.editTitle= function(content){
-        $scope.mdlEditContentObj = angular.copy(content);
+        //$scope.mdlEditContentObj = angular.copy(content);
+        var modalInstance = $uibModal.open({
+              animation: true
+              ,templateUrl: '/templates/contentManagement/_edit_content_title_mdl.html'
+              ,size: 'md'
+              ,backdrop: 'static' //disables modal closing by click on the backdrop.
+              ,resolve :{
+                contentObj : function(){
+                    return angular.copy(content)
+                }
+              }
+              ,controller: function($scope, $uibModalInstance, ctDataAccessFactory, contentObj){
+                  var onLoad = function(){
+                    $scope.content = contentObj
+                  }
+                  $scope.update = function(){
+                        ctDataAccessFactory.updateContentTitle($scope.content, function(data){
+                            if(data.success)
+                            {
+                                toastr.success('Title modified successfully');
+                                $uibModalInstance.close();
+                            }
+                            else{
+                                toastr.warning('Oops!! Some error occured while updating the template');
+                            }
+                        });
+                  }
+
+                  $scope.cancel = function(){
+                    $uibModalInstance.dismiss();
+                  }
+
+                  onLoad();
+              }
+        });
+
+        modalInstance.result.then(function titleUpdated(){
+            $scope.refreshContent($scope.currentFolderId);
+        }, function cancelled(){
+
+        });
+
     }
 
     $scope.updateContentTitle= function(){

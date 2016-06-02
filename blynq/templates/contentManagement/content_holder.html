@@ -30,12 +30,9 @@
                             <li role="menuitem"><a href="#">Delete</a></li>
                         </ul>
                     </div>
-                    <!--<button class="btn  btn-primary pull-right" style="margin-left:5px;" data-toggle="modal"-->
-                            <!--data-target="#mdlUploadContent">Upload-->
-                    <!--</button>-->
                     <button class="btn  btn-primary pull-right" style="margin-left:5px;" ng-click="upload()">Upload
                     </button>
-                    <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#mdlCreateFolder">Create
+                    <button class="btn btn-primary pull-right" ng-click="createFolder()">Create
                         Folder
                     </button>
                 </div>
@@ -61,8 +58,7 @@
                                         <i class="fa fa-trash-o pointer"></i>
                                     </a>
                                 </span>
-                            <a ng-click="editTitle(folder, $index, 'folder')"
-                               data-toggle="modal" data-target="#mdlEditContentTitle">
+                            <a ng-click="editTitle(folder)">
                                 <i class="fa fa-pencil pointer"></i>
                             </a>
                         </div>
@@ -93,8 +89,7 @@
                                 <span class="pull-right">
                                     <a confirm-fn="deleteContent(file)" confirm confirm-type="delete">
                                         <i class="fa fa-trash-o pointer"></i></a></span>
-                                <a ng-click="editTitle(file, $index, 'file')"
-                                   data-toggle="modal" data-target="#mdlEditContentTitle">
+                                <a ng-click="editTitle(file)">
                                     <i class="fa fa-pencil pointer"></i>
                                 </a>
 
@@ -105,13 +100,6 @@
             </div>
         </div>
     </div>
-
-
-    <!-- Modal-create folder -->
-    {% include "contentManagement/_createFolderForm.html" %}
-
-    <!-- Modal-->
-    {% include "contentManagement/_editContentTitle.html" %}
 
 
 </section>
