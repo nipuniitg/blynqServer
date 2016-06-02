@@ -12,9 +12,42 @@ hApp.config(function($httpProvider) {
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
 });
 
-hApp.controller('homeCtrl', ['$scope', '$window', function($scope, $window){
-    var onLoad = function(){
+hApp.factory('homeDataAccessFactory', ['$http', function($http){
 
+    var getHomePageSummary = function(callback){
+        $http({
+            method : "GET",
+            url : "/authentication/getHomePageSummaryJson"
+        }).then(function mySucces(response) {
+            if(callback)
+            {
+                callback(response.data);
+            }
+        }, function myError(response) {
+            console.log(response.statusText);
+        });
+    }
+    return{
+        getHomePageSummary : getHomePageSummary
+    }
+
+}]);
+
+hApp.filter('memoryInGB',function(){
+    return function(x){
+        var inGB = x/1073741824;
+        return inGB.toFixed(2)
+    }
+});
+
+hApp.controller('homeCtrl', ['$scope', '$window','homeDataAccessFactory', function($scope, $window, hDAF){
+    var onLoad = function(){
+        hDAF.getHomePageSummary(function(returnData){
+            $scope.screen_count = returnData.screen_count;
+            $scope.schedule_count = returnData.schedule_count
+            $scope.used_storage= returnData.used_storage
+            $scope.total_storage= returnData.total_storage
+        })
     };
     onLoad();
 

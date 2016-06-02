@@ -81,7 +81,8 @@ width : 130px;
 
 .item-container-header{
 height: 25px;
-padding: 3px
+padding: 3px;
+overflow : hidden;
 }
 
 .item-container > img, .folder-container > img{
@@ -163,11 +164,18 @@ min-height : 500px;
 
 div[class^="col-"].col-fluid{
 padding: 0px;
+position : relative;
 }
 
 .col-fluid .panel.panel-default{
-height : 100%
+height : 100%;
+border-right:1px solid grey
 }
+
+/*.listContainer{
+    height:100%;
+    overflow-y: scroll;
+}*/
 
 html, body{
 height : 100%;
@@ -186,6 +194,7 @@ margin : 0px;
 .item-search-row{
 height : 50px;
 padding: 5px;
+border-bottom:1px solid grey;
 }
 
 .absolute-fluid{
@@ -228,4 +237,43 @@ min-width : 200px;
 
 .fa.pointer{
 cursor:pointer
+}
+
+.fill{
+    height : 100%
+}
+
+.fixed {
+    position : fixed;
+}
+
+.relative{
+    position : relative;
+}
+
+.content-container{
+    position : absolute;
+    top: 53px;
+    bottom:0px;
+    width:100%
+}
+
+.fixed-wrapper{
+    width: auto;
+    position: fixed;
+    top: 0px;
+    bottom: 0px;
+    padding-bottom: 0px;
+}
+
+.listContainer {
+    overflow-y: scroll;
+    position: absolute;
+    width: 100%;
+    top: 86px;
+    bottom: 0px;
+}
+
+.overflow-y{
+    overflow : scroll;
 }
