@@ -4,11 +4,10 @@ from django.db import transaction
 from django.shortcuts import render
 from schedule.models import Calendar
 
-from authentication.models import Address
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, list_to_json, debugFileLog
 from scheduleManagement.models import ScheduleScreens
-from screenManagement.forms import AddScreenForm, AddScreenLocation, AddScreenSpecs, AddGroup
-from screenManagement.models import Screen, ScreenStatus, ScreenSpecs, Group, GroupScreens, ScreenActivationKey
+from screenManagement.forms import AddScreenForm, AddGroup
+from screenManagement.models import Screen, ScreenStatus, Group, GroupScreens, ScreenActivationKey
 
 # import the logging library
 
@@ -307,105 +306,12 @@ def get_selectable_groups_json(request, screen_id=-1):
     return list_to_json(json_data)
 
 
-# Unused functions
-@login_required
-def add_screen_location(request):
-    context_dic = {}
-    success = False
-    if request.method == 'POST':
-        user_details = get_userdetails(request)
-        screen_location_form = AddScreenLocation(data=request.POST)
-        if screen_location_form.is_valid():
-            try:
-                user_details = get_userdetails(request)
-            except Exception as e:
-                print "Exception is ", e
-                print 'Error: username %s does not exist' % str(request.user.username)
-            form_data = screen_location_form.cleaned_data
-            try:
-                location = Address.objects.create(building_name=form_data.get('building_name'),
-                                                  address_line1=form_data.get('address_line1'),
-                                                  address_line2=form_data.get('address_line2'),
-                                                  area=form_data.get('area'),
-                                                  landmark=form_data.get('landmark'),
-                                                  city=form_data.get('city'),
-                                                  pincode=form_data.get('pincode'),
-                                                  added_by=user_details
-                                                  )
-                # TODO: Add an entry of the above screen in the OrganizationScreen
-                # TODO: The above case only handles the PRIVATE businessType
-                # OrganizationScreen.objects.create(organization=organization,
-                #                                   screen=screen,
-                #                                   )
-                success = True
-                success_message = "The address of location has been successfully Added."
-                context_dic['success_message'] = success_message
-            except Exception as e:
-                print "Exception is ", e
-                print 'Error while adding the screen location to database'
-        else:
-            print 'Add Screen location Form is not valid'
-            print screen_location_form.errors
-    else:
-        context_dic['form'] = AddScreenLocation()
-    context_dic['title'] = "Add Screen Location"
-    context_dic['submitButton'] = "Submit"
-    context_dic['success'] = success
-    context_dic['target'] = reverse('add_screen_location')
-    return render(request, 'Shared/displayForm.html', context_dic)
-
-
-@login_required
-def add_screen_specs(request):
-    context_dic = {}
-    success = False
-    if request.method == 'POST':
-        screen_specs_form = AddScreenSpecs(data=request.POST)
-        if screen_specs_form.is_valid():
-            form_data = screen_specs_form.cleaned_data
-            try:
-                screen_specs = ScreenSpecs.objects.create(brand=form_data.get('brand'),
-                                                          model_num=form_data.get('model_num'),
-                                                          weight=form_data.get('weight'),
-                                                          dimensions=form_data.get('dimensions'),
-                                                          resolution=form_data.get('resolution'),
-                                                          display_type=form_data.get('display_type'),
-                                                          screen_size=form_data.get('screen_size'),
-                                                          aspect_ratio=form_data.get('aspect_ratio'),
-                                                          contrast_ratio=form_data.get('contrast_ratio'),
-                                                          wattage=form_data.get('wattage'),
-                                                          additional_details=form_data.get('additional_details')
-                                                          )
-                success = True
-                success_message = "The specifications of the screen have been successfully Added."
-                context_dic['success_message'] = success_message
-            except Exception as e:
-                print "Exception is ", e
-                print 'Error while adding the screen specifications to database'
-        else:
-            print 'Add Screen specifications Form is not valid'
-            print screen_specs_form.errors
-    else:
-        context_dic['form'] = AddScreenSpecs()
-    context_dic['title'] = "Add Screen Specifications"
-    context_dic['submitButton'] = "Submit"
-    context_dic['success'] = success
-    context_dic['target'] = reverse('add_screen_specs')
-    return render(request, 'Shared/displayForm.html', context_dic)
-
-
-def routeToHome(request):
-    return render(request, 'Home.html')
-
-
 @login_required
 def screen_index(request):
-    context_dic = {}
-    context_dic['form'] = AddScreenForm(form_name='formAddScreen', scope_prefix='modalScreenDetailsObj')
+    context_dic = {'form': AddScreenForm(form_name='formAddScreen', scope_prefix='modalScreenDetailsObj')}
     return render(request, 'screen/screens.html', context_dic)
 
 
 def group_index(request):
-    context_dic = {}
-    context_dic['form'] = AddGroup(form_name='formGroup', scope_prefix='modalGroupDetailsObj')
+    context_dic = {'form': AddGroup(form_name='formGroup', scope_prefix='modalGroupDetailsObj')}
     return render(request, 'screen/groups.html', context_dic)

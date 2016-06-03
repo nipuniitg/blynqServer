@@ -1,7 +1,7 @@
 from django.db import models
 from schedule.models import Calendar
 
-from authentication.models import Organization, UserDetails, Address, City
+from authentication.models import Organization, UserDetails, City
 from customLibrary.views_lib import get_userdetails
 
 
@@ -34,25 +34,25 @@ class ScreenStatus(models.Model):
 #         return self.type_name
 
 
-class ScreenSpecs(models.Model):
-    screen_specs_id = models.AutoField(primary_key=True)
-    brand = models.CharField(max_length=50)
-    model_num = models.CharField(max_length=50, null=True, blank=True)
-    weight = models.FloatField(null=True, blank=True)    # in kgs
-    dimensions = models.CharField(max_length=50, null=True, blank=True)    # l*b*h in cm
-    display_type = models.CharField(max_length=10, null=True, blank=True)  # LED/ LCD etc
-    contrast_ratio = models.CharField(max_length=20, null=True, blank=True)
-    wattage = models.IntegerField(null=True, blank=True)  # 55 in watts
-    additional_details = models.TextField(null=True, blank=True)
-
-    def __unicode__(self):
-        return self.brand + ' ' + self.model_num
-
-    class Meta:
-        unique_together = ('brand', 'model_num')
-
-    def natural_key(self):
-        return self.brand, self.model_num, self.display_type
+# class ScreenSpecs(models.Model):
+#     screen_specs_id = models.AutoField(primary_key=True)
+#     brand = models.CharField(max_length=50)
+#     model_num = models.CharField(max_length=50, null=True, blank=True)
+#     weight = models.FloatField(null=True, blank=True)    # in kgs
+#     dimensions = models.CharField(max_length=50, null=True, blank=True)    # l*b*h in cm
+#     display_type = models.CharField(max_length=10, null=True, blank=True)  # LED/ LCD etc
+#     contrast_ratio = models.CharField(max_length=20, null=True, blank=True)
+#     wattage = models.IntegerField(null=True, blank=True)  # 55 in watts
+#     additional_details = models.TextField(null=True, blank=True)
+#
+#     def __unicode__(self):
+#         return self.brand + ' ' + self.model_num
+#
+#     class Meta:
+#         unique_together = ('brand', 'model_num')
+#
+#     def natural_key(self):
+#         return self.brand, self.model_num, self.display_type
 
 
 class ScreenActivationKey(models.Model):
@@ -63,7 +63,7 @@ class ScreenActivationKey(models.Model):
     verified = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return 'serial number ' + str(self.device_serial_num) + ' key ' + str(self.activation_key)
+        return 'serial number {0} key {1}'.format(str(self.device_serial_num), str(self.activation_key))
 
 
 class Group(models.Model):
@@ -120,7 +120,7 @@ class Screen(models.Model):
 
     unique_device_key = models.OneToOneField(ScreenActivationKey)
     activated_on = models.DateTimeField(auto_now_add=True)
-    activated_by = models.ForeignKey(UserDetails, null=True, blank=True)
+    activated_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True, blank=True)
     # related_name - The name to use for the relation from the related object back to this one
     # placed_by - the organization which is keeping the screens
     # placed_by = models.ForeignKey(Organization, on_delete=models.PROTECT,related_name='%(class)s_placed_by', blank=True, null=True)
@@ -140,7 +140,7 @@ class Screen(models.Model):
 
     # Each screen should have a separate calendar
     # Remove null=True for screen_calendar
-    screen_calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE, null=True, blank=True)
+    screen_calendar = models.ForeignKey(Calendar, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __unicode__(self):
         return self.screen_name

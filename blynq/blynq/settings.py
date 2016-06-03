@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'djng', # django-angular http://django-angular.readthedocs.org/en/latest/installation.html
     'schedule', # https://github.com/llazzaro/django-scheduler
     'reversion',    # http://django-reversion.readthedocs.io/en/latest/
+    'coverage',
     'authentication',
     'screenManagement',
     'contentManagement',
@@ -182,7 +183,6 @@ LOGGING = {
 }
 
 
-
 if DEBUG:
     MEDIA_HOST = 'http://127.0.0.1:8000'
 else:
@@ -194,5 +194,3 @@ EMAIL_HOST = 'smtp.zoho.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'django@blynq.in'
 EMAIL_HOST_PASSWORD = 'Asdf;lkj'
-
-
