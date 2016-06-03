@@ -762,4 +762,10 @@ plApp.directive('pdfSection', ['PDFViewerService', function(pdf){
             };
         }
     }
-}])
+}]);
+
+plApp.filter('trusted', ['$sce', function ($sce) {
+    return function(url) {
+        return $sce.trustAsResourceUrl(url);
+    };
+}]);
