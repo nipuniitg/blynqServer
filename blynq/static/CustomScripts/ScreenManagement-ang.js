@@ -213,7 +213,7 @@ sagApp.factory('screensFactory',['$http', 'dataAccessFactory', function($http, d
 
     var getGroupsWithSelectedBool = function(selectedGroups, callback){
         dataAccessFactory.getAllGroups(function(returnData){
-            var allGroupsWithSelectedBool = selectedBoolSetter(returnData, selectedGroups, 'group_id');
+            var allGroupsWithSelectedBool = selectedBoolSetter(returnData, selectedGroups, 'group_id','group_screen_id');
             callback(allGroupsWithSelectedBool);
         });
     };
