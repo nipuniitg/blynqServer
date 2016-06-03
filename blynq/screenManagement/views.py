@@ -245,8 +245,12 @@ def upsert_screen(request):
             screen.save()
             group_screen_id_list = []
             for group in posted_data.get('groups'):
-                group_screen_id = int(group.get('group_screen_id'))
-                if group.group_screen_id == -1:
+                group_screen_id = group.get('group_screen_id')
+                if group_screen_id:
+                    group_screen_id = int(group_screen_id)
+                else:
+                    group_screen_id = -1
+                if group_screen_id == -1:
                     group_entry = Group.objects.get(group_id=int(group.get('group_id')))
                     group_screen = GroupScreens.objects.create(group=group_entry, screen=screen, created_by=user_details)
                     group_screen_id = group.group_screen_id

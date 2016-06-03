@@ -5,16 +5,18 @@
 
 plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
 
-    var deleteContent = function(content, callback){
+    var deleteContent = function(content_ids, callback){
+        var postData = {
+            content_ids : content_ids
+        };
         $http({
              method : "POST"
              ,url : '/content/deleteContent'
-             ,data : content
+             ,data : postData
          }).then(function mySuccess(response){
-                var returnData = response.data;
                 if(callback)
                 {
-                    callback(returnData);
+                    callback(response.data);
                 }
             }, function myError(response) {
                 console.log(response.statusText);
@@ -188,6 +190,26 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
         $scope.refreshContent($scope.currentFolderId);
     };
 
+    var getCheckedContentItems = function(){
+        if($scope.checkedFolders.length > 0 || $scope.checkedContent.length >0)
+        {
+            var content_ids =[];
+            for(i=0;i<$scope.checkedFolders.length;i++)
+            {
+                content_ids.push($scope.folders[$scope.checkedFolders[i]].content_id);
+            }
+            for(i=0;i<$scope.checkedContent.length;i++)
+            {
+                content_ids.push($scope.files[$scope.checkedContent[i]].content_id);
+            }
+            return content_ids;
+        }
+        else{
+            toastr.warning('Check atleast one item to complete the action');
+            return false;
+        }
+    }
+
     $scope.fileIcons = {
         pdf : '/static/images/pdf_logo.png'
         ,video : '/static/images/video_icon.png'
@@ -219,8 +241,8 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
     };
 
     //public or Scope releated functions
-    $scope.deleteContent = function(content){
-        ctDataAccessFactory.deleteContent(content,  function(data){
+    $scope.deleteSingleContent = function(content_id){
+        ctDataAccessFactory.deleteContent([content_id],  function(data){
             if(data.success)
             {
                 $scope.refreshContent($scope.currentFolderId);
@@ -230,6 +252,22 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
                 toastr.warning("Oops!!There was some error. Please try later.");
             }
         });
+    };
+
+    $scope.deleteMultipleContents = function(){
+        var content_ids = getCheckedContentItems();
+        if(content_ids){
+            ctDataAccessFactory.deleteContent(content_ids, function(data){
+                if(data.success)
+                {
+                    $scope.refreshContent($scope.currentFolderId);
+                    toastr.success('Items deleted successfully.');
+                }
+                else{
+                    toastr.warning("Oops!!There was some error. Please try later.");
+                }
+            })
+        }
     }
 
     $scope.navigateToFolder = function(folderId){
@@ -380,17 +418,9 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
     }
 
     $scope.moveContent = function(){
-        if($scope.checkedFolders.length > 0 || $scope.checkedContent.length >0)
-        {
-            var content_ids =[];
-            for(i=0;i<$scope.checkedFolders.length;i++)
-            {
-                content_ids.push($scope.folders[$scope.checkedFolders[i]].content_id);
-            }
-            for(i=0;i<$scope.checkedContent.length;i++)
-            {
-                content_ids.push($scope.files[$scope.checkedContent[i]].content_id);
-            }
+
+        var content_ids = angular.copy(getCheckedContentItems());
+        if(content_ids){
             var modalInstance = $uibModal.open({
               animation: true
               ,templateUrl: '/templates/contentManagement/_move_content_mdl.html'
@@ -419,9 +449,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
                 toastr.warning('Move cancelled')
             });
         }
-        else{
-            toastr.warning('Check atleast one item to complete the action')
-        }
+
     };
 
 
@@ -762,4 +790,10 @@ plApp.directive('pdfSection', ['PDFViewerService', function(pdf){
             };
         }
     }
-}])
+}]);
+
+plApp.filter('trusted', ['$sce', function ($sce) {
+    return function(url) {
+        return $sce.trustAsResourceUrl(url);
+    };
+}]);
