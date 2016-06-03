@@ -10,7 +10,7 @@ from blynq.settings import MEDIA_ROOT
 from contentManagement.forms import UploadContentForm
 # Create your views here.
 from contentManagement.serializers import ContentSerializer
-from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, list_to_json
+from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, list_to_json, debugFileLog
 from contentManagement.models import Content
 
 
@@ -90,19 +90,27 @@ def delete_content(request):
     # user_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
     user_content = Content.get_user_relevant_objects(user_details=user_details)
     posted_data = string_to_dict(request.body)
-    content_id = int(posted_data.get('content_id'))
+    content_ids = posted_data.get('content_ids')
+    deleted_content_ids = []
+    sid = -1
     try:
         with transaction.atomic():
-            required_content = user_content.get(content_id=int(content_id))
-            if required_content.is_folder:
-                delete_folder_helper(req_content=required_content, user_content=user_content)
-            else:
-                delete_file_helper(required_content)
+            for content_id in content_ids:
+                required_content = user_content.get(content_id=int(content_id))
+                if required_content.is_folder:
+                    delete_folder_helper(req_content=required_content, user_content=user_content)
+                else:
+                    delete_file_helper(required_content)
+                sid = transaction.savepoint()
+                deleted_content_ids.append(content_id)
             success = True
     except Exception as e:
-        print "Exception is ", e
+        debugFileLog.error('Exception is')
+        debugFileLog.error(e)
         success = False
-    return ajax_response(success=success)
+        if sid != -1:
+            transaction.savepoint_rollback(sid)
+    return ajax_response(success=success,errors='Invalid content', obj_dict={'deleted_content_ids': deleted_content_ids})
 
 
 @login_required

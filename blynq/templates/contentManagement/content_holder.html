@@ -27,7 +27,7 @@
                         <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
                             <li role="menuitem"><a ng-click="moveContent()">Move to folder</a></li>
                             <li class="divider"></li>
-                            <li role="menuitem"><a href="#">Delete</a></li>
+                            <li role="menuitem"><a confirm confirm-type="delete" confirm-fn="deleteMultipleContents()">Delete</a></li>
                         </ul>
                     </div>
                     <button class="btn  btn-primary pull-right" style="margin-left:5px;" ng-click="upload()">Upload
@@ -54,7 +54,7 @@
                         </div>
                         <div class="item-container-footer">
                                 <span class="pull-right">
-                                    <a confirm confirm-fn="deleteContent(folder)" confirm-type="delete">
+                                    <a confirm confirm-fn="deleteSingleContent(folder.content_id)" confirm-type="delete">
                                         <i class="fa fa-trash-o pointer"></i>
                                     </a>
                                 </span>
@@ -87,7 +87,7 @@
                         <div class="item-container-footer">
                             <div class=>
                                 <span class="pull-right">
-                                    <a confirm-fn="deleteContent(file)" confirm confirm-type="delete">
+                                    <a confirm-fn="deleteSingleContent(file.content_id)" confirm confirm-type="delete">
                                         <i class="fa fa-trash-o pointer"></i></a></span>
                                 <a ng-click="editTitle(file)">
                                     <i class="fa fa-pencil pointer"></i>

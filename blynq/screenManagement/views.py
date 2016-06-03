@@ -1,9 +1,12 @@
 from django.contrib.auth.decorators import login_required
+from django.core import serializers
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.shortcuts import render
 from schedule.models import Calendar
 
+from authentication.models import City
+from authentication.serializers import CitySerializer
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, list_to_json, debugFileLog
 from scheduleManagement.models import ScheduleScreens
 from screenManagement.forms import AddScreenForm, AddGroup
@@ -211,7 +214,8 @@ def upsert_screen(request):
             if screen_id == -1:
                 activation_key = posted_data.get('activation_key')
                 try:
-                    screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key, in_use=False)
+                    screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key, in_use=False,
+                                                                            verified=True)
                     screen = Screen(screen_name=posted_data.get('screen_name'), unique_device_key=screen_activation_key,
                                     activated_by=user_details)
                     screen.save()
@@ -223,11 +227,16 @@ def upsert_screen(request):
                     return ajax_response(success=False, errors=['Not a valid activation key, contact support@blynq.in'])
             else:
                 screen = Screen.objects.get(screen_id=screen_id)
-            screen.screen_size = int(posted_data.get('screen_size'))
+            screen_size = posted_data.get('screen_size')
+            if screen_size:
+                screen.screen_size = int(screen_size)
             screen.address = posted_data.get('address')
-            city_id = int(posted_data.get('city_id'))
-            if city_id != -1:
-                screen.city_id = posted_data.get('city_id')
+            city = posted_data.get('city')
+            if city:
+                city_id = int(city.get('city_id'))
+                screen.city_id = city_id
+            else:
+                screen.city = None
             screen.aspect_ratio = posted_data.get('aspect_ratio')
             screen.resolution = posted_data.get('resolution')
             screen.owned_by = user_details.organization
@@ -304,6 +313,15 @@ def get_selectable_groups_json(request, screen_id=-1):
     groups_data = Group.objects.filter(organization=user_details.organization).exclude(screen__pk=screen_id)
     json_data = GroupSerializer().serialize(groups_data, fields=('group_id', 'group_name', 'group_screen_id'))
     return list_to_json(json_data)
+
+
+def get_city_options(request):
+    city_data = CitySerializer().serialize(City.objects.all(), fields=('city_id', 'city_name'))
+    return list_to_json(city_data)
+
+
+def routeToHome(request):
+    return render(request, 'Home.html')
 
 
 @login_required

@@ -7,48 +7,48 @@
     <div class="modal-body">
         <form class="form-horizontal" role="form" name="screenDetailsForm">
             <div class="form-group">
-                <label for="screen_name" class="col-md-2">
+                <label for="screen_name" class="col-md-4">
                     Screen Name*
                 </label>
                 <div class="col-md-6">
                     <input type="text" placeholder="Screen Name" id="screen_name" name="screen_name"
                            ng-model="screenDetails.screen_name" class="form-control" required>
                 </div>
-                <div class="col-md-6 col-md-offset-2" ng-show="screenDetailsForm.screen_name.$touched &&
+                <div class="col-md-6 col-md-offset-4" ng-show="screenDetailsForm.screen_name.$touched &&
                                 screenDetailsForm.screen_name.$invalid">
                     <span>This field is required.</span>
                 </div>
             </div>
             <div ng-if="showActivationKeyField">
                 <div class="form-group">
-                    <label for="activation_key" class="col-md-2">
-                        Activation Key*(provided by BlynQ)
+                    <label for="activation_key" class="col-md-4">
+                        Activation Key*(Check your device)
                     </label>
                     <div class="col-md-6">
                         <input type="text" placeholder="H8N9-23NK-2OIN-QELI" id="activation_key" name="activation_key"
                                ng-model="screenDetails.activation_key" class="form-control" required>
                     </div>
-                    <div class="col-md-6 col-md-offset-2" ng-show="screenDetailsForm.activation_key.$touched &&
+                    <div class="col-md-6 col-md-offset-4" ng-show="screenDetailsForm.activation_key.$touched &&
                                 screenDetailsForm.activation_key.$invalid">
                         <span>This field is required.</span>
                     </div>
                 </div>
             </div>
             <div class="form-group">
-                <label for="aspect_ratio" class="col-md-2">
+                <label for="aspect_ratio" class="col-md-4">
                     Aspect Ratio*
                 </label>
                 <div class="col-md-6">
                     <input type="text" placeholder="16:9" id="aspect_ratio" name="aspect_ratio"
                            ng-model="screenDetails.aspect_ratio" class="form-control" required>
                 </div>
-                <div class="col-md-6 col-md-offset-2" ng-show="screenDetailsForm.aspect_ratio.$touched &&
+                <div class="col-md-6 col-md-offset-4" ng-show="screenDetailsForm.aspect_ratio.$touched &&
                                 screenDetailsForm.aspect_ratio.$invalid">
                     <span>This field is required.</span>
                 </div>
             </div>
             <div class="form-group">
-                <label for="screen_size" class="col-md-2">
+                <label for="screen_size" class="col-md-4">
                     Screen Size(in inches)
                 </label>
                 <div class="col-md-6">
@@ -57,7 +57,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="resolution" class="col-md-2">
+                <label for="resolution" class="col-md-4">
                     Resolution
                 </label>
                 <div class="col-md-6">
@@ -66,7 +66,27 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="groups" class="col-md-2">
+                <label for="address" class="col-md-4">
+                    Address
+                </label>
+                <div class="col-md-6 wow fadeInRight">
+                    <textarea placeholder="Device address" id="address"
+                              ng-model="screenDetails.address"
+                              name="address" class="form-control">
+                    </textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="resolution" class="col-md-4">
+                    City
+                </label>
+                <div class="col-md-6">
+                    <select class="form-control" ng-model="screenDetails.city"
+                            ng-options="city as city.city_name for city in cityOptions track by city.city_id"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="groups" class="col-md-4">
                     Groups
                 </label>
                 <div id="groups" class="tagsinput">
@@ -89,6 +109,7 @@
     <div class="modal-footer">
         <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
         <button type="button" class="btn btn-success" ng-click="upsertScreen()"
-            ng-disabled="screenDetailsForm.$invalid">{[ saveButtonVerbose ]}</button>
+                ng-disabled="screenDetailsForm.$invalid">{[ saveButtonVerbose ]}
+        </button>
     </div>
 </div>

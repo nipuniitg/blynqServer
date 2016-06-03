@@ -19,12 +19,10 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
             method : "GET",
             url : "getScreens"
         }).then(function mySucces(response) {
-            allScreens = angular.copy(response.data);
             if(callback)
             {
-                callback(allScreens);
+                callback(response.data);
             }
-            return allScreens
         }, function myError(response) {
             console.log(response.statusText);
         });
@@ -35,10 +33,9 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
             method : "GET",
             url : "getGroups"
         }).then(function mySucces(response) {
-            var allGroups = angular.copy(response.data);
             if(callback)
             {
-                callback(allGroups);
+                callback(response.data);
             }
         }, function myError(response) {
             console.log(response.statusText);
@@ -74,35 +71,6 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
             if(callback)
             {
                 callback(response.data);
-            }
-        }, function myError(response) {
-            console.log(response.statusText);
-        });
-    };
-
-    var getSelectableGroups = function(screen_id, callback){
-        $http({
-            method : "GET",
-            url : "getSelectableGroups/" + screen_id
-        }).then(function mySucces(response) {
-            if(callback)
-            {
-                callback(response.data);
-            }
-        }, function myError(response) {
-            console.log(response.statusText);
-        });
-    };
-
-    var getSelectableScreens = function(group_id, callback){
-        $http({
-            method : "GET",
-            url : "getSelectableScreens/" + group_id
-        }).then(function mySucces(response) {
-            var data = angular.copy(response.data);
-            if(callback)
-            {
-                callback(data);
             }
         }, function myError(response) {
             console.log(response.statusText);
@@ -154,18 +122,31 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
             console.log(response.statusText);
         });
 
+    };
+
+    var getCityOptions = function(callback){
+        $http({
+            method : "GET",
+            url : "getCityOptionsJson"
+        }).then(function mySucces(response) {
+            if(callback)
+            {
+                callback(response.data);
+            }
+        }, function myError(response) {
+            console.log(response.statusText);
+        });
     }
 
     return{
-        getAllScreens : getAllScreens,
-        getAllGroups : getAllGroups,
-        upsertScreen : upsertScreen,
-        upsertGroup : upsertGroup,
-        getSelectableScreens : getSelectableScreens,
-        getSelectableGroups : getSelectableGroups
+        getAllScreens : getAllScreens
+        ,getAllGroups : getAllGroups
+        ,upsertScreen : upsertScreen
+        ,upsertGroup : upsertGroup
         ,getScreenSchedules :   getScreenSchedules
         ,getGroupSchedules : getGroupSchedules
         ,deleteGroup : deleteGroup
+        ,getCityOptions : getCityOptions
     }
 
 }]);
@@ -179,14 +160,16 @@ sagApp.factory('screensFactory',['$http', 'dataAccessFactory', function($http, d
     };
 
     var screenBluePrint = {
-        screen_id : -1,
-        screen_name : '',
-        address : '',
-        aspect_ratio : '',
-        screen_size : '',
-        activation_key : '',
-        resolution :'',
-        groups : [],
+        screen_id : -1
+        ,screen_name : ''
+        ,address : ''
+        ,aspect_ratio : ''
+        ,screen_size : ''
+        ,activation_key : ''
+        ,resolution :''
+        ,city : {
+        }
+        ,groups : []
     };
 
     var selectedBoolSetter = function(allItems, selectedItems, key, schedule_key_id){
@@ -389,13 +372,6 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
         $scope.activeScreenIndex =index;
     };
 
-    var addGroupsToScreen = function(){
-      dataAccessFactory.getSelectableGroups($scope.modalScreenDetailsObj.screen_id, function(selectableGroups)
-      {
-        $scope.selectableGroups = angular.copy(selectableGroups);
-      });
-    };
-
 
     //public functions
      $scope.refreshScreens = function(){
@@ -404,7 +380,6 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
             $scope.screens = allScreens;
             $scope.refreshScreenSchedules();
         });
-
      }
 
     onLoad();
@@ -455,12 +430,6 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
         });
 
         modalInstance.result.then(function saved(){
-            if(isNewScreen){
-                toastr('screen Added Successfully');
-            }
-            else{
-                toastr.success('Screen Updated SuccessFully');
-            }
             $scope.refreshScreens();
         }, function cancelled(){
             toastr.warning('Screen Update cancelled')
@@ -477,8 +446,11 @@ sagApp.controller('mdlUpsertScreenDetails', ['$scope','$uibModalInstance','scree
     var onLoad= function(){
         $scope.screenDetails = screenDetailsObj;
         $scope.showActivationKeyField = isNewScreen ? !0 : !1;
-        $scope.saveButtonVerbose = isNewScreen ? 'Add' : 'Update'
-    }
+        $scope.saveButtonVerbose = isNewScreen ? 'Add' : 'Update';
+        dAF.getCityOptions(function(returnData){
+            $scope.cityOptions = returnData;
+        });
+    };
 
     $scope.validateActivationKey = function(){
 
