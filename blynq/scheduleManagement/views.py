@@ -326,9 +326,9 @@ def device_key_active(request):
             error = 'New device with device key %s is asking for activation. ' % activation_key
             error += 'Check the verified boolean if the device is valid.'
             debugFileLog.warning(error)
-        elif screen_activation_key.in_use:
-            error = 'Device activation key %s is already in use.' % activation_key
-            debugFileLog.warning(error)
+            # elif screen_activation_key.in_use:
+            #     error = 'Device activation key %s is already in use.' % activation_key
+            #     debugFileLog.warning(error)
         else:
             success = True
     except ScreenActivationKey.DoesNotExist:
