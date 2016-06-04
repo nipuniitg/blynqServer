@@ -235,7 +235,7 @@ cursor: pointer;
 min-width : 200px;
 }
 
-.fa.pointer{
+.pointer{
 cursor:pointer
 }
 
@@ -276,4 +276,9 @@ cursor:pointer
 
 .overflow-y{
     overflow : scroll;
+}
+
+.input-short{
+    display : inline;
+    width : auto;
 }
