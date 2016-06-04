@@ -85,7 +85,7 @@
                 <!-- end Timing Section -->
                 <!-- Recurrence Section -->
                 <section>
-                    <label class="control-label half-bottom" for="recurrence">
+                    <label class="control-label half-bottom" for="">
                         <strong>Recurrence</strong></label>
                     <div class="form-group">
                         <label for="Daily" class="add-right control-label">
@@ -167,13 +167,13 @@
                                     <input ng-model="recurrence.monthly.recurrenceAbsolute" ng-value="true"
                                            type="radio" name="246" value="true"> Day
                                 </label>
-                                <fieldset ng-disabled="!recurrence.monthly.recurrenceAbsolute">
-                                    <input type="number" class="form-control" name="monthlyAbsoluteRecurrenceDayOfMonth"
+                                <fieldset class="input-short" ng-disabled="!recurrence.monthly.recurrenceAbsolute">
+                                    <input type="number" class="form-control input-short" name="monthlyAbsoluteRecurrenceDayOfMonth"
                                            ng-model="recurrence.monthly.absolute.recurrenceDayOfMonth"
                                            min="1" max="31" ng-required="timeline.recurrenceType === 'MONTHLY'
                                            &amp;&amp; recurrence.monthly.recurrenceAbsolute" required="required">
                                     <label class="control-label">of Every</label>
-                                    <input type="number" class="form-control" name="monthlyAbsoluteRecurrenceFrequency"
+                                    <input type="number" class="form-control input-short" name="monthlyAbsoluteRecurrenceFrequency"
                                            ng-model="recurrence.monthly.absolute.recurrenceFrequency" min="1" max="999"
                                            ng-required="timeline.recurrenceType === 'MONTHLY'
                                            &amp;&amp; recurrence.monthly.recurrenceAbsolute" required="required">
@@ -189,17 +189,17 @@
                                 </p>
                             </div>
                             <div class="form-group">
-                                <div class="input-group">
+                                <div class="">
                                     <label class="control-label">
                                         <input ng-model="recurrence.monthly.recurrenceAbsolute" ng-value=""
                                                type="radio"
                                                name="247" value="false">
                                         The
                                     </label>
-                                    <fieldset ng-disabled="recurrence.monthly.recurrenceAbsolute"
+                                    <fieldset ng-disabled="recurrence.monthly.recurrenceAbsolute" class="input-short"
                                               disabled="disabled">
                                         <!--<week-dropdown week="recurrence.monthly.relative.recurrenceWeekOfMonth">-->
-                                        <select class="form-control input-group-addon"
+                                        <select class="form-control input-group-addon input-short"
                                                 ng-model="recurrence.monthly.relative.recurrenceWeekOfMonth"
                                                 integer-parser="">
                                             <option value="0">First</option>
@@ -209,7 +209,7 @@
                                             <option value="4">Last</option>
                                         </select>
                                         <!--</week-dropdown>-->
-                                        <select class="form-control"
+                                        <select class="form-control input-short"
                                                 ng-model="recurrence.monthly.relative.recurrenceDayOfWeek"
                                                 integer-parser="">
                                             <option value="0">Sunday</option>
@@ -220,13 +220,13 @@
                                             <option value="5">Friday</option>
                                             <option value="6">Saturday</option>
                                         </select>
-                                        <label class="control-label input-group-addon">of Every</label>
-                                        <input type="number" class="form-control input-group-addon"
+                                        <label class="control-label ">of Every</label>
+                                        <input type="number" class="form-control input-short"
                                                name="monthlyRelativeRecurrenceFrequency"
                                                ng-model="recurrence.monthly.relative.recurrenceFrequency"
                                                min="1" max="999"
                                                ng-required="timeline.recurrenceType === 'Monthly' &amp;&amp; !recurrence.monthly.recurrenceAbsolute">
-                                        <label class="input-group-addon">Month(s)</label>
+                                        <label class="">Month(s)</label>
                                     </fieldset>
                                 </div>
                                 <p class="text-danger ng-hide"
