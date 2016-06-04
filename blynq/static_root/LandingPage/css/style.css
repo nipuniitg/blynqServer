@@ -75,7 +75,7 @@ p { line-height: 22px }
     max-height: 100%;
     max-width: 100%;
 }
-@keyframes slidy {
+/*@keyframes slidy {
     0% { left: 0%; }
     20% { left: 0%; }
     25% { left: -100%; }
@@ -85,7 +85,18 @@ p { line-height: 22px }
     75% { left: -300%; }
     95% { left: -300%; }
     100% { left: -400%; }
-}    
+}*/
+
+@keyframes slidy {
+    0% { left: 0%; }
+    20% { left: 0%; }
+    25% { left: -100%; }
+    45% { left: -100%; }
+    50% { left: -200%; }
+    70% { left: -200%; }
+    75% { left: -300%; }
+    95% { left: -300%; }
+}
 div#slider { overflow: hidden ; height:100%; }
 div#slider figure img { width: 20%; float: left; }
 div#slider figure { 
@@ -103,7 +114,7 @@ div#display_screen{
     border-radius: 2px;
     height:250px;
     width:400px; 
-    padding:7px;
+    padding:10px;
     background-image: -webkit-linear-gradient(-45deg, rgb(76, 76, 76) 0px, rgb(89, 89, 89) 12%, 
         rgb(102, 102, 102) 25%, rgb(71, 71, 71) 39%, rgb(44, 44, 44) 50%, rgb(0, 0, 0) 50%, 
         rgb(17, 17, 17) 60%, rgb(43, 43, 43) 76%, rgb(28, 28, 28) 91%, rgb(19, 19, 19) 100%);
