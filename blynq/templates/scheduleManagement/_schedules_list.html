@@ -30,9 +30,9 @@
             </thead>
             <tbody>
             <tr ng-repeat="schedule in schedules">
-                <td><a ng-click="editSchedule($index)"><i class="fa fa-pencil"></i></a></td>
+                <td><a class="pointer" ng-click="editSchedule($index)"><i class="fa fa-pencil"></i></a></td>
                 <!--<td><a ng-click="deleteSchedule($index)"><i class="fa fa-trash-o"></i></a></td>-->
-                <td><a confirm confirm confirm-type="delete" confirm-fn="deleteSchedule($index)">
+                <td><a class="pointer" confirm confirm confirm-type="delete" confirm-fn="deleteSchedule($index)">
                     <i class="fa fa-trash-o"></i></a>
                 </td>
                 <td>{[ schedule.schedule_title ]}</td>
