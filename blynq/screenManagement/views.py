@@ -60,17 +60,13 @@ def add_group(request):
 
 def insert_group_screen(screen, group):
     group_schedules = ScheduleScreens.objects.filter(screen__isnull=True, group=group)
-    try:
-        for each_group_schedule in group_schedules:
-            screen_event = each_group_schedule.event
-            screen_event.pk = None
-            screen_event.calendar = screen.screen_calendar
-            screen_event.save()
-            ScheduleScreens.object.create(screen=screen, schedule=each_group_schedule.schedule,
-                                          group=group, event=screen_event)
-    except Exception as e:
-        print "Exception is ", e
-        return False
+    for each_group_schedule in group_schedules:
+        screen_event = each_group_schedule.event
+        screen_event.pk = None
+        screen_event.calendar = screen.screen_calendar
+        screen_event.save()
+        ScheduleScreens.objects.create(screen=screen, schedule=each_group_schedule.schedule, group=group,
+                                       event=screen_event)
     return True
 
 
@@ -200,7 +196,6 @@ def activation_key_valid(request):
     return ajax_response(success=success, errors=errors)
 
 
-# Replace upsert_screen with upsert_screen1 after Prasanth implements the AddScreenForm
 @transaction.atomic
 @login_required
 def upsert_screen(request):
@@ -226,7 +221,7 @@ def upsert_screen(request):
                     print "Exception is ", e
                     return ajax_response(success=False, errors=['Not a valid activation key, contact support@blynq.in'])
             else:
-                screen = Screen.objects.get(screen_id=screen_id)
+                screen = Screen.get_user_relevant_objects(user_details).get(screen_id=screen_id)
             screen_size = posted_data.get('screen_size')
             if screen_size:
                 screen.screen_size = int(screen_size)
@@ -251,9 +246,9 @@ def upsert_screen(request):
                 else:
                     group_screen_id = -1
                 if group_screen_id == -1:
-                    group_entry = Group.objects.get(group_id=int(group.get('group_id')))
+                    group_entry = Group.get_user_relevant_objects(user_details).get(group_id=int(group.get('group_id')))
                     group_screen = GroupScreens.objects.create(group=group_entry, screen=screen, created_by=user_details)
-                    group_screen_id = group.group_screen_id
+                    group_screen_id = group_screen.group_screen_id
                     success_insert = insert_group_screen(screen=screen, group=group_entry)
                     if not success_insert:
                         error = 'error while inserting group to screen'
