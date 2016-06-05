@@ -59,30 +59,6 @@ def upload_content(request):
     return ajax_response(success=success, errors=errors)
 
 
-def delete_folder_helper(req_content, user_content):
-    user_content = user_content.filter(parent_folder__pk=req_content.content_id)
-    for content in user_content:
-        if content.is_folder:
-            delete_folder_helper(req_content=content, user_content=user_content)
-        else:
-            delete_file_helper(content)
-    req_content.delete()
-
-
-def delete_file_helper(content):
-    file_name = content.document.name
-    if content.document:
-        organization = content.organization
-        organization.used_file_size = organization.used_file_size - content.document.size
-        if organization.used_file_size < 0:
-            organization.used_file_size = 0
-            organization.save()
-    content.delete()
-    path = MEDIA_ROOT + '/' + file_name
-    if os.path.isfile(path):
-        os.remove(path)
-
-
 @transaction.atomic
 @login_required
 def delete_content(request):
@@ -97,10 +73,7 @@ def delete_content(request):
         with transaction.atomic():
             for content_id in content_ids:
                 required_content = user_content.get(content_id=int(content_id))
-                if required_content.is_folder:
-                    delete_folder_helper(req_content=required_content, user_content=user_content)
-                else:
-                    delete_file_helper(required_content)
+                required_content.delete()
                 sid = transaction.savepoint()
                 deleted_content_ids.append(content_id)
             success = True

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.apps import apps
 from django.contrib.admin.sites import AlreadyRegistered
 from reversion.admin import VersionAdmin
-from contentManagement.models import Content, ContentType
+from contentManagement.models import Content
 
 
 class ContentAdmin(VersionAdmin):
@@ -10,7 +10,7 @@ class ContentAdmin(VersionAdmin):
 
 
 admin.site.register(Content, ContentAdmin)
-admin.site.register(ContentType)
+# admin.site.register(ContentType)
 
 
 # Register all the models in the contentManagement app

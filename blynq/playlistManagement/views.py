@@ -61,7 +61,7 @@ def upsert_playlist(request):
                                                          display_time=display_time)
                     playlist_item_id = entry.playlist_item_id
                 else:
-                    entry = PlaylistItems.objects.get(playlist_item_id=playlist_item_id)
+                    entry = playlist.playlistitems_set.get(playlist_item_id=playlist_item_id)
                     entry.position_index = pos_index
                     entry.display_time = display_time
                     entry.save()
@@ -130,6 +130,7 @@ def get_playlists(request):
     json_data = PlaylistSerializer().serialize(user_playlists,
                                                fields=('playlist_id', 'playlist_title','playlist_items'))
     return list_to_json(json_data)
+
 
 def get_files_recursively_json(request, parent_folder_id):
     """

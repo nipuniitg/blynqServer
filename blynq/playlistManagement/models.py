@@ -29,7 +29,7 @@ class Playlist(models.Model):
     playlist_id = models.AutoField(primary_key=True)
     playlist_title = models.CharField(max_length=100)
     playlist_items = models.ManyToManyField(Content, through=PlaylistItems)
-    playlist_total_time = models.IntegerField(null=True)
+    playlist_total_time = models.IntegerField(default=0, blank=True, null=True)
 
     created_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_created_by',
                                    null=True)
@@ -46,11 +46,3 @@ class Playlist(models.Model):
     @staticmethod
     def get_user_relevant_objects(user_details):
         return Playlist.objects.filter(organization=user_details.organization)
-
-    def update_playlist_total_time(self):
-        total_time = 0
-        related_items = PlaylistItems.objects.filter(playlist=self)
-        for item in related_items:
-            total_time = total_time + item.display_time
-        self.playlist_total_time = total_time
-        self.save()
