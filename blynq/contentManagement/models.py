@@ -122,8 +122,8 @@ def delete_file(sender, instance, **kwargs):
         except Exception as e:
             debugFileLog.exception("Exception while subtracting the deleted file size")
         try:
-            src = instance.document.url
-            file_src = BASE_DIR + src
+            src = instance.document.name
+            file_src = os.path.join(MEDIA_ROOT, src)
             if os.path.exists(file_src):
                 dst = '%s/organization%d/' % (DELETED_CONTENT_DIR, instance.organization.organization_id)
                 file_dst = os.path.join(MEDIA_ROOT, dst)
