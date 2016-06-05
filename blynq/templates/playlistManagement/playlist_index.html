@@ -57,7 +57,7 @@
                 <div class="item-search-row">
                     <div class="input-group">
                         <input class="form-control" placeholder="Search" type="text"
-                               ng-model="searchPlaylistQueue.queueItemName">
+                               ng-model="searchActivePlaylistObj.title">
                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
                         data-as-sortable=""
                         is-disabled="is_sortable_disabled"
                         data-ng-model="activePlaylistObj.playlist_items">
-                        <li ng-repeat="item in activePlaylistObj.playlist_items | filter: searchPlaylistQueue"
+                        <li ng-repeat="item in activePlaylistObj.playlist_items | filter: searchActivePlaylistObj"
                             class="list-group-item"
                             ng-class="{active: $index === activePlaylistItemIndex }"
                             ng-click="clickedOnQueueItem($index)"

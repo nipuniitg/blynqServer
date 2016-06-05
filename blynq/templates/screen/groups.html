@@ -20,13 +20,13 @@
                 </div>
                 <div class="item-search-row">
                     <div class="input-group">
-                        <input class="form-control" placeholder="Search" type="text">
+                        <input class="form-control" placeholder="Search" type="text" ng-model="searchGroup.group_name">
                         <span class="input-group-addon"><i class="fa fa-search"></i> </span>
                     </div>
                 </div>
                 <div class="listContainer">
                     <ul class="list-group">
-                    <li ng-repeat="group in groups" class="list-group-item" ng-class="{active:$index===activeGroupIndex}"
+                    <li ng-repeat="group in groups|filter:searchGroup" class="list-group-item" ng-class="{active:$index===activeGroupIndex}"
                         ng-click="clickedOnGroup(group, $index)">
                         {[ group.group_name ]}
                         <i class="pull-right pointer fa fa-trash-o" confirm confirm-type="delete"
@@ -56,35 +56,34 @@
                         <tr>
                             <th class="fix">Screen Name</th>
                             <th class="fix">Address</th>
-                            <th class="fix">Resolution</th>
-                            <th class="fix">Groups</th>
-                            <th class="fix">Screen Size</th>
-
+                            <th class="">City</th>
+                            <!--<th class="fix">Groups</th>-->
                         </tr>
                         <tr>
-                            <th></th>
-                            <th><input type="form-control" placeholder="search"></th>
-                            <th><input type="form-control" placeholder="search"></th>
-                            <th><input type="form-control" placeholder="search"></th>
-                            <th><input type="form-control" placeholder="search"></th>
+                            <th><input type="form-control" placeholder="search"
+                                       ng-model="searchScreens.screen_name"></th>
+                            <th><input type="form-control" placeholder="search"
+                                       ng-model="searchScreens.address"></th>
+                            <th><input type="form-control" placeholder="search"
+                                       ng-model="searchScreens.city.city_name"></th>
+                            <!--<th><input type="form-control" placeholder="search"-->
+                                       <!--ng-model="searchScreens.groups.group_name"></th>-->
                         </tr>
                         </thead>
                         <tbody>
-                        <tr ng-repeat="screen in groups[activeGroupIndex].screens">
+                        <tr ng-repeat="screen in groups[activeGroupIndex].screens| filter: searchScreens">
                             <td class="fix">{[ screen.screen_name ]}</td>
                             <td class="fix">{[ screen.address]}</td>
-                            <td class="">{[ screen.resolution ]}</td>
-                            <td class="">
-                                <div  class="tagsinput" style="height: 100%;">
-                                    <span class="tag" ng-repeat="group in screen.groups">
-                                    <span> {[group.group_name]} &nbsp;&nbsp;</span>
-                                    <!--<a class="tagsinput-remove-link"></a>-->
-                                    </span>
+                            <td class="">{[ screen.city.city_name ]}</td>
+                            <!--<td class="fix">-->
+                                <!--<div  class="tagsinput">-->
+                                    <!--<span class="tag" ng-repeat="group in screen.groups">-->
+                                        <!--<span> {[group.group_name]} &nbsp;&nbsp;</span>-->
+                                    <!--</span>-->
 
-                                </span>
-                                </div>
-                            </td>
-                            <td class="">{[ screen.screen_size ]}</td>
+                                <!--</span>-->
+                                <!--</div>-->
+                            <!--</td>-->
                         </tr>
                         </tbody>
                     </table>

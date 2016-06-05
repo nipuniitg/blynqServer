@@ -34,55 +34,63 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="aspect_ratio" class="col-md-4">
-                    Aspect Ratio*
-                </label>
-                <div class="col-md-6">
-                    <input type="text" placeholder="16:9" id="aspect_ratio" name="aspect_ratio"
-                           ng-model="screenDetails.aspect_ratio" class="form-control" required>
-                </div>
-                <div class="col-md-6 col-md-offset-4" ng-show="screenDetailsForm.aspect_ratio.$touched &&
-                                screenDetailsForm.aspect_ratio.$invalid">
-                    <span>This field is required.</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="screen_size" class="col-md-4">
-                    Screen Size(in inches)
-                </label>
-                <div class="col-md-6">
-                    <input type="text" placeholder="32" id="screen_size" name="screen_size"
-                           ng-model="screenDetails.screen_size" class="form-control">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="resolution" class="col-md-4">
-                    Resolution
-                </label>
-                <div class="col-md-6">
-                    <input type="text" placeholder="1190*768" id="resolution" name="resolution"
-                           ng-model="screenDetails.resolution" class="form-control">
-                </div>
-            </div>
+            <!--<div class="form-group">-->
+                <!--<label for="aspect_ratio" class="col-md-4">-->
+                    <!--Aspect Ratio*-->
+                <!--</label>-->
+                <!--<div class="col-md-6">-->
+                    <!--<input type="text" placeholder="16:9" id="aspect_ratio" name="aspect_ratio"-->
+                           <!--ng-model="screenDetails.aspect_ratio" class="form-control" required>-->
+                <!--</div>-->
+                <!--<div class="col-md-6 col-md-offset-4" ng-show="screenDetailsForm.aspect_ratio.$touched &&-->
+                                <!--screenDetailsForm.aspect_ratio.$invalid">-->
+                    <!--<span>This field is required.</span>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+                <!--<label for="screen_size" class="col-md-4">-->
+                    <!--Screen Size(in inches)-->
+                <!--</label>-->
+                <!--<div class="col-md-6">-->
+                    <!--<input type="text" placeholder="32" id="screen_size" name="screen_size"-->
+                           <!--ng-model="screenDetails.screen_size" class="form-control">-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+                <!--<label for="resolution" class="col-md-4">-->
+                    <!--Resolution-->
+                <!--</label>-->
+                <!--<div class="col-md-6">-->
+                    <!--<input type="text" placeholder="1190*768" id="resolution" name="resolution"-->
+                           <!--ng-model="screenDetails.resolution" class="form-control">-->
+                <!--</div>-->
+            <!--</div>-->
             <div class="form-group">
                 <label for="address" class="col-md-4">
-                    Address
+                    Address*
                 </label>
                 <div class="col-md-6 wow fadeInRight">
                     <textarea placeholder="Device address" id="address"
                               ng-model="screenDetails.address"
-                              name="address" class="form-control">
+                              name="address" class="form-control" required>
                     </textarea>
+                </div>
+                <div class="col-md-6 col-md-offset-4" ng-show="screenDetailsForm.address.$touched &&
+                                screenDetailsForm.address.$invalid">
+                    <span>This field is required.</span>
                 </div>
             </div>
             <div class="form-group">
-                <label for="resolution" class="col-md-4">
-                    City
+                <label for="city" class="col-md-4">
+                    City*
                 </label>
                 <div class="col-md-6">
-                    <select class="form-control" ng-model="screenDetails.city"
+                    <select class="form-control" ng-model="screenDetails.city" name="city" required id="city"
                             ng-options="city as city.city_name for city in cityOptions track by city.city_id"></select>
+                </div>
+                <div class="col-md-6 col-md-offset-4" ng-show="screenDetailsForm.city.$touched &&
+                                screenDetailsForm.city.$invalid">
+                    <span>This field is required.</span>
                 </div>
             </div>
             <div class="form-group">

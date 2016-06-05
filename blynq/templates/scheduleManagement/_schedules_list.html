@@ -22,35 +22,40 @@
             <tr>
                 <th></th>
                 <th></th>
-                <th><input type="form-control" placeholder="search"></th>
-                <th><input type="form-control" placeholder="search"></th>
-                <th><input type="form-control" placeholder="search"></th>
-                <th><input type="form-control" placeholder="search"></th>
+                <th><input type="form-control" placeholder="search" ng-model="searchSchedules.schedule_title"></th>
+                <th><input type="form-control" placeholder="search"
+                           ng-model="searchSchedules.schedule_playlists.playlist_title"></th>
+                <th><input type="form-control" placeholder="search"
+                           ng-model="searchSchedules.schedule_screens.screen_name">
+                </th>
+                <!--<th><input type="form-control" placeholder="search" ng-model="searchSchedules.timeline"></th>-->
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="schedule in schedules">
+            <tr ng-repeat="schedule in schedules | filter : searchSchedules ">
                 <td><a class="pointer" ng-click="editSchedule($index)"><i class="fa fa-pencil"></i></a></td>
-                <!--<td><a ng-click="deleteSchedule($index)"><i class="fa fa-trash-o"></i></a></td>-->
                 <td><a class="pointer" confirm confirm confirm-type="delete" confirm-fn="deleteSchedule($index)">
                     <i class="fa fa-trash-o"></i></a>
                 </td>
                 <td>{[ schedule.schedule_title ]}</td>
                 <td>
-                    <div class="tagsinput " style="height: 100%;">
-                                        <span class="tag" ng-repeat="playlist in schedule.schedule_playlists">
-                                            <span> {[playlist.playlist_title]} &nbsp;&nbsp;</span>
-                                        </span>
+                    <div class="tagsinput">
+                        <span class="tag"
+                              ng-repeat="playlist in schedule.schedule_playlists">
+                            <span> {[playlist.playlist_title]} &nbsp;&nbsp;</span>
+                        </span>
                     </div>
                 </td>
                 <td>
-                    <div class="tagsinput " style="height: 100%;">
-                                        <span class="tag" ng-repeat="screen in schedule.schedule_screens">
-                                            <span> {[screen.screen_name]} &nbsp;&nbsp;</span>
-                                        </span>
-                                        <span class="tag" ng-repeat="group in schedule.schedule_groups">
-                                            <span> {[group.group_name]} &nbsp;&nbsp;</span>
-                                        </span>
+                    <div class="tagsinput">
+                        <span class="tag"
+                              ng-repeat="screen in schedule.schedule_screens">
+                            <span> {[screen.screen_name]} &nbsp;&nbsp;</span>
+                        </span>
+                        <span class="tag"
+                              ng-repeat="group in schedule.schedule_groups">
+                            <span> {[group.group_name]} &nbsp;&nbsp;</span>
+                        </span>
                     </div>
                 </td>
                 <td>timeline</td>

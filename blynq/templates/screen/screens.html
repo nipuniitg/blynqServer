@@ -18,22 +18,20 @@
                     <table class="table  table-hover table-advanced table-striped ">
                         <thead>
                             <tr>
-                            <th>Edit</th>
-                            <th>Status</th>
-                            <th class="fix">Screen Name</th>
-                            <th class="fix">Address</th>
-                            <th class="fix">Resolution</th>
-                            <th class="fix">Groups</th>
-                            <th class="fix">Screen Size</th>
-                        </tr>
+                                <th>Edit</th>
+                                <th>Status</th>
+                                <th>Screen Name</th>
+                                <th>City</th>
+                                <th class="fix">Address</th>
+                                <th class="fix">Groups</th>
+                            </tr>
                             <tr>
                             <th></th>
                             <th></th>
-                            <th><input type="form-control" ng-model="searchScreens.screenName" placeholder="search Name"></th>
-                            <th><input type="form-control" ng-model="searchScreens.city" placeholder="search"></th>
-                            <th><input type="form-control" ng-model="searchScreens.resolution" placeholder="search"></th>
-                            <th><input type="form-control" ng-model="searchScreens.groups.groupName" placeholder="search"></th>
-                            <th><input type="form-control" ng-model="searchScreens.comapny" placeholder="search"></th>
+                            <th><input type="form-control" ng-model="searchScreens.screen_name" placeholder="search Name"></th>
+                            <th><input type="form-control" ng-model="searchScreens.city.city_name" placeholder="search"></th>
+                            <th><input type="form-control" ng-model="searchScreens.address" placeholder="search"></th>
+                            <th><input type="form-control" ng-model="searchScreens.groups.group_name" placeholder="search"></th>
                         </tr>
                         </thead>
                         <tbody style=" height: 230px;overflow-y: auto;width: 100%;">
@@ -41,8 +39,8 @@
                             <td><a href="#" ng-click="editScreenDetails($index)"><i class="fa fa-pencil pointer"></i> </a></td>
                             <td><i class="fa fa-circle online"></i>{[ screen.status ]} </td>
                             <td class="fix">{[ screen.screen_name ]}</td>
+                            <td class="">{[ screen.city.city_name]}</td>
                             <td class="fix">{[ screen.address ]}</td>
-                            <td class="fix">{[screen.resolution]}</td>
                             <td class="fix">
                                 <div  class="tagsinput " style="height: 100%;">
                                     <span class="tag" ng-repeat="group in screen.groups">
@@ -53,9 +51,7 @@
                                 </span>
                                 </div>
                             </td>
-                            <td class="fix">{[ screen.screen_size ]}</td>
                         </tr>
-
                         </tbody>
                     </table>
                 </div>
