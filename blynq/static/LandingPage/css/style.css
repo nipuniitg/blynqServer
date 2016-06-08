@@ -107,7 +107,7 @@ div#slider figure {
   text-align: left;
   font-size: 0;
   overflow: hidden;
-  animation: 10s slidy infinite; 
+  animation: 20s slidy infinite;
 }
 div#display_screen{
     border: 2px white transparent;

@@ -35,7 +35,7 @@
                         </tr>
                         </thead>
                         <tbody style=" height: 230px;overflow-y: auto;width: 100%;">
-                        <tr ng-repeat="screen in screens | filter: searchScreens" ng-click="clickedOnScreen($index)">
+                        <tr class="pointer" ng-repeat="screen in screens | filter: searchScreens" ng-click="clickedOnScreen($index)">
                             <td><a href="#" ng-click="editScreenDetails($index)"><i class="fa fa-pencil pointer"></i> </a></td>
                             <td><i class="fa fa-circle online"></i>{[ screen.status ]} </td>
                             <td class="fix">{[ screen.screen_name ]}</td>

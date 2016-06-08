@@ -40,7 +40,7 @@
                     <!-- Folders -->
                     <div content-droppable class="item-container-wrap" ng-repeat="folder in folders"
                          data-index="{[$index]}">
-                        <div class="div-draggable-wrap" draggable data-index="{[$index]}"
+                        <div class="div-draggable-wrap pointer" draggable data-index="{[$index]}"
                              data-isFolder="{[folder.is_folder]}">
                             <div class="item-container-header">
                                 {[ folder.title ]}
@@ -66,7 +66,7 @@
                     <!-- Files -->
                     <div class="item-container-wrap"
                          ng-repeat="file in files">
-                        <div class="div-draggable-wrap" draggable data-index="{[$index]}"
+                        <div class="div-draggable-wrap pointer" draggable data-index="{[$index]}"
                              data-isfolder="{[file.is_folder]}">
                             <div class="item-container-header">
                                 {[ file.title ]}

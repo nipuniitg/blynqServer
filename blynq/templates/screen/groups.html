@@ -26,7 +26,8 @@
                 </div>
                 <div class="listContainer">
                     <ul class="list-group">
-                    <li ng-repeat="group in groups|filter:searchGroup" class="list-group-item" ng-class="{active:$index===activeGroupIndex}"
+                    <li ng-repeat="group in groups|filter:searchGroup" class="list-group-item pointer"
+                        ng-class="{active:$index===activeGroupIndex}"
                         ng-click="clickedOnGroup(group, $index)">
                         {[ group.group_name ]}
                         <i class="pull-right pointer fa fa-trash-o" confirm confirm-type="delete"
