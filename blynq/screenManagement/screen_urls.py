@@ -5,7 +5,7 @@ from screenManagement import views
 urlpatterns = [
     url(r'^$', views.screen_index, name = 'screen_index'),
     url(r'^group', views.group_index, name = 'group_index'),
-    url(r'^getScreens/$', views.get_screens_json, name = 'screens_json'),
+    url(r'^getScreens', views.get_screens_json, name = 'screens_json'),
     url(r'^getGroups', views.get_groups_json, name='groups_json'),
     url(r'^upsertScreen', views.upsert_screen, name='upsert_screen'),
     url(r'^upsertGroup', views.upsert_group, name='upsert_group'),
