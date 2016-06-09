@@ -11,7 +11,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
         };
         $http({
              method : "POST"
-             ,url : '/content/deleteContent'
+             ,url : '/api/content/deleteContent'
              ,data : postData
          }).then(function mySuccess(response){
                 if(callback)
@@ -24,7 +24,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
     };
 
     var getFilesJson = function(folderId, callback){
-        var URL = '/content/getFilesJson/'+ folderId;
+        var URL = '/api/content/getFilesJson/'+ folderId;
         $http({
              method : "GET",
              url : URL
@@ -40,7 +40,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
     };
 
     var getFoldersJson = function(folderId, callback){
-        var URL = '/content/getFoldersJson/'+ folderId;
+        var URL = '/api/content/getFoldersJson/'+ folderId;
         $http({
              method : "GET",
              url : URL
@@ -61,7 +61,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
         postData.title = mdlObj.title;
         $http({
              method : "POST",
-             url : '/content/createFolder',
+             url : '/api/content/createFolder',
              data : postData
          }).then(function mySuccess(response){
                 returnData = angular.copy(response.data);
@@ -77,7 +77,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
     var updateContentTitle = function(contentObj, callback){
         $http({
              method : "POST",
-             url : '/content/updateContentTitle',
+             url : '/api/content/updateContentTitle',
              data : contentObj
          }).then(function mySuccess(response){
                 returnData = angular.copy(response.data);
@@ -93,7 +93,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
     var getFolderPath = function(folderId, callback){
         $http({
              method : "GET"
-             ,url : '/content/folderPath/'+ folderId
+             ,url : '/api/content/folderPath/'+ folderId
          }).then(function mySuccess(response){
                 returnData = angular.copy(response.data);
                 if(callback)
@@ -112,7 +112,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
         };
         $http({
              method : "POST",
-             url : '/content/moveContent',
+             url : '/api/content/moveContent',
              data : postData
          }).then(function mySuccess(response){
                 if(callback)
@@ -213,6 +213,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
     $scope.fileIcons = {
         pdf : '/static/images/pdf_logo.png'
         ,video : '/static/images/video_icon.png'
+        ,folder : '/static/images/folder-icon.png'
     };
 
     $scope.refreshContent = function(folderId){
@@ -278,7 +279,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
     $scope.createFolder = function(){
         var modalInstance = $uibModal.open({
               animation: true
-              ,templateUrl: '/templates/contentManagement/_create_folder_mdl.html'
+              ,templateUrl: '/static/templates/contentManagement/_create_folder_mdl.html'
               ,size: 'md'
               ,backdrop: 'static' //disables modal closing by click on the backdrop.
               ,resolve :{
@@ -328,7 +329,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
         //$scope.mdlEditContentObj = angular.copy(content);
         var modalInstance = $uibModal.open({
               animation: true
-              ,templateUrl: '/templates/contentManagement/_edit_content_title_mdl.html'
+              ,templateUrl: '/static/templates/contentManagement/_edit_content_title_mdl.html'
               ,size: 'md'
               ,backdrop: 'static' //disables modal closing by click on the backdrop.
               ,resolve :{
@@ -418,12 +419,11 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
     }
 
     $scope.moveContent = function(){
-
         var content_ids = angular.copy(getCheckedContentItems());
         if(content_ids){
             var modalInstance = $uibModal.open({
               animation: true
-              ,templateUrl: '/templates/contentManagement/_move_content_mdl.html'
+              ,templateUrl: '/static/templates/contentManagement/_move_content_mdl.html'
               ,controller: 'mdlContentMoveCtrl'
               ,size: 'lg'
               ,backdrop: 'static' //disables modal closing by click on the backdrop.
@@ -449,7 +449,6 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
                 toastr.warning('Move cancelled')
             });
         }
-
     };
 
 
@@ -458,7 +457,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
         var modalInstance = $uibModal.open({
               animation: true
               //,backdrop : false
-              ,templateUrl: '/templates/contentManagement/_content_view_mdl.html'
+              ,templateUrl: '/static/templates/contentManagement/_content_view_mdl.html'
               ,controller: 'mdlContentInDetailCtrl'
               ,size: 'lg'
               //,windowTemplateUrl : '/templates/shared/_mdl_window_clear.html'
@@ -481,7 +480,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
     $scope.upload = function(){
         var modalInstance = $uibModal.open({
               animation: true
-              ,templateUrl: '/templates/contentManagement/_upload_mdl.html'
+              ,templateUrl: '/static/templates/contentManagement/_upload_mdl.html'
               ,controller: 'mdlUploadContentCtrl'
               ,size: 'md'
               ,backdrop: 'static' //disables modal closing by click on the backdrop.
@@ -627,7 +626,7 @@ plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentS
             objXhr.addEventListener("load", transferComplete, false);
 
             // SEND FILE DETAILS TO THE API.
-            objXhr.open("POST", "/content/uploadContent/");
+            objXhr.open("POST", "/api/content/uploadContent/");
             objXhr.setRequestHeader("X-CSRFToken", csrftoken);
             objXhr.send(formData);
         }

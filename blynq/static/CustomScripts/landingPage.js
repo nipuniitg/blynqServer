@@ -33,7 +33,7 @@ lpApp.controller('formController', ['$http','$scope','$timeout', function($http,
     $scope.submit = function(){
         $http({
              method : "POST"
-             ,url : '/requestQuote'
+             ,url : '/api/requestQuote'
              ,data : $scope.requestQuoteFormDetails
          }).then(function mySucces(response){
                 $scope.showSuccessAlert = true;
