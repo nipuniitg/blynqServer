@@ -62,10 +62,11 @@ def delete_schedule_screen_event(sender, instance, **kwargs):
         if instance.event:
             event = instance.event
             if event.rule:
-                rule = event.rule
+                # rule = event.rule
                 event.rule = None
                 event.save()
-                rule.delete()
+                # multiple events are having the same rule, so not deleting the rule
+                # rule.delete()
             instance.event = None
             instance.save()
             event.delete()

@@ -84,12 +84,13 @@ def upsert_schedule_screens(user_details, schedule, schedule_screens, event_dict
         else:
             entry = ScheduleScreens.objects.get(schedule_screen_id=schedule_screen_id)
             events = Event.objects.filter(id=entry.event.id)
-            for event in events:
-                if event.rule:
-                    rule = event.rule
-                    event.rule = None
-                    event.save()
-                    rule.delete()
+            # Not deleting the rule as all the events have the same rule
+            # for event in events:
+            #     if event.rule:
+            #         rule = event.rule
+            #         event.rule = None
+            #         event.save()
+            #         rule.delete()
             events.update(**event_dict)
             entry.save()
         schedule_screen_id_list.append(schedule_screen_id)
@@ -129,12 +130,13 @@ def upsert_schedule_groups(user_details, schedule, schedule_groups, event_dict):
         else:
             entry = ScheduleScreens.objects.get(schedule_screen_id=schedule_screen_id)
             events = Event.objects.filter(id=entry.event.id)
-            for event in events:
-                if event.rule:
-                    rule = event.rule
-                    event.rule = None
-                    event.save()
-                    rule.delete()
+            # Not deleting the rule as all the events have the same rule
+            # for event in events:
+            #     if event.rule:
+            #         rule = event.rule
+            #         event.rule = None
+            #         event.save()
+            #         rule.delete()
             events.update(**event_dict)
             entry.save()
             schedule_screen_id_list.append(schedule_screen_id)
