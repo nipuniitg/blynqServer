@@ -279,6 +279,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
             if(isNewPlaylist){
                 $scope.playlists.push(angular.copy(upsertedPlaylist));
                 updateActivePlaylist($scope.playlists.length-1);
+                enableSortable();
             }
             else{
                 $scope.playlists[$scope.activePlaylistIndex].playlist_title = upsertedPlaylist.playlist_title;

@@ -220,7 +220,7 @@ sagApp.factory('screensFactory',['$http', 'dataAccessFactory', function($http, d
 
     var getScreensWithSelectedBool = function(selectedGroups, callback){
         dataAccessFactory.getAllScreens(function(returnData){
-            var allGroupsWithSelectedBool = selectedBoolSetter(returnData, selectedGroups, 'group_id', 'group_screen_id');
+            var allGroupsWithSelectedBool = selectedBoolSetter(returnData, selectedGroups, 'screen_id', 'group_screen_id');
             callback(allGroupsWithSelectedBool);
         });
     };

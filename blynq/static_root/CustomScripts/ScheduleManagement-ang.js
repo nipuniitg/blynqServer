@@ -610,7 +610,6 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
 
     //private methods
     var onLoad = function(){
-        $log.log($scope.timeDefined);
         $scope.timeline = timelineFactory.getTimeline(
             $scope.timeDefined
             ,timelineFactory.getDateTimeFromDate($scope.startDate)
@@ -626,7 +625,24 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
             ,$scope.recurrenceDaysOfWeek
         );
         $scope.label = timelineDescription.updateLabel($scope.timeline);
+        $log.log($scope.timeline);
+        updateTimelineObjects($scope.timeline);
     };
+
+    var updateTimelineObjects = function(timeline){
+            $scope.timeDefined = timeline.timeDefined
+            ,$scope.startDate= timelineFactory.getOnlyDate(timeline.startDate)
+            ,$scope.endDate=timelineFactory.getOnlyDate(timeline.endDate)
+            ,$scope.allDay = timeline.allDay
+            ,$scope.startTime=timelineFactory.getOnlyTime(timeline.startTime)
+            ,$scope.endTime=timelineFactory.getOnlyTime(timeline.endTime)
+            ,$scope.recurrenceType=timeline.recurrenceType
+            ,$scope.recurrenceFrequency=timeline.recurrenceFrequency
+            ,$scope.recurrenceAbsolute=timeline.recurrenceAbsolute
+            ,$scope.recurrenceDayOfMonth=timeline.recurrenceDayOfMonth
+            ,$scope.recurrenceWeekOfMonth=timeline.recurrenceWeekOfMonth
+            ,$scope.recurrenceDaysOfWeek=timeline.recurrenceDaysOfWeek
+    }
 
     $scope.$watch('timeDefined', function(newValue){
         $scope.timeline.timeDefined = newValue;
@@ -649,18 +665,7 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
 
         modalInstance.result.then(function apply(timeline) {
             $scope.timeline = timeline
-            ,$scope.timeDefined = timeline.timeDefined
-            ,$scope.startDate= timelineFactory.getOnlyDate(timeline.startDate)
-            ,$scope.endDate=timelineFactory.getOnlyDate(timeline.endDate)
-            ,$scope.allDay = timeline.allDay
-            ,$scope.startTime=timelineFactory.getOnlyTime(timeline.startTime)
-            ,$scope.endTime=timelineFactory.getOnlyTime(timeline.endTime)
-            ,$scope.recurrenceType=timeline.recurrenceType
-            ,$scope.recurrenceFrequency=timeline.recurrenceFrequency
-            ,$scope.recurrenceAbsolute=timeline.recurrenceAbsolute
-            ,$scope.recurrenceDayOfMonth=timeline.recurrenceDayOfMonth
-            ,$scope.recurrenceWeekOfMonth=timeline.recurrenceWeekOfMonth
-            ,$scope.recurrenceDaysOfWeek=timeline.recurrenceDaysOfWeek
+            updateTimelineObjects(timeline);
 
             toastr.success('timeline updated');
             $scope.label = timelineDescription.updateLabel($scope.timeline);
@@ -866,7 +871,7 @@ sdApp.factory('distributionSelectorFactory', ['$log', '$http', '$q','scheduleDet
     //public methods
     var getScreensListWithSelectedBool = function(selectedScreens, callback){
         getScreensJson(function(allScreens){
-            var allScreensWithSelectedBool = sDF.selectedBoolSetter(allScreens, selectedScreens, 'sreen_id',
+            var allScreensWithSelectedBool = sDF.selectedBoolSetter(allScreens, selectedScreens, 'screen_id',
              'schedule_screen_id');
             callback(allScreensWithSelectedBool);
         });
