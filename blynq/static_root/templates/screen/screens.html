@@ -1,0 +1,67 @@
+
+<section class="wrapper fixed-wrapper">
+    <div class="row fill">
+        <!-- List of all screens -->
+        <div class="col-md-6 col-fluid fill">
+            <section class="panel panel-default">
+                <header class="panel-heading">Screens
+                    <div class="widget-icons pull-right">
+                        <a class="btn  btn-primary" ng-click="addNewScreen()">
+                            <i class="fa fa-plus"></i>Add Screen</a>
+
+                    </div>
+                </header>
+                <div class="table-responsive fill">
+                    <table class="table  table-hover table-advanced table-striped ">
+                        <thead>
+                            <tr>
+                                <th>Edit</th>
+                                <th>Status</th>
+                                <th>Screen Name</th>
+                                <th>City</th>
+                                <th class="fix">Address</th>
+                                <th class="fix">Groups</th>
+                            </tr>
+                            <tr>
+                            <th></th>
+                            <th></th>
+                            <th><input type="form-control" ng-model="searchScreens.screen_name" placeholder="search Name"></th>
+                            <th><input type="form-control" ng-model="searchScreens.city.city_name" placeholder="search"></th>
+                            <th><input type="form-control" ng-model="searchScreens.address" placeholder="search"></th>
+                            <th><input type="form-control" ng-model="searchScreens.groups.group_name" placeholder="search"></th>
+                        </tr>
+                        </thead>
+                        <tbody style=" height: 230px;overflow-y: auto;width: 100%;">
+                        <tr class="pointer" ng-repeat="screen in screens | filter: searchScreens" ng-click="clickedOnScreen($index)">
+                            <td><a href="#" ng-click="editScreenDetails($index)"><i class="fa fa-pencil pointer"></i> </a></td>
+                            <td><i class="fa fa-circle online"></i>{[ screen.status ]} </td>
+                            <td class="fix">{[ screen.screen_name ]}</td>
+                            <td class="">{[ screen.city.city_name]}</td>
+                            <td class="fix">{[ screen.address ]}</td>
+                            <td class="fix">
+                                <div  class="tagsinput " style="height: 100%;">
+                                    <span class="tag" ng-repeat="group in screen.groups">
+                                    <span> {[group.group_name]} &nbsp;&nbsp;</span>
+                                    <!--<a class="tagsinput-remove-link"></a>-->
+                                    </span>
+
+                                </span>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+        <!-- List of all schedules for the selected screen -->
+        <div class="col-md-6 col-fluid fill">
+            <schedules-list
+                    schedules="screenSchedules"
+                    refresh-schedules-fn = "refreshScreenSchedules()" title="Screen Schedules">
+            </schedules-list>
+        </div>
+    </div>
+
+
+</section>

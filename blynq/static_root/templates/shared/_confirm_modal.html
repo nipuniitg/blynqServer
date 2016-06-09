@@ -1,0 +1,16 @@
+<div>
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()" aria-hidden="true"><i class="fa fa-times"></i></button>
+        <h3 class="modal-title">{[ modalTitle ]}</h3>
+    </div>
+    <div class="modal-body">
+        {[ message ]}
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-success btn-fixed-width" ng-click="ok()">
+            {[confirmVerbose]}</button>
+        <button type="button" class="btn btn-default btn-fixed-width" ng-click="cancel()">
+            {[ cancelVerbose ]}
+        </button>
+    </div>
+</div>

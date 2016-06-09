@@ -17,7 +17,7 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
     var getAllScreens = function(callback){
         $http({
             method : "GET",
-            url : "getScreens"
+            url : "/api/screen/getScreens"
         }).then(function mySucces(response) {
             if(callback)
             {
@@ -31,7 +31,7 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
     var getAllGroups = function(callback){
         $http({
             method : "GET",
-            url : "getGroups"
+            url : "/api/screen/getGroups"
         }).then(function mySucces(response) {
             if(callback)
             {
@@ -46,7 +46,7 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
         // var screenDetailsJson = JSON.stringify(screenDetails);
         $http({
             method : "POST"
-            ,url : "upsertScreen"
+            ,url : "/api/screen/upsertScreen"
             ,data : screenDetails
         }).then(function mySucces(response) {
             if(callback)
@@ -62,7 +62,7 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
     var upsertGroup = function(groupDetails, callback){
         $http({
             method : "POST"
-            ,url : "upsertGroup"
+            ,url : "/api/screen/upsertGroup"
             ,data : groupDetails
             /*data : {
                 groupDetails : groupDetails
@@ -80,7 +80,7 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
     var getScreenSchedules  =   function(screen_id, callback){
         $http({
             method : "GET",
-            url : "/schedule/getScreenSchedules/" + screen_id
+            url : "/api/schedule/getScreenSchedules/" + screen_id
         }).then(function mySucces(response) {
             if(callback)
             {
@@ -94,7 +94,7 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
     var getGroupSchedules  =   function(group_id, callback){
         $http({
             method : "GET",
-            url : "/schedule/getGroupSchedules/" + group_id
+            url : "/api/schedule/getGroupSchedules/" + group_id
         }).then(function mySucces(response) {
             if(callback)
             {
@@ -111,7 +111,7 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
         }
         $http({
             method : "POST"
-            ,url : "deleteGroup"
+            ,url : "/api/screen/deleteGroup"
             ,data : postData
         }).then(function mySucces(response) {
             if(callback)
@@ -127,7 +127,7 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
     var getCityOptions = function(callback){
         $http({
             method : "GET",
-            url : "getCityOptionsJson"
+            url : "/api/screen/getCityOptionsJson"
         }).then(function mySucces(response) {
             if(callback)
             {
@@ -330,7 +330,7 @@ function(groupsFactory, dataAccessFactory, $scope,$uibModal){
         var isNewGroup = index == newGroupIndex ? !0 : !1;
         var modalInstance = $uibModal.open({
               animation: true
-              ,templateUrl: '/templates/screen/_group_details_mdl.html'
+              ,templateUrl: '/static/templates/screen/_group_details_mdl.html'
               ,controller: 'mdlUpsertGroupDetails'
               ,size: 'lg'
               ,backdrop: 'static' //disables modal closing by click on the backdrop.
@@ -412,7 +412,7 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
         var isNewScreen = index == newScreenIndex ? !0 : !1;
         var modalInstance = $uibModal.open({
               animation: true
-              ,templateUrl: '/templates/screen/_screen_details_mdl.html'
+              ,templateUrl: '/static/templates/screen/_screen_details_mdl.html'
               ,controller: 'mdlUpsertScreenDetails'
               ,size: 'lg'
               ,backdrop: 'static' //disables modal closing by click on the backdrop.
@@ -463,7 +463,7 @@ sagApp.controller('mdlUpsertScreenDetails', ['$scope','$uibModalInstance','scree
     $scope.openGroupSelectorModal = function(){
         var modalInstance = $uibModal.open({
           animation: true,
-          templateUrl: '/templates/screen/_group_selection_mdl.html',
+          templateUrl: '/static/templates/screen/_group_selection_mdl.html',
           controller: 'mdlGroupSelectionCtrl',
           size: 'lg'
           ,backdrop: 'static' //disables modal closing by click on the backdrop.
@@ -519,7 +519,7 @@ sagApp.controller('mdlUpsertGroupDetails',['$scope','$uibModalInstance', 'groupD
     $scope.openScreenSelectorModal = function(){
         var modalInstance = $uibModal.open({
           animation: true,
-          templateUrl: '/templates/screen/_screen_selection_mdl.html',
+          templateUrl: '/static/templates/screen/_screen_selection_mdl.html',
           controller: 'mdlScreenSelectionCtrl',
           size: 'lg'
           ,backdrop: 'static' //disables modal closing by click on the backdrop.

@@ -1,0 +1,101 @@
+<section class="wrapper fixed-wrapper" ng-controller="groupCtrl">
+
+    <div class="row fill">
+
+        <div id="div-groupsList-wrapper" class="col-md-3 fill col-fluid">
+            <!-- Groups -->
+            <div class="panel panel-default">
+                <div class="panel-heading ">
+                    <div class="pull-left">Groups</div>
+                    <div class="widget-icons pull-right">
+                        <a href="#" ng-click="addNewGroup()" class="wminimize"
+                            ng-click="addNewGroup()"><i
+                                class="fa fa-plus"></i>Add Group</a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="item-search-row">
+                    <div class="input-group">
+                        <input class="form-control" placeholder="Search" type="text" ng-model="searchGroup.group_name">
+                        <span class="input-group-addon"><i class="fa fa-search"></i> </span>
+                    </div>
+                </div>
+                <div class="listContainer">
+                    <ul class="list-group">
+                    <li ng-repeat="group in groups|filter:searchGroup" class="list-group-item pointer"
+                        ng-class="{active:$index===activeGroupIndex}"
+                        ng-click="clickedOnGroup(group, $index)">
+                        {[ group.group_name ]}
+                        <i class="pull-right pointer fa fa-trash-o" confirm confirm-type="delete"
+                           confirm-fn="deleteGroup($index)"></i>
+                        <i class="pull-right fa fa-pencil pointer"
+                           ng-click="editGroupDetails($index)"></i>
+                        <span></span>
+                    </li>
+
+                </ul>
+                </div>
+
+
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3 col-fluid fill">
+            <section class="panel panel-default">
+                <header class="panel-heading">
+                    Group Screens
+                </header>
+                <div class="table-responsive fill">
+                    <table class="table  table-hover table-advanced table-striped ">
+                        <thead>
+                        <tr>
+                            <th class="fix">Screen Name</th>
+                            <th class="fix">Address</th>
+                            <th class="">City</th>
+                            <!--<th class="fix">Groups</th>-->
+                        </tr>
+                        <tr>
+                            <th><input type="form-control" placeholder="search"
+                                       ng-model="searchScreens.screen_name"></th>
+                            <th><input type="form-control" placeholder="search"
+                                       ng-model="searchScreens.address"></th>
+                            <th><input type="form-control" placeholder="search"
+                                       ng-model="searchScreens.city.city_name"></th>
+                            <!--<th><input type="form-control" placeholder="search"-->
+                                       <!--ng-model="searchScreens.groups.group_name"></th>-->
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="screen in groups[activeGroupIndex].screens| filter: searchScreens">
+                            <td class="fix">{[ screen.screen_name ]}</td>
+                            <td class="fix">{[ screen.address]}</td>
+                            <td class="">{[ screen.city.city_name ]}</td>
+                            <!--<td class="fix">-->
+                                <!--<div  class="tagsinput">-->
+                                    <!--<span class="tag" ng-repeat="group in screen.groups">-->
+                                        <!--<span> {[group.group_name]} &nbsp;&nbsp;</span>-->
+                                    <!--</span>-->
+
+                                <!--</span>-->
+                                <!--</div>-->
+                            <!--</td>-->
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+
+        <div class="col-md-6 col-fluid fill">
+            <schedules-list
+                    schedules="groupSchedules"
+                    refresh-schedules-fn = "refreshGroupSchedules()" title="Group Schedules">
+            </schedules-list>
+        </div>
+
+    </div>
+
+</section>

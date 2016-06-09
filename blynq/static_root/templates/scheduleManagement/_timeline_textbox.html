@@ -1,0 +1,23 @@
+<section>
+<!--<label class="control-label control-label-secondary add-left">-->
+    <label class="col-md-2">
+    <input ng-model="timeDefined" type="checkbox"
+           > Always</label>
+
+<div class="col-md-10 col-md-offset-2" ng-if="!timeDefined">
+    <div id="timelineTextbox" class="tagsinput " style="height: 100%;">
+        <span class="tag" ng-click="openTimelineModal()">
+            <span> {[ label ]}  &nbsp;&nbsp;</span>
+        </span>
+    </div>
+</div>
+    </section>
+
+
+<!--<div id="timelineTextbox" class="content-box-editable remove-bottom clickable" ng-click="openModal()"
+     >
+    <div class="label label-tag">
+                        <span id="timelineLabel" timeline="timeline"
+                              class="ng-binding">29-Apr-2016 Daily Every 1 Day(s) </span>
+    </div>
+</div>-->

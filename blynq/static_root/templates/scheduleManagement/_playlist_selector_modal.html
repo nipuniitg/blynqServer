@@ -1,0 +1,50 @@
+<div id="playlistSelectorModal">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()" aria-hidden="true"><i class="fa fa-times"></i></button>
+        <h3 class="modal-title">Select Playlists</h3>
+    </div>
+
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel">
+                    <div class="panel-body" style="max-height:400px;overflow:scroll">
+                        <table class="table bootstrap-datatable">
+                            <thead>
+                            <tr>
+                                <th>Select</th>
+                                <th>Playlist Name</th>
+                                <th>Description</th>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th><input type="form-control" ng-model="searchPlaylist.playlist_title"
+                                           placeholder="search Name"></th>
+                                <th><input type="form-control" ng-model="searchPlaylist.description"
+                                           placeholder="search Address"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="playlist in allPlaylists | filter : searchPlaylist">
+                                <td><input type="checkbox" ng-model="playlist.selected"></td>
+                                <td>{[playlist.playlist_title]}</td>
+                                <td>{[playlist.description]}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-fixed-width" ng-click="apply()"
+                ng-disabled="">Select
+            <i class="fa fa-white fa-check icon-right"></i>
+        </button>
+        <button type="button" class="btn btn-default btn-fixed-width" ng-click="cancel()">
+            Cancel <i class="fa fa-times icon-right"></i>
+        </button>
+    </div>
+</div>

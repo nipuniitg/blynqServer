@@ -1,0 +1,84 @@
+<div id="timelineModal">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()" aria-hidden="true"><i class="fa fa-times"></i></button>
+        <h3 class="modal-title">{[title]}</h3>
+    </div>
+    <section class="">
+    <div class="row">
+        <div class="col-md-12" style="min-height:400px; overflow-y: scroll">
+            <div class="panel panel-default" style="border-right:1px solid grey">
+                <div class="panel-heading">Schedule Details</div>
+                <div class="panel-body">
+                    <form id="form_schedule_details" name="scheduleDetailsForm" class="form-horizontal"
+                          enctype="multipart/form-data">
+
+                        <div class="form-group">
+                            <div class="control-label col-md-2">Schedule Name*</div>
+                            <div class="col-md-10">
+                                <input name="scheduleName" class="form-control"
+                                       placeholder="Schedule Title" ng-model="schedule.schedule_title" required>
+                            </div>
+                            <div class="col-md-6 col-md-offset-2" ng-show="scheduleDetailsForm.schedule_title.$touched &&
+                                scheduleDetailsForm.schedule_title.$invalid">
+                                <span>This field is required.</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="control-label col-md-2">Screens*</div>
+                            <div class="col-md-10">
+                                <distribution-list
+                                    selected-screens="schedule.schedule_screens"
+                                    selected-groups ="schedule.schedule_groups">
+                                </distribution-list>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <div class="control-label col-md-2">Playlists*</div>
+                            <div class="col-md-10">
+                                <playlist-textbox
+                                selected-playlists="schedule.schedule_playlists">
+                            </playlist-textbox>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="control-label col-md-2">Timeline*</div>
+                                <timeline-textbox
+                                    time-defined="schedule.timeline.is_always"
+                                    start-date="schedule.timeline.start_date"
+                                    end-date="schedule.timeline.end_recurring_period"
+                                    all-day ="schedule.timeline.all_day"
+                                    start-time="schedule.timeline.start_time"
+                                    end-time="schedule.timeline.end_time"
+                                    recurrence-type="schedule.timeline.frequency"
+                                    recurrence-frequency="schedule.timeline.interval"
+                                    recurrence-absolute="schedule.timeline.recurrence_absolute"
+                                    recurrence-day-of-month="schedule.timeline.bymonthday"
+                                    recurrence-week-of-month="schedule.timeline.byweekno"
+                                    recurrence-days-of-week="schedule.timeline.byweekday">
+                            </timeline-textbox>
+                        </div>
+
+                    </form>
+                    <div class="container" style="margin:10px">
+                        <div class="row">
+                        <div class="col-md-4 col-md-offset-5">
+                            <div class="pull-right">
+                                <button class="btn btn-success" ng-click="saveSchedule()">save</button>
+                                <button class="btn btn-default" ng-click="cancel()"> cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+</div>
+

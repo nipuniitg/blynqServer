@@ -32,7 +32,7 @@ sdApp.factory('scheduleIndexFactory', ['$http', function($http){
     var getSchedules = function(callback){
         $http({
              method : "GET",
-             url : 'getSchedules'
+             url : '/api/schedule/getSchedules'
          }).then(function mySucces(response){
                 if(callback)
                 {
@@ -49,7 +49,7 @@ sdApp.factory('scheduleIndexFactory', ['$http', function($http){
       };
         $http({
             method : "POST"
-            ,url : "/schedule/deleteSchedule"
+            ,url : "/api/schedule/deleteSchedule"
             ,data : obj
         }).then(function mySucces(response){
             if(callback)
@@ -79,7 +79,7 @@ sdApp.directive('schedulesList',['$log','scheduleIndexFactory','$uibModal',
             ,refreshSchedules : '&refreshSchedulesFn'
             ,title : '@'
         }
-        ,templateUrl:   '/templates/scheduleManagement/_schedules_list.html'
+        ,templateUrl:   '/static/templates/scheduleManagement/_schedules_list.html'
         ,link : function($scope){
                 var newScheduleIndex = -1;
 
@@ -109,7 +109,7 @@ sdApp.directive('schedulesList',['$log','scheduleIndexFactory','$uibModal',
                     var isNewSchedule = index == newScheduleIndex ? !0 : !1;
                     var modalInstance = $uibModal.open({
                       animation: true,
-                      templateUrl: '/templates/scheduleManagement/schedule_details.html',
+                      templateUrl: '/static/templates/scheduleManagement/schedule_details.html',
                       controller: 'scheduleDetailsCtrl',
                       size: 'lg'
                       ,backdrop: 'static' //disables modal closing by click on the backdrop.
@@ -209,7 +209,7 @@ sdApp.factory('scheduleDetailsFactory', ['$log','$http', function($log, $http){
     var upsertScheduleDetails = function(schedule, callback){
         $http({
             method : "POST"
-            ,url : "/schedule/upsertSchedule"
+            ,url : "/api/schedule/upsertSchedule"
             ,data : schedule
         }).then(function mySucces(response){
             if(callback)
@@ -307,7 +307,7 @@ return{
         ,recurrenceWeekOfMonth :'='
         ,recurrenceDaysOfWeek  :'='
     }
-    ,templateUrl : '/templates/scheduleManagement/_timeline_textbox.html'
+    ,templateUrl : '/static/templates/scheduleManagement/_timeline_textbox.html'
     ,controller : 'timelinetextboxController'
     ,link : function($scope,element, attr){
 
@@ -636,7 +636,7 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
     $scope.openTimelineModal=function(){
         var modalInstance = $uibModal.open({
           animation: true,
-          templateUrl: '/templates/scheduleManagement/_timeline_modal.html',
+          templateUrl: '/static/templates/scheduleManagement/_timeline_modal.html',
           controller: 'timelineModalController',
           size: 'lg'
           ,backdrop: 'static' //disables modal closing by click on the backdrop.
@@ -783,7 +783,7 @@ sdApp.directive('distributionList', function(){
             ,selectedGroups : '='
         }
         ,controller : 'distributionListController'
-        ,templateUrl : '/templates/scheduleManagement/_distribution_list.html'
+        ,templateUrl : '/static/templates/scheduleManagement/_distribution_list.html'
         ,link : function($scope, elements, attr){
 
         }
@@ -796,7 +796,7 @@ sdApp.controller('distributionListController',['$scope', '$uibModal','$log',
     $scope.openDistributionSelectorModal = function(){
         var modalInstance = $uibModal.open({
           animation: true,
-          templateUrl: '/templates/scheduleManagement/_distribution_selector_modal.html',
+          templateUrl: '/static/templates/scheduleManagement/_distribution_selector_modal.html',
           controller: 'distributionSelectorController',
           size: 'lg'
           ,backdrop: 'static' //disables modal closing by click on the backdrop.
@@ -837,7 +837,7 @@ sdApp.factory('distributionSelectorFactory', ['$log', '$http', '$q','scheduleDet
     var getScreensJson = function(callback){
         $http({
             method : "GET",
-            url : "/screen/getScreens"
+            url : "/api/screen/getScreens"
         }).then(function mySucces(response) {
             if(callback)
             {
@@ -851,7 +851,7 @@ sdApp.factory('distributionSelectorFactory', ['$log', '$http', '$q','scheduleDet
     var getGroupsJson = function(callback){
          $http({
             method : "GET",
-            url : "/screen/getGroups"
+            url : "/api/screen/getGroups"
         }).then(function mySucces(response) {
             if(callback)
             {
@@ -935,7 +935,7 @@ sdApp.directive('playlistTextbox',['$uibModal', function($uibModal){
         ,scope : {
             selectedPlaylists : '='
         }
-        ,templateUrl : '/templates/scheduleManagement/_playlist_textbox.html'
+        ,templateUrl : '/static/templates/scheduleManagement/_playlist_textbox.html'
         ,link : function($scope, elements,attr){
             $scope.removePlaylist = function(index){
                 $scope.selectedPlaylists.splice(index,1);
@@ -943,7 +943,7 @@ sdApp.directive('playlistTextbox',['$uibModal', function($uibModal){
             $scope.openPlaylistSelectorModal = function(){
                 var modalInstance = $uibModal.open({
                   animation: true,
-                  templateUrl: '/templates/scheduleManagement/_playlist_selector_modal.html',
+                  templateUrl: '/static/templates/scheduleManagement/_playlist_selector_modal.html',
                   controller: 'playlistSelectorController',
                   size: 'lg'
                   ,backdrop: 'static' //disables modal closing by click on the backdrop.
@@ -968,7 +968,7 @@ sdApp.factory('playlistSelectorFactory', ['scheduleDetailsFactory','$http', func
     var getPlaylistsJson = function(callback){
         $http({
              method : "GET",
-             url : '/playlist/getPlaylists'
+             url : '/api/playlist/getPlaylists'
          }).then(function mySucces(response){
                 if(callback)
                 {

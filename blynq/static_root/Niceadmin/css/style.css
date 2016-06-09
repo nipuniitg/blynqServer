@@ -360,7 +360,7 @@ ul.sidebar-menu li a{
     position: relative;
     top: 2px;
 }*/
-ul.sidebar-menu li.active a, ul.sidebar-menu li a:hover, ul.sidebar-menu li a:focus {
+ul.sidebar-menu li a.active, ul.sidebar-menu li a:hover, ul.sidebar-menu li a:focus {
     background: #eeeeee;
     color: #1D1B1B;
     display: block;

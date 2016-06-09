@@ -6,7 +6,7 @@ angular.module('mainApp').directive('confirm', ['$log','$uibModal', function($lo
         elem.bind('click',function(){
             var modalInstance = $uibModal.open({
                   animation: true,
-                  templateUrl: '/templates/shared/_confirm_modal.html',
+                  templateUrl: '/static/templates/shared/_confirm_modal.html',
                   controller: 'confirmDirectiveCtrl',
                   size: 'sm'
                   ,backdrop: 'static' //disables modal closing by click on the backdrop.
