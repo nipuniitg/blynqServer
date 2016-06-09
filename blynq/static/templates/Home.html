@@ -32,7 +32,7 @@
 		<div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
 			<div class="info-box blue-bg pointer" ng-click="navigateTo('screens')">
 				<i class="icon_desktop"></i>
-				<div class="count">{[homeCtrl.screen_count]}</div>
+				<div class="count">{[screen_count]}</div>
 				<div class="title">Screens</div>
 			</div><!--/.info-box-->
 		</div><!--/.col-->
@@ -41,7 +41,7 @@
 			<div class="info-box brown-bg pointer" ng-click="navigateTo('contentLibrary')">
 				<i class="fa fa-folder-open-o"></i>
 				<!--<i class="fa fa-shopping-cart"></i>-->
-				<div class="count">{[ homeCtrl.used_storage | memoryInGB ]} GB</div>
+				<div class="count">{[ used_storage | memoryInGB ]} GB</div>
 				<div class="title">Space used</div>
 			</div><!--/.info-box-->
 		</div><!--/.col-->
@@ -50,7 +50,7 @@
 			<div class="info-box dark-bg pointer" ng-click="navigateTo('schedules')">
 				<i class="fa fa-paper-plane-o"></i>
 				<!--<i class="fa fa-thumbs-o-up"></i>-->
-				<div class="count">{[ homeCtrl.schedule_count ]}</div>
+				<div class="count">{[ schedule_count ]}</div>
 				<div class="title">Schedules</div>
 			</div><!--/.info-box-->
 		</div><!--/.col-->
