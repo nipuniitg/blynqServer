@@ -44,7 +44,7 @@ from screenManagement.models import Screen
 def login(request):
     context_dic ={}
     if request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('homepage', args=(request)))
+        return HttpResponseRedirect(reverse('index_page'))
     else:
         if request.POST:
             username = request.POST.get('username')
@@ -54,7 +54,7 @@ def login(request):
             if user:
                 print "authenticate successfull"
                 auth_login(request, user)
-                return HttpResponseRedirect(reverse('homepage'))
+                return HttpResponseRedirect(reverse('index_page'))
             else:
                 return HttpResponse('Invalid Login Details')
 
@@ -62,19 +62,21 @@ def login(request):
 
 
 @login_required
+def divert_to_index_page(request, **kwargs):
+    return render(request, 'masterLayout.html')
+
+
+@login_required
 def homePage(request):
     return render(request, 'Home.html')
 
 
+
 def divertToLandingPage(request):
-    return render(request, 'landing_page_content.html')
-
-
-@login_required
-def getPartailtemplate(request, template_name):
-    path = 'scheduleManagement/'
-    extn = '.html'
-    return render(request, (path+template_name+extn))
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('index_page', args=(request)))
+    else:
+        return render(request, 'landing_page_content.html')
 
 
 def request_quote(request):

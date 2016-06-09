@@ -40,7 +40,8 @@ hApp.filter('memoryInGB',function(){
     }
 });
 
-hApp.controller('homeCtrl', ['$scope', '$window','homeDataAccessFactory', function($scope, $window, hDAF){
+hApp.controller('homeCtrl', ['$scope','homeDataAccessFactory','$state',
+ function($scope, hDAF, $state){
     var onLoad = function(){
         hDAF.getHomePageSummary(function(returnData){
             $scope.screen_count = returnData.screen_count;
@@ -51,14 +52,8 @@ hApp.controller('homeCtrl', ['$scope', '$window','homeDataAccessFactory', functi
     };
     onLoad();
 
-    var navigationLinks = {
-        screen : '/screen'
-        ,content : '/content'
-        ,schedule : '/schedule'
-    };
-
-    $scope.navigateTo = function(type){
-        $window.location.assign(navigationLinks[type]);
+    $scope.navigateTo = function(state){
+        $state.go(state);
     }
 
 }]);

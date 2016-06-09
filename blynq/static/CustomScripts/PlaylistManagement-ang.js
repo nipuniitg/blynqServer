@@ -14,7 +14,7 @@ plApp.factory('plDataAccessFactory',['$http','$window', function($http,$window){
     var getPlaylists = function(callback){
          $http({
              method : "GET",
-             url : 'getPlaylists'
+             url : '/api/playlist/getPlaylists'
          }).then(function mySucces(response){
                 returnData = angular.copy(response.data);
                 if(callback)
@@ -30,7 +30,7 @@ plApp.factory('plDataAccessFactory',['$http','$window', function($http,$window){
     var upsertPlaylist = function(playlist, callback){
         $http({
              method : "POST"
-             ,url : 'upsertPlaylist'
+             ,url : '/api/playlist/upsertPlaylist'
              ,data : playlist
          }).then(function mySucces(response){
                 returnData = angular.copy(response.data);
@@ -46,7 +46,7 @@ plApp.factory('plDataAccessFactory',['$http','$window', function($http,$window){
     var deletePlaylist = function(playlist, callback){
         $http({
              method : "POST"
-             ,url : 'deletePlaylist'
+             ,url : '/api/playlist/deletePlaylist'
              ,data : playlist
          }).then(function mySucces(response){
                 returnData = angular.copy(response.data);
@@ -63,7 +63,7 @@ plApp.factory('plDataAccessFactory',['$http','$window', function($http,$window){
     {
         $http({
              method : "POST"
-             ,url : 'savePlaylistItems'
+             ,url : '/api/playlist/savePlaylistItems'
              ,data : playlist
          }).then(function mySucces(response){
                 returnData = angular.copy(response.data);
@@ -80,7 +80,7 @@ plApp.factory('plDataAccessFactory',['$http','$window', function($http,$window){
     {
         $http({
              method : "GET"
-             ,url : 'getFilesRecursively/'+folderId
+             ,url : '/api/playlist/getFilesRecursively/'+folderId
          }).then(function mySucces(response){
                 returnData = angular.copy(response.data);
                 if(callback)
@@ -228,7 +228,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
 
         var modalInstance = $uibModal.open({
               animation: true
-              ,templateUrl: '/templates/playlistManagement/_playlist_title_mdl.html'
+              ,templateUrl: '/static/templates/playlistManagement/_playlist_title_mdl.html'
               ,controller: function($scope, $uibModalInstance, playlistObj, plDataAccessFactory){
                     var isNewPlaylist = playlistObj.playlist_id == -1 ? !0 : !1;
                     var onLoad = function(){

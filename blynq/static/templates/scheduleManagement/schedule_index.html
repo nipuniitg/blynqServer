@@ -1,8 +1,4 @@
-{% extends 'masterLayout.html' %}
-{% load staticfiles %}
-
-{% block content%}
-<section class="wrapper fixed-wrapper" ng-controller="scheduleIndexCtrl" style="width:100%">
+<section class="wrapper fixed-wrapper" ng-controller="scheduleIndexCtrl" style="width:100%" >
     <div class="row fill">
         <div class="col-md-10 col-fluid fill">
             <schedules-list schedules="schedules"
@@ -12,4 +8,3 @@
         </div>
     </div>
 </section>
-{% endblock content%}
