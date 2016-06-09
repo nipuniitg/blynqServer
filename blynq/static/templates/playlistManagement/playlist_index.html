@@ -1,7 +1,3 @@
-{% extends 'masterLayout.html' %}
-{% load staticfiles %}
-
-{% block content%}
 <section class="wrapper fixed-wrapper" ng-controller="plCtrl">
     <div class="row fill">
         <!-- List of all Playlists -->
@@ -155,10 +151,9 @@
         </div>
 
         <!-- Content div -->
-        <div class="col-md-8 fill" ng-show="!showQueueItemDetails">
-            {% include 'contentManagement/content_holder.html' %}
+        <div class="col-md-8 fill" ng-show="!showQueueItemDetails" ui-view="content">
+
         </div>
     </div>
 
 </section>
-{% endblock content %}
