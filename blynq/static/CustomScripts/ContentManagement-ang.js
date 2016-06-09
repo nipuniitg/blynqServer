@@ -576,7 +576,7 @@ plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentS
         $scope.uploadProgressIndicator = 0;
     };
 
-    var validFileTypes = ['image/png','image/jpg','image/jpeg','image/gif','application/pdf','video'];
+    var validFileTypes = ['image/png','image/jpg','image/jpeg','image/gif','application/pdf','video/mp4','video/mkv'];
 
     $scope.validateFiles = function(){
         $scope.invalidFiles = [];
