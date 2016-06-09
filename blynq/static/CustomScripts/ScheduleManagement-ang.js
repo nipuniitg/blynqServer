@@ -866,7 +866,7 @@ sdApp.factory('distributionSelectorFactory', ['$log', '$http', '$q','scheduleDet
     //public methods
     var getScreensListWithSelectedBool = function(selectedScreens, callback){
         getScreensJson(function(allScreens){
-            var allScreensWithSelectedBool = sDF.selectedBoolSetter(allScreens, selectedScreens, 'sreen_id',
+            var allScreensWithSelectedBool = sDF.selectedBoolSetter(allScreens, selectedScreens, 'screen_id',
              'schedule_screen_id');
             callback(allScreensWithSelectedBool);
         });
