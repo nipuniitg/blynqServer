@@ -9,27 +9,21 @@ from screenManagement import screen_urls
 from playlistManagement import playlist_urls
 from contentManagement import content_urls
 from scheduleManagement import schedule_urls
-import templateView
 
 
 urlpatterns = [
     url(r'^$', auth_views.divertToLandingPage, name='landing_page')
-    ,url(r'^requestQuote', auth_views.request_quote, name='request_quote')
-    ,url(r'^login', auth_views.login, name='login')
+    ,url(r'^/$', auth_views.divert_to_index_page, name='index_page')
     ,url(r'^authentication/', include(authentication_urls))
-    ,url(r'^schedule/', include(schedule_urls))
-    ,url(r'^screen/', include(screen_urls))
-    ,url(r'^content/', include(content_urls))
-    ,url(r'^playlist/', include(playlist_urls))
-    ,url(r'^$', auth_views.homePage)
-    ,url(r'^home/', auth_views.homePage, name='homepage')
-    #,url(r'^home/', screen_views.routeToHome, name='homepage'),
+    ,url(r'^api/requestQuote', auth_views.request_quote, name='request_quote')
+    ,url(r'^api/login', auth_views.login, name='login')
+    ,url(r'^api/schedule/', include(schedule_urls))
+    ,url(r'^api/screen/', include(screen_urls))
+    ,url(r'^api/content/', include(content_urls))
+    ,url(r'^api/playlist/', include(playlist_urls))
     ,url(r'^admin/', include(admin.site.urls))
-    ,url(r'^templates/scheduleManagement/(?P<template_name>[\w-]+)',auth_views.getPartailtemplate)
-    ,url(r'^templates/shared/(?P<template_name>[\w-]+)',templateView.get_shared_partail_templates)
-    ,url(r'^templates/contentManagement/(?P<template_name>[\w-]+)', templateView.get_content_partial_templates)
-    ,url(r'^templates/playlistManagement/(?P<template_name>[\w-]+)', templateView.get_playlist_partial_templates)
-    ,url(r'^templates/screen/(?P<template_name>[\w-]+)', templateView.get_screen_partial_templates)
+    ,url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,})
+    ,url(r'^.*', auth_views.divert_to_index_page)
 
 ]
 
