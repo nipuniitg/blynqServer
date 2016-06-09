@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from authentication.models import UserDetails, Organization, Role
 from blynq import settings
-from customLibrary.views_lib import string_to_dict, ajax_response, get_userdetails, send_mail_blynq, list_to_json
+from customLibrary.views_lib import string_to_dict, ajax_response, get_userdetails, send_mail_blynq, obj_to_json_response
 from scheduleManagement.models import Schedule
 from screenManagement.models import Screen
 
@@ -86,11 +86,11 @@ def request_quote(request):
         if request_quote_form.is_valid():
             try:
                 request_quote_form.save()
-                message = 'Name: ' + posted_data.get('name') + '\n\n'
-                message += 'E-mail: ' + posted_data.get('email') + '\n\n'
+                message = 'Name: ' + str(posted_data.get('name')) + '\n\n'
+                message += 'E-mail: ' + str(posted_data.get('email')) + '\n\n'
                 message += 'Mobile Number: ' + str(posted_data.get('mobile_number')) + '\n\n'
                 message += 'Number of Devices: ' + str(posted_data.get('num_of_devices')) + '\n\n'
-                message += 'Additional Details: ' + posted_data.get('additional_details') + '\n\n'
+                message += 'Additional Details: ' + str(posted_data.get('additional_details')) + '\n\n'
                 send_mail_blynq(subject='[Auto-Generated] Quote Requested', message=message)
                 success = True
             except Exception as e:
@@ -122,7 +122,7 @@ def organization_homepage_summary(request):
         print "Exception is ", e
         context_dic['used_storage'] = 0
         context_dic['total_storage'] = settings.STORAGE_LIMIT_PER_ORGANIZATION
-    return list_to_json(context_dic)
+    return obj_to_json_response(context_dic)
 
 
 # def logout(request):

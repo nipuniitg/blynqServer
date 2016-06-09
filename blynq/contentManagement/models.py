@@ -109,38 +109,6 @@ def upload_to_dir(instance, filename):
     return '%s/user%d/%s' % (USERCONTENT_DIR, instance.uploaded_by.id, filename)
 
 
-@receiver(pre_delete)
-def delete_file(sender, instance, **kwargs):
-    debugFileLog.info("inside delete_file")
-    if sender == Content and instance.document:
-        try:
-            organization = instance.organization
-            organization.used_file_size = organization.used_file_size - instance.document.size
-            if organization.used_file_size < 0:
-                organization.used_file_size = 0
-            organization.save()
-        except Exception as e:
-            debugFileLog.exception("Exception while subtracting the deleted file size")
-        try:
-            src = instance.document.name
-            file_src = os.path.join(MEDIA_ROOT, src)
-            if os.path.exists(file_src):
-                dst = '%s/organization%d/' % (DELETED_CONTENT_DIR, instance.organization.organization_id)
-                file_dst = os.path.join(MEDIA_ROOT, dst)
-                try:
-                    if not os.path.exists(file_dst):
-                        os.makedirs(file_dst)
-                    shutil.move(file_src, file_dst)
-                except Exception as e:
-                    debugFileLog.error("Error while moving deleted content to media/deletedcontent/organization_id")
-                    debugFileLog.exception(e)
-            else:
-                debugFileLog.error("To be deleted content %s does not exist" % file_src)
-        except Exception as e:
-            debugFileLog.exception("Unknown exception while deleting content")
-            debugFileLog.exception(e)
-
-
 class Content(models.Model):
     # This class includes both files and folders as Content
     content_id = models.AutoField(primary_key=True)
@@ -215,6 +183,9 @@ class Content(models.Model):
             path.insert(0, current_folder)
             instance = instance.parent_folder
         return path
+
+    class Meta:
+        ordering = ['-last_modified_time']
 
     @staticmethod
     def get_user_relevant_objects(user_details):
@@ -306,3 +277,35 @@ class Content(models.Model):
         #     if not Content.objects.filter(document=self.document.name, is_public=self.is_public).exists():
         #         self.document.delete(False)
         # delete.alters_data = True
+
+
+@receiver(pre_delete, sender=Content)
+def delete_file(sender, instance, **kwargs):
+    debugFileLog.info("inside delete_file")
+    if instance.document:
+        try:
+            organization = instance.organization
+            organization.used_file_size = organization.used_file_size - instance.document.size
+            if organization.used_file_size < 0:
+                organization.used_file_size = 0
+            organization.save()
+        except Exception as e:
+            debugFileLog.exception("Exception while subtracting the deleted file size")
+        try:
+            src = instance.document.name
+            file_src = os.path.join(MEDIA_ROOT, src)
+            if os.path.exists(file_src):
+                dst = '%s/organization%d/' % (DELETED_CONTENT_DIR, instance.organization.organization_id)
+                file_dst = os.path.join(MEDIA_ROOT, dst)
+                try:
+                    if not os.path.exists(file_dst):
+                        os.makedirs(file_dst)
+                    shutil.move(file_src, file_dst)
+                except Exception as e:
+                    debugFileLog.error("Error while moving deleted content to media/deletedcontent/organization_id")
+                    debugFileLog.exception(e)
+            else:
+                debugFileLog.error("To be deleted content %s does not exist" % file_src)
+        except Exception as e:
+            debugFileLog.exception("Unknown exception while deleting content")
+            debugFileLog.exception(e)

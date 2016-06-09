@@ -10,7 +10,7 @@ from django.db import transaction
 # Create your views here.
 # from schedule.views import calendar
 
-from customLibrary.views_lib import get_userdetails, ajax_response, list_to_json, string_to_dict, list_to_comma_string, \
+from customLibrary.views_lib import get_userdetails, ajax_response, obj_to_json_response, string_to_dict, list_to_comma_string, \
     default_string_to_datetime, get_utc_datetime, debugFileLog
 from playlistManagement.models import Playlist
 from playlistManagement.serializers import PlaylistSerializer
@@ -97,8 +97,6 @@ def upsert_schedule_screens(user_details, schedule, schedule_screens, event_dict
     # Remove screens not in the schedule
     removed_schedule_screens = ScheduleScreens.objects.filter(schedule=schedule, group__isnull=True).exclude(
         schedule_screen_id__in=schedule_screen_id_list)
-    for each_schedule_screen in removed_schedule_screens:
-        each_schedule_screen.delete_event()
     if removed_schedule_screens:
         removed_schedule_screens.delete()
     success = True
@@ -130,20 +128,20 @@ def upsert_schedule_groups(user_details, schedule, schedule_groups, event_dict):
                 schedule_screen_id_list.append(entry.schedule_screen_id)
         else:
             entry = ScheduleScreens.objects.get(schedule_screen_id=schedule_screen_id)
-            if entry.event:
-                Event.objects.filter(id=entry.event.id).update(**event_dict)
-            else:
-                event = Event(**event_dict)
-                event.save()
-                entry.event = event
+            events = Event.objects.filter(id=entry.event.id)
+            for event in events:
+                if event.rule:
+                    rule = event.rule
+                    event.rule = None
+                    event.save()
+                    rule.delete()
+            events.update(**event_dict)
             entry.save()
             schedule_screen_id_list.append(schedule_screen_id)
 
     # Remove groups not in the schedule
     removed_schedule_groups = ScheduleScreens.objects.filter(schedule=schedule, group__isnull=False).exclude(
         schedule_screen_id__in=schedule_screen_id_list)
-    for schedule_group in removed_schedule_groups:
-        schedule_group.delete_event()
     if removed_schedule_groups:
         removed_schedule_groups.delete()
     success = True
@@ -343,7 +341,7 @@ def device_key_active(request):
             screen_activation_key.save()
         except Exception as e:
             db_error = 'Adding the above activation_key to the database failed with the exception {0} \n'.format(str(e))
-            debugFileLog.Error(db_error)
+            debugFileLog.error(db_error)
         success = False
     return ajax_response(success=success, errors=error)
 
@@ -434,7 +432,7 @@ def get_screen_data(request, nof_days=7):
             is_modified = True
         campaigns_json = {'campaigns': screen_data_json, 'is_modified': is_modified}
         success = True
-        return list_to_json(campaigns_json)
+        return obj_to_json_response(campaigns_json)
     except Exception as e:
         print "Exception is ", e
         errors = "Error while fetching the occurences or invalid screen identifier"
@@ -452,7 +450,7 @@ def get_screen_schedules(request, screen_id):
     json_data = ScheduleSerializer().serialize(screen_schedules, fields=('schedule_id', 'schedule_title',
                                                                          'schedule_playlists', 'timeline',
                                                                          'schedule_screens', 'schedule_groups'))
-    return list_to_json(json_data)
+    return obj_to_json_response(json_data)
 
 
 def get_group_schedules(request, group_id):
@@ -465,7 +463,7 @@ def get_group_schedules(request, group_id):
     json_data = ScheduleSerializer().serialize(screen_schedules, fields=('schedule_id', 'schedule_title',
                                                                          'schedule_playlists', 'timeline',
                                                                          'schedule_screens', 'schedule_groups'))
-    return list_to_json(json_data)
+    return obj_to_json_response(json_data)
 
 
 def get_playlist_schedules(request, playlist_id):
@@ -479,7 +477,7 @@ def get_playlist_schedules(request, playlist_id):
     json_data = ScheduleSerializer().serialize(playlist_schedules, fields=('schedule_id', 'schedule_title',
                                                                            'schedule_playlists', 'timeline',
                                                                            'schedule_screens', 'schedule_groups'))
-    return list_to_json(json_data)
+    return obj_to_json_response(json_data)
 
 
 def get_schedules(request):
@@ -490,7 +488,7 @@ def get_schedules(request):
     json_data = ScheduleSerializer().serialize(
         user_schedules, fields=('schedule_id', 'schedule_title', 'schedule_playlists', 'schedule_screens',
                                 'schedule_groups', 'timeline'))
-    return list_to_json(json_data)
+    return obj_to_json_response(json_data)
 
 
 # def get_screen_calendar(request, screen_id):
@@ -519,9 +517,7 @@ def delete_schedule(request):
             posted_data = string_to_dict(request.body)
             schedule_id = int(posted_data.get('schedule_id'))
             schedule = Schedule.get_user_relevant_objects(user_details=user_details).get(schedule_id=schedule_id)
-            schedule_screens = ScheduleScreens.objects.filter(schedule=schedule)
-            for each_schedule_screen in schedule_screens:
-                each_schedule_screen.delete_event()
+            # Cascading delete would delete all the schedule screens
             schedule.delete()
             success = True
     except Exception as e:

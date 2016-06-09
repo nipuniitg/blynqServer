@@ -20,6 +20,9 @@ class PlaylistItems(models.Model):
     def __unicode__(self):
         return self.playlist.playlist_title + ' - ' + self.content.title
 
+    class Meta:
+        ordering = ['position_index']
+
     # def natural_key(self):
     #     return ({'playlist_id': self.playlist.playlist_id, 'content_id': self.content.content_id,
     #              'position_index': self.position_index, 'display_time': self.display_time } )
@@ -42,6 +45,9 @@ class Playlist(models.Model):
 
     def __unicode__(self):
         return self.playlist_title
+
+    class Meta:
+        ordering = ['-last_updated_time']
 
     @staticmethod
     def get_user_relevant_objects(user_details):

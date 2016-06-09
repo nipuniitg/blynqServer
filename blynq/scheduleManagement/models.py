@@ -1,3 +1,5 @@
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 from django.utils.datetime_safe import datetime
 from django.db import models
 
@@ -5,6 +7,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from authentication.models import UserDetails, Organization
+from customLibrary.views_lib import debugFileLog
 from playlistManagement.models import Playlist
 from screenManagement.models import Screen, Group
 from schedule.models import Event
@@ -36,20 +39,39 @@ class ScheduleScreens(models.Model):
             description = description + ' - group ' + self.group.group_name
         return description
 
-    def delete_event(self):
-        if self.event:
-            event = self.event
+    # def delete_event(self):
+    #     if self.event:
+    #         event = self.event
+    #         if event.rule:
+    #             rule = event.rule
+    #             event.rule = None
+    #             event.save()
+    #             rule.delete()
+    #         self.event = None
+    #         self.save()
+    #         event.delete()
+
+    # class Meta:
+    #     unique_together = (('screen', 'schedule', 'group'))
+
+
+@receiver(pre_delete, sender=ScheduleScreens)
+def delete_schedule_screen_event(sender, instance, **kwargs):
+    debugFileLog.info("inside delete_schedule_screen")
+    try:
+        if instance.event:
+            event = instance.event
             if event.rule:
                 rule = event.rule
                 event.rule = None
                 event.save()
                 rule.delete()
-            self.event = None
-            self.save()
+            instance.event = None
+            instance.save()
             event.delete()
-
-    # class Meta:
-    #     unique_together = (('screen', 'schedule', 'group'))
+    except Exception as e:
+        debugFileLog.exception("Received exception")
+        debugFileLog.exception(e)
 
 
 class SchedulePlaylists(models.Model):
@@ -80,6 +102,9 @@ class Schedule(models.Model):
 
     def __unicode__(self):
         return self.schedule_title
+
+    class Meta:
+        ordering = ['-last_updated_time']
 
     @staticmethod
     def get_user_relevant_objects(user_details):

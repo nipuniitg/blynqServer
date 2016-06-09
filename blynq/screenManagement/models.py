@@ -1,11 +1,9 @@
 from django.db import models
+from django.db.models.signals import post_save, pre_delete
+from django.dispatch import receiver
 from schedule.models import Calendar
-
 from authentication.models import Organization, UserDetails, City
-from customLibrary.views_lib import get_userdetails
-
-
-import random, string
+from customLibrary.views_lib import debugFileLog
 # Create your models here.
 
 
@@ -14,6 +12,7 @@ import random, string
 # Online - The device is on and displaying advertisements
 # Idle - The device is on but not displayng advertisements
 # Offline - The device is down or not connected to internet
+
 class ScreenStatus(models.Model):
     screen_status_id = models.AutoField(primary_key=True)
     status_name = models.CharField(max_length=50, unique=True)
@@ -68,7 +67,7 @@ class ScreenActivationKey(models.Model):
 
 class Group(models.Model):
     group_id = models.AutoField(primary_key=True)
-    group_name = models.CharField(max_length=100,null= False)
+    group_name = models.CharField(max_length=100, null=False)
     description = models.TextField(blank=True, null=True)
     created_on = models.DateField(auto_now_add=True)
     # TODO: When a manager deletes the below user, set his info here
@@ -86,7 +85,7 @@ class Group(models.Model):
         return self.group_name
 
     def natural_key(self):
-        return ({'group_id': self.group_id, 'group_name': self.group_name } )
+        return ({'group_id': self.group_id, 'group_name': self.group_name})
 
     # Only used once, try to refractor more code using functions like this
     @staticmethod
@@ -99,7 +98,8 @@ class GroupScreens(models.Model):
     screen = models.ForeignKey('Screen', on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
 
-    created_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True, related_name='%(class)s_created_by')
+    created_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True,
+                                   related_name='%(class)s_created_by')
 
     def __unicode__(self):
         return self.screen.screen_name + '-' + self.group.group_name
@@ -108,13 +108,13 @@ class GroupScreens(models.Model):
 class Screen(models.Model):
     screen_id = models.AutoField(primary_key=True)
     screen_name = models.CharField(max_length=100)
-    screen_size = models.IntegerField(blank=True, null=True)    # in inches
+    screen_size = models.IntegerField(blank=True, null=True)  # in inches
     aspect_ratio = models.CharField(max_length=20, null=True, blank=True)
-    resolution = models.CharField(max_length=20, null=True, blank=True)    # 1366*768
+    resolution = models.CharField(max_length=20, null=True, blank=True)  # 1366*768
     # specifications = models.ForeignKey(ScreenSpecs, on_delete=models.PROTECT, null=True, blank=True)
 
     # TODO: change this location to a foreign key to authentication.Address
-    #location = models.ForeignKey(Address, on_delete=models.PROTECT)
+    # location = models.ForeignKey(Address, on_delete=models.PROTECT)
     address = models.CharField(max_length=100, blank=True)
     city = models.ForeignKey(City, blank=True, null=True)
 
@@ -148,3 +148,30 @@ class Screen(models.Model):
     @staticmethod
     def get_user_relevant_objects(user_details):
         return Screen.objects.filter(owned_by=user_details.organization)
+
+
+@receiver(post_save, sender=GroupScreens)
+def create_schedule_screens(sender, instance, **kwargs):
+    debugFileLog.info("Inside create_schedule_screens post_save")
+    screen = instance.screen
+    group = instance.group
+    from scheduleManagement.models import ScheduleScreens
+    group_schedules = ScheduleScreens.objects.filter(screen__isnull=True, group=group)
+    for each_group_schedule in group_schedules:
+        screen_event = each_group_schedule.event
+        screen_event.pk = None
+        screen_event.calendar = screen.screen_calendar
+        screen_event.save()
+        ScheduleScreens.objects.create(screen=screen, schedule=each_group_schedule.schedule, group=group,
+                                       event=screen_event)
+    debugFileLog.info("Schedules for the group has been successfully copied to the screen")
+
+
+# This function is to either remove groups from screens or screens from groups and remove relevant entries from the
+# ScheduleScreens table
+@receiver(pre_delete, sender=GroupScreens)
+def remove_schedule_screens(sender, instance, **kwargs):
+    debugFileLog.info("Inside remove_schedule_screens pre_delete")
+    from scheduleManagement.models import ScheduleScreens
+    schedule_screens = ScheduleScreens.objects.filter(group=instance.group, screen=instance.screen)
+    schedule_screens.delete()

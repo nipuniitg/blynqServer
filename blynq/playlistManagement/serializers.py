@@ -23,7 +23,7 @@ class PlaylistSerializer(Serializer):
     def end_object(self, obj):
         self._current['playlist_id'] = obj._get_pk_val()
         if 'playlist_items' in self.selected_fields:
-            playlist_items_data = PlaylistItems.objects.filter(playlist=obj).order_by('position_index')
+            playlist_items_data = PlaylistItems.objects.filter(playlist=obj)
             self._current['playlist_items'] = PlaylistItemsSerializer().serialize(
                 playlist_items_data,fields=('playlist_item_id', 'display_time', 'content'))
         self.objects.append(self._current)

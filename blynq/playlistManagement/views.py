@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from contentManagement.models import Content
 from contentManagement.serializers import ContentSerializer
 from contentManagement.views import get_files_recursively
-from customLibrary.views_lib import get_userdetails, string_to_dict, ajax_response, list_to_json
+from customLibrary.views_lib import get_userdetails, string_to_dict, ajax_response, obj_to_json_response
 from playlistManagement.models import Playlist, PlaylistItems
 
 
@@ -96,6 +96,24 @@ def upsert_playlist(request):
     return ajax_response(success=success, errors=errors, obj_dict=obj_dict)
 
 
+def delete_playlist(request):
+    user_details = get_userdetails(request)
+    posted_data = string_to_dict(request.body)
+    playlist_id = int(posted_data.get('playlist_id'))
+    errors = []
+    success = False
+    try:
+        playlist = Playlist.get_user_relevant_objects(user_details=user_details).get(playlist_id=playlist_id)
+        playlist.delete()
+        success = True
+    except Exception as e:
+        print "Exception is ", e
+        error = "Error while deleting playlist"
+        print error
+        errors.append(error)
+    return ajax_response(success=success, errors=errors)
+
+
 def get_playlists(request):
     """
     :param request:
@@ -129,7 +147,7 @@ def get_playlists(request):
     user_playlists = Playlist.get_user_relevant_objects(user_details=user_details)
     json_data = PlaylistSerializer().serialize(user_playlists,
                                                fields=('playlist_id', 'playlist_title','playlist_items'))
-    return list_to_json(json_data)
+    return obj_to_json_response(json_data)
 
 
 def get_files_recursively_json(request, parent_folder_id):
@@ -139,10 +157,10 @@ def get_files_recursively_json(request, parent_folder_id):
     :return:
     [
         {
-            url: "http://127.0.0.1:8000/media/usercontent/1/fuck_you_bitches.jpg",
+            url: "http://127.0.0.1:8000/media/usercontent/1/sachin.jpg",
             content_id: 1,
-            document: "usercontent/1/fuck_you_bitches.jpg",
-            title: "fuck_you_bitches"
+            document: "usercontent/1/sachin.jpg",
+            title: "sachin"
         }
     ]
     """
@@ -152,25 +170,7 @@ def get_files_recursively_json(request, parent_folder_id):
     user_content = Content.get_user_relevant_objects(user_details=user_details)
     all_files = user_content.filter(content_id__in=all_files_content_ids)
     json_data = ContentSerializer().serialize(all_files, fields=('title', 'document', 'document_type', 'content_id'))
-    return list_to_json(json_data)
-
-
-def delete_playlist(request):
-    user_details = get_userdetails(request)
-    posted_data = string_to_dict(request.body)
-    playlist_id = int(posted_data.get('playlist_id'))
-    errors = []
-    success = False
-    try:
-        playlist = Playlist.get_user_relevant_objects(user_details=user_details).get(playlist_id=playlist_id)
-        playlist.delete()
-        success = True
-    except Exception as e:
-        print "Exception is ", e
-        error = "Error while deleting playlist"
-        print error
-        errors.append(error)
-    return ajax_response(success=success, errors=errors)
+    return obj_to_json_response(json_data)
 
 
 

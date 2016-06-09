@@ -30,7 +30,6 @@ urlpatterns = [
     ,url(r'^templates/contentManagement/(?P<template_name>[\w-]+)', templateView.get_content_partial_templates)
     ,url(r'^templates/playlistManagement/(?P<template_name>[\w-]+)', templateView.get_playlist_partial_templates)
     ,url(r'^templates/screen/(?P<template_name>[\w-]+)', templateView.get_screen_partial_templates)
-
 ]
 
 if settings.DEBUG:

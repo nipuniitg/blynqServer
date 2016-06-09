@@ -136,12 +136,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static_root")
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# in MEDIA_ROOT
-# the uploaded content of each user is present in /media/usercontent/userdetails.user.id/
-USERCONTENT_DIR = 'usercontent'
-# the deleted files are moved to /media/deletedcontent/organization.organization_id
-DELETED_CONTENT_DIR = 'deletedcontent'
-
 
 # The below variables are for registration app
 # REGISTRATION_OPEN = True        # If True, users can register
@@ -191,8 +185,17 @@ LOGGING = {
 
 if DEBUG:
     MEDIA_HOST = 'http://127.0.0.1:8000'
+    USERCONTENT_DIR = 'test_usercontent'
+    DELETED_CONTENT_DIR = 'test_deletedcontent'
 else:
     MEDIA_HOST = 'http://www.blynq.in'
+    USERCONTENT_DIR = 'usercontent'
+    DELETED_CONTENT_DIR = 'deletedcontent'
+
+# in MEDIA_ROOT
+# the uploaded content of each user is present in /media/usercontent/userdetails.user.id/
+# the deleted files are moved to /media/deletedcontent/organization.organization_id
+
 
 
 EMAIL_USE_TLS = True

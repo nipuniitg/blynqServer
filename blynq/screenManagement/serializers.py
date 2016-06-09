@@ -31,9 +31,6 @@ class ScreenSerializer(Serializer):
             group_screens = GroupScreens.objects.filter(screen=obj)
             self._current['groups'] = GroupScreensSerializer().serialize(
                 group_screens, fields=('group_screen_id', 'group'))
-        if 'group_screen_id' in self.selected_fields:
-            # This -1 is used in the get_selectable_groups function while adding screens to groups
-            self._current['group_screen_id'] = -1
         self.objects.append( self._current )
 
 
@@ -44,7 +41,4 @@ class GroupSerializer(Serializer):
             group_screens = GroupScreens.objects.filter(group=obj)
             self._current['screens'] = GroupScreensSerializer().serialize(group_screens, fields=('group_screen_id',
                                                                                                  'screen'))
-        if 'group_screen_id' in self.selected_fields:
-            # This -1 is used in the get_selectable_groups function while adding groups to screens
-            self._current['group_screen_id'] = -1
         self.objects.append(self._current)

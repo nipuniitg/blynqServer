@@ -1,17 +1,14 @@
 import os
-
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import render
-# from django.db.models import Q
-import json
-from blynq.settings import MEDIA_ROOT
 from contentManagement.forms import UploadContentForm
-# Create your views here.
 from contentManagement.serializers import ContentSerializer
-from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, list_to_json, debugFileLog
+from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, debugFileLog
 from contentManagement.models import Content
+
+# Create your views here.
 
 
 @login_required
@@ -116,14 +113,14 @@ def create_folder(request):
     return ajax_response(success=success, errors=errors)
 
 
-def get_tree_view(request, parent_folder_id=-1):
-    parent_folder_id = int(parent_folder_id)
-    tree_view = []
-    json_folders = get_folders_json(request, parent_folder_id)
-    for folder in json_folders:
-        folder['folders'] = get_tree_view(request, folder.get('content_id'))
-    tree_view = json_folders
-    return tree_view
+# def get_tree_view(request, parent_folder_id=-1):
+#     parent_folder_id = int(parent_folder_id)
+#     tree_view = []
+#     json_folders = get_folders_json(request, parent_folder_id)
+#     for folder in json_folders:
+#         folder['folders'] = get_tree_view(request, folder.get('content_id'))
+#     tree_view = json_folders
+#     return tree_view
 
 
 def get_files_recursively(request, parent_folder_id=-1):
@@ -156,7 +153,7 @@ def folder_path(request, current_folder_id):
         path = user_content.logical_path_list()
     home_folder = {'content_id': -1, 'title': 'Home'}
     path.insert(0, home_folder)
-    return list_to_json(path)
+    return obj_to_json_response(path)
 
 
 def get_content_helper(request, parent_folder_id=-1, is_folder=False):
@@ -178,7 +175,7 @@ def get_content_helper(request, parent_folder_id=-1, is_folder=False):
         print "Exception is ", e
         json_data = []
         error = "Error while fetching the content or invalid parent folder id"
-    return list_to_json(json_data)
+    return obj_to_json_response(json_data)
 
 
 def get_folders_json(request, parent_folder_id=-1):
@@ -190,9 +187,9 @@ def get_folders_json(request, parent_folder_id=-1):
         {
             url: "",
             content_id: 2,
-            document: "",
             is_folder: true,
-            title: "temp folder"
+            title: "temp folder",
+            document_type: "folder"
         }
     ]
     """
@@ -209,9 +206,9 @@ def get_files_json(request, parent_folder_id=-1):
         {
             url: "http://127.0.0.1:8000/media/usercontent/1/image1.jpg",
             content_id: 1,
-            document: "usercontent/1/image1.jpg",
             is_folder: false,
-            title: "image1"
+            title: "image1",
+            document_type: "image/jpeg"
         }
     ]
     """
@@ -219,7 +216,6 @@ def get_files_json(request, parent_folder_id=-1):
     return get_content_helper(request, parent_folder_id=parent_folder_id, is_folder=False)
 
 
-# TODO: Move files across folders
 def update_content_title(request):
     user_details = get_userdetails(request)
     success = False

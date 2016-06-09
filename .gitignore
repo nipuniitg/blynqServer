@@ -64,3 +64,7 @@ blynq/screenManagement/views.pyc
 blynq/screenManagement/migrations/0001_initial.pyc
 blynq/screenManagement/migrations/0002_group_dummy_screen_group.pyc
 blynq/screenManagement/migrations/__init__.pyc
+blynq/media/deletedcontent
+blynq/htmlcov
+blynq/media/test_deletedcontent
+blynq/media/test_usercontent

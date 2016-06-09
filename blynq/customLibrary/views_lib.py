@@ -33,8 +33,12 @@ def string_to_dict(str):
     return json.loads(str)
 
 
-def list_to_json(list):
-    return JsonResponse(list, safe=False)
+def obj_to_json_str(obj):
+    return json.dumps(obj)
+
+
+def obj_to_json_response(obj):
+    return JsonResponse(obj, safe=False)
 
 
 def list_to_comma_string(list):
