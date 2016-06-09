@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>BlynQ</title>
+    <!-- Below href is the definining point for angular routing.-->
+    <base href="/">
 
     <!-- Bootstrap CSS -->
     <link href="{% static 'Niceadmin/css/bootstrap.min.css' %}" rel="stylesheet">
@@ -31,6 +33,7 @@
     <!-- jquery UI-->
     <script src="{% static 'Libraries/jquery-ui-1.11.4/jquery-ui.min.js' %}"></script>
 
+
     <!-- ng-sortable js and css-->
     <script src="{% static 'Libraries/ng-sortable.js' %}"></script>
     <link rel="stylesheet" href="{% static 'Libraries/ng-sortable.css' %}">
@@ -46,9 +49,13 @@
     <script src="{% static 'Niceadmin/js/lte-ie7.js' %}"></script>
     <script src="{% static 'Niceadmin/script.js' %}"></script>
 
+
+
     <!-- angular-ui-bootstrap -->
     <script src="{% static 'Libraries/angular-bootstrap/ui-bootstrap-tpls-1.3.2.js' %}"></script>
 
+    <!-- angular-ui-router -->
+    <script src="{% static 'Libraries/angular-ui-router/angular-ui-router.min.js' %}"></script>
 
     <!-- angular loading bar -->
     <script src="{% static 'Libraries/angular-loading-bar/loading-bar.min.js' %}"></script>
@@ -73,7 +80,7 @@
 
 <body>
 <!-- container section start -->
-<section id="container" class="">
+<section id="container" class="" ng-app="mainApp">
     <!--header start-->
 
     <header class="header dark-bg">
@@ -87,7 +94,7 @@
 
         <!--logo start-->
         <div>
-            <a href="{% url 'homepage' %}" class="logo" style="height:60px;width:150px">
+            <a ui-sref="home" class="logo" style="height:60px;width:150px">
             <img src="{%static 'LandingPage/img/Website_logo.png'%}" style="max-height:100%;max-width:100%">
         </a>
         </div>
@@ -120,7 +127,7 @@
                         <ul class="dropdown-menu extended logout">
                             <div class="log-arrow-up"></div>
                             <li class="eborder-top">
-                                <a href="{% url 'auth_logout'%}"><i class="icon_key_alt"></i> Log Out</a>
+                                <a href="{% url 'auth_logout' %}"><i class="icon_key_alt"></i> Log Out</a>
                             </li>
                         </ul>
                     </li>
@@ -132,14 +139,13 @@
     </header>
     <!--header end-->
 
-    {% if user.is_authenticated %}
     <!--sidebar start-->
     <aside>
         <div id="sidebar" class="nav-collapse ">
             <!-- sidebar menu start-->
             <ul class="sidebar-menu">
                 <li class="">
-                    <a class="" href="{% url 'homepage' %}">
+                    <a class="" ui-sref="home" ui-sref-active="active">
                         <i class="icon_house_alt"></i>
                         <span>Home</span>
                     </a>
@@ -158,21 +164,21 @@
                 <!--</li>-->
 
                 <li class="">
-                    <a class="" href="{% url 'screen_index' %}">
+                    <a class="" ui-sref="screens" ui-sref-active="active">
                         <i class="icon_desktop"></i>
                         <span>Screens</span>
                     </a>
                 </li>
 
                 <li class="">
-                    <a class="" href="{% url 'group_index' %}">
+                    <a class="" ui-sref="groups" ui-sref-active="active">
                         <i class="fa fa-object-group"></i>
                         <span>Groups</span>
                     </a>
                 </li>
 
                 <li>
-                    <a class="" href="{% url 'playlist_index' %}">
+                    <a class="" ui-sref="playlists" ui-sref-active="active">
                         <i class="fa fa-film"></i>
                         <span>Playlists</span>
 
@@ -180,7 +186,7 @@
                 </li>
 
                 <li class="">
-                    <a href="{% url 'schedule_index' %}" class="">
+                    <a ui-sref="schedules" ui-sref-active="active" class="">
                         <i class="fa fa-paper-plane-o"></i>
                         <span>Schedules</span>
                     </a>
@@ -188,7 +194,7 @@
 
 
                 <li>
-                    <a class="" href="{% url 'content_index' %}">
+                    <a class="" ui-sref="contentLibrary" ui-sref-active="active">
                         <i class="fa fa-folder-open-o"></i>
                         <span>Content Library</span>
                     </a>
@@ -217,13 +223,12 @@
         </div>
     </aside>
     <!--sidebar end-->
-    {% endif %}
 
     <!--main content start-->
-    <section id="main-content" ng-app="mainApp">
+    <section id="main-content" ui-view>
         {% if user.is_authenticated %}
-        {% block content %}
-        {% endblock content %}
+        <!--{% block content %}-->
+        <!--{% endblock content %}-->
         {% else %}
         <section class="wrapper">
             {% block nonAuthenticatedContent %}
