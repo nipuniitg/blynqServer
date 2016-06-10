@@ -20,7 +20,7 @@
                 </div>
                 <div class="listContainer">
                     <ul class="list-group ">
-                        <li ng-repeat="playlist in playlists | filter: searchPlaylists" class="list-group-item"
+                        <li ng-repeat="playlist in playlists | filter: searchPlaylists" class="list-group-item pointer"
                             ng-class="{active: $index === activePlaylistIndex }"
                             ng-click="clickedOnPlaylist($index)">
                             {[ playlist.playlist_title ]}
