@@ -460,7 +460,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
               ,templateUrl: '/static/templates/contentManagement/_content_view_mdl.html'
               ,controller: 'mdlContentInDetailCtrl'
               ,size: 'lg'
-              //,windowTemplateUrl : '/templates/shared/_mdl_window_clear.html'
+              ,windowTemplateUrl : '/static/templates/shared/_mdl_window_template.html'
               //,backdrop: 'static' //disables modal closing by click on the backdrop.
               ,resolve : {
                     file : function(){
