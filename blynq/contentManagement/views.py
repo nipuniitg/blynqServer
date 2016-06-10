@@ -6,7 +6,8 @@ from django.shortcuts import render
 from contentManagement.forms import UploadContentForm
 from contentManagement.serializers import ContentSerializer
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, debugFileLog
-from contentManagement.models import Content
+from contentManagement.models import Content, ContentType
+
 
 # Create your views here.
 
@@ -17,6 +18,44 @@ def index(request):
     # context_dic['form'] = UploadContentForm(form_name='formUpload', scope_prefix='mdlNewFileDetailsObj')
     # print context_dic
     return render(request,'contentManagement/content_index.html')
+
+
+@login_required
+def upsert_url(request):
+    errors = []
+    success = False
+    try:
+        user_details = get_userdetails(request)
+        posted_data = string_to_dict(request.body)
+        content_id = int(posted_data.get('content_id'))
+        title = posted_data.get('title')
+        url = posted_data.get('url')
+        if url:
+            import mimetypes
+            file_type, encoding = mimetypes.guess_type(str(url))
+            try:
+                content_type = ContentType.objects.get(file_type=file_type)
+            except ContentType.DoesNotExist:
+                debugFileLog.exception("file type does not exist, might be an url")
+                content_type, created = ContentType.objects.get_or_create(file_type='url')
+                if created:
+                    content_type.category = 'url'
+                    content_type.save()
+            content_dict = dict(title=title, url=url, content_type=content_type, uploaded_by=user_details,
+                                last_modified_by=user_details, organization=user_details.organization)
+            if content_id == -1:
+                content = Content(**content_dict)
+            else:
+                content = Content.objects.filter(content_id=content_id).update(**content_dict)
+            content.save()
+            success = True
+        else:
+            errors = ['Please enter a valid URL']
+    except Exception as e:
+        debugFileLog.exception('Received exception')
+        debugFileLog.exception(e)
+        errors = str(e)
+    return ajax_response(success=success, errors=errors)
 
 
 @login_required
@@ -169,7 +208,7 @@ def get_content_helper(request, parent_folder_id=-1, is_folder=False):
             parent_folder = user_content.get(content_id=parent_folder_id)
             user_content = user_content.filter(parent_folder=parent_folder)
         user_content = user_content.filter(is_folder=is_folder)
-        json_data = ContentSerializer().serialize(user_content, fields=('title', 'document', 'document_type',
+        json_data = ContentSerializer().serialize(user_content, fields=('title', 'document', 'content_type',
                                                                         'content_id', 'is_folder'))
     except Exception as e:
         print "Exception is ", e

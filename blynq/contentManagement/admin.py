@@ -10,7 +10,6 @@ class ContentAdmin(VersionAdmin):
 
 
 admin.site.register(Content, ContentAdmin)
-# admin.site.register(ContentType)
 
 
 # Register all the models in the contentManagement app

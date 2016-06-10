@@ -15,21 +15,27 @@ from blynq.settings import BASE_DIR, MEDIA_ROOT, USERCONTENT_DIR, DELETED_CONTEN
 from customLibrary.views_lib import debugFileLog
 
 
-# class ContentType(models.Model):
-#     content_type_id = models.AutoField(primary_key=True)
-#     CONTENT_TYPE_CHOICES = (
-#         ('IMG', 'Image'),
-#         # Uncomment below types when we add support
-#         ('VID', 'Video'),
-#         ('PPT', 'Presentation'),
-#         ('PDF', 'Pdf'),
-#         ('GIF', 'Gif'),
-#     )
-#     type = models.CharField(max_length=3, choices=CONTENT_TYPE_CHOICES)
-#     file_extension = models.CharField(max_length=10)
-#
-#     def __unicode__(self):
-#         return self.type + ' - ' + self.file_extension
+class ContentType(models.Model):
+    content_type_id = models.AutoField(primary_key=True)
+    CONTENT_TYPE_CHOICES = (
+        ('image', 'Image'),
+        # Uncomment below types when we add support
+        ('video', 'Video'),
+        # ('PPT', 'Presentation'),
+        ('pdf', 'Pdf'),
+        ('gif', 'Gif'),
+        ('url', 'Url'),
+        ('iframe', 'Iframe')
+    )
+    category = models.CharField(max_length=10, choices=CONTENT_TYPE_CHOICES)
+    file_type = models.CharField(max_length=30)
+    supported_encodings = models.TextField(help_text='list of comma separated encodings', null=True, blank=True)
+
+    def __unicode__(self):
+        return self.file_type
+
+    def natural_key(self):
+        return self.file_type
 
 
 # def create_dir(parent_dir_path, dir_name ):
@@ -55,56 +61,6 @@ from customLibrary.views_lib import debugFileLog
 #     instance.save()
 
 
-# class Folder(models.Model):
-#     """
-#     Represents a Folder that things (files) can be put into. Folders are *NOT*
-#     mirrored in the Filesystem and can have any unicode chars as their name.
-#     Other models may attach to a folder with a ForeignKey. If the related name
-#     ends with "_files" they will automatically be listed in the
-#     folder.files list along with all the other models that link to the folder
-#     in this way. Make sure the linked models obey the AbstractFile interface
-#     (Duck Type).
-#     """
-#     is_root = False
-#
-#     parent = models.ForeignKey('self', verbose_name=('parent'), null=True, blank=True,
-#                                related_name='children')
-#     name = models.CharField(_('name'), max_length=100)
-#
-#     owner = models.ForeignKey(UserDetails, verbose_name=('owner'),
-#                               related_name='%(class)s_owner',
-#                               null=True, blank=True)
-#
-#     uploaded_at = models.DateTimeField(_('uploaded at'), auto_now_add=True)
-#
-#     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
-#     modified_at = models.DateTimeField(_('modified at'), auto_now=True)
-#
-#     # For each entry in content table, we add an entry into the Folder table and
-#     # set the dummy_content_folder to True. So that it would be easy in the scheduleManagement
-#     dummy_content_folder = models.BooleanField(default=False)
-#
-#     @property
-#     def logical_path(self):
-#         """
-#         Gets logical path of the folder in the tree structure.
-#         Used to generate breadcrumbs
-#         """
-#         folder_path = []
-#         if self.parent:
-#             folder_path.extend(self.parent.get_ancestors())
-#             folder_path.append(self.parent)
-#         return folder_path
-#
-#     @property
-#     def pretty_logical_path(self):
-#         return "/%s" % "/".join([f.name for f in self.logical_path + [self]])
-#
-#     @property
-#     def quoted_logical_path(self):
-#         return urlquote(self.pretty_logical_path)
-
-
 def upload_to_dir(instance, filename):
     return '%s/user%d/%s' % (USERCONTENT_DIR, instance.uploaded_by.id, filename)
 
@@ -113,17 +69,13 @@ class Content(models.Model):
     # This class includes both files and folders as Content
     content_id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100, verbose_name=_('name'))
-    # description = models.TextField(null=True, blank=True, verbose_name=_('description'))
 
     document = models.FileField(upload_to=upload_to_dir, null=True)
+    url = models.CharField(max_length=255, blank=True, null=True)
 
     sha1_hash = models.CharField(_('sha1'), max_length=40, blank=True, default='')
-    original_filename = models.CharField(_('original filename'), max_length=100, blank=True, null=True)
-    # file_type = models.ForeignKey(ContentType, null=True, on_delete=models.PROTECT)
-    document_type = models.CharField(max_length=50, default='image/jpg', null=True)
 
-    # folder = models.ForeignKey(Folder, verbose_name=_('folder'), related_name='all_files',
-    #                            null=True, blank=True)
+    content_type = models.ForeignKey(ContentType, null=True, on_delete=models.PROTECT)
 
     uploaded_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_uploaded_by',
                                     null=True)
@@ -144,15 +96,20 @@ class Content(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.document:
-            self.document_type = 'folder'
+            # self.document_type = 'folder'
             super(Content, self).save(*args, **kwargs)
         else:
             import mimetypes
             document_type, encoding = mimetypes.guess_type(self.document.name)
-            self.document_type = document_type
+            # self.document_type = document_type
+            self.url = self.document.url
             if self.organization.used_file_size + self.document.size <= self.organization.total_file_size_limit:
                 self.organization.used_file_size = self.organization.used_file_size + self.document.size
-                self.organization.save()
+                try:
+                    self.organization.save()
+                except Exception as e:
+                    debugFileLog.exception("Recieved exception while increasing the organization file usage size")
+                    debugFileLog.exception(e)
                 super(Content, self).save(*args, **kwargs)
             else:
                 debugFileLog.warning("The organization " + self.organization.name + " total file size limit exceeded")

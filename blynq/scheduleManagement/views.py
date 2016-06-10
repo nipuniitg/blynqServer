@@ -357,6 +357,7 @@ def get_screen_data(request, nof_days=7):
     success = False
     is_modified = False
     posted_data = string_to_dict(request.body)
+    # the datetime format of last_received should be
     last_received = posted_data.get('last_received')
     unique_device_key = posted_data.get('device_key')
     last_received_datetime = default_string_to_datetime(last_received)

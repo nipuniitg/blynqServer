@@ -12,7 +12,7 @@ class PlaylistItemsSerializer(Serializer):
     def end_object(self, obj):
         self._current['playlist_item_id'] = obj._get_pk_val()
         if 'content' in self.selected_fields:
-            json_data = ContentSerializer().serialize([obj.content], fields=('title', 'document', 'document_type',
+            json_data = ContentSerializer().serialize([obj.content], fields=('title', 'document', 'content_type',
                                                                              'content_id', 'is_folder'))
             self.add_dict_to_current(json_data)
             del self._current['content']

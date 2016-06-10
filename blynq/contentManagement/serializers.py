@@ -10,7 +10,9 @@ class ContentSerializer(Serializer):
             if obj.is_folder:
                 # TODO: Keep the url as the path to the default folder icon
                 self._current['url'] = ''
-            else:
+            elif obj.document:
                 self._current['url'] = settings.MEDIA_HOST + obj.document.url
+            else:
+                self._current['url'] = obj.url
             del self._current['document']
         self.objects.append(self._current)
