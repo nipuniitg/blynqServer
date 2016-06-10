@@ -18,7 +18,10 @@
         </pdf-section>
     </div>
     <!-- video -->
-    <!--<div ng-if="file.document_type.indexOf('video')>-1">-->
-        <!--<img ng-src="file.url">-->
-    <!--</div>-->
+    <div ng-if="file.document_type.indexOf('video')>-1">
+        <video width="400" controls>
+            <source ng-src="{[file.url]}" >
+            Your browser does not support HTML5 video.
+        </video>
+    </div>
 </div>
