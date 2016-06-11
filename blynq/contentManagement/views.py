@@ -30,8 +30,9 @@ def upsert_url(request):
         content_id = int(posted_data.get('content_id'))
         title = posted_data.get('title')
         url = posted_data.get('url')
+        parent_folder_id = int(posted_data.get('parent_folder_id'))
         if url:
-            content_dict = dict(title=title, url=url, uploaded_by=user_details,
+            content_dict = dict(title=title, url=url, uploaded_by=user_details, parent_folder_id=parent_folder_id,
                                 last_modified_by=user_details, organization=user_details.organization)
             if content_id == -1:
                 content = Content(**content_dict)
