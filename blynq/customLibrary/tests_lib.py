@@ -232,13 +232,13 @@ def generate_content_dict(content, include_is_folder=True):
     if content:
         content_dict['title'] = content.title
         content_dict['content_id'] = content.content_id
-        content_dict['document_type'] = content.document_type
+        content_dict['content_type'] = content.content_type.file_type if content.content_type else None
         if include_is_folder:
             content_dict['is_folder'] = content.is_folder
-        if content.is_folder:
-            content_dict['url'] = ""
-        else:
+        if content.document:
             content_dict['url'] = MEDIA_HOST + content.document.url
+        else:
+            content_dict['url'] = content.url
     return content_dict
 
 

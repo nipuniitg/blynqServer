@@ -34,7 +34,7 @@ class ContentTest(TestCase):
         # Create a folder and verify
         parent_folder = create_content(default_content=True, is_folder=True)
         self.assertTrue(isinstance(parent_folder, Content))
-        self.assertEqual(parent_folder.document_type, 'folder')
+        self.assertEqual(parent_folder.content_type, None)
         self.assertEqual(parent_folder.__unicode__(), parent_folder.title)
         self.assertEqual(parent_folder.natural_key(), parent_folder.title)
         self.assertEqual(parent_folder.logical_path(), '/')

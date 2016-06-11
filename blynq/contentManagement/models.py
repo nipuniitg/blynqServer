@@ -95,14 +95,8 @@ class Content(models.Model):
     relative_path = models.CharField(max_length=1025, default='/')
 
     def save(self, *args, **kwargs):
-        if not self.document:
-            # self.document_type = 'folder'
-            super(Content, self).save(*args, **kwargs)
-        else:
-            import mimetypes
-            document_type, encoding = mimetypes.guess_type(self.document.name)
-            # self.document_type = document_type
-            self.url = self.document.url
+        if self.document:
+            url = self.document.url
             if self.organization.used_file_size + self.document.size <= self.organization.total_file_size_limit:
                 self.organization.used_file_size = self.organization.used_file_size + self.document.size
                 try:
@@ -114,6 +108,22 @@ class Content(models.Model):
             else:
                 debugFileLog.warning("The organization " + self.organization.name + " total file size limit exceeded")
                 debugFileLog.error("Can't upload file")
+        elif self.url:
+            url = self.url
+        else:
+            url = ''
+        import mimetypes
+        file_type, encoding = mimetypes.guess_type(str(url))
+        try:
+            content_type = ContentType.objects.get(file_type=file_type)
+        except ContentType.DoesNotExist:
+            debugFileLog.exception("file type does not exist, might be an url")
+            content_type, created = ContentType.objects.get_or_create(file_type='url')
+            if created:
+                content_type.category = 'url'
+                content_type.save()
+        self.content_type = content_type
+        super(Content, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return self.title

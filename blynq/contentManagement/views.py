@@ -31,17 +31,7 @@ def upsert_url(request):
         title = posted_data.get('title')
         url = posted_data.get('url')
         if url:
-            import mimetypes
-            file_type, encoding = mimetypes.guess_type(str(url))
-            try:
-                content_type = ContentType.objects.get(file_type=file_type)
-            except ContentType.DoesNotExist:
-                debugFileLog.exception("file type does not exist, might be an url")
-                content_type, created = ContentType.objects.get_or_create(file_type='url')
-                if created:
-                    content_type.category = 'url'
-                    content_type.save()
-            content_dict = dict(title=title, url=url, content_type=content_type, uploaded_by=user_details,
+            content_dict = dict(title=title, url=url, uploaded_by=user_details,
                                 last_modified_by=user_details, organization=user_details.organization)
             if content_id == -1:
                 content = Content(**content_dict)
@@ -208,8 +198,9 @@ def get_content_helper(request, parent_folder_id=-1, is_folder=False):
             parent_folder = user_content.get(content_id=parent_folder_id)
             user_content = user_content.filter(parent_folder=parent_folder)
         user_content = user_content.filter(is_folder=is_folder)
-        json_data = ContentSerializer().serialize(user_content, fields=('title', 'document', 'content_type',
-                                                                        'content_id', 'is_folder'))
+        json_data = ContentSerializer().serialize(user_content,
+                                                  fields=('title', 'document', 'content_type', 'content_id',
+                                                          'is_folder'), use_natural_foreign_keys=True)
     except Exception as e:
         print "Exception is ", e
         json_data = []
@@ -228,7 +219,7 @@ def get_folders_json(request, parent_folder_id=-1):
             content_id: 2,
             is_folder: true,
             title: "temp folder",
-            document_type: "folder"
+            content_type: None
         }
     ]
     """
@@ -247,7 +238,7 @@ def get_files_json(request, parent_folder_id=-1):
             content_id: 1,
             is_folder: false,
             title: "image1",
-            document_type: "image/jpeg"
+            content_type: "image/jpeg"
         }
     ]
     """
