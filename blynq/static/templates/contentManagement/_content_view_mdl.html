@@ -3,11 +3,11 @@
     <!-- Based on the type of file, implement that viewer-->
 
     <!-- image-->
-    <div ng-if="file.document_type.indexOf('image')>-1" class="content-detail-container">
+    <div ng-if="file.content_type.indexOf('image')>-1" class="content-detail-container">
         <img ng-src="{[ file.url]}" class="max-fit">
     </div>
     <!-- pdf -->
-    <div ng-if="file.document_type.indexOf('pdf')>-1" class="content-detail-container">
+    <div ng-if="file.content_type.indexOf('pdf')>-1" class="content-detail-container">
         <pdf-section class="max-fit">
             <button ng-click="prevPage()">&lt;</button>
             <button ng-click="nextPage()">&gt;</button>
@@ -18,7 +18,7 @@
         </pdf-section>
     </div>
     <!-- video -->
-    <div ng-if="file.document_type.indexOf('video')>-1" class="content-detail-container">
+    <div ng-if="file.content_type.indexOf('video')>-1" class="content-detail-container">
         <video controls class="max-fit">
             <source ng-src="{[file.url]}" >
             Your browser does not support HTML5 video.

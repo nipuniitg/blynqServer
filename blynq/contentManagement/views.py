@@ -27,12 +27,17 @@ def upsert_url(request):
     try:
         user_details = get_userdetails(request)
         posted_data = string_to_dict(request.body)
-        content_id = int(posted_data.get('content_id'))
-        title = posted_data.get('title')
-        url = posted_data.get('url')
         parent_folder_id = int(posted_data.get('parent_folder_id'))
+        if parent_folder_id == -1:
+            parent_folder = None
+        else:
+            parent_folder = Content.get_user_relevant_objects(user_details=user_details).get(content_id=parent_folder_id)
+        posted_content = posted_data.get('content')
+        content_id = int(posted_content.get('content_id'))
+        title = posted_content.get('title')
+        url = posted_content.get('url')
         if url:
-            content_dict = dict(title=title, url=url, uploaded_by=user_details, parent_folder_id=parent_folder_id,
+            content_dict = dict(title=title, url=url, uploaded_by=user_details, parent_folder=parent_folder,
                                 last_modified_by=user_details, organization=user_details.organization)
             if content_id == -1:
                 content = Content(**content_dict)
