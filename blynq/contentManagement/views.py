@@ -41,9 +41,9 @@ def upsert_url(request):
                                 last_modified_by=user_details, organization=user_details.organization)
             if content_id == -1:
                 content = Content(**content_dict)
+                content.save()
             else:
-                content = Content.objects.filter(content_id=content_id).update(**content_dict)
-            content.save()
+                Content.objects.filter(content_id=content_id).update(**content_dict)
             success = True
         else:
             errors = ['Please enter a valid URL']
