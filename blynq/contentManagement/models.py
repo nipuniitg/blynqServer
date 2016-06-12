@@ -17,17 +17,6 @@ from customLibrary.views_lib import debugFileLog
 
 class ContentType(models.Model):
     content_type_id = models.AutoField(primary_key=True)
-    CONTENT_TYPE_CHOICES = (
-        ('image', 'Image'),
-        # Uncomment below types when we add support
-        ('video', 'Video'),
-        # ('PPT', 'Presentation'),
-        ('pdf', 'Pdf'),
-        ('gif', 'Gif'),
-        ('url', 'Url'),
-        ('iframe', 'Iframe')
-    )
-    category = models.CharField(max_length=10, choices=CONTENT_TYPE_CHOICES)
     file_type = models.CharField(max_length=30)
     supported_encodings = models.TextField(help_text='list of comma separated encodings', null=True, blank=True)
 
@@ -95,6 +84,9 @@ class Content(models.Model):
     relative_path = models.CharField(max_length=1025, default='/')
 
     def save(self, *args, **kwargs):
+        if self.is_folder:
+            super(Content, self).save(*args, **kwargs)
+            return
         if self.document:
             url = self.document.url
             if self.organization.used_file_size + self.document.size <= self.organization.total_file_size_limit:
@@ -114,13 +106,14 @@ class Content(models.Model):
             url = ''
         import mimetypes
         file_type, encoding = mimetypes.guess_type(str(url))
+        full_file_type = 'url/' if self.url else ''
+        full_file_type = full_file_type + file_type
         try:
-            content_type = ContentType.objects.get(file_type=file_type)
+            content_type = ContentType.objects.get(file_type=full_file_type)
         except ContentType.DoesNotExist:
             debugFileLog.exception("file type does not exist, might be an url")
             content_type, created = ContentType.objects.get_or_create(file_type='url')
             if created:
-                content_type.category = 'url'
                 content_type.save()
         self.content_type = content_type
         super(Content, self).save(*args, **kwargs)
