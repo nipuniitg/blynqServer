@@ -77,6 +77,7 @@ margin: 0px;
 padding : 3px;
 height : 100px;
 width : 130px;
+position : relative;
 }
 
 .item-container-header{
@@ -96,6 +97,13 @@ overflow : hidden;
     height: 25px;
     width : 100%;
     padding: 2px 10px 5px 10px
+}
+
+.item-container .url-icon{
+    position : absolute;
+    color : blue;
+    top : 10px;
+    right : 5px;
 }
 
 .highlight-acceptable{
@@ -285,6 +293,12 @@ cursor:pointer
 
 .content-detail-container{
     text-align : center;
+}
+
+.content-detail-container iframe{
+    width : 100%;
+    background : white;
+    min-height : 500px
 }
 
 .max-fit{

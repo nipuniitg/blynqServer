@@ -64,7 +64,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
          }).then(function mySuccess(response){
                 if(callback)
                 {
-                    callback(returnData);
+                    callback(response.data);
                 }
             }, function myError(response) {
                 console.log(response.statusText);
