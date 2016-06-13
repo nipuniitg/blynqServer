@@ -20,8 +20,13 @@
     <!-- video -->
     <div ng-if="file.content_type.indexOf('video')>-1" class="content-detail-container">
         <video controls class="max-fit">
-            <source ng-src="{[file.url]}" >
+            <source ng-src="{[file.url | trusted]}">
             Your browser does not support HTML5 video.
         </video>
+    </div>
+
+    <!-- url, that is not image, pdf, video. Hence, shown in iframe-->
+    <div ng-if="file.content_type == 'url'" class="content-detail-container">
+        <iframe ng-src="{[ file.url | trusted]}"></iframe>
     </div>
 </div>

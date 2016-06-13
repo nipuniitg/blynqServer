@@ -46,7 +46,8 @@
                                 Add Folder
                             </a></li>
                             <li class="divider"></li>
-                            <li role="menuitem"><a class="pointer" ng-click="addNewURL()"><i class="icon_link_alt"></i>
+                            <li role="menuitem"><a class="pointer" ng-click="addNewURL()">
+                                <i class="glyphicon glyphicon-link"></i>
                                 Add URL
                             </a></li>
                         </ul>
@@ -95,7 +96,10 @@
                                 <img ng-if="file.content_type.indexOf('image')>-1" ng-src="{[ file.url ]}">
                                 <img ng-if="file.content_type.indexOf('pdf')>-1" ng-src="{[ fileIcons.pdf ]}">
                                 <img ng-if="file.content_type.indexOf('video')>-1" ng-src="{[ fileIcons.video ]}">
-                                <img ng-if="file.content_type.indexOf('url')>-1" ng-src="{[ fileIcons.url ]}">
+                                <img ng-if="file.content_type == 'url'" ng-src="{[ fileIcons.url ]}">
+                                <span class="url-icon">
+                                   <i class="glyphicon glyphicon-link" ng-if="file.content_type.indexOf('url')>-1" ></i>
+                                </span>
                             </div>
                         </div>
                         <div class="item-container-footer">
