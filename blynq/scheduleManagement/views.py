@@ -445,6 +445,7 @@ def get_screen_data(request, nof_days=7):
     return ajax_response(success=success, errors=errors)
 
 
+@csrf_exempt
 def get_content_urls_local(request, nof_days=1):
     """
     :param request:
@@ -452,9 +453,8 @@ def get_content_urls_local(request, nof_days=1):
     :return:
     returns a list of urls for the content in the playlists scheduled for the next day
     """
-    import pdb;pdb.set_trace()
     posted_data = string_to_dict(request.body)
-    unique_key = int(posted_data.data('unique_key'))
+    unique_key = posted_data.get('unique_key')
     try:
         local_server = LocalServer.objects.get(unique_key=unique_key)
         organization = local_server.organization
