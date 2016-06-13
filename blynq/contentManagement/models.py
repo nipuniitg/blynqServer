@@ -109,14 +109,15 @@ class Content(models.Model):
         import mimetypes
         file_type, encoding = mimetypes.guess_type(str(url))
         full_file_type = 'url/' if self.url else ''
-        full_file_type = full_file_type + file_type
+        if file_type:
+            full_file_type = full_file_type + file_type
+        else:
+            full_file_type = None
         try:
             content_type = ContentType.objects.get(file_type=full_file_type)
         except ContentType.DoesNotExist:
             debugFileLog.exception("file type does not exist, might be an url")
             content_type, created = ContentType.objects.get_or_create(file_type='web/url')
-            if created:
-                content_type.save()
         self.content_type = content_type
         super(Content, self).save(*args, **kwargs)
 
