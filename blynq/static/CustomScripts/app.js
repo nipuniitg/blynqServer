@@ -69,6 +69,14 @@ mainApp.config(function($locationProvider,$stateProvider, $urlRouterProvider) {
         ,controller : 'scheduleIndexCtrl'
         ,controllerAs : 'scheduleIndexCtrl'
     })
+    .state('logout',{
+        template : ' '
+        ,resolve : {
+            logout : ['logoutService', function(logoutService){
+                logoutService();
+            }]
+        }
+    })
 });
 
 mainApp.factory("PrintToConsole", ["$rootScope", function ($rootScope) {
@@ -115,6 +123,20 @@ mainApp.factory("PrintToConsole", ["$rootScope", function ($rootScope) {
 
 mainApp.run(['PrintToConsole', function(PrintToConsole) {
     PrintToConsole.active = false;
+}]);
+
+mainApp.factory('logoutService',['$http','$window', function ($http, $window) {
+    return function () {
+        $http({
+             method : "GET",
+             url : '/authentication/logout'
+         }).then(function mySuccess(response){
+                response.data='';
+                $window.location.href='';
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
+    }
 }]);
 
 

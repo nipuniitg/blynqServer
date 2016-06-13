@@ -98,36 +98,25 @@
             <img src="{%static 'LandingPage/img/Website_logo.png'%}" style="max-height:100%;max-width:100%">
         </a>
         </div>
-
         <!--logo end-->
 
-        <!--<div class="nav search-row" id="top_menu">-->
-        <!--&lt;!&ndash;  search form start &ndash;&gt;-->
-        <!--<ul class="nav top-menu">-->
-        <!--<li>-->
-        <!--<form class="navbar-form">-->
-        <!--<input class="form-control" placeholder="Search" type="text">-->
-        <!--</form>-->
-        <!--</li>-->
-        <!--</ul>-->
-        <!--&lt;!&ndash;  search form end &ndash;&gt;-->
-        <!--</div>-->
+
         {% if user.is_authenticated %}
             <div class="top-nav notification-row">
                 <!-- notificatoin dropdown start-->
                 <ul class="nav pull-right top-menu">
                     <li class="dropdown">
                         <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                            <!--<span class="profile-ava">-->
-                                <!--<img alt="" src="img/avatar1_small.jpg">-->
-                            <!--</span>-->
                             <span class="username">{{ user.get_username }}</span>
                             <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu extended logout">
                             <div class="log-arrow-up"></div>
                             <li class="eborder-top">
-                                <a href="{% url 'auth_logout' %}"><i class="icon_key_alt"></i> Log Out</a>
+                                <a class="pointer" ui-sref="logout"><i class="icon_key_alt"></i> Log Out</a>
+                            </li>
+                            <li>
+                                <a class="pointer" ui-sref="settings"><i class="icon_cogs"></i> Settings</a>
                             </li>
                         </ul>
                     </li>
