@@ -282,3 +282,12 @@ cursor:pointer
     display : inline;
     width : auto;
 }
+
+.content-detail-container{
+    text-align : center;
+}
+
+.max-fit{
+    max-height  : 100%;
+    max-width   : 100%
+}

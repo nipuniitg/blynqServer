@@ -1865,6 +1865,7 @@ ul#filters > .active > span {
     -webkit-border-radius: 1px;
     border: 1px solid #eee;
 }
+/*
 .form-control {
     border: 1px solid #d9d9d9;
     border-radius: 2px;
@@ -1872,7 +1873,7 @@ ul#filters > .active > span {
 .form-control:focus {
     border: none;
     border: 1px solid #d9d9d9;
-}
+}*/
 .input-group-addon {
     border: border: 1px solid #d9d9d9;
     border-radius: 1px;
@@ -1954,6 +1955,7 @@ ul#filters > .active > span {
     color: #b6b6b6;
     font-weight: 300;
 }
+/*
 .form-signin .form-control {
     position: relative;
     font-size: 16px;
@@ -1963,7 +1965,7 @@ ul#filters > .active > span {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.form-signin .form-control:focus { z-index: 2 }
+.form-signin .form-control:focus { z-index: 2 }*/
 .form-signin input[type="text"],
 .form-signin input[type="password"] {
     margin-bottom: 15px;

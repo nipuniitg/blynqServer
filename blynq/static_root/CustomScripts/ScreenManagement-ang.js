@@ -308,9 +308,13 @@ function(groupsFactory, dataAccessFactory, $scope,$uibModal){
     }
 
     $scope.refreshGroupSchedules = function(){
-        dataAccessFactory.getGroupSchedules($scope.groups[$scope.activeGroupIndex].group_id, function(returnData){
-            $scope.groupSchedules = returnData;
-        });
+        if($scope.activeGroupIndex){
+            dataAccessFactory.getGroupSchedules($scope.groups[$scope.activeGroupIndex].group_id, function(returnData){
+                $scope.groupSchedules = returnData;
+            });
+        }else{
+            $scope.groupSchedules =0;
+        }
     };
 
 

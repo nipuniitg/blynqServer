@@ -29,10 +29,9 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
              method : "GET",
              url : URL
          }).then(function mySuccess(response){
-                returnData = angular.copy(response.data);
                 if(callback)
                 {
-                    callback(returnData);
+                    callback(response.data);
                 }
             }, function myError(response) {
                 console.log(response.statusText);
@@ -45,10 +44,9 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
              method : "GET",
              url : URL
          }).then(function mySuccess(response){
-                returnData = angular.copy(response.data);
                 if(callback)
                 {
-                    callback(returnData);
+                    callback(response.data);
                 }
             }, function myError(response) {
                 console.log(response.statusText);
@@ -64,7 +62,6 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
              url : '/api/content/createFolder',
              data : postData
          }).then(function mySuccess(response){
-                returnData = angular.copy(response.data);
                 if(callback)
                 {
                     callback(returnData);
@@ -80,10 +77,9 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
              url : '/api/content/updateContentTitle',
              data : contentObj
          }).then(function mySuccess(response){
-                returnData = angular.copy(response.data);
                 if(callback)
                 {
-                    callback(returnData);
+                    callback(response.data);
                 }
             }, function myError(response) {
                 console.log(response.statusText);
@@ -95,10 +91,9 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
              method : "GET"
              ,url : '/api/content/folderPath/'+ folderId
          }).then(function mySuccess(response){
-                returnData = angular.copy(response.data);
                 if(callback)
                 {
-                    callback(returnData);
+                    callback(response.data);
                 }
             }, function myError(response) {
                 console.log(response.statusText);
@@ -124,6 +119,24 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
             });
     }
 
+    var upsertUrl = function(content, parent_folder_id, callback ){
+        var postData = {};
+        postData.content = content;
+        postData.parent_folder_id = parent_folder_id;
+        $http({
+             method : "POST",
+             url : '/api/content/upsertUrl',
+             data : postData
+         }).then(function mySuccess(response){
+                if(callback)
+                {
+                    callback(response.data);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
+    }
+
     return{
         deleteContent : deleteContent
         ,getFiles : getFilesJson
@@ -132,6 +145,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
         ,updateContentTitle : updateContentTitle
         ,getFolderPath : getFolderPath
         ,moveContent    :   moveContent
+        ,upsertUrl  : upsertUrl
     }
 
 }]);
@@ -182,12 +196,19 @@ plApp.factory('ctFactory', ['ctDataAccessFactory', function(ctDataAccessFactory)
 }]);
 
 plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', '$uibModal',
-function($scope, ctFactory, ctDataAccessFactory, $uibModal){
+function($scope, ctFactory, ctDataAccessFactory, $uibModal ){
 
     //private functions
     var onLoad = function(){
         $scope.currentFolderId = -1  //-1 represents root folder. And hence fetches the data in root folder.
         $scope.refreshContent($scope.currentFolderId);
+
+//        $uibTooltip.options=
+//            {
+//                'popover-append-to-body' : true,
+//                'popover-trigger' : 'mouseenter'
+//            }
+//        ;
     };
 
     var getCheckedContentItems = function(){
@@ -214,6 +235,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
         pdf : '/static/images/pdf_logo.png'
         ,video : '/static/images/video_icon.png'
         ,folder : '/static/images/folder-icon.png'
+        ,url : '/static/images/url_icon.png'
     };
 
     $scope.refreshContent = function(folderId){
@@ -325,8 +347,15 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
 
     //----editContentTitle
 
-    $scope.editTitle= function(content){
-        //$scope.mdlEditContentObj = angular.copy(content);
+    $scope.editContent= function(content, index){
+        if(content.content_type == 'url'){
+            $scope.editUrl(index);
+        }else{
+            editTitle();
+        }
+    }
+
+    var editTitle = function(content){
         var modalInstance = $uibModal.open({
               animation: true
               ,templateUrl: '/static/templates/contentManagement/_edit_content_title_mdl.html'
@@ -367,25 +396,9 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
         }, function cancelled(){
 
         });
-
     }
 
-    $scope.updateContentTitle= function(){
-        ctDataAccessFactory.updateContentTitle($scope.mdlEditContentObj, function(data){
-            if(data.success)
-            {
-                $scope.refreshContent($scope.currentFolderId);
-                toastr.success('Title Modified successfully');
-            }
-            else{
-                toastr.warning('Oops!! Some error occured while updating the template');
-            }
-        });
-    }
 
-    $scope.cancelupdateContentTitle = function(){
-        $scope.mdlEditContentObj = null;
-    }
 
     //move item
     var clearCheckedLists = function(){
@@ -460,7 +473,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
               ,templateUrl: '/static/templates/contentManagement/_content_view_mdl.html'
               ,controller: 'mdlContentInDetailCtrl'
               ,size: 'lg'
-              //,windowTemplateUrl : '/templates/shared/_mdl_window_clear.html'
+              ,windowTemplateUrl : '/static/templates/shared/_mdl_window_template.html'
               //,backdrop: 'static' //disables modal closing by click on the backdrop.
               ,resolve : {
                     file : function(){
@@ -494,6 +507,98 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal){
             });
 
         modalInstance.result.then(function uploaded(){
+            $scope.refreshContent($scope.currentFolderId);
+        }, function cancelled(){
+        });
+    }
+
+    //upsertURl
+    var newURL = -1;
+
+    $scope.addNewURL = function(){
+        openUpsertURLModal(newURL);
+    }
+
+    $scope.editUrl = function(index){
+        openUpsertURLModal(index);
+    }
+
+    var openUpsertURLModal = function(index){
+        var isNewURL = index == newURL ? !0 : !1;
+
+        var modalInstance = $uibModal.open({
+              animation: true
+              ,templateUrl: '/static/templates/contentManagement/_url_mdl.html'
+              ,size: 'md'
+              ,backdrop: 'static' //disables modal closing by click on the backdrop.
+              ,resolve : {
+                    urlObj : function(){
+                        if(isNewURL)
+                        {
+                            return {
+                                content_id : -1
+                                ,title : ''
+                                ,url : ''
+                            }
+                        }
+                        else{
+                            return angular.copy($scope.files[index]);
+                        }
+                    }
+                    ,currentFolderId : function(){
+                        return $scope.currentFolderId
+                    }
+              }
+              ,controller : function($scope, $uibModalInstance,ctDataAccessFactory, urlObj,currentFolderId,$log){
+                    var isNewURL;
+                    var onLoad = function(){
+                        $scope.urlObj = urlObj;
+                        isNewURL = urlObj.content_id == -1 ? !0 : !1
+                        if(isNewURL){
+                            $scope.modalTitle = 'Add URL';
+                            $scope.saveVerbose = 'Add';
+                        }
+                        else{
+                            $scope.modalTitle = 'Update URL';
+                            $scope.saveVerbose = 'Update';
+                        }
+                    }
+                    onLoad();
+
+                    var validate = function(){
+                        if($scope.urlUpsertForm.$valid){
+                            return !0
+                        }else{ return !1}
+                    }
+
+                    $scope.save = function(){
+                        if(validate()){
+                            ctDataAccessFactory.upsertUrl($scope.urlObj, currentFolderId, function(returnData){
+                                if(returnData.success){
+                                    if(isNewURL){
+                                        toastr.success('url Added Successfully');
+                                    }else{
+                                        toastr.success('url updated Successfully');
+                                    }
+                                    $uibModalInstance.close();
+                                }else{
+                                    toastr.warning('Oops! some error occured while '+ (isNewURL ? 'adding.':'updating.')
+                                    +'Please try after refreshing the page');
+                                    $log.log(returnData.errors);
+                                }
+                            })
+                        }else{
+                            toastr.warning('There are some error in the form. Please correct them');
+                        }
+                    }
+
+                    $scope.cancel = function(){
+                        $uibModalInstance.dismiss();
+                    }
+              }
+            });
+
+        modalInstance.result.then(function saved(){
             $scope.refreshContent($scope.currentFolderId);
         }, function cancelled(){
         });
