@@ -21,7 +21,7 @@ urlpatterns = [
     ,url(r'^api/screen/', include(screen_urls))
     ,url(r'^api/content/', include(content_urls))
     ,url(r'^api/playlist/', include(playlist_urls))
-    ,url(r'^admin/', include(admin.site.urls))
+    ,url(r'^admin', include(admin.site.urls))
     ,url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,})
     ,url(r'^.*', auth_views.divert_to_index_page)
 ]

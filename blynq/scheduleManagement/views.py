@@ -9,10 +9,12 @@ from django.db import transaction
 
 # Create your views here.
 # from schedule.views import calendar
-
+from authentication.models import LocalServer, Organization
+from contentManagement.models import Content
+from contentManagement.serializers import ContentSerializer
 from customLibrary.views_lib import get_userdetails, ajax_response, obj_to_json_response, string_to_dict, list_to_comma_string, \
     default_string_to_datetime, get_utc_datetime, debugFileLog
-from playlistManagement.models import Playlist
+from playlistManagement.models import Playlist, PlaylistItems
 from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import Schedule, ScheduleScreens, SchedulePlaylists
 from scheduleManagement.serializers import ScheduleSerializer
@@ -441,6 +443,46 @@ def get_screen_data(request, nof_days=7):
         errors = "Error while fetching the occurences or invalid screen identifier"
         print errors
     return ajax_response(success=success, errors=errors)
+
+
+def get_content_urls_local(request, nof_days=1):
+    """
+    :param request:
+    :param nof_days:
+    :return:
+    returns a list of urls for the content in the playlists scheduled for the next day
+    """
+    import pdb;pdb.set_trace()
+    posted_data = string_to_dict(request.body)
+    unique_key = int(posted_data.data('unique_key'))
+    try:
+        local_server = LocalServer.objects.get(unique_key=unique_key)
+        organization = local_server.organization
+        screens = Screen.objects.filter(owned_by=organization)
+        schedule_screens = ScheduleScreens.objects.filter(screen__in=screens)
+        current_datetime = timezone.now()
+        next_day = current_datetime + datetime.timedelta(days=1)
+        start_time = next_day.replace(hour=0, minute=0, second=0)
+        time_diff = datetime.timedelta(days=nof_days)
+        end_time = start_time + time_diff
+        required_schedule_ids = []
+        for schedule_screen in schedule_screens:
+            if schedule_screen.event:
+                occurrences = schedule_screen.event.get_occurrences(start_time, end_time)
+                if occurrences:
+                    required_schedule_ids.append(schedule_screen.schedule_id)
+        playlist_ids = SchedulePlaylists.objects.filter(schedule_id__in=required_schedule_ids).values_list(
+            'playlist_id', flat=True)
+        content_ids = PlaylistItems.objects.filter(playlist_id__in=playlist_ids).values_list('content_id', flat=True)
+        contents = Content.objects.filter(content_id__in=content_ids).exclude(content_type__file_type__contains='web')
+        json_data = ContentSerializer().serialize(contents, fields='document')
+        url_list = [str(element['url']) for element in json_data]
+        return obj_to_json_response(url_list)
+    except Exception as e:
+        debugFileLog.exception(e)
+        success=False
+        errors = str(e)
+        return ajax_response(success=success, errors=errors)
 
 
 def get_screen_schedules(request, screen_id):

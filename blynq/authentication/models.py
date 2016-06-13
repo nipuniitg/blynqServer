@@ -62,6 +62,13 @@ class Organization(models.Model):
         return self.name
 
 
+class LocalServer(models.Model):
+    local_server_id = models.AutoField(primary_key=True)
+    local_url = models.CharField(max_length=255)
+    unique_key = models.CharField(max_length=30, help_text='Enter the MAC-Address of the device as unique key')
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+
+
 '''
 A User can have one of the below roles in increasing hierarchy
 viewer - who has only view access to the content and the schedule. Only for monitoring purposes.

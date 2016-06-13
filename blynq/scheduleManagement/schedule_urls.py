@@ -13,4 +13,5 @@ urlpatterns = [
     url(r'^getScreenSchedules/(?P<screen_id>\d+)', views.get_screen_schedules, name='get_screen_schedules'),
     url(r'^getGroupSchedules/(?P<group_id>\d+)', views.get_group_schedules, name='get_group_schedules'),
     url(r'^getPlaylistSchedules/(?P<playlist_id>\d+)', views.get_playlist_schedules, name='get_playlist_schedules'),
+    url(r'^getContentUrlsLocal', views.get_content_urls_local, name='get_content_urls_local'),
 ]
