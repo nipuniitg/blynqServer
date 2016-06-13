@@ -191,6 +191,12 @@ def folder_path(request, current_folder_id):
     return obj_to_json_response(path)
 
 
+def get_valid_content_types(request):
+    unicode_content_types = ContentType.objects.all().values_list('file_type', flat=True)
+    str_content_types = [str(content_type) for content_type in unicode_content_types]
+    return obj_to_json_response(str_content_types)
+
+
 def get_content_helper(request, parent_folder_id=-1, is_folder=False):
     try:
         user_details = get_userdetails(request)

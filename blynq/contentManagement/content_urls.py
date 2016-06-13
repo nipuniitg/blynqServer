@@ -13,4 +13,5 @@ urlpatterns = [
      url(r'^folderPath/(?P<current_folder_id>-?\d+)', views.folder_path, name='folder_path'),
      url(r'^moveContent', views.move_content, name='move_content'),
      url(r'^upsertUrl', views.upsert_url, name='upsert_url'),
+     url(r'^validContentTypes', views.get_valid_content_types, name='valid_content_types')
 ]
