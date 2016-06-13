@@ -137,6 +137,20 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
             });
     }
 
+    var getValidContentTypes = function(callback){
+        $http({
+             method : "GET"
+             ,url : '/api/content/validContentTypes'
+         }).then(function mySuccess(response){
+                if(callback)
+                {
+                    callback(response.data);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
+    }
+
     return{
         deleteContent : deleteContent
         ,getFiles : getFilesJson
@@ -146,6 +160,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
         ,getFolderPath : getFolderPath
         ,moveContent    :   moveContent
         ,upsertUrl  : upsertUrl
+        ,getValidContentTypes : getValidContentTypes
     }
 
 }]);
@@ -672,16 +687,20 @@ plApp.controller('mdlContentInDetailCtrl',['$scope','file','$uibModalInstance',
 
 }]);
 
-plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentScopeObj','$cookies',
- function($scope,$uibModalInstance, parentScopeObj, $cookies){
-
+plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentScopeObj','$cookies','ctDataAccessFactory',
+ function($scope,$uibModalInstance, parentScopeObj, $cookies, ctDAF){
+    var validateFiles = [];
     var onLoad = function(){
         $scope.currentFolderId = parentScopeObj.currentFolderId;
         $scope.files=[];
         $scope.uploadProgressIndicator = 0;
+        ctDAF.getValidContentTypes(function(returnData){
+            validFileTypes = returnData
+        })
+
     };
 
-    var validFileTypes = ['image/png','image/jpg','image/jpeg','image/gif','application/pdf','video/mp4','video/mkv'];
+   // var validFileTypes = ['image/png','image/jpg','image/jpeg','image/gif','application/pdf','video/mp4','video/mkv'];
 
     $scope.validateFiles = function(){
         $scope.invalidFiles = [];
