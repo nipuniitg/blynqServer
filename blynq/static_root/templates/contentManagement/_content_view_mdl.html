@@ -26,7 +26,7 @@
     </div>
 
     <!-- url, that is not image, pdf, video. Hence, shown in iframe-->
-    <div ng-if="file.content_type == 'url'" class="content-detail-container">
+    <div ng-if="file.content_type == 'web/url'" class="content-detail-container">
         <iframe ng-src="{[ file.url | trusted]}"></iframe>
     </div>
 </div>

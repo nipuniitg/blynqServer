@@ -477,7 +477,10 @@ def get_content_urls_local(request, nof_days=1):
         contents = Content.objects.filter(content_id__in=content_ids).exclude(content_type__file_type__contains='web')
         json_data = ContentSerializer().serialize(contents, fields='document')
         url_list = [str(element['url']) for element in json_data]
-        return obj_to_json_response(url_list)
+        json_obj = dict()
+        json_obj['urls'] = url_list
+        json_obj['success'] = True
+        return obj_to_json_response(json_obj)
     except Exception as e:
         debugFileLog.exception(e)
         success=False

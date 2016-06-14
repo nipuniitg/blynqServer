@@ -65,8 +65,13 @@ class Organization(models.Model):
 class LocalServer(models.Model):
     local_server_id = models.AutoField(primary_key=True)
     local_url = models.CharField(max_length=255)
-    unique_key = models.CharField(max_length=30, help_text='Enter the MAC-Address of the device as unique key')
+    # decimal format of the mac-address can be obtained using from uuid import getnode; getnode()
+    unique_key = models.CharField(max_length=20,
+                                  help_text='Enter the decimal format of MAC-Address of the device as unique key')
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+
+    def __unicode__(self):
+        return self.local_url + ' ' + self.organization.name
 
 
 '''
