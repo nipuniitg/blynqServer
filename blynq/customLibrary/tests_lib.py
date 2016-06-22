@@ -25,12 +25,12 @@ def create_role(role_name='Manager', description='Manager'):
 
 def create_organization(default_organization=True):
     if default_organization:
-        name = 'Blynq'
+        organization_name = 'Blynq'
         website = 'http://www.blynq.in'
     else:
-        name = generate_random_string(6)
-        website = 'http://www.' + name + '.in'
-    return Organization.objects.get_or_create(name=name, defaults={'website':website})[0]
+        organization_name = generate_random_string(6)
+        website = 'http://www.' + organization_name + '.in'
+    return Organization.objects.get_or_create(organization_name=organization_name, defaults={'website':website})[0]
 
 
 def create_userdetails(default_userdetails=True, organization=None, role=None):
