@@ -91,6 +91,7 @@ class Content(models.Model):
             return
         if self.document:
             url = self.document.url
+            full_file_type = 'file/'
             if self.organization.used_file_size + self.document.size <= self.organization.total_file_size_limit:
                 self.organization.used_file_size = self.organization.used_file_size + self.document.size
                 try:
@@ -100,15 +101,16 @@ class Content(models.Model):
                     debugFileLog.exception(e)
                 super(Content, self).save(*args, **kwargs)
             else:
-                debugFileLog.warning("The organization " + self.organization.name + " total file size limit exceeded")
+                debugFileLog.warning("The organization " + self.organization.organization_name + " total file size limit exceeded")
                 debugFileLog.error("Can't upload file")
         elif self.url:
             url = self.url
+            full_file_type = 'url/'
         else:
             url = ''
+            full_file_type = ''
         import mimetypes
         file_type, encoding = mimetypes.guess_type(str(url))
-        full_file_type = 'url/' if self.url else ''
         if file_type:
             full_file_type = full_file_type + file_type
         else:
