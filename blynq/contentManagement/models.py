@@ -17,7 +17,7 @@ from customLibrary.views_lib import debugFileLog
 
 class ContentType(models.Model):
     content_type_id = models.AutoField(primary_key=True)
-    # file_type is of the format <upload_type>/<file_type> like url/image/png, file/image/png, web/url, web/iframe
+    # file_type is of the format <upload_type>/<file_type>/<extension> like url/image/png, file/image/png, web/url/youtube, web/iframe
     # <upload_type> is either file or url or web.
     file_type = models.CharField(max_length=30)
     supported_encodings = models.TextField(help_text='list of comma separated encodings', null=True, blank=True)
@@ -117,7 +117,13 @@ class Content(models.Model):
             content_type = ContentType.objects.get(file_type=full_file_type)
         except ContentType.DoesNotExist:
             debugFileLog.exception("file type does not exist, might be an url")
-            content_type, created = ContentType.objects.get_or_create(file_type='web/url')
+            def check_youtube_url(url):
+                import re
+                youtube_url_regex = '^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$'
+                return re.match(youtube_url_regex, url)
+            is_youtube = check_youtube_url(url)
+            file_type = 'web/url/youtube' if is_youtube else 'web/url/unknown'
+            content_type, created = ContentType.objects.get_or_create(file_type=file_type)
         self.content_type = content_type
         super(Content, self).save(*args, **kwargs)
 
