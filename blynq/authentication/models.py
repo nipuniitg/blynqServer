@@ -47,7 +47,7 @@ One organization should be Blynq
 
 class Organization(models.Model):
     organization_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100, unique=True)
+    organization_name = models.CharField(max_length=100, unique=True)
     website = models.CharField(max_length=100, null=True)
     # address = models.ForeignKey(Address, on_delete=models.PROTECT, blank=True, null=True)
     address = models.CharField(max_length=100, blank=True, null=True)
@@ -56,10 +56,10 @@ class Organization(models.Model):
     used_file_size = models.BigIntegerField(default=0)
 
     def __unicode__(self):
-        return self.name
+        return self.organization_name
 
     def natural_key(self):
-        return self.name
+        return self.organization_name
 
 
 class LocalServer(models.Model):
