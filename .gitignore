@@ -11,6 +11,7 @@ blynq/.idea/encodings.xml
 blynq/.idea/misc.xml
 blynq/.idea/modules.xml
 blynq/.idea/vcs.xml
+blynq/static/bower_components/*
 blynq/.idea/workspace.xml
 blynq/authentication/__init__.pyc
 blynq/authentication/admin.pyc
