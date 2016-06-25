@@ -9,7 +9,7 @@
                     <div class="pull-left">Groups</div>
                     <div class="widget-icons pull-right">
                         <a href="#" ng-click="addNewGroup()" class="wminimize"
-                            ng-click="addNewGroup()"><i
+                           ng-click="addNewGroup()"><i
                                 class="fa fa-plus"></i>Add Group</a>
                     </div>
                     <div class="clearfix"></div>
@@ -22,20 +22,19 @@
                 </div>
                 <div class="listContainer">
                     <ul class="list-group">
-                    <li ng-repeat="group in groups|filter:searchGroup" class="list-group-item pointer"
-                        ng-class="{active:$index===activeGroupIndex}"
-                        ng-click="clickedOnGroup(group, $index)">
-                        {[ group.group_name ]}
-                        <i class="pull-right pointer fa fa-trash-o" confirm confirm-type="delete"
-                           confirm-fn="deleteGroup($index)"></i>
-                        <i class="pull-right fa fa-pencil pointer"
-                           ng-click="editGroupDetails($index)"></i>
-                        <span></span>
-                    </li>
+                        <li ng-repeat="group in groups|filter:searchGroup" class="list-group-item pointer"
+                            ng-class="{active:$index===activeGroupIndex}"
+                            ng-click="clickedOnGroup(group, $index)">
+                            {[ group.group_name ]}
+                            <i class="pull-right pointer fa fa-trash-o" confirm confirm-type="delete"
+                               confirm-fn="deleteGroup($index)"></i>
+                            <i class="pull-right fa fa-pencil pointer"
+                               ng-click="editGroupDetails($index)"></i>
+                            <span></span>
+                        </li>
 
-                </ul>
+                    </ul>
                 </div>
-
 
 
             </div>
@@ -64,7 +63,7 @@
                             <th><input type="form-control" placeholder="search"
                                        ng-model="searchScreens.city.city_name"></th>
                             <!--<th><input type="form-control" placeholder="search"-->
-                                       <!--ng-model="searchScreens.groups.group_name"></th>-->
+                            <!--ng-model="searchScreens.groups.group_name"></th>-->
                         </tr>
                         </thead>
                         <tbody>
@@ -73,13 +72,13 @@
                             <td class="fix">{[ screen.address]}</td>
                             <td class="">{[ screen.city.city_name ]}</td>
                             <!--<td class="fix">-->
-                                <!--<div  class="tagsinput">-->
-                                    <!--<span class="tag" ng-repeat="group in screen.groups">-->
-                                        <!--<span> {[group.group_name]} &nbsp;&nbsp;</span>-->
-                                    <!--</span>-->
+                            <!--<div  class="tagsinput">-->
+                            <!--<span class="tag" ng-repeat="group in screen.groups">-->
+                            <!--<span> {[group.group_name]} &nbsp;&nbsp;</span>-->
+                            <!--</span>-->
 
-                                <!--</span>-->
-                                <!--</div>-->
+                            <!--</span>-->
+                            <!--</div>-->
                             <!--</td>-->
                         </tr>
                         </tbody>
@@ -90,10 +89,34 @@
         </div>
 
         <div class="col-md-6 col-fluid fill">
-            <schedules-list
-                    schedules="groupSchedules"
-                    refresh-schedules-fn = "refreshGroupSchedules()" title="Group Schedules">
-            </schedules-list>
+            <section class="panel panel-default">
+                <header class="panel-heading">
+                    Schedules-Calendar
+                    <span class="pull-right">
+                        <div class="btn-group">
+                            <a class="btn btn-primary" ng-model="schedulesView"
+                               uib-btn-radio="'list'">
+                                <i class="icon_table"></i>
+                            </a>
+                            <a class="btn btn-primary" ng-model="schedulesView"
+                               uib-btn-radio="'calendar'">
+                                <i class=" icon_calendar"></i>
+                            </a>
+                            <add-schedule refresh-schedules-fn="refreshScreenSchedulesAndEvents()">
+                            </add-schedule>
+                        </div>
+                    </span>
+                </header>
+                <schedules-list ng-show="schedulesView == 'list'"
+                                schedules="groupSchedules"
+                                refresh-schedules-fn="refreshGroupSchedulesandEvents()">
+                </schedules-list>
+                <schedules-calendar ng-show="schedulesView == 'calendar'"
+                                    events="groupEvents"
+                                    refresh-events-fn="refreshScreenSchedulesandEvents()">
+                </schedules-calendar>
+            </section>
+
         </div>
 
     </div>
