@@ -34,7 +34,7 @@
                       }
 
                       $scope.previousSlide = function(){
-                        if(($scope.index -1) > 0){
+                        if(($scope.index -1) > -1){
                             $scope.index = $scope.index - 1;
                         }
                       }
