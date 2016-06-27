@@ -78,15 +78,6 @@ def get_ist_datetime(utc_datetime):
     return local_datetime
 
 
-def get_utc_datetime(ist_datetime):
-    """
-    :param ist_datetime: python datetime object in IST timezone
-    :return: utc_datetime : python datetime object in UTC timezone
-    """
-    local_datetime = ist_timezone.localize(ist_datetime, is_dst=None)
-    utc_datetime = local_datetime.astimezone(pytz.utc)
-    return utc_datetime
-
 def generate_utc_datetime(ist_date, ist_time):
     """
     :param ist_date: python date object in the format "%Y/%m/%d"
@@ -98,6 +89,16 @@ def generate_utc_datetime(ist_date, ist_time):
     local_dt = ist_timezone.localize(naive, is_dst=None)
     utc_dt = local_dt.astimezone(pytz.utc)
     return utc_dt
+
+
+def get_utc_datetime(ist_datetime):
+    """
+    :param ist_datetime: python datetime object in IST timezone
+    :return: utc_datetime : python datetime object in UTC timezone
+    """
+    ist_date = ist_datetime.strftime(date_fmt)
+    ist_time = ist_datetime.strftime(time_fmt)
+    return generate_utc_datetime(ist_date=ist_date, ist_time=ist_time)
 
 
 def get_ist_date_str(utc_datetime):

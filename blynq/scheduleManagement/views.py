@@ -203,8 +203,11 @@ def event_for_allday(schedule, timeline):
 
 def event_for_always(schedule):
     debugFileLog.info("inside event_for_always")
-    start = timezone.now().replace(hour=0, minute=0, second=0)
-    end = timezone.now().replace(hour=23, minute=59, second=59)
+    ist_now = get_ist_datetime(timezone.now())
+    ist_start = ist_now.replace(hour=0, minute=0, second=0)
+    ist_end = ist_now.replace(hour=23, minute=59, second=59)
+    start = get_utc_datetime(ist_start)
+    end = get_utc_datetime(ist_end)
     rule = Rule(name=schedule.schedule_title, description=schedule.schedule_title, frequency='DAILY')
     rule.save()
     creator = schedule.created_by.user if schedule.created_by else None
@@ -647,13 +650,17 @@ def calendar_schedules(start_datetime, end_datetime, screen_id=None, group_id=No
                 continue
             schedule = each_schedule_screen.schedule
             schedule_json = default_schedule_serializer([schedule])
+            if each_schedule_screen.group:
+                display_type = 'special'
+            else:
+                display_type = 'info'
             for each_occur in occurrences:
                 campaign_dict = {'title': schedule.schedule_title,
                                  'startsAt': get_ist_datetime(each_occur.start),
                                  'endsAt': get_ist_datetime(each_occur.end),
                                  'schedule': schedule_json[0],
                                  # some default values
-                                 'type': 'info',
+                                 'type': display_type,
                                  'editable': True,
                                  'deletable': True,
                                  }
