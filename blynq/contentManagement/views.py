@@ -39,11 +39,12 @@ def upsert_url(request):
         if url:
             content_dict = dict(title=title, url=url, uploaded_by=user_details, parent_folder=parent_folder,
                                 last_modified_by=user_details, organization=user_details.organization)
-            if content_id == -1:
-                content = Content(**content_dict)
-                content.save()
-            else:
-                Content.objects.filter(content_id=content_id).update(**content_dict)
+            instance, created = Content.get_user_relevant_objects(user_details=user_details).get_or_create(
+                content_id=content_id, defaults=content_dict)
+            if not created:
+                for attr, value in content_dict.iteritems():
+                    setattr(instance, attr, value)
+                instance.save()
             success = True
         else:
             errors = ['Please enter a valid URL']

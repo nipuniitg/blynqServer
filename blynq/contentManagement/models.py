@@ -2,7 +2,7 @@ import shutil
 
 from django.db import models
 from django.conf import settings
-from django.db.models.signals import pre_delete
+from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
@@ -250,9 +250,27 @@ class Content(models.Model):
         # delete.alters_data = True
 
 
+def save_relevant_playlists(content_id):
+    print 'save_relevant_playlists'
+    try:
+        from playlistManagement.models import PlaylistItems
+        playlist_items = PlaylistItems.objects.filter(content_id=content_id)
+        for item in playlist_items:
+            item.playlist.save()
+    except Exception as e:
+        debugFileLog.exception("Exception while saving the playlist to update last_updated_time")
+        debugFileLog.exception(e)
+
+
+@receiver(post_save, sender=Content)
+def post_save_content(sender, instance, **kwargs):
+    debugFileLog.info("inside post_save_content")
+    save_relevant_playlists(content_id=instance.content_id)
+
+
 @receiver(pre_delete, sender=Content)
-def delete_file(sender, instance, **kwargs):
-    debugFileLog.info("inside delete_file")
+def pre_delete_content(sender, instance, **kwargs):
+    debugFileLog.info("inside pre_delete_content")
     if instance.document:
         try:
             organization = instance.organization
@@ -280,3 +298,4 @@ def delete_file(sender, instance, **kwargs):
         except Exception as e:
             debugFileLog.exception("Unknown exception while deleting content")
             debugFileLog.exception(e)
+    save_relevant_playlists(content_id=instance.content_id)

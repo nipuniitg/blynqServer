@@ -53,8 +53,11 @@ def send_mail_blynq(to=['hello@blynq.in'], subject='', message=''):
         debugFileLog.error('Error while sending mail to ' + ','.join(to))
 
 
-# Format of the string is 31012016095455
 def default_string_to_datetime(str):
+    """
+    :param str: Format of the string is "%2d%2m%4Y%2H%2M%2S", example 31012016095455
+    :return: dt: python datetime object in the utc timezone
+    """
     dt = datetime.datetime.strptime(str, '%d%m%Y%H%M%S')
     dt = timezone.make_aware(dt, timezone.get_default_timezone())
     return dt
@@ -66,13 +69,21 @@ date_fmt = "%Y/%m/%d"
 datetime_fmt = "%Y/%m/%d %H:%M"
 
 
-# Delete the below function if not used
 def get_ist_datetime(utc_datetime):
+    """
+    :param utc_datetime: python datetime object in utc format
+    :return: local_datetime : python datetime object in ist timezone
+    """
     local_datetime = utc_datetime.replace(tzinfo=pytz.utc).astimezone(ist_timezone)
     return local_datetime
 
 
 def get_utc_datetime(ist_date, ist_time):
+    """
+    :param ist_date: python date object in the format "%Y/%m/%d"
+    :param ist_time: python time object in the format "%H:%M"
+    :return: utc_dt : python datetime object in utc timezone
+    """
     ist_datetime = ist_date + ' ' + ist_time
     local = pytz.timezone("Asia/Kolkata")
     naive = datetime.datetime.strptime(ist_datetime, datetime_fmt)
@@ -82,6 +93,10 @@ def get_utc_datetime(ist_date, ist_time):
 
 
 def get_ist_date_str(utc_datetime):
+    """
+    :param utc_datetime:
+    :return:
+    """
     ist_datetime = get_ist_datetime(utc_datetime=utc_datetime)
     ist_date = ist_datetime.strftime(date_fmt)
     return ist_date
