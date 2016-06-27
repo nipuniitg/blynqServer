@@ -1,5 +1,6 @@
 import shutil
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
 from django.db.models.signals import pre_delete, post_save
@@ -118,6 +119,8 @@ class Content(models.Model):
         try:
             content_type = ContentType.objects.get(file_type=full_file_type)
         except ContentType.DoesNotExist:
+            if self.document:
+                raise ValidationError(_('Invalid File extension'), code='invalid')
             debugFileLog.exception("file type does not exist, might be an url")
             def check_youtube_url(url):
                 import re
