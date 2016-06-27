@@ -570,3 +570,14 @@ def delete_schedule(request):
         success = False
         errors = ['Sorry, you do not have access to this schedule']
     return ajax_response(success=success, errors=errors)
+
+
+def get_screen_events(request):
+    import pdb;pdb.set_trace()
+    print request.body
+    return ajax_response(success=True)
+
+def get_group_events(request):
+    import pdb;pdb.set_trace()
+    print request.body
+    return ajax_response(success=True)

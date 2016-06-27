@@ -102,18 +102,18 @@
                                uib-btn-radio="'calendar'">
                                 <i class=" icon_calendar"></i>
                             </a>
-                            <add-schedule refresh-schedules-fn="refreshScreenSchedulesAndEvents()">
+                            <add-schedule refresh-schedules-fn="refreshGroupSchedulesAndEvents()">
                             </add-schedule>
                         </div>
                     </span>
                 </header>
                 <schedules-list ng-show="schedulesView == 'list'"
                                 schedules="groupSchedules"
-                                refresh-schedules-fn="refreshGroupSchedulesandEvents()">
+                                refresh-schedules-fn="refreshGroupSchedules()">
                 </schedules-list>
                 <schedules-calendar ng-show="schedulesView == 'calendar'"
                                     events="groupEvents"
-                                    refresh-events-fn="refreshScreenSchedulesandEvents()">
+                                    refresh-events-fn="refreshGroupEvents">
                 </schedules-calendar>
             </section>
 

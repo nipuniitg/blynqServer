@@ -79,11 +79,11 @@
                 </header>
                 <schedules-list ng-show="schedulesView == 'list'"
                                 schedules="screenSchedules"
-                                refresh-schedules-fn="refreshScreenSchedulesandEvents()">
+                                refresh-schedules-fn="refreshScreenSchedules()">
                 </schedules-list>
                 <schedules-calendar ng-show="schedulesView == 'calendar'"
                                     events="screenEvents"
-                                    refresh-events-fn="refreshScreenSchedulesandEvents()">
+                                    refresh-events-fn="refreshScreenEvents">
                 </schedules-calendar>
             </section>
         </div>

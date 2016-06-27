@@ -131,7 +131,7 @@ sdApp.directive('schedulesCalendar',['$log','scheduleIndexFactory','$uibModal',
             refreshEvents : '&refreshEventsFn'
         }
         ,templateUrl: '/static/templates/scheduleManagement/_schedules_calendar.html'
-        ,controller : ['calendarFactory','$uibModal', function(cF, $uibModal){
+        ,controller : ['$scope','calendarFactory','$uibModal', function($scope, cF, $uibModal){
                         var clndrCtrl = this;
                         var onLoad = function(){
                             clndrCtrl.calendarViewTypes = cF.calendarViewTypes;
@@ -181,6 +181,16 @@ sdApp.directive('schedulesCalendar',['$log','scheduleIndexFactory','$uibModal',
                                 toastr.warning('schedule cancelled')
                             })
                         };
+
+                        $scope.$watch(angular.bind(this, function () {
+                          return clndrCtrl.viewDate;
+                        }), function (newVal, oldVal) {
+                            var oldDateMonth = moment(oldVal).month();
+                            var newDateMonth = moment(newVal).month();
+                            if(oldDateMonth !== newDateMonth){
+                                clndrCtrl.refreshEvents()(newDateMonth+1);
+                            }
+                        });
 
                         //events
                         clndrCtrl.eventClicked = function(event) {
