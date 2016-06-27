@@ -16,7 +16,7 @@
                         <thead>
                             <tr>
                                 <th>Edit</th>
-                                <th>Status</th>
+                                <!--<th>Status</th>-->
                                 <th>Screen Name</th>
                                 <th>City</th>
                                 <th class="fix">Address</th>
@@ -24,7 +24,7 @@
                             </tr>
                             <tr>
                             <th></th>
-                            <th></th>
+                            <!--<th></th>-->
                             <th><input type="form-control" ng-model="searchScreens.screen_name" placeholder="search Name"></th>
                             <th><input type="form-control" ng-model="searchScreens.city.city_name" placeholder="search"></th>
                             <th><input type="form-control" ng-model="searchScreens.address" placeholder="search"></th>
@@ -34,7 +34,7 @@
                         <tbody style=" height: 230px;overflow-y: auto;width: 100%;">
                         <tr class="pointer" ng-repeat="screen in screens | filter: searchScreens" ng-click="clickedOnScreen($index)">
                             <td><a href="#" ng-click="editScreenDetails($index)"><i class="fa fa-pencil pointer"></i> </a></td>
-                            <td><i class="fa fa-circle online"></i>{[ screen.status ]} </td>
+                            <!--<td><i class="fa fa-circle online"></i>{[ screen.status ]} </td>-->
                             <td class="fix">{[ screen.screen_name ]}</td>
                             <td class="">{[ screen.city.city_name]}</td>
                             <td class="fix">{[ screen.address ]}</td>

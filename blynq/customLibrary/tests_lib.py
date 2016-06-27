@@ -11,7 +11,6 @@ from contentManagement.models import Content
 from customLibrary.views_lib import obj_to_json_str, string_to_dict, get_ist_date_str, get_ist_time_str
 from playlistManagement.models import Playlist, PlaylistItems
 from scheduleManagement.models import Schedule, SchedulePlaylists, ScheduleScreens
-from scheduleManagement.serializers import default_timeline
 from screenManagement.models import ScreenStatus, ScreenActivationKey, Group, Screen, GroupScreens
 
 
@@ -25,12 +24,12 @@ def create_role(role_name='Manager', description='Manager'):
 
 def create_organization(default_organization=True):
     if default_organization:
-        name = 'Blynq'
+        organization_name = 'Blynq'
         website = 'http://www.blynq.in'
     else:
-        name = generate_random_string(6)
-        website = 'http://www.' + name + '.in'
-    return Organization.objects.get_or_create(name=name, defaults={'website':website})[0]
+        organization_name = generate_random_string(6)
+        website = 'http://www.' + organization_name + '.in'
+    return Organization.objects.get_or_create(organization_name=organization_name, defaults={'website':website})[0]
 
 
 def create_userdetails(default_userdetails=True, organization=None, role=None):
@@ -310,6 +309,15 @@ def generate_group_dict(group=None):
     return group_dict
 
 
+def default_timeline(is_always=True, all_day=True, recurrence_absolute=False, start_date=None, end_recurring_period=None,
+                     start_time=None, end_time=None, frequency=None, interval=None, byweekday=None, bymonthday=None,
+                     byweekno=None):
+    return {'is_always': is_always, 'recurrence_absolute': recurrence_absolute, 'all_day': all_day,
+            'start_date':start_date, 'end_recurring_period': end_recurring_period, 'start_time': start_time,
+            'end_time': end_time, 'frequency':frequency, 'interval': interval, 'byweekday': byweekday,
+            'bymonthday': bymonthday, 'byweekno': byweekno }
+
+
 def generate_schedule_screens(schedule=None):
     schedule_screens_list = []
     if schedule:
@@ -352,10 +360,9 @@ def generate_schedule_playlists(schedule=None):
     return schedule_playlists_list
 
 
-def generate_schedule_timeline(schedule=None):
+def generate_schedule_timeline(schedule=None, is_always=True, all_day=True, recurrence_absolute=False):
     if not schedule:
-        return default_timeline()
-
+        return default_timeline(is_always=is_always, all_day=all_day, recurrence_absolute=recurrence_absolute)
     schedule_screens = ScheduleScreens.objects.filter(schedule=schedule)
     event_json = {}
     if schedule_screens:

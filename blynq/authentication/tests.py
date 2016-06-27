@@ -26,8 +26,8 @@ class OrganizationTest(TestCase):
     def test_organization(self):
         organization = create_organization()
         self.assertTrue((isinstance(organization, Organization)))
-        self.assertEqual(organization.__unicode__(), organization.name)
-        self.assertEqual(organization.natural_key(), organization.name)
+        self.assertEqual(organization.__unicode__(), organization.organization_name)
+        self.assertEqual(organization.natural_key(), organization.organization_name)
 
 
 class UserDetailsTest(TestCase):

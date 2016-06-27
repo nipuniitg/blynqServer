@@ -71,11 +71,11 @@ class Group(models.Model):
     description = models.TextField(blank=True, null=True)
     created_on = models.DateField(auto_now_add=True)
     # TODO: When a manager deletes the below user, set his info here
-    created_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True)
-    # Below logic not required
-    # For each entry in the Screen table, we add an entry in the Group table and
-    # set the flag dummy_screen_group to True. So that it would be easy in the scheduleManagement
-    # dummy_screen_group = models.BooleanField(default=False)
+    created_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True, blank=True,
+                                   related_name='%(class)s_created_by')
+    last_updated_time = models.DateTimeField(auto_now=True, null=True)
+    last_updated_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True, blank=True,
+                                        related_name='%(class)s_last_updated_by')
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
 
     class Meta:
@@ -120,7 +120,11 @@ class Screen(models.Model):
 
     unique_device_key = models.OneToOneField(ScreenActivationKey)
     activated_on = models.DateTimeField(auto_now_add=True)
-    activated_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True, blank=True)
+    activated_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True, blank=True,
+                                     related_name='%(class)s_activated_by')
+    last_updated_time = models.DateTimeField(auto_now=True, null=True)
+    last_updated_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True, blank=True,
+                                        related_name='%(class)s_last_updated_by')
     # related_name - The name to use for the relation from the related object back to this one
     # placed_by - the organization which is keeping the screens
     # placed_by = models.ForeignKey(Organization, on_delete=models.PROTECT,related_name='%(class)s_placed_by', blank=True, null=True)

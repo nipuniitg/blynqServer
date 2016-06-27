@@ -363,10 +363,10 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal ){
     //----editContentTitle
 
     $scope.editContent= function(content, index){
-        if(content.content_type == 'url'){
+        if(!content.is_folder && content.content_type.indexOf('url')>-1){
             $scope.editUrl(index);
         }else{
-            editTitle();
+            editTitle(content);
         }
     }
 

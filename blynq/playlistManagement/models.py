@@ -1,11 +1,12 @@
 from django.db import models
+from django.db.models.signals import post_save, pre_delete
+from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
-
 from django.conf import settings
-
 # Create your models here.
 from authentication.models import UserDetails, Organization
 from contentManagement.models import Content
+from customLibrary.views_lib import debugFileLog
 
 
 class PlaylistItems(models.Model):
@@ -23,9 +24,9 @@ class PlaylistItems(models.Model):
     class Meta:
         ordering = ['position_index']
 
-    # def natural_key(self):
-    #     return ({'playlist_id': self.playlist.playlist_id, 'content_id': self.content.content_id,
-    #              'position_index': self.position_index, 'display_time': self.display_time } )
+        # def natural_key(self):
+        #     return ({'playlist_id': self.playlist.playlist_id, 'content_id': self.content.content_id,
+        #              'position_index': self.position_index, 'display_time': self.display_time } )
 
 
 class Playlist(models.Model):
@@ -52,3 +53,19 @@ class Playlist(models.Model):
     @staticmethod
     def get_user_relevant_objects(user_details):
         return Playlist.objects.filter(organization=user_details.organization)
+
+
+@receiver(post_save, sender=Playlist)
+def post_save_playlist(sender, instance, **kwargs):
+    debugFileLog.info("Inside post_save_playlist")
+    # Set the last_updated_time for all the schedules having this playlist
+    from scheduleManagement.models import SchedulePlaylists
+    try:
+        schedule_playlists = SchedulePlaylists.objects.filter(playlist_id=instance.playlist_id)
+        for each_schedule_playlist in schedule_playlists:
+            schedule = each_schedule_playlist.schedule
+            schedule.save()
+    except Exception as e:
+        debugFileLog.exception("Error while updating the last_updated_time of the schedules "
+                               "corresponding to playlist %s" % instance.playlist.playlist_title)
+        debugFileLog.exception(e)

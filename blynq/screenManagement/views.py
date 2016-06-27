@@ -46,6 +46,7 @@ def upsert_group(request):
                         group = Group.get_user_relevant_objects(user_details).get(group_id=group_id)
                         group.group_name = form_data.get('group_name')
                     group.description = form_data.get('description')
+                    group.last_updated_by = user_details
                     group.save()
                     screens = posted_data.get('screens')
                     group_screen_id_list = []
@@ -152,6 +153,7 @@ def upsert_screen(request):
             screen.aspect_ratio = posted_data.get('aspect_ratio')
             screen.resolution = posted_data.get('resolution')
             screen.owned_by = user_details.organization
+            screen.last_updated_by = user_details
             status = default_screen_status()
             screen.status = status
             screen.save()

@@ -76,11 +76,6 @@ def upsert_playlist(request):
             for content in removed_playlist_content:
                 content.delete()
 
-            # Set the last_updated_time for all the schedules having this playlist
-            schedule_playlists = SchedulePlaylists.objects.filter(playlist_id=playlist_id)
-            for each_schedule_playlist in schedule_playlists:
-                schedule = each_schedule_playlist.schedule
-                schedule.save()
             json_data = PlaylistSerializer().serialize([playlist],
                                                        fields=('playlist_id', 'playlist_title', 'playlist_items'))
             assert len(json_data) > 0

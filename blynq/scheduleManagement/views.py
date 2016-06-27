@@ -31,19 +31,8 @@ def add_schedule(request):
     return render(request, 'scheduleManagement/schedule_details.html')
 
 
-def default_rule(frequency='DAILY'):
-    if frequency == 'DAILY':
-        return Rule.objects.filter(name='default-daily')[0]
-    elif frequency == 'WEEKLY':
-        return Rule.objects.filter(name='default-weekly')[0]
-    elif frequency == 'MONTHLY':
-        return Rule.objects.filter(name='default-monthly')[0]
-    elif frequency == 'YEARLY':
-        return Rule.objects.filter(name='default-yearly')[0]
-
-
 def interval_param(interval):
-    print 'inside interval_param'
+    debugFileLog.info('inside interval_param')
     return 'interval:' + str(interval)
 
 
@@ -60,7 +49,7 @@ def append_params(params, new_keyvalue):
 
 # byweekday should be a list [0,2,3] meaning 0-Monday, 1-Tuesday, 2-Wednesday, 3-Thursday, 4-Friday, 5-Saturday,6-Sunday
 def generate_rule_params(interval=1, bymonthday=None, byweekday=None, byweekno=None):
-    print "inside generate_rule_params"
+    debugFileLog.info("inside generate_rule_params")
     params = interval_param(interval)
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekday', bylistday=byweekday))
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekday', bylistday=byweekday))
@@ -70,7 +59,7 @@ def generate_rule_params(interval=1, bymonthday=None, byweekday=None, byweekno=N
 
 
 def upsert_schedule_screens(user_details, schedule, schedule_screens, event_dict):
-    print "inside upsert_schedule_screens"
+    debugFileLog.info("inside upsert_schedule_screens")
     error = ''
     schedule_screen_id_list = []
     for item in schedule_screens:
@@ -107,7 +96,7 @@ def upsert_schedule_screens(user_details, schedule, schedule_screens, event_dict
 
 
 def upsert_schedule_groups(user_details, schedule, schedule_groups, event_dict):
-    print "inside upsert_schedule_groups"
+    debugFileLog.info("inside upsert_schedule_groups")
     error = ''
     schedule_screen_id_list = []
     for item in schedule_groups:
@@ -154,7 +143,7 @@ def upsert_schedule_groups(user_details, schedule, schedule_groups, event_dict):
 
 # upsert schedule playlists
 def upsert_schedule_playlists(user_details, schedule, schedule_playlists):
-    print "inside upsert_schedule_playlists"
+    debugFileLog.info("inside upsert_schedule_playlists")
     error = ''
     schedule_playlist_id_list = []
     for pos_index, item in enumerate(schedule_playlists):
@@ -180,7 +169,7 @@ def upsert_schedule_playlists(user_details, schedule, schedule_playlists):
 
 
 def generate_rule(timeline, name, description):
-    print "inside generate_rule"
+    debugFileLog.info("inside generate_rule")
     interval = int(timeline.get('interval'))
     byweekno = timeline.get('byweekno')
     bymonthday = timeline.get('bymonthday')
@@ -195,7 +184,7 @@ def generate_rule(timeline, name, description):
 
 
 def event_for_allday(schedule, timeline):
-    print "inside event_for_allday"
+    debugFileLog.info("inside event_for_allday")
     start_date = timeline.get('start_date')
     start_time = "00:00"  # datetime.time(0)
     start = get_utc_datetime(ist_date=start_date, ist_time=start_time)
@@ -212,7 +201,7 @@ def event_for_allday(schedule, timeline):
 
 
 def event_for_always(schedule):
-    print "inside event_for_always"
+    debugFileLog.info("inside event_for_always")
     start = timezone.now().replace(hour=0, minute=0, second=0)
     end = timezone.now().replace(hour=23, minute=59, second=59)
     rule = Rule(name=schedule.schedule_title, description=schedule.schedule_title, frequency='DAILY')
@@ -224,7 +213,7 @@ def event_for_always(schedule):
 
 
 def event_dict_from_timeline(timeline, schedule):
-    print "insisde event_dict_from_timeline"
+    debugFileLog.info("insisde event_dict_from_timeline")
     is_always = timeline.get('is_always')
     all_day = timeline.get('all_day')
     recurrence_absolute = timeline.get('recurrence_absolute')
@@ -259,7 +248,7 @@ def event_dict_from_timeline(timeline, schedule):
 @transaction.atomic
 @login_required
 def upsert_schedule(request):
-    print "inside upsert_schedule"
+    debugFileLog.info("inside upsert_schedule")
     errors = []
     success = False
     user_details = get_userdetails(request)
@@ -302,10 +291,10 @@ def upsert_schedule(request):
             errors.append(error)
     except Exception as e:
         success = False
-        print "Exception is ", e
         error = 'Error while upserting content to schedule'
+        debugFileLog.exception(error)
+        debugFileLog.exception(e)
         errors.append(error)
-        print errors
     return ajax_response(success=success, errors=errors)
 
 
@@ -352,7 +341,7 @@ def device_key_active(request):
 
 @csrf_exempt
 def get_screen_data(request, nof_days=7):
-    print "inside get_screen_data"
+    debugFileLog.info("inside get_screen_data")
     # user_details, organization = user_and_organization(request)
     errors = []
     screen_data_json = []
@@ -383,8 +372,8 @@ def get_screen_data(request, nof_days=7):
                     screen_schedule = event.schedulescreens
                     schedule_for_event = True
                 except Exception as e:
-                    print "Exception is ", e
-                    print 'Event does not exist in the schedule screens'
+                    debugFileLog.exception('Event does not exist in the schedule screens')
+                    debugFileLog.exception(e)
                     continue
                 schedule = screen_schedule.schedule
                 if schedule.last_updated_time > last_received_datetime:
@@ -409,8 +398,8 @@ def get_screen_data(request, nof_days=7):
                         screen_schedule = event.schedulescreens
                         schedule_for_event = True
                     except Exception as e:
-                        print "Exception is ", e
-                        print 'Event does not exist in the schedule screens'
+                        debugFileLog.exception('Event does not exist in the schedule screens')
+                        debugFileLog.exception(e)
                         continue
                     schedule = screen_schedule.schedule
                     if schedule.schedule_id in completed_schedules:
@@ -439,9 +428,9 @@ def get_screen_data(request, nof_days=7):
         success = True
         return obj_to_json_response(campaigns_json)
     except Exception as e:
-        print "Exception is ", e
         errors = "Error while fetching the occurences or invalid screen identifier"
-        print errors
+        debugFileLog.exception(errors)
+        debugFileLog.exception(e)
     return ajax_response(success=success, errors=errors)
 
 
@@ -477,7 +466,10 @@ def get_content_urls_local(request, nof_days=1):
         contents = Content.objects.filter(content_id__in=content_ids).exclude(content_type__file_type__contains='web')
         json_data = ContentSerializer().serialize(contents, fields='document')
         url_list = [str(element['url']) for element in json_data]
-        return obj_to_json_response(url_list)
+        json_obj = dict()
+        json_obj['urls'] = url_list
+        json_obj['success'] = True
+        return obj_to_json_response(json_obj)
     except Exception as e:
         debugFileLog.exception(e)
         success=False
@@ -486,7 +478,7 @@ def get_content_urls_local(request, nof_days=1):
 
 
 def get_screen_schedules(request, screen_id):
-    print "inside get_screen_schedules"
+    debugFileLog.info("inside get_screen_schedules")
     screen_id = int(screen_id)
     user_details = get_userdetails(request)
     screen_schedule_id_list = ScheduleScreens.objects.filter(screen_id=screen_id).values_list(
@@ -499,7 +491,7 @@ def get_screen_schedules(request, screen_id):
 
 
 def get_group_schedules(request, group_id):
-    print "inside get_group_schedules"
+    debugFileLog.info("inside get_group_schedules")
     screen_id = int(group_id)
     user_details = get_userdetails(request)
     group_schedule_id_list = ScheduleScreens.objects.filter(group_id=group_id).values_list(
@@ -512,7 +504,7 @@ def get_group_schedules(request, group_id):
 
 
 def get_playlist_schedules(request, playlist_id):
-    print "inside get_playlist_schedules"
+    debugFileLog.info("inside get_playlist_schedules")
     playlist_id = int(playlist_id)
     user_details = get_userdetails(request)
     playlist_schedule_id_list = SchedulePlaylists.objects.filter(playlist_id=playlist_id).values_list(
@@ -526,7 +518,89 @@ def get_playlist_schedules(request, playlist_id):
 
 
 def get_schedules(request):
-    print "inside get_schedules"
+    """
+    :param request:
+    :return:
+    [
+        {
+            timeline: {
+                byweekno: null,
+                recurrence_absolute: false,
+                start_time: "05:30",
+                interval: null,
+                all_day: true,
+                bymonthday: null,
+                end_time: "05:29",
+                frequency: "DAILY",
+                is_always: true,
+                byweekday: null,
+                start_date: "2016/06/09",
+                end_recurring_period: null
+            },
+            schedule_playlists: [
+            {
+                playlist_items: [
+                {
+                    display_time: 15,
+                    is_folder: false,
+                    title: "sachin",
+                    url: "http://127.0.0.1:8000/media/usercontent/1/sachin.jpg",
+                    playlist_item_id: 7,
+                    content_type: "file/image/jpeg",
+                    content_id: 11
+                }],
+                playlist_title: "first playlist",
+                schedule_playlist_id: 23,
+                playlist_id: 1
+            }],
+            schedule_id: 23,
+            schedule_groups: [ ],
+            schedule_screens: [
+            {
+                status: "Offline",
+                city: {
+                    city_id: 1,
+                    city_name: "Hyderabad"
+                },
+                schedule_screen_id: 31,
+                screen_name: "jaydev android emulator",
+                screen_size: 32,
+                groups: [
+                {
+                    group_name: "Group 1",
+                    group_id: 1,
+                    group_screen_id: 5
+                }],
+                address: "",
+                resolution: "1190*768",
+                screen_id: 1
+            },
+            {
+                status: "Offline",
+                city: {
+                    city_id: 1,
+                    city_name: "Hyderabad"
+                },
+                schedule_screen_id: 32,
+                screen_name: "test device",
+                screen_size: 24,
+                groups: [
+                {
+                    group_name: "Group 1",
+                    group_id: 1,
+                    group_screen_id: 4
+                }
+                ],
+                address: "mount fort",
+                resolution: "1024*768",
+                screen_id: 2
+            }
+            ],
+            schedule_title: "11"
+        }
+    ]
+    """
+    debugFileLog.info("inside get_schedules")
     user_details = get_userdetails(request)
     user_schedules = Schedule.get_user_relevant_objects(user_details)
 
@@ -545,7 +619,7 @@ def get_schedules(request):
 #         calendar_slug = screen_calendar.slug
 #         context_dic['calendar'] = screen_calendar
 #     except Exception as e:
-#         print "Exception is ", e
+#         debugFileLog.exception(e)
 #         return render(request, 'schedule/calendar.html')
 #     return calendar(request, calendar_slug=calendar_slug)
 
@@ -553,7 +627,7 @@ def get_schedules(request):
 @transaction.atomic
 @login_required
 def delete_schedule(request):
-    print "inside delete schedule"
+    debugFileLog.info("inside delete schedule")
     user_details = get_userdetails(request)
     errors = []
     success = False
@@ -566,9 +640,10 @@ def delete_schedule(request):
             schedule.delete()
             success = True
     except Exception as e:
-        print "Exception is ", e
         success = False
         errors = ['Sorry, you do not have access to this schedule']
+        debugFileLog.exception(errors[0])
+        debugFileLog.exception(e)
     return ajax_response(success=success, errors=errors)
 
 

@@ -2,7 +2,7 @@ import shutil
 
 from django.db import models
 from django.conf import settings
-from django.db.models.signals import pre_delete
+from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
@@ -17,7 +17,7 @@ from customLibrary.views_lib import debugFileLog
 
 class ContentType(models.Model):
     content_type_id = models.AutoField(primary_key=True)
-    # file_type is of the format <upload_type>/<file_type> like url/image/png, file/image/png, web/url, web/iframe
+    # file_type is of the format <upload_type>/<file_type>/<extension> like url/image/png, file/image/png, web/url/youtube, web/iframe
     # <upload_type> is either file or url or web.
     file_type = models.CharField(max_length=30)
     supported_encodings = models.TextField(help_text='list of comma separated encodings', null=True, blank=True)
@@ -91,6 +91,7 @@ class Content(models.Model):
             return
         if self.document:
             url = self.document.url
+            full_file_type = 'file/'
             if self.organization.used_file_size + self.document.size <= self.organization.total_file_size_limit:
                 self.organization.used_file_size = self.organization.used_file_size + self.document.size
                 try:
@@ -100,15 +101,16 @@ class Content(models.Model):
                     debugFileLog.exception(e)
                 super(Content, self).save(*args, **kwargs)
             else:
-                debugFileLog.warning("The organization " + self.organization.name + " total file size limit exceeded")
+                debugFileLog.warning("The organization " + self.organization.organization_name + " total file size limit exceeded")
                 debugFileLog.error("Can't upload file")
         elif self.url:
             url = self.url
+            full_file_type = 'url/'
         else:
             url = ''
+            full_file_type = ''
         import mimetypes
         file_type, encoding = mimetypes.guess_type(str(url))
-        full_file_type = 'url/' if self.url else ''
         if file_type:
             full_file_type = full_file_type + file_type
         else:
@@ -117,7 +119,13 @@ class Content(models.Model):
             content_type = ContentType.objects.get(file_type=full_file_type)
         except ContentType.DoesNotExist:
             debugFileLog.exception("file type does not exist, might be an url")
-            content_type, created = ContentType.objects.get_or_create(file_type='web/url')
+            def check_youtube_url(url):
+                import re
+                youtube_url_regex = '^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$'
+                return re.match(youtube_url_regex, url)
+            is_youtube = check_youtube_url(url)
+            file_type = 'web/url/youtube' if is_youtube else 'web/url/unknown'
+            content_type, created = ContentType.objects.get_or_create(file_type=file_type)
         self.content_type = content_type
         super(Content, self).save(*args, **kwargs)
 
@@ -242,9 +250,27 @@ class Content(models.Model):
         # delete.alters_data = True
 
 
+def save_relevant_playlists(content_id):
+    print 'save_relevant_playlists'
+    try:
+        from playlistManagement.models import PlaylistItems
+        playlist_items = PlaylistItems.objects.filter(content_id=content_id)
+        for item in playlist_items:
+            item.playlist.save()
+    except Exception as e:
+        debugFileLog.exception("Exception while saving the playlist to update last_updated_time")
+        debugFileLog.exception(e)
+
+
+@receiver(post_save, sender=Content)
+def post_save_content(sender, instance, **kwargs):
+    debugFileLog.info("inside post_save_content")
+    save_relevant_playlists(content_id=instance.content_id)
+
+
 @receiver(pre_delete, sender=Content)
-def delete_file(sender, instance, **kwargs):
-    debugFileLog.info("inside delete_file")
+def pre_delete_content(sender, instance, **kwargs):
+    debugFileLog.info("inside pre_delete_content")
     if instance.document:
         try:
             organization = instance.organization
@@ -272,3 +298,4 @@ def delete_file(sender, instance, **kwargs):
         except Exception as e:
             debugFileLog.exception("Unknown exception while deleting content")
             debugFileLog.exception(e)
+    save_relevant_playlists(content_id=instance.content_id)
