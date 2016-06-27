@@ -127,8 +127,8 @@ sdApp.directive('schedulesCalendar',['$log','scheduleIndexFactory','$uibModal',
         restrict    :   'E'
         ,scope : true
         ,bindToController : {
-            //events : '=events'
-            refreshEvents : '&refreshEventsFn'
+            events : '=events'
+            ,refreshEvents : '&refreshEventsFn'
         }
         ,templateUrl: '/static/templates/scheduleManagement/_schedules_calendar.html'
         ,controller : ['$scope','calendarFactory','$uibModal', function($scope, cF, $uibModal){
@@ -137,28 +137,6 @@ sdApp.directive('schedulesCalendar',['$log','scheduleIndexFactory','$uibModal',
                             clndrCtrl.calendarViewTypes = cF.calendarViewTypes;
                             clndrCtrl.calendarView = clndrCtrl.calendarViewTypes.month;
                             clndrCtrl.viewDate = moment();
-                            clndrCtrl.events=[
-                            {
-                                title: 'Owner Event', // The title of the event
-                                type: 'info', // The type of the event (determines its color). Can be important, warning, info, inverse, success or special
-                                startsAt: new Date(2016,5,1,1), // A javascript date object for when the event starts
-                                endsAt: new Date(2017,8,26,15), // Optional - a javascript date object for when the event ends
-                                editable: true, // If edit-event-html is set and this field is explicitly set to false then dont make it editable.
-                                deletable: true, // If delete-event-html is set and this field is explicitly set to false then dont make it deleteable
-                                incrementsBadgeTotal: true, //If set to false then will not count towards the badge total amount on the month and year view
-                                allDay: false // set to true to display the event as an all day event on the day view
-                            }
-                            ,{
-                                title: 'Content Partner Event', // The title of the event
-                                type: 'warning', // The type of the event (determines its color). Can be important, warning, info, inverse, success or special
-                                startsAt: new Date(2016,5,1,1), // A javascript date object for when the event starts
-                                endsAt: new Date(2017,8,26,15), // Optional - a javascript date object for when the event ends
-                                editable: true, // If edit-event-html is set and this field is explicitly set to false then dont make it editable.
-                                deletable: true, // If delete-event-html is set and this field is explicitly set to false then dont make it deleteable
-                                incrementsBadgeTotal: true, //If set to false then will not count towards the badge total amount on the month and year view
-                                allDay: false // set to true to display the event as an all day event on the day view
-                            }
-                        ];
                         };
                         onLoad();
 
@@ -176,7 +154,7 @@ sdApp.directive('schedulesCalendar',['$log','scheduleIndexFactory','$uibModal',
                               }
                             });
                             modalInstance.result.then(function saved(){
-                                $scope.refreshEvents();
+                                clndrCtrl.refreshEvents()(clndrCtrl.viewDate.month()+1);
                             }, function cancelled(){
                                 toastr.warning('schedule cancelled')
                             })
@@ -194,11 +172,58 @@ sdApp.directive('schedulesCalendar',['$log','scheduleIndexFactory','$uibModal',
 
                         //events
                         clndrCtrl.eventClicked = function(event) {
-                          alert('clicked');
+                          var modalInstance = $uibModal.open({
+                              animation: true
+                              ,templateUrl: '/static/templates/contentManagement/_content_view_mdl.html'
+                              ,controller: ['$scope','$uibModalInstance','resolvedObj',
+                               function($scope,$uibModalInstance,resolvedObj)
+                              {
+                                  var onLoad = function(){
+                                    $scope.slideContent = resolvedObj.slideContent
+                                    $scope.index = resolvedObj.index
+                                  }
+
+                                  onLoad();
+
+                                  $scope.$watch('index', function(n){
+                                    $scope.file = $scope.slideContent[n];
+                                  });
+
+                                  $scope.nextSlide = function(){
+                                    if(($scope.index + 1)<($scope.slideContent.length)){
+                                        $scope.index = $scope.index + 1;
+                                    }
+                                  }
+
+                                  $scope.previousSlide = function(){
+                                    if(($scope.index -1) > -1){
+                                        $scope.index = $scope.index - 1;
+                                    }
+                                  }
+                              }]
+                              ,size: 'lg'
+                              ,windowTemplateUrl : '/static/templates/shared/_mdl_window_template.html'
+                              ,resolve : {
+                                    resolvedObj : function(){
+                                        var obj ={};
+                                        obj.slideContent = [];
+                                        for(i=0;i<event.schedule.schedule_playlists.length;i++){
+                                            angular.extend(obj.slideContent, event.schedule.schedule_playlists[i].playlist_items);
+                                        }
+                                        if($scope.index){
+                                            obj.index = angular.copy(parseInt($scope.index));
+                                        }else{
+                                            obj.index = 0;
+                                        }
+
+                                        return obj;
+                                    }
+                              }
+                            });
                         };
 
                         clndrCtrl.eventEdited = function(event) {
-                          alert('Edited');
+                            clndrCtrl.editSchedule(event.schedule);
                         };
                     }]
         ,controllerAs : 'clndrCtrl'
