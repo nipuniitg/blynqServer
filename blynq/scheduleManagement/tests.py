@@ -8,7 +8,7 @@ from django.utils import timezone
 from customLibrary.tests_lib import create_schedule, create_schedule_playlist, create_schedule_screen, create_group, \
     create_userdetails, generate_random_string, verify_posted_dict, generate_screen_dict, generate_playlist_dict, \
     generate_schedule_dict, verify_get_result, generate_schedule_timeline
-from customLibrary.views_lib import get_utc_datetime, get_ist_datetime, time_fmt, date_fmt
+from customLibrary.views_lib import generate_utc_datetime, get_ist_datetime, time_fmt, date_fmt
 from scheduleManagement.models import Schedule, SchedulePlaylists, ScheduleScreens
 from scheduleManagement.views import device_key_active, get_schedules, get_screen_schedules, get_playlist_schedules, \
     get_group_schedules, upsert_schedule, delete_schedule

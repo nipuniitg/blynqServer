@@ -1,4 +1,5 @@
 import datetime
+import calendar
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -13,7 +14,7 @@ from authentication.models import LocalServer, Organization
 from contentManagement.models import Content
 from contentManagement.serializers import ContentSerializer
 from customLibrary.views_lib import get_userdetails, ajax_response, obj_to_json_response, string_to_dict, list_to_comma_string, \
-    default_string_to_datetime, get_utc_datetime, debugFileLog
+    default_string_to_datetime, generate_utc_datetime, debugFileLog, get_ist_datetime, get_utc_datetime
 from playlistManagement.models import Playlist, PlaylistItems
 from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import Schedule, ScheduleScreens, SchedulePlaylists
@@ -187,12 +188,12 @@ def event_for_allday(schedule, timeline):
     debugFileLog.info("inside event_for_allday")
     start_date = timeline.get('start_date')
     start_time = "00:00"  # datetime.time(0)
-    start = get_utc_datetime(ist_date=start_date, ist_time=start_time)
+    start = generate_utc_datetime(ist_date=start_date, ist_time=start_time)
     end_date = start_date
     end_time = "23:59"  # datetime.time(23, 59, 59, 999)
-    end = get_utc_datetime(ist_date=end_date, ist_time=end_time)
+    end = generate_utc_datetime(ist_date=end_date, ist_time=end_time)
     end_recurring_period_date = timeline.get('end_recurring_period')
-    end_recurring_period = get_utc_datetime(ist_date=end_recurring_period_date, ist_time=end_time)
+    end_recurring_period = generate_utc_datetime(ist_date=end_recurring_period_date, ist_time=end_time)
     rule = generate_rule(timeline=timeline, name=schedule.schedule_title, description=schedule.schedule_title)
     creator = schedule.created_by.user if schedule.created_by else None
     event_dict = {'start': start, 'end': end, 'title': schedule.schedule_title, 'creator': creator,
@@ -231,13 +232,13 @@ def event_dict_from_timeline(timeline, schedule):
     else:
         start_date = timeline.get('start_date')
         start_time = timeline.get('start_time')
-        start = get_utc_datetime(ist_date=start_date, ist_time=start_time)
+        start = generate_utc_datetime(ist_date=start_date, ist_time=start_time)
         end_date = start_date
         end_time = timeline.get('end_time')
-        end = get_utc_datetime(ist_date=end_date, ist_time=end_time)
+        end = generate_utc_datetime(ist_date=end_date, ist_time=end_time)
         end_recurring_period_time = end_time
         end_recurring_period = timeline.get('end_recurring_period')
-        end_recurring_period = get_utc_datetime(ist_date=end_recurring_period, ist_time=end_recurring_period_time)
+        end_recurring_period = generate_utc_datetime(ist_date=end_recurring_period, ist_time=end_recurring_period_time)
         rule = generate_rule(timeline, name=schedule.schedule_title, description=schedule.schedule_title)
         creator = schedule.created_by.user if schedule.created_by else None
         event_dict = {'start': start, 'end': end, 'title': schedule.schedule_title, 'creator': creator,
@@ -409,7 +410,6 @@ def get_screen_data(request, nof_days=7):
                     occurrences = event.get_occurrences(start_time, end_time)
                     if not occurrences:
                         continue
-                    # TODO: optimize this
                     playlists = schedule.playlists.all()
                     playlists_json = PlaylistSerializer().serialize(playlists, fields=('playlist_id', 'playlist_title',
                                                                                        'playlist_items'))
@@ -477,6 +477,12 @@ def get_content_urls_local(request, nof_days=1):
         return ajax_response(success=success, errors=errors)
 
 
+def default_schedule_serializer(querySet):
+    return ScheduleSerializer().serialize(querySet, fields=('schedule_id', 'schedule_title',
+                                                            'schedule_playlists', 'timeline',
+                                                            'schedule_screens', 'schedule_groups'))
+
+
 def get_screen_schedules(request, screen_id):
     debugFileLog.info("inside get_screen_schedules")
     screen_id = int(screen_id)
@@ -484,9 +490,7 @@ def get_screen_schedules(request, screen_id):
     screen_schedule_id_list = ScheduleScreens.objects.filter(screen_id=screen_id).values_list(
         'schedule_id', flat=True).distinct()
     screen_schedules = Schedule.get_user_relevant_objects(user_details).filter(schedule_id__in=screen_schedule_id_list)
-    json_data = ScheduleSerializer().serialize(screen_schedules, fields=('schedule_id', 'schedule_title',
-                                                                         'schedule_playlists', 'timeline',
-                                                                         'schedule_screens', 'schedule_groups'))
+    json_data = default_schedule_serializer(querySet=screen_schedules)
     return obj_to_json_response(json_data)
 
 
@@ -497,9 +501,7 @@ def get_group_schedules(request, group_id):
     group_schedule_id_list = ScheduleScreens.objects.filter(group_id=group_id).values_list(
         'schedule_id', flat=True).distinct()
     screen_schedules = Schedule.get_user_relevant_objects(user_details).filter(schedule_id__in=group_schedule_id_list)
-    json_data = ScheduleSerializer().serialize(screen_schedules, fields=('schedule_id', 'schedule_title',
-                                                                         'schedule_playlists', 'timeline',
-                                                                         'schedule_screens', 'schedule_groups'))
+    json_data = default_schedule_serializer(querySet=screen_schedules)
     return obj_to_json_response(json_data)
 
 
@@ -511,9 +513,7 @@ def get_playlist_schedules(request, playlist_id):
         'schedule_id', flat=True).distinct()
     playlist_schedules = Schedule.get_user_relevant_objects(user_details=user_details).filter(
         schedule_id__in=playlist_schedule_id_list)
-    json_data = ScheduleSerializer().serialize(playlist_schedules, fields=('schedule_id', 'schedule_title',
-                                                                           'schedule_playlists', 'timeline',
-                                                                           'schedule_screens', 'schedule_groups'))
+    json_data = default_schedule_serializer(querySet=playlist_schedules)
     return obj_to_json_response(json_data)
 
 
@@ -603,25 +603,8 @@ def get_schedules(request):
     debugFileLog.info("inside get_schedules")
     user_details = get_userdetails(request)
     user_schedules = Schedule.get_user_relevant_objects(user_details)
-
-    json_data = ScheduleSerializer().serialize(
-        user_schedules, fields=('schedule_id', 'schedule_title', 'schedule_playlists', 'schedule_screens',
-                                'schedule_groups', 'timeline'))
+    json_data = default_schedule_serializer(querySet=user_schedules)
     return obj_to_json_response(json_data)
-
-
-# def get_screen_calendar(request, screen_id):
-#     user_details = get_userdetails(request)
-#     context_dic = {}
-#     try:
-#         screen = Screen.get_user_relevant_objects(user_details=user_details).get(screen_id=screen_id)
-#         screen_calendar = screen.screen_calendar
-#         calendar_slug = screen_calendar.slug
-#         context_dic['calendar'] = screen_calendar
-#     except Exception as e:
-#         debugFileLog.exception(e)
-#         return render(request, 'schedule/calendar.html')
-#     return calendar(request, calendar_slug=calendar_slug)
 
 
 @transaction.atomic
@@ -647,12 +630,67 @@ def delete_schedule(request):
     return ajax_response(success=success, errors=errors)
 
 
+def calendar_schedules(start_datetime, end_datetime, screen_id=None, group_id=None):
+    if screen_id and group_id:
+        schedule_screens = ScheduleScreens.objects.filter(screen_id=screen_id, group_id=group_id)
+    elif screen_id:
+        schedule_screens = ScheduleScreens.objects.filter(screen_id=screen_id)
+    elif group_id:
+        schedule_screens = ScheduleScreens.objects.filter(group_id=group_id)
+    else:
+        return []
+    screen_data_json = []
+    for each_schedule_screen in schedule_screens:
+        if each_schedule_screen.event:
+            occurrences = each_schedule_screen.event.get_occurrences(start_datetime, end_datetime)
+            if not occurrences:
+                continue
+            schedule = each_schedule_screen.schedule
+            schedule_json = default_schedule_serializer([schedule])
+            for each_occur in occurrences:
+                campaign_dict = {'title': schedule.schedule_title,
+                                 'startsAt': get_ist_datetime(each_occur.start),
+                                 'endsAt': get_ist_datetime(each_occur.end),
+                                 'schedule': schedule_json[0],
+                                 # some default values
+                                 'type': 'info',
+                                 'editable': True,
+                                 'deletable': True,
+                                 }
+                screen_data_json.append(campaign_dict)
+    return screen_data_json
+
+
+def get_calendar_events(params):
+    screen_id = params.get('screen_id')
+    group_id = params.get('group_id')
+    if screen_id:
+        screen_id = int(screen_id)
+    if group_id:
+        group_id = int(group_id)
+    month = params.get('month')
+    if month:
+        month = int(month)
+    else:
+        month = timezone.now().month
+    year = timezone.now().year
+    (_,days_in_month) = calendar.monthrange(year, month)
+    screen_data = []
+    for day in range(days_in_month):
+        start_datetime = datetime.datetime(year=year, month=month, day=day+1)
+        end_datetime = start_datetime.replace(hour=23, minute=59, second=59)
+        day_schedules = calendar_schedules(start_datetime=get_utc_datetime(start_datetime),
+                                           end_datetime=get_utc_datetime(end_datetime), screen_id=screen_id,
+                                           group_id=group_id)
+        screen_data.extend(day_schedules)
+    return obj_to_json_response(screen_data)
+
+
 def get_screen_events(request):
-    import pdb;pdb.set_trace()
-    print request.body
-    return ajax_response(success=True)
+    params = request.GET
+    return get_calendar_events(params)
+
 
 def get_group_events(request):
-    import pdb;pdb.set_trace()
-    print request.body
-    return ajax_response(success=True)
+    params = request.GET
+    return get_calendar_events(params)
