@@ -80,7 +80,7 @@ def upload_content(request):
             content = Content(title=title, document=document, uploaded_by=user_details,
                               last_modified_by=user_details, organization=user_details.organization,
                               parent_folder=parent_folder, is_folder=False)
-            content.save()
+            content.save(uploaded=True)
         success = True
     except AssertionError:
         print "Parent folder id is not a folder"

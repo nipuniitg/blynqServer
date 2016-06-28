@@ -94,14 +94,15 @@ class Content(models.Model):
         if self.document:
             url = self.document.url
             full_file_type = 'file/'
-            if self.organization.used_file_size + self.document.size <= self.organization.total_file_size_limit:
+            if kwargs.get('uploaded') and self.organization.used_file_size + self.document.size <= \
+                    self.organization.total_file_size_limit:
                 self.organization.used_file_size = self.organization.used_file_size + self.document.size
                 try:
+                    del kwargs['uploaded']
                     self.organization.save()
                 except Exception as e:
                     debugFileLog.exception("Recieved exception while increasing the organization file usage size")
                     debugFileLog.exception(e)
-                super(Content, self).save(*args, **kwargs)
             else:
                 debugFileLog.warning("The organization " + self.organization.organization_name + " total file size limit exceeded")
                 debugFileLog.error("Can't upload file")
@@ -255,7 +256,7 @@ class Content(models.Model):
 
 
 def save_relevant_playlists(content_id):
-    print 'save_relevant_playlists'
+    debugFileLog.info('save_relevant_playlists')
     try:
         from playlistManagement.models import PlaylistItems
         playlist_items = PlaylistItems.objects.filter(content_id=content_id)
