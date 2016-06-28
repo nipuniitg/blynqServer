@@ -346,6 +346,7 @@ function(groupsFactory, dataAccessFactory, $scope,$uibModal, cAD){
     $scope.clickedOnGroup= function(group, index){
         setActiveGroupIndex(index);
         $scope.screensInSelectedGroup = group.screens;
+        $scope.refreshGroupSchedulesAndEvents();
     }
 
     $scope.refreshGroupSchedulesAndEvents = function(){
@@ -446,7 +447,7 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
     //schedules
     $scope.clickedOnScreen = function(index){
         setActiveScreenIndex(index);
-        $scope.refreshScreenSchedules();
+        $scope.refreshScreenSchedulesandEvents();
     };
 
     $scope.refreshScreenSchedulesandEvents = function(){
