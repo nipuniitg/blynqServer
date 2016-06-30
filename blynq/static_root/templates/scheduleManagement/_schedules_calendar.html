@@ -1,0 +1,58 @@
+<div style="overflow-y: scroll; height:92%" >
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="text-center">{[ clndrCtrl.calendarTitle ]}</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="btn-group">
+                <button
+                        class="btn btn-primary"
+                        mwl-date-modifier
+                        date="clndrCtrl.viewDate"
+                        decrement="clndrCtrl.calendarView">
+                    Previous
+                </button>
+                <button
+                        class="btn btn-default"
+                        mwl-date-modifier
+                        date="clndrCtrl.viewDate"
+                        set-to-today>
+                    Today
+                </button>
+                <button
+                        class="btn btn-primary"
+                        mwl-date-modifier
+                        date="clndrCtrl.viewDate"
+                        increment="clndrCtrl.calendarView">
+                    Next
+                </button>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="btn-group pull-right">
+                <!--<label class="btn btn-primary" ng-model="vm.calendarView" uib-btn-radio="'year'">Year</label>-->
+                <label class="btn btn-primary" ng-model="clndrCtrl.calendarView"
+                       uib-btn-radio="clndrCtrl.calendarViewTypes.month">Month</label>
+                <!--<label class="btn btn-primary" ng-model="vm.calendarView" uib-btn-radio="'week'">Week</label>-->
+                <label class="btn btn-primary" ng-model="clndrCtrl.calendarView"
+                       uib-btn-radio="clndrCtrl.calendarViewTypes.day">Day</label>
+            </div>
+        </div>
+    </div>
+
+    <mwl-calendar
+            view="clndrCtrl.calendarView"
+            view-date="clndrCtrl.viewDate"
+            events="clndrCtrl.events"
+            view-title="clndrCtrl.calendarTitle"
+            edit-event-html="'<i class=\'glyphicon glyphicon-pencil\'></i>'"
+            delete-event-html="'<i class=\'glyphicon glyphicon-remove\'></i>'"
+            cell-is-open="clndrCtrl.isCellOpen"
+            on-event-click="clndrCtrl.eventClicked(calendarEvent)"
+            on-edit-event-click="clndrCtrl.eventEdited(calendarEvent)"
+            on-delete-event-click="clndrCtrl.eventDeleted(calendarEvent)">
+    </mwl-calendar>
+</div>

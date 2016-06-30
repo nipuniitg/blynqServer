@@ -136,6 +136,44 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
         }, function myError(response) {
             console.log(response.statusText);
         });
+    };
+
+    var getScreenEvents = function(screen_id, month, callback){
+        var postData = {
+            screen_id : screen_id
+            ,month : month
+        }
+        $http({
+            method : "GET"
+            ,url : "/api/schedule/getScreenEvents"
+            ,params : postData
+        }).then(function mySucces(response) {
+            if(callback)
+            {
+                callback(response.data);
+            }
+        }, function myError(response) {
+            console.log(response.statusText);
+        });
+    }
+
+    var getGroupEvents = function(group_id, month, callback){
+        var postData = {
+            group_id : group_id
+            ,month : month
+        };
+        $http({
+            method : "GET"
+            ,url : "/api/schedule/getGroupEvents"
+            ,params : postData
+        }).then(function mySucces(response) {
+            if(callback)
+            {
+                callback(response.data);
+            }
+        }, function myError(response) {
+            console.log(response.statusText);
+        });
     }
 
     return{
@@ -147,6 +185,8 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
         ,getGroupSchedules : getGroupSchedules
         ,deleteGroup : deleteGroup
         ,getCityOptions : getCityOptions
+        ,getScreenEvents : getScreenEvents
+        ,getGroupEvents : getGroupEvents
     }
 
 }]);
@@ -270,12 +310,13 @@ sagApp.factory('groupsFactory',['$http','dataAccessFactory', function($http, dat
 }]);
 
 //group Index Cntrl
-sagApp.controller('groupCtrl',['groupsFactory', 'dataAccessFactory', '$scope','$uibModal',
-function(groupsFactory, dataAccessFactory, $scope,$uibModal){
+sagApp.controller('groupCtrl',['groupsFactory', 'dataAccessFactory', '$scope','$uibModal','constantsAndDefaults',
+function(groupsFactory, dataAccessFactory, $scope,$uibModal, cAD){
 
    var onLoad = function(){
           refreshGroups();
           setActiveGroupIndex(0);
+          $scope.schedulesView = cAD.defaultSchedulesLayoutType();
    }
 
    var setActiveGroupIndex = function(index){
@@ -285,7 +326,7 @@ function(groupsFactory, dataAccessFactory, $scope,$uibModal){
    var refreshGroups = function(){
         groupsFactory.getAllGroups(function(groups){
                 $scope.groups = groups;
-                $scope.refreshGroupSchedules();
+                $scope.refreshGroupSchedulesAndEvents();
           });
    };
 
@@ -305,10 +346,17 @@ function(groupsFactory, dataAccessFactory, $scope,$uibModal){
     $scope.clickedOnGroup= function(group, index){
         setActiveGroupIndex(index);
         $scope.screensInSelectedGroup = group.screens;
+        $scope.refreshGroupSchedulesAndEvents();
+    }
+
+    $scope.refreshGroupSchedulesAndEvents = function(){
+        var currentMonth = moment().month() + 1;
+        $scope.refreshGroupSchedules();
+        $scope.refreshGroupEvents(currentMonth);
     }
 
     $scope.refreshGroupSchedules = function(){
-        if($scope.activeGroupIndex){
+        if($scope.groups){
             dataAccessFactory.getGroupSchedules($scope.groups[$scope.activeGroupIndex].group_id, function(returnData){
                 $scope.groupSchedules = returnData;
             });
@@ -316,6 +364,12 @@ function(groupsFactory, dataAccessFactory, $scope,$uibModal){
             $scope.groupSchedules =0;
         }
     };
+
+    $scope.refreshGroupEvents = function(month){
+        dataAccessFactory.getGroupEvents($scope.groups[$scope.activeGroupIndex].group_id,month, function(returnData){
+                $scope.groupEvents = returnData;
+            });
+    }
 
 
 
@@ -363,13 +417,15 @@ function(groupsFactory, dataAccessFactory, $scope,$uibModal){
 }]);
 
 //screen Index Cntrl
-sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','$uibModal',
-  function(screensFactory,dataAccessFactory, $scope, $uibModal){
+sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','$uibModal','constantsAndDefaults',
+  function(screensFactory,dataAccessFactory, $scope, $uibModal, cAD){
 
     //private functions
     var onLoad = function(){
         $scope.refreshScreens();
         $scope.activeScreenIndex = 0;
+        //Intialising default view of schedules as list view
+        $scope.schedulesView = cAD.defaultSchedulesLayoutType();
     };
 
     var setActiveScreenIndex = function(index){
@@ -382,7 +438,7 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
         screensFactory.getAllScreens(function(allScreens)
         {
             $scope.screens = allScreens;
-            $scope.refreshScreenSchedules();
+            $scope.refreshScreenSchedulesandEvents();
         });
      }
 
@@ -391,14 +447,26 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
     //schedules
     $scope.clickedOnScreen = function(index){
         setActiveScreenIndex(index);
-        $scope.refreshScreenSchedules();
+        $scope.refreshScreenSchedulesandEvents();
     };
+
+    $scope.refreshScreenSchedulesandEvents = function(){
+        var currentMonth = moment().month() + 1;
+        $scope.refreshScreenSchedules();
+        $scope.refreshScreenEvents(currentMonth);
+    }
 
     $scope.refreshScreenSchedules = function(){
         dataAccessFactory.getScreenSchedules($scope.screens[$scope.activeScreenIndex].screen_id, function(returnData){
             $scope.screenSchedules = returnData;
         });
     };
+
+    $scope.refreshScreenEvents = function(month){
+        dataAccessFactory.getScreenEvents($scope.screens[$scope.activeScreenIndex].screen_id,month,function(returnData){
+            $scope.screenEvents = returnData;
+        });
+    }
 
 
     //add and Edit Screen Details
@@ -621,3 +689,7 @@ sagApp.controller('mdlScreenSelectionCtrl',['$scope','$uibModalInstance', 'selec
 
 
 }]);
+
+
+
+

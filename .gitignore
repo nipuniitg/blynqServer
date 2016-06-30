@@ -69,3 +69,4 @@ blynq/media/deletedcontent
 blynq/htmlcov
 blynq/media/test_deletedcontent
 blynq/media/test_usercontent
+blynq/static_root/bower_components
