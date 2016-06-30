@@ -94,11 +94,10 @@ class Content(models.Model):
         if self.document:
             url = self.document.url
             full_file_type = 'file/'
-            if kwargs.get('uploaded') and self.organization.used_file_size + self.document.size <= \
+            if self.organization.used_file_size + self.document.size <= \
                     self.organization.total_file_size_limit:
                 self.organization.used_file_size = self.organization.used_file_size + self.document.size
                 try:
-                    del kwargs['uploaded']
                     self.organization.save()
                 except Exception as e:
                     debugFileLog.exception("Recieved exception while increasing the organization file usage size")

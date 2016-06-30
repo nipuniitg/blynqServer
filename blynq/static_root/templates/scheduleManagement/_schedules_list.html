@@ -1,12 +1,4 @@
-<section class="panel panel-default">
-    <div class="panel-heading">
-        {[ title ]}
-        <a class="btn  btn-primary pull-right" ng-click="addSchedule()">
-            <i class="fa fa-plus"></i>
-            Add Schedule
-        </a>
-    </div>
-    <!-- relevant schedules list-->
+<div style="overflow-y: scroll; height:92%" >
     <div ng-if="schedules.length>0" class="table-responsive fill">
         <table class="table  table-hover table-advanced table-striped ">
             <thead>
@@ -74,4 +66,4 @@
             </div>
         </div>
     </div>
-</section>
+    </div>
