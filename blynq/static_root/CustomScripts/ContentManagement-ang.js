@@ -708,7 +708,7 @@ plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentS
         if($scope.files.length>0)
         {
             for(var i in $scope.files){
-                if(validFileTypes.indexOf('file/' + $scope.files[i].type)<0)
+                if(validFileTypes.indexOf($scope.files[i].type)<0)
                 {
                     $scope.$apply(function(){$scope.invalidFiles.push($scope.files[i])});
                     invalid = true;

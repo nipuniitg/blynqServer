@@ -305,24 +305,3 @@ cursor:pointer
     max-height  : 100%;
     max-width   : 100%
 }
-
-.slider-link{
-    position : absolute;
-    height: 100%;
-    width : 40px;
-    top: 0px;
-    background:white;
-    opacity: .3;
-    cursor : pointer;
-}
-
-.slider-link-right{
-    right : 0px;
-}
-
-.slider-icon{
-    font : 25px;
-    position:absolute;
-    top:50%;
-    left:50%;
-}
