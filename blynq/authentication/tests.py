@@ -60,6 +60,8 @@ class RequestedQuoteTest(TestCase):
 
 # Test views.py
 class AuthenticationViewsTest(TestCase):
+    fixtures = ['../fixtures/ContentType.json',]
+
     def setUp(self):
         self.factory = RequestFactory()
         user = create_userdetails(default_userdetails=True).user
@@ -85,6 +87,8 @@ class AuthenticationViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json_data['screen_count'], 1)
         self.assertEqual(json_data['schedule_count'], 1)
+        self.assertEqual(json_data['used_storage'], content.document.size)
+        content.save()
         self.assertEqual(json_data['used_storage'], content.document.size)
         content.delete()
         print 'test_views_homepage completed successfully'

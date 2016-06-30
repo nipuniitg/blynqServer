@@ -13,6 +13,8 @@ from customLibrary.tests_lib import create_content, create_userdetails, create_o
 
 
 class ContentTest(TestCase):
+    fixtures = ['../fixtures/ContentType.json',]
+
     def test_content_methods(self):
         content = create_content(default_content=True, is_folder=False)
         self.assertTrue(isinstance(content, Content))
@@ -50,6 +52,8 @@ class ContentTest(TestCase):
 
 
 class ContentViewsTest(TestCase):
+    fixtures = ['../fixtures/ContentType.json',]
+
     def setUp(self):
         self.factory = RequestFactory()
         user = create_userdetails(default_userdetails=True).user

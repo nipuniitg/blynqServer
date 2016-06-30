@@ -12,6 +12,8 @@ from playlistManagement.views import get_playlists, get_files_recursively_json, 
 
 
 class PlaylistTest(TestCase):
+    fixtures = ['../fixtures/ContentType.json',]
+
     def test_playlist(self):
         playlist = create_playlist(default_playlist=True)
         self.assertTrue(isinstance(playlist, Playlist))
@@ -31,6 +33,8 @@ class PlaylistTest(TestCase):
 
 
 class PlaylistViewsTest(TestCase):
+    fixtures = ['../fixtures/ContentType.json',]
+
     def setUp(self):
         self.factory = RequestFactory()
         user = create_userdetails(default_userdetails=True).user
