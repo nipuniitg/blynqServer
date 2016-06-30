@@ -127,7 +127,7 @@ def create_content(default_content=True, is_folder=False, userdetails=None, pare
     if is_folder:
         document = None
     else:
-        document = SimpleUploadedFile('test_file.txt', 'these are the file contents!')
+        document = SimpleUploadedFile('test_file.jpg', 'these are the file contents!')
     if not userdetails:
         userdetails = create_userdetails()
     try:

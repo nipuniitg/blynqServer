@@ -8,7 +8,8 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from authentication.models import UserDetails, Organization, Role
 from blynq import settings
-from customLibrary.views_lib import string_to_dict, ajax_response, get_userdetails, send_mail_blynq, obj_to_json_response
+from customLibrary.views_lib import string_to_dict, ajax_response, get_userdetails, send_mail_blynq, obj_to_json_response, \
+    debugFileLog
 from scheduleManagement.models import Schedule
 from screenManagement.models import Screen
 
@@ -109,7 +110,7 @@ def request_quote(request):
 
 @login_required
 def organization_homepage_summary(request):
-    print "inside organization_homepage_summary"
+    debugFileLog.info("inside organization_homepage_summary")
     user_details = get_userdetails(request=request)
     context_dic = {}
     try:

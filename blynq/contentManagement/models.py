@@ -1,7 +1,7 @@
 import shutil
 
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, NotSupportedError
 from django.conf import settings
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
@@ -94,18 +94,6 @@ class Content(models.Model):
         if self.document:
             url = self.document.url
             full_file_type = 'file/'
-            if kwargs.get('uploaded') and self.organization.used_file_size + self.document.size <= \
-                    self.organization.total_file_size_limit:
-                self.organization.used_file_size = self.organization.used_file_size + self.document.size
-                try:
-                    del kwargs['uploaded']
-                    self.organization.save()
-                except Exception as e:
-                    debugFileLog.exception("Recieved exception while increasing the organization file usage size")
-                    debugFileLog.exception(e)
-            else:
-                debugFileLog.warning("The organization " + self.organization.organization_name + " total file size limit exceeded")
-                debugFileLog.error("Can't upload file")
         elif self.url:
             url = self.url
             full_file_type = 'url/'
@@ -131,7 +119,24 @@ class Content(models.Model):
             is_youtube = check_youtube_url(url)
             file_type = 'url/web/youtube' if is_youtube else 'url/web/other'
             content_type, created = ContentType.objects.get_or_create(file_type=file_type)
+        except ContentType.MultipleObjectsReturned:
+            content_type = ContentType.objects.filter(file_type=full_file_type)[0]
+        except Exception as e:
+            debugFileLog.exception(e)
+            raise NotSupportedError('%s is not supported at the moment' % full_file_type)
         self.content_type = content_type
+        # Now increment the used_file_size of the organization if the file is being saved for the first time
+        if self.document and self.pk is None:
+            if self.organization.used_file_size + self.document.size <= self.organization.total_file_size_limit:
+                self.organization.used_file_size = self.organization.used_file_size + self.document.size
+                try:
+                    self.organization.save()
+                except Exception as e:
+                    debugFileLog.exception("Recieved exception while increasing the organization file usage size")
+                    debugFileLog.exception(e)
+            else:
+                debugFileLog.warning("The organization " + self.organization.organization_name + " total file size limit exceeded")
+                debugFileLog.error("Can't upload file")
         super(Content, self).save(*args, **kwargs)
 
     def __unicode__(self):
@@ -160,8 +165,8 @@ class Content(models.Model):
             instance = instance.parent_folder
         return path
 
-    class Meta:
-        ordering = ['-last_modified_time']
+    # class Meta:
+    #     ordering = ['-last_modified_time']
 
     @staticmethod
     def get_user_relevant_objects(user_details):
