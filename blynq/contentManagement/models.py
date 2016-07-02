@@ -55,6 +55,7 @@ class ContentType(models.Model):
 
 
 def upload_to_dir(instance, filename):
+    filename = os.path.basename(filename)
     return '%s/user%d/%s' % (USERCONTENT_DIR, instance.uploaded_by.id, filename)
 
 
@@ -299,7 +300,8 @@ def pre_delete_content(sender, instance, **kwargs):
                 try:
                     if not os.path.exists(file_dst):
                         os.makedirs(file_dst)
-                    shutil.move(file_src, file_dst)
+                    full_file_dst = file_dst + os.path.basename(src)
+                    shutil.move(file_src, full_file_dst)
                 except Exception as e:
                     debugFileLog.error("Error while moving deleted content to media/deletedcontent/organization_id")
                     debugFileLog.exception(e)
