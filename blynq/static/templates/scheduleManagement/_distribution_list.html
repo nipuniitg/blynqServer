@@ -1,5 +1,6 @@
-<div class="col-sm-12">
-    <div id="inpScreensAndGroups" class="tagsinput " style="height: 100%;">
+<div class="row">
+    <div class="col-sm-12">
+        <div id="inpScreensAndGroups" class="tagsinput " style="height: 100%;">
         <span class="tag" ng-repeat="screen in selectedScreens">
             <span> {[screen.screen_name]} &nbsp;&nbsp;</span>
             <a class="tagsinput-remove-link"
@@ -10,14 +11,16 @@
             <a class="tagsinput-remove-link"
                ng-click="removeGroup($index)"></a>
         </span>
-        <div class="tagsinput-add-container">
-            <div class="tagsinput-add"
-                 ng-click="openDistributionSelectorModal()"></div>
-            <input value="" data-default=""
-                   style="color: rgb(102, 102, 102); width: 7px;">
+            <div class="tagsinput-add-container">
+                <div class="tagsinput-add"
+                     ng-click="openDistributionSelectorModal()"></div>
+                <input value="" data-default=""
+                       style="color: rgb(102, 102, 102); width: 7px;">
+            </div>
         </div>
     </div>
-</div>
-<div class="help-block with-errors col-sm-offset-3 col-sm-9" ng-show="selectedScreens.length<1 && selectedGroups.length <1">
-    select atleast one screen
+    <div class="help-block with-errors col-sm-offset-3 col-sm-9"
+         ng-show="selectedScreens.length<1 && selectedGroups.length <1">
+        select atleast one screen
+    </div>
 </div>
