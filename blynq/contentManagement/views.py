@@ -70,6 +70,8 @@ def convert_video(content):
     file_path = os.path.join(MEDIA_ROOT, content.document.name)
     temp_file_path = os.path.join(MEDIA_ROOT, 'temp/converted_'+os.path.basename(file_path))
     try:
+        if os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
         call(["ffmpeg", "-i", file_path, "-vcodec", "mpeg4", temp_file_path])
         video_file = open(temp_file_path)
         django_file = File(video_file)
