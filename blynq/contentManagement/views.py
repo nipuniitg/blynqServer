@@ -1,8 +1,14 @@
 import os
+from copy import deepcopy
+
 from django.contrib.auth.decorators import login_required
+from django.core.files import File
 from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import render
+from subprocess import call
+
+from blynq.settings import MEDIA_ROOT
 from contentManagement.forms import UploadContentForm
 from contentManagement.serializers import ContentSerializer
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, debugFileLog
@@ -55,6 +61,34 @@ def upsert_url(request):
     return ajax_response(success=success, errors=errors)
 
 
+def convert_video(content):
+    if not content or not content.content_type:
+        return True
+    # Only do conversion for video types, may be add a helper function instead of this check
+    if 'video' not in content.content_type.file_type or not content.document:
+        return True
+    file_path = os.path.join(MEDIA_ROOT, content.document.name)
+    temp_file_path = os.path.join(MEDIA_ROOT, 'temp/converted_'+os.path.basename(file_path))
+    try:
+        call(["ffmpeg", "-i", file_path, "-vcodec", "mpeg4", temp_file_path])
+        video_file = open(temp_file_path)
+        django_file = File(video_file)
+        new_content = deepcopy(content)
+        new_content.pk = None
+        new_content.document = django_file
+        new_content.save()
+        content.delete()
+        try:
+            os.remove(temp_file_path)
+        except Exception as e:
+            debugFileLog.exception('Not able to remove the temp file while video convertion %s' % temp_file_path)
+            debugFileLog.exception(e)
+        return True
+    except Exception as e:
+        debugFileLog.exception(e)
+        return False
+
+
 @login_required
 def upload_content(request):
     errors = []
@@ -81,6 +115,10 @@ def upload_content(request):
                               last_modified_by=user_details, organization=user_details.organization,
                               parent_folder=parent_folder, is_folder=False)
             content.save()
+            if not convert_video(content):
+                errors = ['Error while conveting the video file to correct format']
+                debugFileLog.exception(errors[0])
+                return ajax_response(success=success, errors=errors)
         success = True
     except AssertionError:
         print "Parent folder id is not a folder"
