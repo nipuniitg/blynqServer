@@ -7,7 +7,27 @@
             schedule_title : '',
             schedule_screens : [],
             schedule_groups : [],
-            schedule_playlists:[],
+            splitScreen : false,
+            selectedLayout : {label : 'Full Screen', id: -4, panes : 1},
+            panes :[]
+        };
+        //            schedule_playlists:[],
+//            timeline:{
+//                is_always   : !0
+//                ,start_date  : null
+//                ,end_recurring_period :null
+//                ,all_day     :!0
+//                ,start_time  :null
+//                ,end_time    :null
+//                ,frequency  :null
+//                ,interval   :null
+//                ,recurrence_absolute:null
+//                ,byweekno   :null
+//                ,byweekday  :null
+//                ,bymonthday :null
+//            }
+        var paneBlueprint = {
+            playlists : [],
             timeline:{
                 is_always   : !0
                 ,start_date  : null
@@ -56,6 +76,7 @@
 
         return{
             scheduleBlueprint : scheduleBlueprint
+            ,paneBlueprint : paneBlueprint
             ,screenBlueprint : screenBlueprint
             ,groupBlueprint : groupBlueprint
             ,playlistBlueprint : playlistBlueprint

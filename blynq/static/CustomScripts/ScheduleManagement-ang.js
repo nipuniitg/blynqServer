@@ -302,14 +302,45 @@ sdApp.factory('scheduleDetailsFactory', ['$log','$http', function($log, $http){
     }
 }]);
 
-sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleDetailsFactory',
-'$uibModalInstance','schedule', function($scope, $uibModal, $log, sDF, $uibModalInstance, schedule){
+sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleDetailsFactory','constantsAndDefaults',
+'$uibModalInstance','schedule','blueprints',
+ function($scope, $uibModal, $log, sDF,cAD, $uibModalInstance, schedule,blueprints){
 
-    $scope.schedule = schedule;
+    var isNewSchedule;
+    var onLoad = function(){
+        $scope.schedule = schedule;
+        isNewSchedule = schedule.schedule_id == -1 ? !0 : !1;
+        $scope.layouts = angular.copy(cAD.layouts());
+        $scope.title = isNewSchedule? 'Add Schedule' : 'Edit Schedule';
+        $scope.activeTabIndex=0;
+    }
+    onLoad();
 
-    var isNewSchedule = schedule.schedule_id == -1 ? !0 : !1
+    /* when no splitScreen is selected, number of panes is set to one*/
+    $scope.$watch('schedule.splitScreen', function(newValue){
+        if(!newValue) //if no split screen, keep only one pane.
+        {
+            $scope.schedule.panes = [];
+            $scope.schedule.panes.push(angular.copy(blueprints.paneBlueprint));
+        }
+        else //keep the default selected to one from the layouts
+        {
+            $scope.schedule.selectedLayout = $scope.layouts[0];
+        }
+    });
 
-    $scope.title = isNewSchedule? 'Add Schedule' : 'Edit Schedule';
+    /*when layout changes, the number of panes change. so remove existing panes and insert new.*/
+    $scope.$watch('schedule.selectedLayout', function(newLayout){
+        if($scope.schedule.splitScreen)
+        {
+            var totalPanes = newLayout.panes;
+            $scope.schedule.panes = [];
+            for(i =0; i< totalPanes; i++){
+                $scope.schedule.panes.push(angular.copy(blueprints.paneBlueprint));
+            }
+            $scope.activeTabIndex = 0;
+        }
+    });
 
     var validateSchedule = function(){
         if($scope.schedule.schedule_playlists.length<1)
@@ -330,7 +361,7 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
         else{
             toastr.warning('Plese fill all required fields');
         }
-    }
+    };
 
     $scope.saveSchedule= function(){
         $log.log($scope.schedule);
@@ -358,8 +389,6 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
     $scope.cancel = function(){
         $uibModalInstance.dismiss();
     };
-
-    //onLoad();
 }]);
 //**end schedule details material
 
