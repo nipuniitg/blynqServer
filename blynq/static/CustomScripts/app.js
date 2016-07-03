@@ -1,6 +1,6 @@
 (function(){
     'use strict';
-    var mainApp =  angular.module('mainApp', ['ui.router','sdApp', 'plApp','sagApp','hApp','mwl.calendar'])
+    var mainApp =  angular.module('mainApp', ['ui.router','sdApp', 'plApp','sagApp','hApp','sPApp', 'mwl.calendar'])
     .config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('{[');
     $interpolateProvider.endSymbol(']}');
@@ -70,6 +70,12 @@ mainApp.config(function($locationProvider,$stateProvider, $urlRouterProvider) {
         ,controller : 'scheduleIndexCtrl'
         ,controllerAs : 'scheduleIndexCtrl'
     })
+    .state('screenPartition', {
+        url: "/screenPartition"
+        ,templateUrl:'/static/templates/screenPartition/screen_partition_index.html'
+        ,controller : 'screenPartitionIndexCtrl'
+        ,controllerAs : 'sPIC'
+    })
     .state('logout',{
         template : ' '
         ,resolve : {
@@ -78,6 +84,7 @@ mainApp.config(function($locationProvider,$stateProvider, $urlRouterProvider) {
             }]
         }
     })
+
 });
 
 mainApp.factory("PrintToConsole", ["$rootScope", function ($rootScope) {

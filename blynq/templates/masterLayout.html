@@ -71,6 +71,11 @@
     <link href="{% static 'bower_components/angular-bootstrap-calendar/dist/css/angular-bootstrap-calendar.css' %}"
           rel="stylesheet"/>
 
+    <!-- angular resizable -->
+    <script src="{% static 'bower_components/angular-resizable/angular-resizable.min.js' %}"></script>
+    <link href="{% static 'bower_components/angular-resizable/angular-resizable.min.css' %}"
+          rel="stylesheet"/>
+
     <!-- angular Custom Scripts -->
     <script src="{% static 'CustomScripts/app.js' %}"></script>
     <script src="{% static 'CustomScripts/home.js' %}"></script>
@@ -78,6 +83,7 @@
     <script src="{% static 'CustomScripts/PlaylistManagement-ang.js' %}"></script>
     <script src="{% static 'CustomScripts/ContentManagement-ang.js' %}"></script>
     <script src="{% static 'CustomScripts/ScheduleManagement-ang.js' %}"></script>
+    <script src="{% static 'CustomScripts/screenPartition-ang.js' %}"></script>
 
     <script src="{% static 'CustomScripts/shared/confirmDirective.js' %}"></script>
     <script src="{% static 'CustomScripts/shared/blueprints.js' %}"></script>
@@ -195,6 +201,12 @@
                     <a class="" ui-sref="contentLibrary" ui-sref-active="active">
                         <i class="fa fa-folder-open-o"></i>
                         <span>Content Library</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="" ui-sref="screenPartition" ui-sref-active="active">
+                        <i class="fa fa-th-large"></i>
+                        <span>Screen Partition</span>
                     </a>
                 </li>
 

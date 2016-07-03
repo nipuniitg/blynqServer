@@ -326,3 +326,51 @@ cursor:pointer
     top:50%;
     left:50%;
 }
+
+/* Angualr-resizable*/
+
+.template-canvas{
+    width : 480px;
+    height : 270px;
+    border: 2px solid #333;
+}
+
+.template-canvas-content{
+    flex: 1;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-around;
+    align-content: space-around;
+    padding: $spacing/2;
+}
+
+.layout-row{
+    min-height: 50px;
+    flex: 1;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around;
+    align-content: space-around;
+    &.resizable {
+        flex: 0 0 300px;
+    }
+}
+
+.layout-pane{
+
+    box-sizing: border-box;
+    border-radius: 5px;
+    padding: 1.25em 1.75em;
+    background: #ddd;
+    border: $spacing/2 solid #fff;
+    flex: 1;
+    min-width: 30px;
+    &.resizable {
+        flex: 0 0 300px;
+    }
+}
+
+#one { background: #607466; color: darken($color4, 30); }
+#two { background: #7bd389; color: darken($color3, 30); }
+#three { background: #aedcc0; color: darken($color5, 30); }
+#four { background: url(http://publicdomainarchive.com/wp-content/uploads/2014/12/public-domain-images-free-stock-photos-high-quality-resolution-downloads-public-domain-archive-7-1000x665.jpg); }
