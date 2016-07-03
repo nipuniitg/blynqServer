@@ -5,7 +5,7 @@ from django.contrib.auth.models import User, UserManager
 from django.db.models.signals import post_save
 from django.core.exceptions import ValidationError
 # See https://docs.djangoproject.com/en/1.8/ref/contrib/auth/ for User model details
-from blynq.settings import STORAGE_LIMIT_PER_ORGANIZATION, PLAYER_UPDATES_DIR
+from blynq.settings import STORAGE_LIMIT_PER_ORGANIZATION, PLAYER_UPDATES_DIR, MEDIA_ROOT
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -135,6 +135,9 @@ def upload_to_dir(instance, filename):
         version_num = 1
     version = '-v' + str(version_num+1)
     title = title + version + ext
+    updates_dir = os.path.join(MEDIA_ROOT, PLAYER_UPDATES_DIR)
+    if not os.path.exists(updates_dir):
+        os.makedirs(updates_dir)
     return '%s/%s' % (PLAYER_UPDATES_DIR, title)
 
 
