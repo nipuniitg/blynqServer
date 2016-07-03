@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from authentication.models import UserDetails, Organization, Role, PlayerUpdate
 from blynq import settings
+from blynq.settings import MEDIA_HOST
 from customLibrary.views_lib import string_to_dict, ajax_response, get_userdetails, send_mail_blynq, obj_to_json_response, \
     debugFileLog, default_string_to_datetime
 from scheduleManagement.models import Schedule
@@ -160,7 +161,7 @@ def get_player_update(request):
         updates = PlayerUpdate.objects.filter(uploaded_time__gt=last_received_datetime)
         if updates:
             player_json['is_update_available'] = True
-            player_json['url'] = updates[0].executable.url
+            player_json['url'] = MEDIA_HOST + updates[0].executable.url
     except ScreenActivationKey.DoesNotExist:
         debugFileLog.exception('Screen activation key does not exist')
     except Exception as e:
