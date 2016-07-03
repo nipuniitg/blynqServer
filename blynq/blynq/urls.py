@@ -16,6 +16,7 @@ urlpatterns = [
     ,url(r'^/$', auth_views.divert_to_index_page, name='index_page')
     ,url(r'^authentication/', include(authentication_urls))
     ,url(r'^api/requestQuote', auth_views.request_quote, name='request_quote')
+    ,url(r'^api/playerUpdate', auth_views.get_player_update, name='player_update')
     ,url(r'^api/login', auth_views.login, name='login')
     ,url(r'^api/schedule/', include(schedule_urls))
     ,url(r'^api/screen/', include(screen_urls))
