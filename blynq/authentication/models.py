@@ -127,13 +127,14 @@ def upload_to_dir(instance, filename):
     title, ext = os.path.splitext(filename)
     try:
         version_num = PlayerUpdate.objects.latest('player_update_id').player_update_id
+        version_num += 1
     except PlayerUpdate.DoesNotExist:
         version_num = 1
     except Exception as e:
         from customLibrary.views_lib import debugFileLog
         debugFileLog.exception(e)
         version_num = 1
-    version = '-v' + str(version_num+1)
+    version = '-v' + str(version_num)
     title = title + version + ext
     updates_dir = os.path.join(MEDIA_ROOT, PLAYER_UPDATES_DIR)
     if not os.path.exists(updates_dir):
