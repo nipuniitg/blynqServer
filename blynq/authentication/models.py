@@ -1,9 +1,12 @@
+import os
+
 from django.db import models
 from django.contrib.auth.models import User, UserManager
 from django.db.models.signals import post_save
 from django.core.exceptions import ValidationError
 # See https://docs.djangoproject.com/en/1.8/ref/contrib/auth/ for User model details
-from blynq.settings import STORAGE_LIMIT_PER_ORGANIZATION
+from blynq.settings import STORAGE_LIMIT_PER_ORGANIZATION, PLAYER_UPDATES_DIR
+from django.utils.translation import ugettext_lazy as _
 
 
 class City(models.Model):
@@ -117,6 +120,38 @@ class RequestedQuote(models.Model):
 
     def __unicode__(self):
         return 'Quote requested from ' + str(self.email)
+
+
+def upload_to_dir(instance, filename):
+    filename = os.path.basename(filename)
+    title, ext = os.path.splitext(filename)
+    try:
+        version_num = PlayerUpdate.objects.latest('player_update_id').player_update_id
+    except PlayerUpdate.DoesNotExist:
+        version_num = 1
+    except Exception as e:
+        from customLibrary.views_lib import debugFileLog
+        debugFileLog.exception(e)
+        version_num = 1
+    version = '-v' + str(version_num+1)
+    title = title + version + ext
+    return '%s/%s' % (PLAYER_UPDATES_DIR, title)
+
+
+class PlayerUpdate(models.Model):
+    player_update_id = models.AutoField(primary_key=True)
+    executable = models.FileField(upload_to=upload_to_dir)
+    uploaded_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_uploaded_by',
+                                    null=True)
+    comments = models.TextField(blank=True, null=True)
+    uploaded_time = models.DateTimeField(_('uploaded time'), auto_now_add=True)
+    last_modified_time = models.DateTimeField(_('modified at'), auto_now=True)
+
+    class Meta:
+        ordering = ['-uploaded_time']
+
+    def __unicode__(self):
+        return self.executable.url
 
 
 # class models.User

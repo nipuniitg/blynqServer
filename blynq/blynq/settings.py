@@ -200,6 +200,8 @@ else:
     USERCONTENT_DIR = 'usercontent'
     DELETED_CONTENT_DIR = 'deletedcontent'
 
+PLAYER_UPDATES_DIR = 'player_updates'
+
 # in MEDIA_ROOT
 # the uploaded content of each user is present in /media/usercontent/userdetails.user.id/
 # the deleted files are moved to /media/deletedcontent/organization.organization_id
