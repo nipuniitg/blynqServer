@@ -9,6 +9,30 @@ lpApp.config(function($httpProvider){
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
 });
 
+lpApp.factory('lpDataAccessFactory',['$http',function($http){
+
+    var validateLogin = function(credentials, callback){
+        $http({
+             method : "POST"
+             ,url : '/api/authentication/login'
+             ,data : credentials
+         }).then(function mySuccess(response){
+                if(callback)
+                {
+                    callback(response.data);
+                }
+            }, function myError(response) {
+                toastr.error('Oops! Some error. Please refresh the page and login again.')
+                console.log(response.statusText);
+            });
+    }
+
+    return{
+        validateLogin : validateLogin
+    }
+
+}]);
+
 lpApp.controller('formController', ['$http','$scope','$timeout', function($http, $scope, $timeout){
     var defaultFormDetails = {
         name : ''
@@ -28,7 +52,6 @@ lpApp.controller('formController', ['$http','$scope','$timeout', function($http,
         $scope.requestQuoteForm.$setPristine();
         $scope.requestQuoteForm.$setUntouched();
     };
-
 
     $scope.submit = function(){
         $http({
@@ -51,4 +74,56 @@ lpApp.controller('formController', ['$http','$scope','$timeout', function($http,
     };
 
     onLoad();
+}]);
+
+lpApp.directive('loginDtv', ['$uibModal', function($uibModal){
+    return{
+        restrict : 'A',
+        link : function(scope, elem){
+            elem.bind('click', function(){
+                var modalInstance = $uibModal.open({
+                      animation: true
+                      ,templateUrl: '/static/templates/authentication/_login_mdl.html'
+                      ,size: 'md'
+                      ,backdrop: 'static' //disables modal closing by click on the backdrop.
+                      ,controller: function($scope, $uibModalInstance,lpDataAccessFactory){
+                          var loginCtrl = this;
+                          var resetCredentials = {
+                            username : null,
+                            password : null
+                          }
+
+                          var onLoad = function(){
+                            loginCtrl.showCredentailsError = false;
+                          }
+                          loginCtrl.submit = function(){
+                                lpDataAccessFactory.validateLogin(loginCtrl.credentials, function(data){
+                                    if(!data.success)
+                                    {
+                                        loginCtrl.showCredentailsError = true;
+                                        loginCtrl.credentials = angular.copy(resetCredentials);
+                                    }
+                                });
+                                loginCtrl.showCredentailsError = true;
+                                loginCtrl.credentials = angular.copy(resetCredentials);
+                          }
+
+                          loginCtrl.cancel = function(){
+                            $uibModalInstance.dismiss();
+                          }
+
+                          onLoad();
+                      }
+                      ,controllerAs : 'loginCtrl'
+                });
+
+//                modalInstance.result.then(function folderCreated(){
+//                    $scope.refreshContent($scope.currentFolderId);
+//                }, function cancelled(){
+//
+//                });
+            })
+        }
+    }
+
 }]);

@@ -1,0 +1,52 @@
+<!--Login template with loginCtrl as controller -->
+<div class="">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="loginCtrl.cancel()" aria-hidden="true">
+            <i class="fa fa-times"></i></button>
+        <h2 class="modal-title">Login</h2>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+            <uib-alert type="danger" ng-show="loginCtrl.showCredentailsError">
+                Invalid login details. Please try again.
+            </uib-alert>
+
+            <form class="form-horizontal" role="form" name="loginForm">
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="txtUsername">Username</label>
+                    <div class="col-sm-5">
+                        <input type="text" name="loginForm.username" class="form-control" id="txtUsername"
+                               ng-model="loginCtrl.credentials.username" placeholder="Enter username" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="txtpassword">Password:</label>
+                    <div class="col-sm-5">
+                        <input type="password" name="loginForm.password" class="form-control" id="txtpassword"
+                               ng-model="loginCtrl.credentials.password" placeholder="Enter password" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <div class="checkbox">
+                            <label><input type="checkbox"> Remember me</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="submit" class="btn btn-success" id="btnSubmit"
+                                ng-click="loginCtrl.submit()">Submit <i class="fa fa-white fa-check icon-right"></i>
+                        </button>
+                        <button type="button" class="btn btn-default btn-fixed-width" ng-click="loginCtrl.cancel()">
+                            Cancel <i class="fa fa-times icon-right"></i>
+                        </button>
+                        <!--<input type='text' hidden name="next" value="{{ request.REQUEST.next }}">-->
+                    </div>
+                </div>
+            </form>
+        </div>
+        </div>
+    </div>
+</div>
