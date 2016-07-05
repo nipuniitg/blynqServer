@@ -39,6 +39,7 @@ def upsert_url(request):
                 content_id=parent_folder_id)
         posted_content = posted_data.get('content')
         content_id = int(posted_content.get('content_id'))
+        content_id = None if content_id == -1 else content_id
         title = posted_content.get('title')
         url = posted_content.get('url')
         if url:
