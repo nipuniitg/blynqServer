@@ -303,7 +303,7 @@ cursor:pointer
 
 .max-fit{
     max-height  : 100%;
-    max-width   : 100%
+    max-width   : 100%;
 }
 
 .slider-link{
@@ -314,6 +314,7 @@ cursor:pointer
     background:white;
     opacity: .3;
     cursor : pointer;
+    z-index : 1050;
 }
 
 .slider-link-right{
