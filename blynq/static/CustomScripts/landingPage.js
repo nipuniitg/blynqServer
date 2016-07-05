@@ -14,7 +14,7 @@ lpApp.factory('lpDataAccessFactory',['$http',function($http){
     var validateLogin = function(credentials, callback){
         $http({
              method : "POST"
-             ,url : '/api/authentication/login'
+             ,url : '/authentication/login'
              ,data : credentials
          }).then(function mySuccess(response){
                 if(callback)
@@ -76,54 +76,56 @@ lpApp.controller('formController', ['$http','$scope','$timeout', function($http,
     onLoad();
 }]);
 
-lpApp.directive('loginDtv', ['$uibModal', function($uibModal){
-    return{
-        restrict : 'A',
-        link : function(scope, elem){
-            elem.bind('click', function(){
-                var modalInstance = $uibModal.open({
-                      animation: true
-                      ,templateUrl: '/static/templates/authentication/_login_mdl.html'
-                      ,size: 'md'
-                      ,backdrop: 'static' //disables modal closing by click on the backdrop.
-                      ,controller: function($scope, $uibModalInstance,lpDataAccessFactory){
-                          var loginCtrl = this;
-                          var resetCredentials = {
-                            username : null,
-                            password : null
-                          }
 
-                          var onLoad = function(){
-                            loginCtrl.showCredentailsError = false;
-                          }
-                          loginCtrl.submit = function(){
-                                lpDataAccessFactory.validateLogin(loginCtrl.credentials, function(data){
-                                    if(!data.success)
-                                    {
-                                        loginCtrl.showCredentailsError = true;
-                                        loginCtrl.credentials = angular.copy(resetCredentials);
-                                    }
-                                });
-                                loginCtrl.showCredentailsError = true;
-                                loginCtrl.credentials = angular.copy(resetCredentials);
-                          }
-
-                          loginCtrl.cancel = function(){
-                            $uibModalInstance.dismiss();
-                          }
-
-                          onLoad();
-                      }
-                      ,controllerAs : 'loginCtrl'
-                });
-
-//                modalInstance.result.then(function folderCreated(){
-//                    $scope.refreshContent($scope.currentFolderId);
-//                }, function cancelled(){
-//
+/* login Directive*/
+//lpApp.directive('loginDtv', ['$uibModal', function($uibModal){
+//    return{
+//        restrict : 'A',
+//        link : function(scope, elem){
+//            elem.bind('click', function(){
+//                var modalInstance = $uibModal.open({
+//                      animation: true
+//                      ,templateUrl: '/static/templates/authentication/_login_mdl.html'
+//                      ,size: 'md'
+//                      ,backdrop: 'static' //disables modal closing by click on the backdrop.
+//                      ,controller: 'loginCtrl'
+//                      ,controllerAs : 'loginCtrl'
 //                });
-            })
-        }
-    }
+//
+//            })
+//        }
+//    }
+//
+//}]);
 
+lpApp.controller('loginCtrl', ['$scope','lpDataAccessFactory','$window',
+  function($scope,lpDataAccessFactory, $window){
+      var loginCtrl = this;
+      var resetCredentials = {
+        username : null,
+        password : null
+      }
+
+      var onLoad = function(){
+        loginCtrl.showCredentailsError = false;
+      }
+      loginCtrl.submit = function(){
+            lpDataAccessFactory.validateLogin(loginCtrl.credentials, function(data){
+                if(!data.success)
+                {
+                    loginCtrl.showCredentailsError = true;
+                    loginCtrl.credentials = angular.copy(resetCredentials);
+                }
+                else{
+                    $window.location.href='';
+                }
+
+            });
+      }
+
+      loginCtrl.cancel = function(){
+        $uibModalInstance.dismiss();
+      }
+
+      onLoad();
 }]);

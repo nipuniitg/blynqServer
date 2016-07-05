@@ -48,19 +48,23 @@ from screenManagement.models import Screen, ScreenActivationKey
 def login(request):
     context_dic ={}
     if request.user.is_authenticated():
+        print 'authenticated'
         return HttpResponseRedirect(reverse('index_page'))
     else:
-        if request.POST:
-            username = request.POST.get('username')
-            password = request.POST.get('password')
+        if request.method == 'POST':
+            success = False
+            postedData = string_to_dict(request.body)
+            username = postedData.get('username')
+            password = postedData.get('password')
             # print username, password
             user = authenticate(username=username, password=password)
             if user:
                 print "authenticate successfull"
                 auth_login(request, user)
-                return HttpResponseRedirect(reverse('index_page'))
+                success = True
+                return ajax_response(success=success)
             else:
-                return HttpResponse('Invalid Login Details')
+                return ajax_response(success = success)
 
     return render(request, 'authentication/login.html', context_dic)
 
