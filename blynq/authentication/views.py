@@ -1,20 +1,15 @@
 from django.shortcuts import render
-from django.http import HttpResponse
 from django.http import HttpResponseRedirect
-from django.views.decorators.csrf import csrf_exempt
 
 from authentication.forms import RequestQuoteForm
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from authentication.models import UserDetails, Organization, Role, PlayerUpdate
 from blynq import settings
-from blynq.settings import MEDIA_HOST
 from customLibrary.views_lib import string_to_dict, ajax_response, get_userdetails, send_mail_blynq, obj_to_json_response, \
-    debugFileLog, default_string_to_datetime
+    debugFileLog
 from scheduleManagement.models import Schedule
-from screenManagement.models import Screen, ScreenActivationKey
+from screenManagement.models import Screen
 
 
 # def register(request):
@@ -148,26 +143,3 @@ def setSessionVar(request, status):
 '''
 
 # TODO: Using tv remote to move slides.
-
-
-@csrf_exempt
-def get_player_update(request):
-    debugFileLog.info("inside get_player_update")
-    errors = []
-    posted_data = string_to_dict(request.body)
-    # the datetime format of last_received should be
-    last_received = posted_data.get('last_received')
-    unique_device_key = posted_data.get('device_key')
-    last_received_datetime = default_string_to_datetime(last_received)
-    player_json={'is_update_available': False, 'url': None}
-    try:
-        screen = ScreenActivationKey.objects.get(activation_key=unique_device_key, verified=True)
-        updates = PlayerUpdate.objects.filter(uploaded_time__gt=last_received_datetime)
-        if updates:
-            player_json['is_update_available'] = True
-            player_json['url'] = MEDIA_HOST + updates[0].executable.url
-    except ScreenActivationKey.DoesNotExist:
-        debugFileLog.exception('Screen activation key does not exist')
-    except Exception as e:
-        debugFileLog.exception(e)
-    return obj_to_json_response(player_json)

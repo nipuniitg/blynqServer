@@ -1,12 +1,9 @@
 import os
 
+from django.contrib.auth.models import User
 from django.db import models
-from django.contrib.auth.models import User, UserManager
-from django.db.models.signals import post_save
-from django.core.exceptions import ValidationError
 # See https://docs.djangoproject.com/en/1.8/ref/contrib/auth/ for User model details
-from blynq.settings import STORAGE_LIMIT_PER_ORGANIZATION, PLAYER_UPDATES_DIR, MEDIA_ROOT
-from django.utils.translation import ugettext_lazy as _
+from blynq.settings import STORAGE_LIMIT_PER_ORGANIZATION, MEDIA_ROOT, PLAYER_UPDATES_DIR
 
 
 class City(models.Model):
@@ -65,18 +62,6 @@ class Organization(models.Model):
         return self.organization_name
 
 
-class LocalServer(models.Model):
-    local_server_id = models.AutoField(primary_key=True)
-    local_url = models.CharField(max_length=255)
-    # decimal format of the mac-address can be obtained using from uuid import getnode; getnode()
-    unique_key = models.CharField(max_length=20,
-                                  help_text='Enter the decimal format of MAC-Address of the device as unique key')
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
-
-    def __unicode__(self):
-        return self.local_url + ' ' + self.organization.name
-
-
 '''
 A User can have one of the below roles in increasing hierarchy
 viewer - who has only view access to the content and the schedule. Only for monitoring purposes.
@@ -122,40 +107,10 @@ class RequestedQuote(models.Model):
         return 'Quote requested from ' + str(self.email)
 
 
+# Dummy function to bypass the migration failure. ( AttributeError: 'module' object has no attribute 'upload_to_dir' )
+# Remove this function
 def upload_to_dir(instance, filename):
-    filename = os.path.basename(filename)
-    title, ext = os.path.splitext(filename)
-    try:
-        version_num = PlayerUpdate.objects.latest('player_update_id').player_update_id
-        version_num += 1
-    except PlayerUpdate.DoesNotExist:
-        version_num = 1
-    except Exception as e:
-        from customLibrary.views_lib import debugFileLog
-        debugFileLog.exception(e)
-        version_num = 1
-    version = '-v' + str(version_num)
-    title = title + version + ext
-    updates_dir = os.path.join(MEDIA_ROOT, PLAYER_UPDATES_DIR)
-    if not os.path.exists(updates_dir):
-        os.makedirs(updates_dir)
-    return '%s/%s' % (PLAYER_UPDATES_DIR, title)
-
-
-class PlayerUpdate(models.Model):
-    player_update_id = models.AutoField(primary_key=True)
-    executable = models.FileField(upload_to=upload_to_dir)
-    uploaded_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_uploaded_by',
-                                    null=True)
-    comments = models.TextField(blank=True, null=True)
-    uploaded_time = models.DateTimeField(_('uploaded time'), auto_now_add=True)
-    last_modified_time = models.DateTimeField(_('modified at'), auto_now=True)
-
-    class Meta:
-        ordering = ['-uploaded_time']
-
-    def __unicode__(self):
-        return self.executable.url
+    pass
 
 
 # class models.User

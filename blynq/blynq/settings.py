@@ -49,6 +49,7 @@ INSTALLED_APPS = (
     'screenManagement',
     'contentManagement',
     'playlistManagement',
+    'playerManagement',
     'scheduleManagement',
     #'django_js_reverse',
 )

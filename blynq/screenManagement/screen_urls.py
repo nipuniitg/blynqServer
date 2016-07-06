@@ -10,6 +10,5 @@ urlpatterns = [
     url(r'^upsertScreen', views.upsert_screen, name='upsert_screen'),
     url(r'^upsertGroup', views.upsert_group, name='upsert_group'),
     url(r'^deleteGroup', views.delete_group, name='delete_group'),
-    url(r'^activationKeyValid', views.activation_key_valid, name='activation_key_valid'),
     url(r'^getCityOptionsJson', views.get_city_options, name='city_options')
 ]

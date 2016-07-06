@@ -1,4 +1,4 @@
-from authentication.models import Role, Organization, UserDetails, City, LocalServer, PlayerUpdate
+from authentication.models import Role, Organization, UserDetails, City
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
@@ -34,5 +34,3 @@ class RoleAdmin(VersionAdmin):
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(Role)
 admin.site.register(City)
-admin.site.register(LocalServer)
-admin.site.register(PlayerUpdate)
