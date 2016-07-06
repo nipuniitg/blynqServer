@@ -68,7 +68,9 @@ def convert_video(content):
     if 'video' not in content.content_type.file_type or not content.document:
         return True
     file_path = os.path.join(MEDIA_ROOT, content.document.name)
-    temp_file_path = os.path.join(MEDIA_ROOT, 'temp/converted_' + os.path.basename(file_path))
+    filename = os.path.basename(file_path)
+    title, ext = os.path.splitext(filename)
+    temp_file_path = os.path.join(MEDIA_ROOT, 'temp/converted_' + title + '.mp4')
     try:
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
