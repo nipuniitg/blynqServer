@@ -30,11 +30,21 @@ def get_userdetails(request):
 
 def string_to_dict(str):
     # json_acceptable_string = str.replace("'", "\"")
-    return json.loads(str)
+    try:
+        obj = json.loads(str)
+    except Exception as e:
+        obj = {}
+        debugFileLog.exception(e)
+    return obj
 
 
 def obj_to_json_str(obj):
-    return json.dumps(obj)
+    try:
+        json_str = json.dumps(obj)
+    except Exception as e:
+        debugFileLog.exception(e)
+        json_str = ''
+    return json_str
 
 
 def obj_to_json_response(obj):
