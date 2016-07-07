@@ -81,7 +81,7 @@ def convert_video(content):
         # for line in output.stdout:
         #     if re.match('[0-9]+$', line):
         #         resolution_width = int(line)
-        convert_cmd = 'ffmpeg -i "%s" -vcodec libx264 -vprofile high -preset slow -vf ' \
+        convert_cmd = 'ffmpeg -i "%s" -vcodec libx264 -vprofile high -preset medium -vf ' \
                       '"scale=2*trunc(iw/2):-2" -threads  0 -acodec copy -b:a 128k "%s"' % (file_path, temp_file_path)
         p = subprocess.Popen(convert_cmd, shell=True, stdout=subprocess.PIPE)
         output, error = p.communicate()
@@ -109,7 +109,7 @@ def convert_video(content):
 @login_required
 def upload_content(request):
     errors = []
-    success = False
+    success = True
     convertion_success = True
     try:
         user_details = get_userdetails(request)
