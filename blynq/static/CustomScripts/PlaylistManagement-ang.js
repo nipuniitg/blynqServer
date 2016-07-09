@@ -317,6 +317,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
                 $scope.playlistQueueEditMode = false;
                 $scope.playlists[$scope.activePlaylistIndex] = data.playlist;
                 $scope.activePlaylistObj = angular.copy($scope.playlists[$scope.activePlaylistIndex]);
+                $scope.activePlaylistItem = angular.copy($scope.activePlaylistObj.playlist_items[$scope.activePlaylistItemIndex]);
                 disableSortable();
             }
             else{
@@ -379,7 +380,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
     //Related to queue item details methods
     $scope.clickedOnQueueItem = function(index){
         $scope.showQueueItemDetails = true;
-        $scope.activePlaylistItem = $scope.activePlaylistObj.playlist_items[index];
+        $scope.activePlaylistItem = angular.copy($scope.activePlaylistObj.playlist_items[index]);
         $scope.activePlaylistItemIndex = index;
     };
 
@@ -396,7 +397,8 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
     };
 
     $scope.saveItemDurationUpdate = function(){
-        $scope.showQueueItemDetails = false;
+        $scope.activePlaylistObj.playlist_items[$scope.activePlaylistItemIndex] = angular.copy($scope.activePlaylistItem);
+        toastr.success('duration updated!! Dont forget to save playlist after edit.')
     };
 
     onLoad();
