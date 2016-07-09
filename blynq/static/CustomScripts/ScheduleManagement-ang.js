@@ -67,6 +67,26 @@ sdApp.factory('scheduleIndexFactory', ['$http', function($http){
         ,deleteSchedule : deleteSchedule
     }
 }]);
+
+sdApp.filter('timelineLabel', ['timelineFactory','timelineDescription', function(tF, tD) {
+    return function(timeline){
+        var cookedTimeline = tF.getTimeline(
+            timeline.is_always
+            ,tF.getDateTimeFromDate(timeline.startDate)
+            ,tF.getDateTimeFromDate(timeline.end_recurring_period)
+            ,timeline.all_day
+            ,tF.getDateTimeFromTime(timeline.start_time)
+            ,tF.getDateTimeFromTime(timeline.end_time)
+            ,timeline.frequency
+            ,timeline.interval
+            ,timeline.recurrence_absolute
+            ,timeline.bymonthday
+            ,timeline.byweekno
+            ,timeline.byweekday
+        );
+        return tD.updateLabel(cookedTimeline);
+    };
+}]);
 //**end schedule index material
 
 //schedules-list and schedules-calendar
