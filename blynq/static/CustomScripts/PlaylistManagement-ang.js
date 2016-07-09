@@ -283,6 +283,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
             }
             else{
                 $scope.playlists[$scope.activePlaylistIndex].playlist_title = upsertedPlaylist.playlist_title;
+                updateActivePlaylist($scope.activePlaylistIndex);
             }
             $scope.playlistQueueEditMode = true;
         }, function cancelled(){
