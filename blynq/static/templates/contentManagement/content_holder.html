@@ -63,7 +63,7 @@
                         <div class="div-draggable-wrap pointer" draggable data-index="{[$index]}"
                              data-isFolder="{[folder.is_folder]}">
                             <div class="item-container-header">
-                                <span style="width:75%">{[ folder.title ]}</span>
+                                <p style="width:88%; overflow:hidden">{[ folder.title ]}</p>
                                 <input type="checkbox" class="right-absolute" value="None" name="check"
                                    ng-checked="checkedFolders.indexOf(index) > -1"
                                    ng-click="toggleCheck('folder', $index)"/>
@@ -90,9 +90,9 @@
                         <div class="div-draggable-wrap pointer" draggable data-index="{[$index]}"
                              data-isfolder="{[file.is_folder]}">
                             <div class="item-container-header">
-                                {[ file.title ]}
-                                <input class="pull-right" type="checkbox"
-                                       ng-checked="checkedFolders.indexOf(index) > -1"
+                                <p style="width:88%;overflow:hidden">{[ file.title ]}</p>
+                                <input class="right-absolute" type="checkbox"
+                                       ng-checked="checkedContent.indexOf(index) > -1"
                                        ng-click="toggleCheck('file', $index)"/>
                             </div>
                             <!--<div class="item-container" ng-click="viewContentInDetail(file)" >-->
