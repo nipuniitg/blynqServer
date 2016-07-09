@@ -1,3 +1,4 @@
+from django.core.validators import MaxValueValidator
 from django.db import models
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
@@ -179,3 +180,34 @@ def remove_schedule_screens(sender, instance, **kwargs):
     from scheduleManagement.models import ScheduleScreens
     schedule_screens = ScheduleScreens.objects.filter(group=instance.group, screen=instance.screen)
     schedule_screens.delete()
+
+
+class ScreenPane(models.Model):
+    screen_pane_id = models.AutoField(primary_key=True)
+    # Change this pane_title to some pane unique identifier
+    pane_title = models.CharField(max_length=100, null=True, blank=True)
+    lower_x = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
+    lower_y = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
+    width = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
+    height = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
+    split_screen = models.ForeignKey('SplitScreen', null=True, blank=True, related_name='%(class)s_splitscreen')
+
+    def __unicode__(self):
+        return self.split_screen.title + '-' + self.pane_title
+
+
+class SplitScreen(models.Model):
+    split_screen_id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=100)
+    is_default = models.BooleanField(default=False)
+    # By default we will be giving only 4 layout options:
+    # layout_id -1 : For (lower_x=0, lower_y=0, width=100, height=100)
+    # layout_id -2 : For (lower_x=0, lower_y=0, width=50, height=100); (lower_x=50, lower_y=0, width=50, height=100)
+    # layout_id -3 : For (lower_x=0, lower_y=10, width=100, height=90); (lower_x=0, lower_y=0, width=100, height=10)
+    # layout_id -4 : For (lower_x=0, lower_y=10, width=50, height=90); (lower_x=50, lower_y=10, width=50, height=90);
+    # (lower_x=0, lower_y=0, width=100, height=10)
+    layout_id = models.IntegerField(default=0, null=True, blank=True)
+    num_of_panes = models.IntegerField(default=2)
+
+    def __unicode__(self):
+        return self.title

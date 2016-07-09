@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.apps import apps
 from django.contrib.admin.sites import AlreadyRegistered
 from reversion.admin import VersionAdmin
-from scheduleManagement.models import Schedule, SchedulePlaylists, ScheduleScreens
+from scheduleManagement.models import Schedule, SchedulePlaylists
 
 
 class ScheduleAdmin(VersionAdmin):
@@ -19,7 +19,7 @@ class ScheduleScreensAdmin(VersionAdmin):
 
 admin.site.register(Schedule, ScheduleAdmin)
 admin.site.register(SchedulePlaylists, SchedulePlaylistsAdmin)
-admin.site.register(ScheduleScreens, ScheduleScreensAdmin)
+# admin.site.register(ScheduleScreens, ScheduleScreensAdmin)
 
 
 # Register all the models in the scheduleManagement app
