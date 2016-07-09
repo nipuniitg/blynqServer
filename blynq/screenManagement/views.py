@@ -7,11 +7,11 @@ from authentication.models import City
 from authentication.serializers import CitySerializer
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, debugFileLog
 from screenManagement.forms import AddScreenForm, AddGroup
-from screenManagement.models import Screen, ScreenStatus, Group, GroupScreens, ScreenActivationKey
+from screenManagement.models import Screen, ScreenStatus, Group, GroupScreens, ScreenActivationKey, SplitScreen
 # import the logging library
 
 # Get an instance of a logger
-from screenManagement.serializers import ScreenSerializer, GroupSerializer
+from screenManagement.serializers import ScreenSerializer, GroupSerializer, SplitScreenSerializer
 
 
 # Create your views here.
@@ -235,3 +235,10 @@ def screen_index(request):
 def group_index(request):
     context_dic = {'form': AddGroup(form_name='formGroup', scope_prefix='modalGroupDetailsObj')}
     return render(request, 'screen/groups.html', context_dic)
+
+
+def valid_screen_layouts(request):
+    json_data = SplitScreenSerializer().serialize(SplitScreen.objects.all(), fields=('split_screen_id', 'title',
+                                                                                     'layout_id', 'num_of_panes',
+                                                                                     'screen_panes'))
+    return obj_to_json_response(json_data)
