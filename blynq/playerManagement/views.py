@@ -43,16 +43,20 @@ def player_update_available(request):
     return obj_to_json_response(player_json)
 
 
+@csrf_exempt
 def activation_key_valid(request):
     posted_data = string_to_dict(request.body)
-    activation_key = posted_data.get('activation_key')
+    activation_key = posted_data.get('device_key')
     errors = []
     try:
-        screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key, in_use=False)
+        screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key, in_use=True, verified=True)
         success = True
     except ScreenActivationKey.DoesNotExist:
         errors = ['Invalid activation key, try another or contact support']
         success = False
+    except Exception as e:
+        success = False        
+        errors = ['Invalid activation key, try another or contact support']
     return ajax_response(success=success, errors=errors)
 
 
