@@ -294,6 +294,7 @@
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
                 <form class="form-horizontal" role="form" name="requestQuoteForm" >
+                    {% csrf_token %}
                     <div class="form-group">
                         <label for="name" class="col-md-2 wow fadeInLeft">
                             Name

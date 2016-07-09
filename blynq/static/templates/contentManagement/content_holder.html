@@ -15,7 +15,7 @@
     <!-- Content Library -->
     <div class="row content-container">
         <div class="col-md-12 fill">
-            <div class="panel panel-default fill" >
+            <div class="panel panel-default fill">
                 <div class="panel-heading">
                     Content
                     <div class="btn-group pull-right" style="margin-left:5px;" uib-dropdown is-open="status.isopen">
@@ -26,7 +26,8 @@
                         <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
                             <li role="menuitem"><a class="pointer" ng-click="moveContent()">Move to folder</a></li>
                             <li class="divider"></li>
-                            <li role="menuitem"><a class="pointer" confirm confirm-type="delete" confirm-fn="deleteMultipleContents()">Delete</a></li>
+                            <li role="menuitem"><a class="pointer" confirm confirm-type="delete"
+                                                   confirm-fn="deleteMultipleContents()">Delete</a></li>
                         </ul>
                     </div>
                     <div class="btn-group pull-right" uib-dropdown is-open="">
@@ -42,7 +43,8 @@
                             </a>
                             </li>
                             <li class="divider"></li>
-                            <li role="menuitem"><a class="pointer" ng-click="createFolder()"><i class="icon_folder-add"></i>
+                            <li role="menuitem"><a class="pointer" ng-click="createFolder()"><i
+                                    class="icon_folder-add"></i>
                                 Add Folder
                             </a></li>
                             <li class="divider"></li>
@@ -54,17 +56,17 @@
                     </div>
 
                 </div>
-                <div class="panel-body fill overflow-y" >
+                <div class="panel-body fill overflow-y">
                     <!-- Folders -->
                     <div content-droppable class="item-container-wrap" ng-repeat="folder in folders"
                          data-index="{[$index]}">
                         <div class="div-draggable-wrap pointer" draggable data-index="{[$index]}"
                              data-isFolder="{[folder.is_folder]}">
                             <div class="item-container-header">
-                                {[ folder.title ]}
-                                    <input type="checkbox" class=" pull-right" value="None" name="check"
-                                    ng-checked="checkedFolders.indexOf(index) > -1"
-                                    ng-click="toggleCheck('folder', $index)"/>
+                                <span style="width:75%">{[ folder.title ]}</span>
+                                <input type="checkbox" class="right-absolute" value="None" name="check"
+                                   ng-checked="checkedFolders.indexOf(index) > -1"
+                                   ng-click="toggleCheck('folder', $index)"/>
                             </div>
                             <div class="folder-container" ng-click="navigateToFolder(folder.content_id)">
                                 <img ng-src="{[ fileIcons.folder ]}">
@@ -72,7 +74,8 @@
                         </div>
                         <div class="item-container-footer">
                                 <span class="pull-right">
-                                    <a confirm confirm-fn="deleteSingleContent(folder.content_id)" confirm-type="delete">
+                                    <a confirm confirm-fn="deleteSingleContent(folder.content_id)"
+                                       confirm-type="delete">
                                         <i class="fa fa-trash-o pointer"></i>
                                     </a>
                                 </span>
@@ -89,17 +92,17 @@
                             <div class="item-container-header">
                                 {[ file.title ]}
                                 <input class="pull-right" type="checkbox"
-                                    ng-checked="checkedFolders.indexOf(index) > -1"
-                                    ng-click="toggleCheck('file', $index)"/>
+                                       ng-checked="checkedFolders.indexOf(index) > -1"
+                                       ng-click="toggleCheck('file', $index)"/>
                             </div>
                             <!--<div class="item-container" ng-click="viewContentInDetail(file)" >-->
-                            <div class="item-container" content-slider  slide-content="files" index="{[$index]}">
+                            <div class="item-container" content-slider slide-content="files" index="{[$index]}">
                                 <img ng-if="file.content_type.indexOf('image')>-1" ng-src="{[ file.url ]}">
                                 <img ng-if="file.content_type.indexOf('pdf')>-1" ng-src="{[ fileIcons.pdf ]}">
                                 <img ng-if="file.content_type.indexOf('video')>-1" ng-src="{[ fileIcons.video ]}">
                                 <img ng-if="file.content_type.indexOf('url/web')>-1" ng-src="{[ fileIcons.url ]}">
                                 <span class="url-icon">
-                                   <i class="glyphicon glyphicon-link" ng-if="file.content_type.indexOf('url')>-1" ></i>
+                                   <i class="glyphicon glyphicon-link" ng-if="file.content_type.indexOf('url')>-1"></i>
                                 </span>
                             </div>
                         </div>
