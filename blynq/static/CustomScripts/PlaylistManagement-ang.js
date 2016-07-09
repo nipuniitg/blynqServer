@@ -397,8 +397,14 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
     };
 
     $scope.saveItemDurationUpdate = function(){
-        $scope.activePlaylistObj.playlist_items[$scope.activePlaylistItemIndex] = angular.copy($scope.activePlaylistItem);
-        toastr.success('duration updated!! Dont forget to save playlist after edit.')
+        if($scope.contentDetailsForm.$valid)
+        {
+           $scope.activePlaylistObj.playlist_items[$scope.activePlaylistItemIndex] = angular.copy($scope.activePlaylistItem);
+            toastr.success('duration updated!! Dont forget to save playlist after edit.')
+        }else{
+            toastr.warning('Some errors are there in the input fields. Resolve then and try again');
+        }
+
     };
 
     onLoad();
