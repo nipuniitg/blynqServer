@@ -29,6 +29,7 @@
                     </uib-alert>
 
                     <form class="form-horizontal" role="form" name="loginForm">
+                        {% csrf_token %}
                         <div class="form-group">
                             <label class="control-label col-sm-2" for="txtUsername">Username</label>
                             <div class="col-sm-5">
