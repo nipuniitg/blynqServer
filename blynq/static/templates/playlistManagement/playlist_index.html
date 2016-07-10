@@ -58,7 +58,8 @@
                     </div>
                 </div>
                 <div droppable add-content-function="addContentToPlaylistItems"
-                     add-folder-function="addFolderContentToPlaylistItems" class="listContainer">
+                     add-folder-function="addFolderContentToPlaylistItems" class="listContainer"
+                    style="{[ playlistQueueEditMode ? 'top:119px;' : '']}">
                     <ul id="ul-playlistQueue" class="list-group"
                         data-as-sortable=""
                         is-disabled="is_sortable_disabled"
