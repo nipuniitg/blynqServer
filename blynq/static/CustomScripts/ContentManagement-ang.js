@@ -694,9 +694,10 @@ plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentS
         $scope.currentFolderId = parentScopeObj.currentFolderId;
         $scope.files=[];
         $scope.uploadProgressIndicator = 0;
+        $scope.uploadInProgress = false;
         ctDAF.getValidContentTypes(function(returnData){
             validFileTypes = returnData
-        })
+        });
 
     };
 
@@ -730,29 +731,37 @@ plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentS
     }
 
     $scope.uploadFiles = function(){
-        if($scope.validateFiles())
+        if(!$scope.uploadInProgress)
         {
-            var formData = new FormData();
-            var filesArr = [];
+            if($scope.validateFiles()){
+                var formData = new FormData();
+                var filesArr = [];
 
-            for(var i in $scope.files){
-                formData.append('file'+i, $scope.files[i]);
+                for(var i in $scope.files){
+                    formData.append('file'+i, $scope.files[i]);
+                }
+                formData.append('currentFolderId', $scope.currentFolderId);
+                formData.append('totalFiles', $scope.files.length);
+
+
+                // ADD LISTENERS.
+                var objXhr = new XMLHttpRequest();
+                var csrftoken = $cookies.get('csrftoken');
+                //using upload is necessary. It triggers the progress bar.
+                objXhr.upload.onprogress = updateProgress;
+                objXhr.addEventListener("load", transferComplete, false);
+
+                // SEND FILE DETAILS TO THE API.
+                objXhr.open("POST", "/api/content/uploadContent/");
+                objXhr.setRequestHeader("X-CSRFToken", csrftoken);
+                objXhr.send(formData);
+
+                //set uploadInProgress
+                $scope.uploadInProgress = true;
             }
-            formData.append('currentFolderId', $scope.currentFolderId);
-            formData.append('totalFiles', $scope.files.length);
-
-
-            // ADD LISTENERS.
-            var objXhr = new XMLHttpRequest();
-            var csrftoken = $cookies.get('csrftoken');
-            //using upload is necessary. It triggers the progress bar.
-            objXhr.upload.onprogress = updateProgress;
-            objXhr.addEventListener("load", transferComplete, false);
-
-            // SEND FILE DETAILS TO THE API.
-            objXhr.open("POST", "/api/content/uploadContent/");
-            objXhr.setRequestHeader("X-CSRFToken", csrftoken);
-            objXhr.send(formData);
+        }
+        else{
+            toastr.warning('upload already in progress');
         }
     }
 
@@ -773,6 +782,7 @@ plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentS
             $uibModalInstance.close();
         }
         else{
+            $scope.uploadInProgress = false;
             toastr.warning('upload aborted');
             toastr.warning(response.errors.join());
         }
