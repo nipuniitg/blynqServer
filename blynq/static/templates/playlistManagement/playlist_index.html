@@ -91,9 +91,38 @@
                 <div class="panel-heading ">
                     <div class="pull-left">Item Details</div>
                 </div>
-                <div class="panel-body fill">
-                    <div class="item-container" style="width:50%; margin:0 auto">
-                        <img ng-src="{[ activePlaylistItem.url ]}">
+                <div class="panel-body fill overflow-y">
+                    <div style="margin:0 auto;text-align : center;">
+                        <!--<img ng-src="{[ activePlaylistItem.url ]}">-->
+                        <!-- image-->
+                        <div ng-if="activePlaylistItem.content_type.indexOf('image')>-1" class="">
+                            <img ng-src="{[ activePlaylistItem.url]}" class="max-fit">
+                        </div>
+                        <!-- pdf -->
+                        <div ng-if="activePlaylistItem.content_type.indexOf('pdf')>-1" class="">
+                            <pdf-section class="max-fit">
+                                <button ng-click="prevPage()">&lt;</button>
+                                <button ng-click="nextPage()">&gt;</button>
+                                <br>
+                                <span>{[currentPage]}/{[totalPages]}</span>
+                                <br>
+                                <pdfviewer src="{[ activePlaylistItem.url | trusted ]}"
+                                           on-page-load='pageLoaded(page,total)'
+                                           id="viewer"></pdfviewer>
+                            </pdf-section>
+                        </div>
+                        <!-- video -->
+                        <div ng-if="activePlaylistItem.content_type.indexOf('video')>-1" class="">
+                            <video controls class="max-fit" ng-src="{[activePlaylistItem.url | trusted]}">
+                                <!--<source ng-src="{[file.url | trusted]}">-->
+                                Your browser does not support HTML5 video.
+                            </video>
+                        </div>
+
+                        <!-- url, that is not image, pdf, video. Hence, shown in iframe-->
+                        <div ng-if="activePlaylistItem.content_type.indexOf('url/web')>-1" class="">
+                            <iframe class="max-fit" ng-src="{[ activePlaylistItem.url | trusted]}"></iframe>
+                        </div>
                     </div>
                     <form class="form-horizontal" role="form" name="contentDetailsForm" novalidate>
                         <div class="form-group">
@@ -153,6 +182,15 @@
                             </div>
                         </div>
                     </form>
+                    <!-- Below html is used to get the duration of videos. Not related to the above code.-->
+                    <div id="video_meta_data" ng-show="false">
+                        <video controls class="max-fit" ng-src="{[file.url | trusted]}" id="video_for_duration"
+                               preload="metadata">
+                            <!--<source ng-src="{[file.url | trusted]}">-->
+                            Your browser does not support HTML5 video.
+                        </video>
+                    </div>
+
                 </div>
 
             </div>

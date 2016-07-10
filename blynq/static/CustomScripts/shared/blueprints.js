@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 
-    angular.module('mainApp').factory('blueprints', [function(){
+    angular.module('mainApp').factory('blueprints', ['$q', function($q){
         var scheduleBlueprint = {
             schedule_id : -1,
             schedule_title : '',
@@ -54,12 +54,40 @@
             ,title: ''
         }
 
+        function PlaylistItem(contentFile, videoDurationFn){
+            this.is_folder = false;
+            this.title = contentFile.title;
+            this.url = contentFile.url;
+            this.content_type = contentFile.content_type;
+            this.content_id = contentFile.content_id;
+
+            this.playlist_item_id = -1;
+
+            this.setDuration = function(contentFile){
+                var deferred = $q.defer();
+                switch (this.content_type.split("/")[1]){
+                    case 'video':
+                        videoDurationFn(contentFile, function(duration){
+                            deferred.resolve(duration)
+                        });
+                        return deferred.promise
+                        break;
+                    default :
+                        var duration = 15;
+                        deferred.resolve(duration);
+                        return deferred.promise
+                }
+            }
+        }
+
+
         return{
             scheduleBlueprint : scheduleBlueprint
             ,screenBlueprint : screenBlueprint
             ,groupBlueprint : groupBlueprint
             ,playlistBlueprint : playlistBlueprint
             ,playlistItemBlueprint : playlistItemBlueprint
+            ,PlaylistItem : PlaylistItem
         }
     }]);
 }());

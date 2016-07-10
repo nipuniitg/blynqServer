@@ -151,8 +151,9 @@ return{
 
 }]);
 
-plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAccessFactory','$uibModal',
- function(plFactory,ctFactory, $scope, $window, dataAccessFactory,$uibModal){
+plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAccessFactory',
+'$uibModal','blueprints','$q',
+ function(plFactory,ctFactory, $scope, $window, dataAccessFactory,$uibModal,blueprints, $q){
 
     var onLoad = function(){
         //playlist
@@ -337,17 +338,21 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
     $scope.addContentToPlaylistItems = function(index){
         if($scope.playlistQueueEditMode)
         {
-            toastr.success('dropped')
+            toastr.success('Dropped. Adding in progress..')
             var contentDropped = ctFactory.getFilesObj()[index];
-            var newPlaylistItem = angular.copy(plFactory.playlistItemBlueprint);
-            newPlaylistItem.title = contentDropped.title;
-            newPlaylistItem.url  = contentDropped.url;
-            newPlaylistItem.content_id = contentDropped.content_id;
             //:TODO If the dropped content is video, duration time should be set as per that video duration
+            var newPlaylistItem = new blueprints.PlaylistItem(contentDropped, getVideoDuration);
+            newPlaylistItem.setDuration(contentDropped).then(function(duration){
+                if(duration == NaN)
+                {
+                    newPlaylistItem.display_time = 500;
+                }else
+                {
+                    newPlaylistItem.display_time = duration;
+                }
 
-            //Had to put apply manually as the DOM is not updated by itself.
-            $scope.$apply(function(){
-                 $scope.activePlaylistObj.playlist_items.push(newPlaylistItem);
+                    $scope.activePlaylistObj.playlist_items.push(newPlaylistItem);
+                    toastr.success('File added to playlist');
             });
         }
         else
@@ -406,6 +411,27 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
         }
 
     };
+
+    //video drag drop duration
+    var getVideoDuration = function(contentFile, callback){
+        var duration;
+        var video = document.getElementById("video_for_duration");
+        //if same item dropped, then take duration from the existing
+        if(video.src == contentFile.url){
+            duration =  Math.ceil(video.duration);
+            callback(duration);
+        }
+        else{
+            $scope.$apply(function(){
+                $scope.file = contentFile;
+            });
+            video.onloadedmetadata = function(){
+                duration = Math.ceil(video.duration);
+                callback(duration);
+            };
+        }
+    }
+
 
     onLoad();
 
