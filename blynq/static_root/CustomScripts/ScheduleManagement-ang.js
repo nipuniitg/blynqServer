@@ -67,9 +67,9 @@ sdApp.factory('scheduleIndexFactory', ['$http', function($http){
         ,deleteSchedule : deleteSchedule
     }
 }]);
-// end schedule index material
+//**end schedule index material
 
-//schedules-list
+//schedules-list and schedules-calendar
 sdApp.directive('schedulesList',['$log','scheduleIndexFactory','$uibModal',
     function($log, sIF, $uibModal){
     return{
@@ -81,32 +81,7 @@ sdApp.directive('schedulesList',['$log','scheduleIndexFactory','$uibModal',
         }
         ,templateUrl:   '/static/templates/scheduleManagement/_schedules_list.html'
         ,link : function($scope){
-                var newScheduleIndex = -1;
-
-                var newScheduleTemplate = {
-                    schedule_id : -1,
-                    schedule_title : '',
-                    schedule_screens : [],
-                    schedule_groups : [],
-                    schedule_playlists:[],
-                    timeline:{
-                        is_always   : !0
-                        ,start_date  : null
-                        ,end_recurring_period :null
-                        ,all_day     :!0
-                        ,start_time  :null
-                        ,end_time    :null
-                        ,frequency  :null
-                        ,interval   :null
-                        ,recurrence_absolute:null
-                        ,byweekno   :null
-                        ,byweekday  :null
-                        ,bymonthday :null
-                    }
-                };
-
                 var openModalPopup = function(index){
-                    var isNewSchedule = index == newScheduleIndex ? !0 : !1;
                     var modalInstance = $uibModal.open({
                       animation: true,
                       templateUrl: '/static/templates/scheduleManagement/schedule_details.html',
@@ -115,13 +90,7 @@ sdApp.directive('schedulesList',['$log','scheduleIndexFactory','$uibModal',
                       ,backdrop: 'static' //disables modal closing by click on the backdrop.
                       ,resolve: {
                         schedule: function(){
-                            if(isNewSchedule)
-                            {
-                                return angular.copy(newScheduleTemplate);
-                            }
-                            else{
-                                return angular.copy($scope.schedules[index]);
-                            }
+                            return angular.copy($scope.schedules[index]);
                         }
                       }
                     });
@@ -131,10 +100,6 @@ sdApp.directive('schedulesList',['$log','scheduleIndexFactory','$uibModal',
                     }, function cancelled(){
                         toastr.warning('schedule cancelled')
                     })
-                };
-
-                $scope.addSchedule= function(){
-                    openModalPopup(newScheduleIndex);
                 };
 
                 $scope.editSchedule = function(index){
@@ -155,7 +120,116 @@ sdApp.directive('schedulesList',['$log','scheduleIndexFactory','$uibModal',
         }
     }
 }]);
-// end schedules-list
+
+sdApp.directive('schedulesCalendar',['$log','scheduleIndexFactory','$uibModal',
+    function($log, sIF, $uibModal){
+    return{
+        restrict    :   'E'
+        ,scope : true
+        ,bindToController : {
+            events : '=events'
+            ,refreshEvents : '&refreshEventsFn'
+        }
+        ,templateUrl: '/static/templates/scheduleManagement/_schedules_calendar.html'
+        ,controller : ['$scope','calendarFactory','$uibModal', function($scope, cF, $uibModal){
+                        var clndrCtrl = this;
+                        var onLoad = function(){
+                            clndrCtrl.calendarViewTypes = cF.calendarViewTypes;
+                            clndrCtrl.calendarView = clndrCtrl.calendarViewTypes.month;
+                            clndrCtrl.viewDate = moment();
+                        };
+                        onLoad();
+
+                        clndrCtrl.editSchedule= function(schedule){
+                            var modalInstance = $uibModal.open({
+                              animation: true,
+                              templateUrl: '/static/templates/scheduleManagement/schedule_details.html',
+                              controller: 'scheduleDetailsCtrl',
+                              size: 'lg'
+                              ,backdrop: 'static' //disables modal closing by click on the backdrop.
+                              ,resolve: {
+                                schedule: function(){
+                                    return angular.copy(schedule);
+                                }
+                              }
+                            });
+                            modalInstance.result.then(function saved(){
+                                clndrCtrl.refreshEvents()(clndrCtrl.viewDate.month()+1);
+                            }, function cancelled(){
+                                toastr.warning('schedule cancelled')
+                            })
+                        };
+
+                        $scope.$watch(angular.bind(this, function () {
+                          return clndrCtrl.viewDate;
+                        }), function (newVal, oldVal) {
+                            var oldDateMonth = moment(oldVal).month();
+                            var newDateMonth = moment(newVal).month();
+                            if(oldDateMonth !== newDateMonth){
+                                clndrCtrl.refreshEvents()(newDateMonth+1);
+                            }
+                        });
+
+                        //events
+                        clndrCtrl.eventClicked = function(event) {
+                          var modalInstance = $uibModal.open({
+                              animation: true
+                              ,templateUrl: '/static/templates/contentManagement/_content_view_mdl.html'
+                              ,controller: ['$scope','$uibModalInstance','resolvedObj',
+                               function($scope,$uibModalInstance,resolvedObj)
+                              {
+                                  var onLoad = function(){
+                                    $scope.slideContent = resolvedObj.slideContent
+                                    $scope.index = resolvedObj.index
+                                  }
+
+                                  onLoad();
+
+                                  $scope.$watch('index', function(n){
+                                    $scope.file = $scope.slideContent[n];
+                                  });
+
+                                  $scope.nextSlide = function(){
+                                    if(($scope.index + 1)<($scope.slideContent.length)){
+                                        $scope.index = $scope.index + 1;
+                                    }
+                                  }
+
+                                  $scope.previousSlide = function(){
+                                    if(($scope.index -1) > -1){
+                                        $scope.index = $scope.index - 1;
+                                    }
+                                  }
+                              }]
+                              ,size: 'lg'
+                              ,windowTemplateUrl : '/static/templates/shared/_mdl_window_template.html'
+                              ,resolve : {
+                                    resolvedObj : function(){
+                                        var obj ={};
+                                        obj.slideContent = [];
+                                        for(i=0;i<event.schedule.schedule_playlists.length;i++){
+                                            angular.extend(obj.slideContent, event.schedule.schedule_playlists[i].playlist_items);
+                                        }
+                                        if($scope.index){
+                                            obj.index = angular.copy(parseInt($scope.index));
+                                        }else{
+                                            obj.index = 0;
+                                        }
+
+                                        return obj;
+                                    }
+                              }
+                            });
+                        };
+
+                        clndrCtrl.eventEdited = function(event) {
+                            clndrCtrl.editSchedule(event.schedule);
+                        };
+                    }]
+        ,controllerAs : 'clndrCtrl'
+    }
+}]);
+//**end schedules-list and schedules-calendar
 
 
 //schedule Details material
@@ -287,7 +361,7 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
 
     //onLoad();
 }]);
-// end schedule details material
+//**end schedule details material
 
 //timeline material
 sdApp.directive('timelineTextbox', function(){
@@ -777,7 +851,7 @@ sdApp.directive("largerThanTime", [function() {
     }
 ]);
 
-// end timline material
+//**end timline material
 
 //distribution list material
 sdApp.directive('distributionList', function(){
@@ -929,7 +1003,7 @@ $scope.cancel = function(){
 onLoad();
 
  }]);
-//end-distribution list material
+//**end-distribution list material
 
 
 //playlistsList material
@@ -1025,4 +1099,62 @@ sdApp.controller('playlistSelectorController', ['$scope', '$log','$uibModalInsta
     onLoad();
 }]);
 
-//end playlists List material
+//**end playlists List material
+
+
+//calenders - Schedule
+sdApp.factory('calendarFactory',[function(){
+    var calendarViewTypes = {
+        day : 'day'
+        ,week : 'week'
+        ,month : 'month'
+        ,year : 'year'
+    }
+    return{
+        calendarViewTypes : calendarViewTypes
+    }
+}])
+//**end calenders -Schedule
+
+
+//add schedule
+sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal',
+    function($log, sIF, $uibModal){
+    return{
+        restrict    :   'E'
+        ,scope      :   {
+            refreshSchedules : '&refreshSchedulesFn'
+        }
+        ,template:   '<a class="btn  btn-primary pull-right" ng-click="addSchedule()">\
+                        <i class="fa fa-plus"></i> \
+                        Add Schedule\
+                        </a>'
+        ,controller : ['$scope','blueprints', function($scope, blueprints){
+                var openModalPopup = function(index){
+                    var modalInstance = $uibModal.open({
+                      animation: true,
+                      templateUrl: '/static/templates/scheduleManagement/schedule_details.html',
+                      controller: 'scheduleDetailsCtrl',
+                      size: 'lg'
+                      ,backdrop: 'static' //disables modal closing by click on the backdrop.
+                      ,resolve: {
+                        schedule: function(){
+                            return angular.copy(blueprints.scheduleBlueprint);
+                        }
+                      }
+                    });
+                    modalInstance.result.then(function saved(){
+                        $scope.refreshSchedules();
+                    }, function cancelled(){
+                        toastr.warning('schedule cancelled')
+                    })
+                };
+
+                $scope.addSchedule= function(){
+                    openModalPopup();
+                };
+        }]
+    }
+}]);
+
+//*end Add schedule

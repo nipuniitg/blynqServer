@@ -92,11 +92,12 @@
                                     ng-checked="checkedFolders.indexOf(index) > -1"
                                     ng-click="toggleCheck('file', $index)"/>
                             </div>
-                            <div class="item-container" ng-click="viewContentInDetail(file)">
+                            <!--<div class="item-container" ng-click="viewContentInDetail(file)" >-->
+                            <div class="item-container" content-slider  slide-content="files" index="{[$index]}">
                                 <img ng-if="file.content_type.indexOf('image')>-1" ng-src="{[ file.url ]}">
                                 <img ng-if="file.content_type.indexOf('pdf')>-1" ng-src="{[ fileIcons.pdf ]}">
                                 <img ng-if="file.content_type.indexOf('video')>-1" ng-src="{[ fileIcons.video ]}">
-                                <img ng-if="file.content_type == 'web/url'" ng-src="{[ fileIcons.url ]}">
+                                <img ng-if="file.content_type.indexOf('url/web')>-1" ng-src="{[ fileIcons.url ]}">
                                 <span class="url-icon">
                                    <i class="glyphicon glyphicon-link" ng-if="file.content_type.indexOf('url')>-1" ></i>
                                 </span>

@@ -1092,7 +1092,7 @@ div[data-role="editor-toolbar"] {
   width: auto;
   display: inline-block;
   font-size: 14px;
-  border-right:1px solid #e6e6e6 ;
+  /*border-right:1px solid #e6e6e6 ;*/
   margin-right : 5px;
 }
 /*.panel .panel-heading ul li {

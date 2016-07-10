@@ -1,9 +1,9 @@
+import os
+
+from django.contrib.auth.models import User
 from django.db import models
-from django.contrib.auth.models import User, UserManager
-from django.db.models.signals import post_save
-from django.core.exceptions import ValidationError
 # See https://docs.djangoproject.com/en/1.8/ref/contrib/auth/ for User model details
-from blynq.settings import STORAGE_LIMIT_PER_ORGANIZATION
+from blynq.settings import STORAGE_LIMIT_PER_ORGANIZATION, MEDIA_ROOT, PLAYER_UPDATES_DIR
 
 
 class City(models.Model):
@@ -62,18 +62,6 @@ class Organization(models.Model):
         return self.organization_name
 
 
-class LocalServer(models.Model):
-    local_server_id = models.AutoField(primary_key=True)
-    local_url = models.CharField(max_length=255)
-    # decimal format of the mac-address can be obtained using from uuid import getnode; getnode()
-    unique_key = models.CharField(max_length=20,
-                                  help_text='Enter the decimal format of MAC-Address of the device as unique key')
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
-
-    def __unicode__(self):
-        return self.local_url + ' ' + self.organization.name
-
-
 '''
 A User can have one of the below roles in increasing hierarchy
 viewer - who has only view access to the content and the schedule. Only for monitoring purposes.
@@ -117,6 +105,12 @@ class RequestedQuote(models.Model):
 
     def __unicode__(self):
         return 'Quote requested from ' + str(self.email)
+
+
+# Dummy function to bypass the migration failure. ( AttributeError: 'module' object has no attribute 'upload_to_dir' )
+# Remove this function
+def upload_to_dir(instance, filename):
+    pass
 
 
 # class models.User

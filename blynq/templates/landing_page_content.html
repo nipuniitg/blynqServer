@@ -38,6 +38,7 @@
                 </li>
                 <li>
                     <a href="/authentication/login">Login</a>
+                    <!--<a href="#" login-dtv>Login</a>-->
                 </li>
             </ul>
         </div>
@@ -281,16 +282,19 @@
 </div>
 
 <!--Request Quote -->
-<div class="row">
-    <div class=" property gray-bg" id="request-a-quote" ng-app="lpApp" ng-controller="formController">
+<div class="">
+    <div class=" property gray-bg" id="request-a-quote"  ng-controller="formController">
         <div class="row">
             <div class="col-md-12">
                 <h2 style="text-align : center;">
                     Request a Quote
                 </h2>
             </div>
+            </div>
+        <div class="row">
             <div class="col-md-8 col-md-offset-2">
                 <form class="form-horizontal" role="form" name="requestQuoteForm" >
+                    {% csrf_token %}
                     <div class="form-group">
                         <label for="name" class="col-md-2 wow fadeInLeft">
                             Name
@@ -546,7 +550,7 @@
 <!--</footer>-->
 <!--small footer end-->
 
-<script src="{% static 'CustomScripts/landingPage.js' %}">
+
 </script>
 
 {% endblock content%}

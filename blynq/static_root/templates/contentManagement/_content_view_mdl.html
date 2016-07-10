@@ -2,6 +2,12 @@
 <div>
     <!-- Based on the type of file, implement that viewer-->
 
+    <a class="slider-link" ng-click="previousSlide()">
+        <div class="slider-icon">
+             <i class="fa fa-caret-left "></i>
+        </div>
+    </a>
+
     <!-- image-->
     <div ng-if="file.content_type.indexOf('image')>-1" class="content-detail-container">
         <img ng-src="{[ file.url]}" class="max-fit">
@@ -26,7 +32,13 @@
     </div>
 
     <!-- url, that is not image, pdf, video. Hence, shown in iframe-->
-    <div ng-if="file.content_type == 'web/url'" class="content-detail-container">
+    <div ng-if="file.content_type.indexOf('url/web')>-1" class="content-detail-container">
         <iframe ng-src="{[ file.url | trusted]}"></iframe>
     </div>
+
+    <a class="slider-link slider-link-right" ng-click="nextSlide()">
+        <div class="slider-icon">
+             <i class="fa fa-caret-right "></i>
+        </div>
+    </a>
 </div>

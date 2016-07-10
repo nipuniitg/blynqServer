@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.apps import apps
 from django.contrib.admin.sites import AlreadyRegistered
 from reversion.admin import VersionAdmin
-from screenManagement.models import Group, Screen, GroupScreens, ScreenStatus
+from screenManagement.models import Group, Screen, GroupScreens
 
 
 class GroupAdmin(VersionAdmin):

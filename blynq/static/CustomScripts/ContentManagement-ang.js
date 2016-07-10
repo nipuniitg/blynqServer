@@ -766,9 +766,16 @@ plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentS
         }
     };
 
-    var transferComplete = function(){
-        toastr.success('upload Complete');
-        $uibModalInstance.close();
+    var transferComplete = function(progressEvent){
+        var response = JSON.parse(progressEvent.currentTarget.responseText);
+        if(response.success){
+            toastr.success('upload Complete');
+            $uibModalInstance.close();
+        }
+        else{
+            toastr.warning('upload aborted');
+            toastr.warning(response.errors.join());
+        }
     };
 
     $scope.cancel = function(){

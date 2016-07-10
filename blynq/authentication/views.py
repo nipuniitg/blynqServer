@@ -1,14 +1,13 @@
 from django.shortcuts import render
-from django.http import HttpResponse
 from django.http import HttpResponseRedirect
+
 from authentication.forms import RequestQuoteForm
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from authentication.models import UserDetails, Organization, Role
 from blynq import settings
-from customLibrary.views_lib import string_to_dict, ajax_response, get_userdetails, send_mail_blynq, obj_to_json_response
+from customLibrary.views_lib import string_to_dict, ajax_response, get_userdetails, send_mail_blynq, obj_to_json_response, \
+    debugFileLog
 from scheduleManagement.models import Schedule
 from screenManagement.models import Screen
 
@@ -44,19 +43,23 @@ from screenManagement.models import Screen
 def login(request):
     context_dic ={}
     if request.user.is_authenticated():
+        print 'authenticated'
         return HttpResponseRedirect(reverse('index_page'))
     else:
-        if request.POST:
-            username = request.POST.get('username')
-            password = request.POST.get('password')
+        if request.method == 'POST':
+            success = False
+            postedData = string_to_dict(request.body)
+            username = postedData.get('username')
+            password = postedData.get('password')
             # print username, password
             user = authenticate(username=username, password=password)
             if user:
                 print "authenticate successfull"
                 auth_login(request, user)
-                return HttpResponseRedirect(reverse('index_page'))
+                success = True
+                return ajax_response(success=success)
             else:
-                return HttpResponse('Invalid Login Details')
+                return ajax_response(success = success)
 
     return render(request, 'authentication/login.html', context_dic)
 
@@ -109,7 +112,7 @@ def request_quote(request):
 
 @login_required
 def organization_homepage_summary(request):
-    print "inside organization_homepage_summary"
+    debugFileLog.info("inside organization_homepage_summary")
     user_details = get_userdetails(request=request)
     context_dic = {}
     try:
@@ -140,5 +143,3 @@ def setSessionVar(request, status):
 '''
 
 # TODO: Using tv remote to move slides.
-
-

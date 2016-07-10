@@ -49,6 +49,7 @@ INSTALLED_APPS = (
     'screenManagement',
     'contentManagement',
     'playlistManagement',
+    'playerManagement',
     'scheduleManagement',
     #'django_js_reverse',
 )
@@ -199,6 +200,8 @@ else:
     MEDIA_HOST = 'http://www.blynq.in'
     USERCONTENT_DIR = 'usercontent'
     DELETED_CONTENT_DIR = 'deletedcontent'
+
+PLAYER_UPDATES_DIR = 'player_updates'
 
 # in MEDIA_ROOT
 # the uploaded content of each user is present in /media/usercontent/userdetails.user.id/

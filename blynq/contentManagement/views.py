@@ -1,9 +1,13 @@
 import os
+import subprocess
+from copy import deepcopy
+
 from django.contrib.auth.decorators import login_required
+from django.core.files import File
 from django.db import transaction
-from django.http import HttpResponse
 from django.shortcuts import render
-from contentManagement.forms import UploadContentForm
+
+from blynq.settings import MEDIA_ROOT
 from contentManagement.serializers import ContentSerializer
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, debugFileLog
 from contentManagement.models import Content, ContentType
@@ -17,7 +21,7 @@ def index(request):
     # context_dic = {}
     # context_dic['form'] = UploadContentForm(form_name='formUpload', scope_prefix='mdlNewFileDetailsObj')
     # print context_dic
-    return render(request,'contentManagement/content_index.html')
+    return render(request, 'contentManagement/content_index.html')
 
 
 @login_required
@@ -31,9 +35,11 @@ def upsert_url(request):
         if parent_folder_id == -1:
             parent_folder = None
         else:
-            parent_folder = Content.get_user_relevant_objects(user_details=user_details).get(content_id=parent_folder_id)
+            parent_folder = Content.get_user_relevant_objects(user_details=user_details).get(
+                content_id=parent_folder_id)
         posted_content = posted_data.get('content')
         content_id = int(posted_content.get('content_id'))
+        content_id = None if content_id == -1 else content_id
         title = posted_content.get('title')
         url = posted_content.get('url')
         if url:
@@ -55,40 +61,101 @@ def upsert_url(request):
     return ajax_response(success=success, errors=errors)
 
 
+def convert_video(content):
+    if not content or not content.content_type:
+        return True
+    # Only do conversion for video types, may be add a helper function instead of this check
+    if 'video' not in content.content_type.file_type or not content.document:
+        return True
+    file_path = os.path.join(MEDIA_ROOT, content.document.name)
+    filename = os.path.basename(file_path)
+    title, ext = os.path.splitext(filename)
+    temp_file_path = os.path.join(MEDIA_ROOT, 'temp/converted_' + title + '.mp4')
+    try:
+        if os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
+        # resolution_width = 480
+        # cmd = "eval $(ffprobe -v error -of flat=s=_ -select_streams v:0 -show_entries stream=height,width %s);" \
+        #       " echo ${streams_stream_0_width}" % file_path
+        # output = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+        # for line in output.stdout:
+        #     if re.match('[0-9]+$', line):
+        #         resolution_width = int(line)
+        convert_cmd = 'ffmpeg -i "%s" -vcodec libx264 -vprofile high -preset medium -vf ' \
+                      '"scale=2*trunc(iw/2):-2" -threads  0 -acodec copy -b:a 128k "%s"' % (file_path, temp_file_path)
+        p = subprocess.Popen(convert_cmd, shell=True, stdout=subprocess.PIPE)
+        output, error = p.communicate()
+        if p.returncode != 0:
+            debugFileLog.exception("Video conversion failed with error %d %s %s" % (p.returncode, output, error))
+            return False
+        video_file = open(temp_file_path)
+        django_file = File(video_file)
+        new_content = deepcopy(content)
+        new_content.pk = None
+        new_content.document = django_file
+        new_content.save()
+        content.delete()
+        try:
+            os.remove(temp_file_path)
+        except Exception as e:
+            debugFileLog.exception('Not able to remove the temp file while video convertion %s' % temp_file_path)
+            debugFileLog.exception(e)
+        return True
+    except Exception as e:
+        debugFileLog.exception(e)
+        return False
+
+
 @login_required
 def upload_content(request):
     errors = []
-    success = False
+    success = True
+    convertion_success = True
     try:
         user_details = get_userdetails(request)
         posted_data = request.POST
         total_files = int(posted_data.get('totalFiles'))
         parent_folder_id = int(posted_data.get('currentFolderId'))
         if total_files <= 0:
-            errors = ['Error in the total files received']
-            print errors[0]
+            error_str = 'Error in the total files received'
+            debugFileLog.error(error_str)
             return ajax_response(success=success, errors=errors)
         for i in range(total_files):
             key = 'file' + str(i)
             document = request.FILES[key]
             title = os.path.splitext(document.name)[0]
-            if parent_folder_id == -1:
-                parent_folder = None
-            else:
-                parent_folder = Content.get_user_relevant_objects(user_details).get(content_id=parent_folder_id)
-                assert parent_folder.is_folder
-            content = Content(title=title, document=document, uploaded_by=user_details,
-                              last_modified_by=user_details, organization=user_details.organization,
-                              parent_folder=parent_folder, is_folder=False)
-            content.save(uploaded=True)
-        success = True
-    except AssertionError:
-        print "Parent folder id is not a folder"
+            try:
+                if parent_folder_id == -1:
+                    parent_folder = None
+                else:
+                    parent_folder = Content.get_user_relevant_objects(user_details).get(content_id=parent_folder_id)
+                    assert parent_folder.is_folder
+                content = Content(title=title, document=document, uploaded_by=user_details,
+                                  last_modified_by=user_details, organization=user_details.organization,
+                                  parent_folder=parent_folder, is_folder=False)
+                content.save()
+                if not convert_video(content):
+                    error_str = 'Error while conveting the video file %s to correct format' % content.title
+                    errors.append(error_str)
+                    debugFileLog.exception(error_str)
+                    content.delete()
+                    convertion_success = False
+            except AssertionError:
+                success = False
+                error_str = "Improper parent folder, please refresh the page and try again"
+                debugFileLog.exception(error_str)
+                errors.append(error_str)
+            except Exception as e:
+                success = False
+                error_str = 'Error while uploading the file %s ' % document.title
+                debugFileLog.exception(error_str)
+                errors.append(error_str)
+        success = success and convertion_success
     except Exception as e:
-        print "Exception is ", e
-        error = 'Error while uploading the file'
-        print error
-        errors.append(error)
+        success = False
+        error_str = 'Error while uploading the file'
+        debugFileLog.exception(error_str)
+        errors.append(error_str)
     return ajax_response(success=success, errors=errors)
 
 
@@ -116,12 +183,13 @@ def delete_content(request):
         success = False
         if sid != -1:
             transaction.savepoint_rollback(sid)
-    return ajax_response(success=success,errors='Invalid content', obj_dict={'deleted_content_ids': deleted_content_ids})
+    return ajax_response(success=success, errors='Invalid content',
+                         obj_dict={'deleted_content_ids': deleted_content_ids})
 
 
 @login_required
 def create_folder(request):
-    #data in request.body- components passes "currentFolderId", "title"
+    # data in request.body- components passes "currentFolderId", "title"
     errors = []
     success = False
     user_details = get_userdetails(request)
@@ -131,7 +199,8 @@ def create_folder(request):
         if parent_folder_id == -1:
             parent_folder = None
         else:
-            parent_folder = Content.get_user_relevant_objects(user_details=user_details).get(content_id=parent_folder_id)
+            parent_folder = Content.get_user_relevant_objects(user_details=user_details).get(
+                content_id=parent_folder_id)
         title = posted_data.get('title')
         Content.objects.create(title=title,
                                document=None,
@@ -297,7 +366,7 @@ def move_content(request):
         success = False
         error = 'You dont have permission to move the selected content. ' \
                 'Please refresh and try again if you think, you should have permission'
-        return ajax_response(success=success, errors= errors)
+        return ajax_response(success=success, errors=errors)
     for content_id in content_ids:
         try:
             content = user_content.get(content_id=content_id)
@@ -306,5 +375,4 @@ def move_content(request):
         except Content.DoesNotExist:
             success = False
             error = 'Error occured while moving the items. please refresh and try again.'
-    return ajax_response(success=success, errors= errors)
-
+    return ajax_response(success=success, errors=errors)

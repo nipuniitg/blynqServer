@@ -1,6 +1,7 @@
 (function(){
     'use strict';
-    var mainApp =  angular.module('mainApp', ['ui.router','sdApp', 'plApp','sagApp','hApp']).config(function($interpolateProvider) {
+    var mainApp =  angular.module('mainApp', ['ui.router','sdApp', 'plApp','sagApp','hApp','mwl.calendar'])
+    .config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('{[');
     $interpolateProvider.endSymbol(']}');
     });
@@ -138,6 +139,11 @@ mainApp.factory('logoutService',['$http','$window', function ($http, $window) {
             });
     }
 }]);
+
+mainApp.config(function(calendarConfig) {
+
+    console.log(calendarConfig); //view all available config
+    });
 
 
 }());
