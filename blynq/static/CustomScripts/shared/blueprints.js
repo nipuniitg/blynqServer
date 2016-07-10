@@ -2,14 +2,14 @@
 'use strict';
 
     angular.module('mainApp').factory('blueprints', ['$q', function($q){
-        var scheduleBlueprint = {
-            schedule_id : -1,
-            schedule_title : '',
-            schedule_screens : [],
-            schedule_groups : [],
-            splitScreen : false,
-            selectedLayout : {label : 'Full Screen', id: -4, panes : 1},
-            panes :[]
+        function Schedule() {
+            this.schedule_id = -1,
+            this.schedule_title = '',
+            this.schedule_screens = [],
+            this.schedule_groups = [],
+            this.is_split = false,
+            this.selected_layout = {},
+            this.schedule_panes =[];
         };
         //            schedule_playlists:[],
 //            timeline:{
@@ -26,22 +26,24 @@
 //                ,byweekday  :null
 //                ,bymonthday :null
 //            }
-        var paneBlueprint = {
-            playlists : [],
-            timeline:{
+        function Pane(screen_pane){
+            this.schedule_pane_id = -1;
+            this.screen_pane = angular.copy(screen_pane);
+            this.schedule_playlists = [];
+            this.timeline ={
                 is_always   : !0
                 ,start_date  : null
                 ,end_recurring_period :null
                 ,all_day     :!0
                 ,start_time  :null
                 ,end_time    :null
-                ,frequency  :null
+                ,frequency  :"DAILY"
                 ,interval   :null
                 ,recurrence_absolute:null
                 ,byweekno   :null
                 ,byweekday  :null
                 ,bymonthday :null
-            }
+            };
         };
         var screenBlueprint = {
             screen_id : -1
@@ -102,8 +104,8 @@
 
 
         return{
-            scheduleBlueprint : scheduleBlueprint
-            ,paneBlueprint : paneBlueprint
+            Schedule : Schedule
+            ,Pane : Pane
             ,screenBlueprint : screenBlueprint
             ,groupBlueprint : groupBlueprint
             ,playlistBlueprint : playlistBlueprint

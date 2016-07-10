@@ -253,7 +253,7 @@ sdApp.directive('schedulesCalendar',['$log','scheduleIndexFactory','$uibModal',
 
 
 //schedule Details material
-sdApp.factory('scheduleDetailsFactory', ['$log','$http', function($log, $http){
+sdApp.factory('scheduleDetailsFactory', ['$log','$http','$q', function($log, $http,$q){
 
     var selectedBoolSetter = function(allItems, selectedItems, key, schedule_key_id){
         var r = []
@@ -315,10 +315,26 @@ sdApp.factory('scheduleDetailsFactory', ['$log','$http', function($log, $http){
         });
     };
 
+    var getScreenLayouts = function(){
+        var deferred = $q.defer();
+        $http({
+             method : "GET",
+             url : '/api/screen/validScreenLayouts'
+         }).then(function mySucces(response){
+               deferred.resolve(response.data);
+            }, function myError(response) {
+                console.log(response.statusText);
+                deferred.reject();
+            });
+
+         return deferred.promise
+    }
+
     return{
         selectedBoolSetter : selectedBoolSetter
         ,getSelectedItems : getSelectedItems
         ,upsertScheduleDetails : upsertScheduleDetails
+        ,getScreenLayouts : getScreenLayouts
     }
 }]);
 
@@ -330,36 +346,52 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
     var onLoad = function(){
         $scope.schedule = schedule;
         isNewSchedule = schedule.schedule_id == -1 ? !0 : !1;
-        $scope.layouts = angular.copy(cAD.layouts());
+        sDF.getScreenLayouts().then(function(layouts){
+            //copy full screen layout to use when switching between split and non split
+            $scope.fullScreenLayout = angular.copy(layouts[0]);
+
+            //Todo : below, not quite right. Improve
+            //set fullscreen as default for new schedule--not quite right
+            if(isNewSchedule)
+            {
+                $scope.schedule.selected_layout = $scope.fullScreenLayout
+            }
+
+            //seperate out other layouts for dropdown.
+            layouts.shift();
+            $scope.layouts =angular.copy(layouts);
+        });
         $scope.title = isNewSchedule? 'Add Schedule' : 'Edit Schedule';
         $scope.activeTabIndex=0;
     }
     onLoad();
 
     /* when no splitScreen is selected, number of panes is set to one*/
-    $scope.$watch('schedule.splitScreen', function(newValue){
-        if(!newValue) //if no split screen, keep only one pane.
+    $scope.$watch('schedule.is_split', function(newValue){
+        if(!newValue) //if not split screen, keep only one pane.
         {
-            $scope.schedule.panes = [];
-            $scope.schedule.panes.push(angular.copy(blueprints.paneBlueprint));
+            //Ensure only one pane
+            $scope.schedule.schedule_panes = [];
+            var newPane = new blueprints.Pane();
+            $scope.schedule.schedule_panes.push(newPane);
+
+            //Keep selected_layout as  Full Screen Layout
+            $scope.selected_layout = $scope.fullScreenLayout;
         }
         else //keep the default selected to one from the layouts
         {
-            $scope.schedule.selectedLayout = $scope.layouts[0];
+            $scope.schedule.selected_layout = $scope.layouts[0];
         }
     });
 
     /*when layout changes, the number of panes change. so remove existing panes and insert new.*/
-    $scope.$watch('schedule.selectedLayout', function(newLayout){
-        if($scope.schedule.splitScreen)
-        {
-            var totalPanes = newLayout.panes;
-            $scope.schedule.panes = [];
-            for(i =0; i< totalPanes; i++){
-                $scope.schedule.panes.push(angular.copy(blueprints.paneBlueprint));
-            }
-            $scope.activeTabIndex = 0;
+    $scope.$watch('schedule.selected_layout', function(newLayout){
+        var totalPanes = newLayout.num_of_panes;
+        $scope.schedule.schedule_panes = [];
+        for(i =0; i< totalPanes; i++){
+            $scope.schedule.schedule_panes.push(new blueprints.Pane(newLayout.screen_panes[i]));
         }
+        $scope.activeTabIndex = 0;
     });
 
     var validateSchedule = function(){
@@ -385,7 +417,7 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
 
     $scope.saveSchedule= function(){
         $log.log($scope.schedule);
-        if(validateSchedule()){
+        //if(validateSchedule()){
             sDF.upsertScheduleDetails($scope.schedule, function(data){
             if(data.success)
             {
@@ -403,7 +435,7 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
                 toastr.warning('Oops!.There was some error while updating the schedule.');
             }
         });
-        }
+        //}
     };
 
     $scope.cancel = function(){
@@ -748,7 +780,7 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
             ,$scope.recurrenceDaysOfWeek
         );
         $scope.label = timelineDescription.updateLabel($scope.timeline);
-        $log.log($scope.timeline);
+        //$log.log($scope.timeline);
         updateTimelineObjects($scope.timeline);
     };
 
@@ -770,7 +802,6 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
     $scope.$watch('timeDefined', function(newValue){
         $scope.timeline.timeDefined = newValue;
     });
-
 
     $scope.openTimelineModal=function(){
         var modalInstance = $uibModal.open({
@@ -1188,7 +1219,8 @@ sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal',
                       ,backdrop: 'static' //disables modal closing by click on the backdrop.
                       ,resolve: {
                         schedule: function(){
-                            return angular.copy(blueprints.scheduleBlueprint);
+                            var schedule = new blueprints.Schedule();
+                            return schedule
                         }
                       }
                     });
