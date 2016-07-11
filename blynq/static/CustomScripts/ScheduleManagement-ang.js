@@ -137,6 +137,15 @@ sdApp.directive('schedulesList',['$log','scheduleIndexFactory','$uibModal',
                         }
                     });
                 };
+
+                /*define searchSchedules and groups.
+                Without below watch gives an error as those properties would be for undefined.*/
+                $scope.searchSchedules = {};
+                $scope.searchSchedules.schedule_groups = {};
+                //to make sure search happen for both screen name and group name
+                $scope.$watch('searchSchedules.schedule_screens.screen_name', function(newValue){
+                    $scope.searchSchedules['schedule_groups']['group_name'] = newValue;
+                })
         }
     }
 }]);
