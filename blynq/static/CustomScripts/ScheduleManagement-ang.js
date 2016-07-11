@@ -1198,18 +1198,18 @@ sdApp.factory('calendarFactory',[function(){
 
 
 //add schedule
-sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal',
-    function($log, sIF, $uibModal){
+sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal','blueprints',
+    function($log, sIF, $uibModal,blueprints){
     return{
-        restrict    :   'E'
+        restrict    :   'EA'
         ,scope      :   {
             refreshSchedules : '&refreshSchedulesFn'
         }
-        ,template:   '<a class="btn  btn-primary pull-right" ng-click="addSchedule()">\
-                        <i class="fa fa-plus"></i> \
-                        Add Schedule\
-                        </a>'
-        ,controller : ['$scope','blueprints', function($scope, blueprints){
+//        ,template:   '<a class="btn  btn-primary pull-right" ng-click="addSchedule()">\
+//                        <i class="fa fa-plus"></i> \
+//                        Add Schedule\
+//                        </a>'
+        ,link : function($scope, elem){
                 var openModalPopup = function(index){
                     var modalInstance = $uibModal.open({
                       animation: true,
@@ -1231,10 +1231,14 @@ sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal',
                     })
                 };
 
-                $scope.addSchedule= function(){
+//                $scope.addSchedule= function(){
+//                    openModalPopup();
+//                };
+
+                elem.on('click', function(){
                     openModalPopup();
-                };
-        }]
+                })
+        }
     }
 }]);
 
