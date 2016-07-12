@@ -1,4 +1,4 @@
-var sdApp = angular.module("sdApp",['ui.bootstrap']).config(function($interpolateProvider) {
+var sdApp = angular.module("sdApp",[]).config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('{[');
     $interpolateProvider.endSymbol(']}');
     });

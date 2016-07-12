@@ -1,6 +1,7 @@
 (function(){
     'use strict';
-    var mainApp =  angular.module('mainApp', ['ui.router','sdApp', 'plApp','sagApp','hApp','sPApp', 'mwl.calendar'])
+    var mainApp =  angular.module('mainApp', ['ui.router','sdApp', 'plApp','sagApp','hApp','sPApp',
+     'mwl.calendar','ui.bootstrap'])
     .config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('{[');
     $interpolateProvider.endSymbol(']}');
@@ -147,10 +148,17 @@ mainApp.factory('logoutService',['$http','$window', function ($http, $window) {
     }
 }]);
 
-mainApp.config(function(calendarConfig) {
+mainApp.config(['calendarConfig', '$uibTooltipProvider', function(calendarConfig,$uibTooltipProvider) {
 
     console.log(calendarConfig); //view all available config
+
+
+    $uibTooltipProvider.options({
+        placement : 'right'
+        ,appendToBody : true
+        //,trigger : ['mourseenter', 'click']
     });
+    }])
 
 
 }());

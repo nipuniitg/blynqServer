@@ -210,20 +210,16 @@ plApp.factory('ctFactory', ['ctDataAccessFactory', function(ctDataAccessFactory)
 
 }]);
 
-plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', '$uibModal',
-function($scope, ctFactory, ctDataAccessFactory, $uibModal ){
+plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', '$uibModal','constantsAndDefaults',
+function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
 
     //private functions
     var onLoad = function(){
         $scope.currentFolderId = -1  //-1 represents root folder. And hence fetches the data in root folder.
         $scope.refreshContent($scope.currentFolderId);
 
-//        $uibTooltip.options=
-//            {
-//                'popover-append-to-body' : true,
-//                'popover-trigger' : 'mouseenter'
-//            }
-//        ;
+        $scope.fileIcons = cAD.getFileIcons();
+        $scope.popOverMessages = cAD.getPopOverMessages();
     };
 
     var getCheckedContentItems = function(){
@@ -245,13 +241,6 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal ){
             return false;
         }
     }
-
-    $scope.fileIcons = {
-        pdf : '/static/images/pdf_logo.png'
-        ,video : '/static/images/video_icon.png'
-        ,folder : '/static/images/folder-icon.png'
-        ,url : '/static/images/url_icon.png'
-    };
 
     $scope.refreshContent = function(folderId){
 

@@ -1,7 +1,7 @@
 (function(){
     'use strict';
 
-var sPApp = angular.module("sPApp",['angularResizable', 'ui.bootstrap']).config(function($interpolateProvider) {
+var sPApp = angular.module("sPApp",['angularResizable']).config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('{[');
     $interpolateProvider.endSymbol(']}');
     });
