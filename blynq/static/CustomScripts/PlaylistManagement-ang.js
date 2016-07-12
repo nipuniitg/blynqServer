@@ -437,3 +437,21 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
 
 }]);
 
+plApp.filter('playlistTotalTime', [function(){
+    return function(playlist){
+        var totalSec = 0;
+        for(i=0;i<playlist.playlist_items.length;i++){
+            totalSec += playlist.playlist_items[i].display_time;
+        }
+
+        var hours   = Math.floor(totalSec / 3600);
+        var minutes = Math.floor((totalSec - (hours * 3600)) / 60);
+        var seconds = totalSec - (hours * 3600) - (minutes * 60);
+
+        var result = (hours < 10 ? "0" + hours : hours) + "-" + (minutes < 10 ? "0" + minutes : minutes) + "-" + (seconds  < 10 ? "0" + seconds : seconds);
+
+        return result
+    }
+
+}]);
+
