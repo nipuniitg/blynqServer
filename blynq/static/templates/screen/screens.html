@@ -64,13 +64,13 @@
                     Schedules-Calendar
                     <span class="pull-right">
                         <div class="btn-group">
-                            <a class="btn btn-primary" ng-model="schedulesView"
-                               uib-btn-radio="'list'">
+                            <a class="btn btn-primary" ng-model="schedulesView" uib-btn-radio="'list'"
+                                uib-popover="{[ popOverMessages.listView ]}" popover-trigger="mouseenter">
                                 <i class="icon_table"></i>
                             </a>
-                            <a class="btn btn-primary" ng-model="schedulesView"
-                               uib-btn-radio="'calendar'">
-                                <i class=" icon_calendar"></i>
+                            <a class="btn btn-primary" ng-model="schedulesView" uib-btn-radio="'calendar'"
+                                uib-popover="{[ popOverMessages.calendarView ]}" popover-trigger="mouseenter">
+                                <i class="icon_calendar"></i>
                             </a>
                             <a add-schedule refresh-schedules-fn="refreshScreenSchedulesAndEvents()"
                                class="btn  btn-primary pull-right">
