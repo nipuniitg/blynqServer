@@ -19,9 +19,9 @@
         </div>
         <!-- Folders List -->
         <div class="row">
-            <div>
-                <ul class="list-group">
-                    <li class="list-group-item" ng-repeat="folder in folders"
+            <div class="col-md-6" ng-if="folders.length>0">
+                <ul class="list-group" >
+                    <li class="list-group-item pointer" ng-repeat="folder in folders"
                         ng-click="navigateToFolder(folder.content_id)">
                         {[ folder.title]}
                         <span class="pull-right" >
@@ -29,6 +29,11 @@
                         </span>
                     </li>
                 </ul>
+            </div>
+            <div class="col-md-12" ng-if="folders.length ==0">
+                <div class="well">
+                    <p>No folders available</p>
+                </div>
             </div>
         </div>
 

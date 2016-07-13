@@ -442,7 +442,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
               animation: true
               ,templateUrl: '/static/templates/contentManagement/_move_content_mdl.html'
               ,controller: 'mdlContentMoveCtrl'
-              ,size: 'lg'
+              ,size: 'md'
               ,backdrop: 'static' //disables modal closing by click on the backdrop.
               ,resolve : {
                     content_ids : function(){
