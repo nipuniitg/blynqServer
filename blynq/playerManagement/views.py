@@ -67,8 +67,10 @@ def device_key_active(request):
             # elif screen_activation_key.in_use:
             #     error = 'Device activation key %s is already in use.' % activation_key
             #     debugFileLog.warning(error)
-        else:
+        elif screen_activation_key.in_use:
             success = True
+        else:
+            success = False
     except ScreenActivationKey.DoesNotExist:
         error = 'Activation key %s doesn\'t exist in the database.\n ' % activation_key
         error += 'Adding it, check the verified boolean if the device is valid.\n'
