@@ -87,7 +87,7 @@ def device_key_active(request):
 
 @csrf_exempt
 def activation_key_valid(request):
-    debugFileLog.debug( "Inside activation_key_valid" )
+    debugFileLog.info( "Inside activation_key_valid" )
     return device_key_active(request)
     # posted_data = string_to_dict(request.body)
     # activation_key = posted_data.get('device_key')
@@ -107,7 +107,7 @@ def activation_key_valid(request):
 
 @csrf_exempt
 def get_screen_data(request, nof_days=7):
-    debugFileLog.debug("inside get_screen_data")
+    debugFileLog.info("inside get_screen_data")
     # user_details, organization = user_and_organization(request)
     errors = []
     screen_data_json = []
@@ -117,6 +117,7 @@ def get_screen_data(request, nof_days=7):
     # the datetime format of last_received should be
     last_received = posted_data.get('last_received')
     unique_device_key = posted_data.get('device_key')
+    debugFileLog.info( "device_key is %s last_received is %s " % ( unique_device_key, last_received ) )
     last_received_datetime = default_string_to_datetime(last_received)
     last_received_date = last_received_datetime.date()
     try:

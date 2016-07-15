@@ -185,8 +185,13 @@ LOGGING = {
             'propagate': True,
         },
         'debugFileLog': {
+            'level': 'DEBUG',
             'handlers': ['debug'],
             'propagate': True,
+        },
+        'core.handlers': {
+            'level': 'DEBUG',
+            'handlers': ['debug']
         }
     },
 }
