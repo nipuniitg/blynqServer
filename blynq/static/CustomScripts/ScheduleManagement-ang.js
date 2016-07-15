@@ -385,7 +385,7 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
             $scope.schedule.schedule_panes.push(newPane);
 
             //Keep selected_layout as  Full Screen Layout
-            $scope.selected_layout = $scope.fullScreenLayout;
+            $scope.schedule.selected_layout = $scope.fullScreenLayout;
         }
         else //keep the default selected to one from the layouts
         {
