@@ -75,7 +75,7 @@
         onLoad();
 
         cPCtrl.changePassword = function(){
-            if($scope.changePasswordForm.$valid & cPCtrl.passwordsMatch){
+            if($scope.changePasswordForm.$valid && cPCtrl.passwordsMatch){
                 var passwordsObj = {
                     current_password :  cPCtrl.current_password,
                     new_password : cPCtrl.new_password,
@@ -95,7 +95,7 @@
         $scope.$watch(angular.bind(this, function(){
             return cPCtrl.reenter_new_password;
         }), function (newVal) {
-          if(typeof cPCtrl.reenter_new_password !=='undefined' & cPCtrl.reenter_new_password.length>0 & cPCtrl.reenter_new_password.length != newVal){
+          if(typeof cPCtrl.reenter_new_password !=='undefined' && cPCtrl.reenter_new_password.length>0 && cPCtrl.reenter_new_password.length != newVal){
             cPCtrl.passwordsMatch = false;
           }
           else{
