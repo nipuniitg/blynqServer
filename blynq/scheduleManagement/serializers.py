@@ -4,7 +4,7 @@ from customLibrary.views_lib import get_ist_date_str, get_ist_time_str, debugFil
 from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import SchedulePlaylists, ScheduleScreens, SchedulePane
 from screenManagement.models import ScreenPane
-from screenManagement.serializers import ScreenSerializer, GroupSerializer, ScreenPaneSerializer
+from screenManagement.serializers import ScreenSerializer, GroupSerializer, ScreenPaneSerializer, SplitScreenSerializer
 
 
 class SchedulePlaylistsSerializer(Serializer):
@@ -106,6 +106,11 @@ class ScheduleSerializer(Serializer):
             json_data = ScheduleScreensSerializer().serialize(
                 schedule_groups, fields=('schedule_screen_id','group'))
             self._current['schedule_groups'] = json_data
+        if 'selected_layout' in self.selected_fields:
+            query_set = [obj.split_screen] if obj.split_screen else []
+            json_data = SplitScreenSerializer().serialize(query_set, fields=(
+                'split_screen_id', 'screen_panes', 'title', 'num_of_panes'))
+            self._current['selected_layout'] = json_data[0] if json_data else {}
         if 'schedule_panes' in self.selected_fields:
             schedule_panes = SchedulePane.objects.filter(schedule=obj)
             json_data = SchedulePaneSerializer().serialize(schedule_panes,

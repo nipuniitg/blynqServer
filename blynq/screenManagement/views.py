@@ -224,6 +224,6 @@ def group_index(request):
 
 def valid_screen_layouts(request):
     json_data = SplitScreenSerializer().serialize(SplitScreen.objects.all(), fields=('split_screen_id', 'title',
-                                                                                     'layout_id', 'num_of_panes',
+                                                                                     'num_of_panes',
                                                                                      'screen_panes'))
     return obj_to_json_response(json_data)

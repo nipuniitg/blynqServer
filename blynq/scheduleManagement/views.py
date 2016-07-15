@@ -381,7 +381,7 @@ def device_key_active(request):
 
 def default_schedule_serializer(querySet):
     return ScheduleSerializer().serialize(querySet, fields=('schedule_id', 'schedule_title',
-                                                            'schedule_panes', 'is_split',
+                                                            'schedule_panes', 'is_split', 'selected_layout',
                                                             'schedule_screens', 'schedule_groups'))
 
 
