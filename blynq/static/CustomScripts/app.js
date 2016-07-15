@@ -1,6 +1,6 @@
 (function(){
     'use strict';
-    var mainApp =  angular.module('mainApp', ['ui.router','sdApp', 'plApp','sagApp','hApp','sPApp',
+    var mainApp =  angular.module('mainApp', ['ui.router','sdApp', 'plApp','sagApp','hApp','sPApp','uDApp',
      'mwl.calendar','ui.bootstrap'])
     .config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('{[');
@@ -85,11 +85,23 @@ mainApp.config(function($locationProvider,$stateProvider, $urlRouterProvider) {
             }]
         }
     })
+    .state('changePassword', {
+        url : '/changePassword'
+        ,templateUrl : '/static/templates/authentication/change_password.html'
+        ,controller : 'changePasswordCtrl',
+        controllerAs : 'cPCtrl'
+    })
+    .state('updateUserDetails', {
+        url : '/userDetails'
+        ,templateUrl : '/static/templates/authentication/update_user_details.html'
+        ,controller : 'updateUserDetailsCtrl',
+        controllerAs : 'uUDCtrl'
+    })
 
 });
 
 mainApp.factory("PrintToConsole", ["$rootScope", function ($rootScope) {
-    var handler = { active: false };
+    var handler = { active: true };
     handler.toggle = function () { handler.active = !handler.active; };
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         if (handler.active) {

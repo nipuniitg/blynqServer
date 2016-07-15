@@ -84,6 +84,7 @@
     <script src="{% static 'CustomScripts/ContentManagement-ang.js' %}"></script>
     <script src="{% static 'CustomScripts/ScheduleManagement-ang.js' %}"></script>
     <script src="{% static 'CustomScripts/screenPartition-ang.js' %}"></script>
+    <script src="{% static 'CustomScripts/UserDetails-ang.js' %}"></script>
 
     <script src="{% static 'CustomScripts/shared/confirmDirective.js' %}"></script>
     <script src="{% static 'CustomScripts/shared/blueprints.js' %}"></script>
@@ -128,10 +129,13 @@
                         <ul class="dropdown-menu extended logout">
                             <div class="log-arrow-up"></div>
                             <li class="eborder-top">
-                                <a class="pointer" ui-sref="logout"><i class="icon_key_alt"></i> Log Out</a>
+                                <a class="pointer" ui-sref="changePassword"><i class="icon_cogs"></i>Change Password</a>
                             </li>
                             <li>
-                                <a class="pointer" ui-sref="settings"><i class="icon_cogs"></i> Settings</a>
+                                <a class="pointer" ui-sref="updateUserDetails"><i class="fa fa-user"></i>Profile</a>
+                            </li>
+                            <li >
+                                <a class="pointer" ui-sref="logout"><i class="icon_key_alt"></i> Log Out</a>
                             </li>
                         </ul>
                     </li>
