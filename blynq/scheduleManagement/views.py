@@ -188,10 +188,9 @@ def upsert_schedule_groups(user_details, schedule, schedule_groups):
             group = Group.get_user_relevant_objects(user_details).get(group_id=group_id)
             # Adding one screen=NULL entry to handle the case of scheduling empty groups and later adding screens
             # into that empty group
-            # event = Event(**event_dict)
-            # event.save()
-            # entry = ScheduleScreens(schedule=schedule, group=group, event=event)
-            # entry.save()
+            entry = ScheduleScreens(schedule=schedule, group=group)
+            entry.save()
+            schedule_screen_id = entry.schedule_screen_id
             # schedule_screen_id_list.append(entry.schedule_screen_id)
             for screen in group.screen_set.all():
                 # screen_event = Event(**event_dict)
@@ -200,19 +199,7 @@ def upsert_schedule_groups(user_details, schedule, schedule_groups):
                 entry = ScheduleScreens(screen=screen, schedule=schedule, group=group)
                 entry.save()
                 schedule_screen_id_list.append(entry.schedule_screen_id)
-        else:
-            # entry = ScheduleScreens.objects.get(schedule_screen_id=schedule_screen_id)
-            # events = Event.objects.filter(id=entry.event.id)
-            # # Not deleting the rule as all the events have the same rule
-            # # for event in events:
-            # #     if event.rule:
-            # #         rule = event.rule
-            # #         event.rule = None
-            # #         event.save()
-            # #         rule.delete()
-            # events.update(**event_dict)
-            # entry.save()
-            schedule_screen_id_list.append(schedule_screen_id)
+        schedule_screen_id_list.append(schedule_screen_id)
 
     # Remove groups not in the schedule
     removed_schedule_groups = ScheduleScreens.objects.filter(schedule=schedule, group__isnull=False).exclude(
@@ -233,8 +220,8 @@ def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists
         playlist_id = int(item.get('playlist_id'))
         playlist = Playlist.get_user_relevant_objects(user_details).get(playlist_id=playlist_id)
         if schedule_playlist_id == -1:
-            entry = SchedulePlaylists.objects.create(schedule_pane_id=schedule_pane_id, playlist=playlist,
-                                                     position_index=pos_index)
+            entry = SchedulePlaylists(schedule_pane_id=schedule_pane_id, playlist=playlist, position_index=pos_index)
+            entry.save()
             schedule_playlist_id = entry.schedule_playlist_id
         else:
             entry = SchedulePlaylists.objects.get(schedule_playlist_id=schedule_playlist_id)
@@ -243,12 +230,11 @@ def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists
         schedule_playlist_id_list.append(schedule_playlist_id)
 
     # Remove playlists not in playlist_schedules
-    removed_playlist_schedules = SchedulePlaylists.objects.filter(schedule=schedule).exclude(
+    removed_playlist_schedules = SchedulePlaylists.objects.filter(schedule_pane_id=schedule_pane_id).exclude(
         schedule_playlist_id__in=schedule_playlist_id_list)
-    for playlist_schedule in removed_playlist_schedules:
-        playlist_schedule.delete()
-    success = True
-    return success, error
+    if removed_playlist_schedules:
+        removed_playlist_schedules.delete()
+    return True, error
 
 
 def upsert_schedule_panes(user_details, schedule, schedule_panes, split_screen):
@@ -257,16 +243,15 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, split_screen):
     schedule_pane_id_list = []
     for item in schedule_panes:
         schedule_pane_id = int(item.get('schedule_pane_id'))
-        # screen_pane_id = int(item.get('screen_pane_id'))
-        screen_pane_title = item.get('screen_pane_title')
-        screen_pane = ScreenPane.objects.get(split_screen=split_screen, pane_title=screen_pane_title)
-        screen_pane_id = screen_pane.screen_pane_id
-
-        is_always = item.get('is_always')
-        all_day = item.get('all_day')
-        recurrence_absolute = item.get('recurrence_absolute')
         schedule_playlists = item.get('schedule_playlists')
+        screen_pane = item.get('screen_pane')
+        screen_pane_id = int(screen_pane.get('screen_pane_id'))
         timeline = item.get('timeline')
+        is_always = timeline.get('is_always')
+        all_day = timeline.get('all_day')
+        recurrence_absolute = timeline.get('recurrence_absolute')
+        if not recurrence_absolute:
+            recurrence_absolute = False
         event_dict = event_dict_from_timeline(timeline=timeline, schedule=schedule)
         event = Event(**event_dict)
         event.save()
@@ -283,13 +268,14 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, split_screen):
             schedule_pane.is_always = is_always
             schedule_pane.all_day = all_day
             schedule_pane.recurrence_absolute = recurrence_absolute
+            # Not deleting the event, to have the history of events
             schedule_pane.event = event
             schedule_pane.save()
         upsert_schedule_playlists(user_details=user_details, schedule_pane_id=schedule_pane_id,
                                   schedule_playlists=schedule_playlists)
         schedule_pane_id_list.append(schedule_pane_id)
 
-    # Remove Schedule Panes not in the post request
+    # Remove Schedule Panes which are not in the post request
     remove_schedule_panes = SchedulePane.objects.filter(schedule=schedule).exclude(
         schedule_pane_id__in=schedule_pane_id_list)
     if remove_schedule_panes:
@@ -313,17 +299,11 @@ def upsert_schedule(request):
             schedule_screens = posted_data.get('schedule_screens')
             schedule_groups = posted_data.get('schedule_groups')
             is_split = posted_data.get('is_split')
-            layout_id = int(posted_data.get('layout_id'))
+            selected_layout = posted_data.get('selected_layout')
             schedule_panes = posted_data.get('schedule_panes')
             user_schedules = Schedule.get_user_relevant_objects(user_details=user_details)
-            # Get SplitScreen from layout_id
-            try:
-                split_screen = SplitScreen.objects.get(layout_id=layout_id)
-            except Exception as e:
-                debugFileLog.exception('Invalid layout_id %d' % layout_id)
-                debugFileLog.exception(e)
-                split_screen = SplitScreen.objects.all()[0]
-
+            split_screen_id = int(selected_layout.get('split_screen_id'))
+            split_screen = SplitScreen.objects.get(split_screen_id=split_screen_id)
             # upsert schedule
             if schedule_id == -1:
                 schedule = Schedule(schedule_title=schedule_title, created_by=user_details, is_split=is_split,
@@ -337,21 +317,17 @@ def upsert_schedule(request):
                 schedule.last_updated_by = user_details
             schedule.save()
 
-            # success, error = upsert_schedule_playlists(user_details=user_details, schedule=schedule,
-            #                                            schedule_playlists=schedule_playlists)
-            # errors.append(error)
-
-            success, error = upsert_schedule_panes(user_details=user_details, schedule=schedule,
-                                                   schedule_panes=schedule_panes, split_screen=split_screen)
-
             success_screens, error = upsert_schedule_screens(user_details=user_details, schedule=schedule,
                                                              schedule_screens=schedule_screens)
-            success = success and success_screens
             errors.append(error)
 
             success_groups, error = upsert_schedule_groups(user_details=user_details, schedule=schedule,
                                                            schedule_groups=schedule_groups)
-            success = success and success_groups
+            errors.append(error)
+
+            success_panes, error = upsert_schedule_panes(user_details=user_details, schedule=schedule,
+                                                         schedule_panes=schedule_panes, split_screen=split_screen)
+            success = success_screens and success_groups and success_panes
             errors.append(error)
     except Exception as e:
         success = False
@@ -405,7 +381,7 @@ def device_key_active(request):
 
 def default_schedule_serializer(querySet):
     return ScheduleSerializer().serialize(querySet, fields=('schedule_id', 'schedule_title',
-                                                            'schedule_playlists', 'timeline',
+                                                            'schedule_panes', 'timeline',
                                                             'schedule_screens', 'schedule_groups'))
 
 
@@ -436,9 +412,9 @@ def get_playlist_schedules(request, playlist_id):
     playlist_id = int(playlist_id)
     user_details = get_userdetails(request)
     playlist_schedule_id_list = SchedulePlaylists.objects.filter(playlist_id=playlist_id).values_list(
-        'schedule_id', flat=True).distinct()
+        'schedule_pane_id', flat=True).distinct()
     playlist_schedules = Schedule.get_user_relevant_objects(user_details=user_details).filter(
-        schedule_id__in=playlist_schedule_id_list)
+        schedule_pane_id__in=playlist_schedule_id_list)
     json_data = default_schedule_serializer(querySet=playlist_schedules)
     return obj_to_json_response(json_data)
 

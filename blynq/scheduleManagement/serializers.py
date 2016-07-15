@@ -1,9 +1,10 @@
 from django.core.serializers.python import Serializer
 
-from customLibrary.views_lib import get_ist_date_str, get_ist_time_str
+from customLibrary.views_lib import get_ist_date_str, get_ist_time_str, debugFileLog
 from playlistManagement.serializers import PlaylistSerializer
-from scheduleManagement.models import SchedulePlaylists, ScheduleScreens
-from screenManagement.serializers import ScreenSerializer, GroupSerializer
+from scheduleManagement.models import SchedulePlaylists, ScheduleScreens, SchedulePane
+from screenManagement.models import ScreenPane
+from screenManagement.serializers import ScreenSerializer, GroupSerializer, ScreenPaneSerializer
 
 
 class SchedulePlaylistsSerializer(Serializer):
@@ -18,6 +19,23 @@ class SchedulePlaylistsSerializer(Serializer):
                                                                                'playlist_items') )
             self.add_dict_to_current(json_data)
             del self._current['playlist']
+        self.objects.append(self._current)
+
+
+class SchedulePaneSerializer(Serializer):
+    def end_object(self, obj):
+        self._current['schedule_pane_id'] = obj._get_pk_val()
+        if 'schedule_playlists' in self.selected_fields:
+            schedule_playlists = SchedulePlaylists.objects.filter(schedule_pane=obj)
+            json_data = SchedulePlaylistsSerializer().serialize(
+                schedule_playlists, fields=('schedule_playlist_id','playlist'))
+            self._current['schedule_playlists'] = json_data
+        if 'screen_pane' in self.selected_fields:
+            json_data = ScreenPaneSerializer().serialize([obj.screen_pane], fields=('screen_pane_id', 'pane_title',
+                                                                                    ))
+            self._current['screen_pane'] = json_data[0]
+        if 'timeline' in self.selected_fields:
+            self._current['timeline'] = get_schedule_timeline(obj)
         self.objects.append(self._current)
 
 
@@ -49,44 +67,35 @@ def default_timeline():
             'byweekday': None, 'bymonthday': None, 'byweekno': None }
 
 
-def get_schedule_timeline(schedule):
-    schedule_screens = ScheduleScreens.objects.filter(schedule=schedule)
+def get_schedule_timeline(schedule_pane):
     event_json = {}
-    if schedule_screens:
-        event = schedule_screens[0].event
-        if event:
-            event_json['is_always'] = schedule.is_always
-            event_json['recurrence_absolute'] = schedule.recurrence_absolute
-            event_json['all_day'] = schedule.all_day
-            event_json['start_date'] = get_ist_date_str(event.start) if event.start else None
-            if event.end_recurring_period:
-                event_json['end_recurring_period'] = get_ist_date_str(utc_datetime=event.end_recurring_period)
-            else:
-                event_json['end_recurring_period'] = None
-            event_json['start_time'] = get_ist_time_str(utc_datetime=event.start) if event.start else None
-            event_json['end_time'] = get_ist_time_str(utc_datetime=event.end) if event.end else None
-            rule = event.rule
-            params = rule.get_params() if rule else {}
-            event_json['frequency'] = rule.frequency if rule else None
-            event_json['interval'] = params.get('interval')
-            event_json['byweekday'] = params.get('byweekday')
-            event_json['bymonthday'] = params.get('bymonthday')
-            event_json['byweekno'] = params.get('byweekno')
-            return event_json
-        print "Event doesn't exist for the schedule"
-    else:
-        print "No screens added for this schedule"
+    event = schedule_pane.event
+    if event:
+        event_json['is_always'] = schedule_pane.is_always
+        event_json['recurrence_absolute'] = schedule_pane.recurrence_absolute
+        event_json['all_day'] = schedule_pane.all_day
+        event_json['start_date'] = get_ist_date_str(event.start) if event.start else None
+        if event.end_recurring_period:
+            event_json['end_recurring_period'] = get_ist_date_str(utc_datetime=event.end_recurring_period)
+        else:
+            event_json['end_recurring_period'] = None
+        event_json['start_time'] = get_ist_time_str(utc_datetime=event.start) if event.start else None
+        event_json['end_time'] = get_ist_time_str(utc_datetime=event.end) if event.end else None
+        rule = event.rule
+        params = rule.get_params() if rule else {}
+        event_json['frequency'] = rule.frequency if rule else None
+        event_json['interval'] = params.get('interval')
+        event_json['byweekday'] = params.get('byweekday')
+        event_json['bymonthday'] = params.get('bymonthday')
+        event_json['byweekno'] = params.get('byweekno')
+        return event_json
+    debugFileLog.error("Event doesn't exist for the schedule")
     return default_timeline()
 
 
 class ScheduleSerializer(Serializer):
     def end_object(self, obj):
         self._current['schedule_id'] = obj._get_pk_val()
-        if 'schedule_playlists' in self.selected_fields:
-            schedule_playlists = SchedulePlaylists.objects.filter(schedule=obj)
-            json_data = SchedulePlaylistsSerializer().serialize(
-                schedule_playlists, fields=('schedule_playlist_id','playlist'))
-            self._current['schedule_playlists'] = json_data
         if 'schedule_screens' in self.selected_fields:
             schedule_screens = ScheduleScreens.objects.filter(schedule=obj, group__isnull=True)
             json_data = ScheduleScreensSerializer().serialize(
@@ -97,6 +106,10 @@ class ScheduleSerializer(Serializer):
             json_data = ScheduleScreensSerializer().serialize(
                 schedule_groups, fields=('schedule_screen_id','group'))
             self._current['schedule_groups'] = json_data
-        if 'timeline' in self.selected_fields:
-            self._current['timeline'] = get_schedule_timeline(obj)
+        if 'schedule_panes' in self.selected_fields:
+            schedule_panes = SchedulePane.objects.filter(schedule=obj)
+            json_data = SchedulePaneSerializer().serialize(schedule_panes,
+                                                           fields=('schedule_pane_id', 'schedule_playlists',
+                                                                   'screen_pane', 'timeline'))
+            self._current['schedule_panes'] = json_data
         self.objects.append(self._current)

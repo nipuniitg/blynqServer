@@ -25,7 +25,7 @@ class ScheduleScreens(models.Model):
     event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='schedulescreens')
 
     def __unicode__(self):
-        description = self.schedule.schedule_title
+        description = self.schedule.schedule_title if self.schedule and self.schedule.schedule_title else ''
         if self.screen:
             description = description + ' - screen ' + self.screen.screen_name
         if self.group:
@@ -75,7 +75,12 @@ class SchedulePlaylists(models.Model):
     position_index = models.IntegerField()
 
     def __unicode__(self):
-        return self.schedule.schedule_title + '-' + self.playlist.playlist_title
+        if self.schedule_pane and self.schedule_pane.schedule:
+            schedule_title = self.schedule_pane.schedule.schedule_title
+        else:
+            schedule_title = ''
+        playlist_title =  self.playlist.playlist_title if self.playlist and self.playlist.playlist_title else ''
+        return schedule_title + '-' + playlist_title
 
 
 class SchedulePane(models.Model):
@@ -87,6 +92,11 @@ class SchedulePane(models.Model):
     all_day = models.BooleanField(default=True)
     recurrence_absolute = models.BooleanField(default=False)
     event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='%(class)s_event')
+
+    def __unicode__(self):
+        schedule_title = self.schedule.schedule_title if self.schedule and self.schedule.schedule_title else ''
+        pane_title = self.screen_pane.pane_title if self.screen_pane and self.screen_pane.pane_title else ''
+        return schedule_title + ' - ' + pane_title
 
 
 class Schedule(models.Model):

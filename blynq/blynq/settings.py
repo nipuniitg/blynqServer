@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
+from django.utils import timezone
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -150,6 +152,7 @@ DEFAULT_DISPLAY_TIME = 10
 STORAGE_LIMIT_PER_ORGANIZATION = 1*1024*1024*1024  # 1 gb 1*1024*1024*1024
 
 
+today = timezone.now().strftime("%Y%m%d")
 LOG_DIRECTORY = os.path.join(BASE_DIR, 'logs')
 
 LOGGING = {
@@ -171,7 +174,7 @@ LOGGING = {
         'debug': {
             'class': 'logging.FileHandler',
             'formatter': 'verbose',
-            'filename': os.path.join(LOG_DIRECTORY, 'debug.log'),
+            'filename': os.path.join(LOG_DIRECTORY, 'debug%s.log' % today),
         },
     },
     'loggers': {
