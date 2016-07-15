@@ -708,10 +708,10 @@ return{
 sdApp.factory('timelineDescription',['$filter','timelineFactory', function(e, tLF){
 var t = {}
       , n = {
-        DAILY: "Daily",
-        WEEKLY: "Weekly",
-        MONTHLY: "Monthly",
-        YEARLY: "Yearly"
+        DAILY: "DAILY",
+        WEEKLY: "WEEKLY",
+        MONTHLY: "MONTHLY",
+        YEARLY: "YEARLY"
     }
       , i = {
         EVERY_DAY: "Every Day",
@@ -737,8 +737,21 @@ var t = {}
     var updateLabel = function(e) {
         var t = ""
           , l = "dd-MMM-yyyy";
-        if (e.startDate && (t = t + tLF.getOnlyDate(e.startDate) + " "),
-        e.endDate && (t = t + i.TO + " " + tLF.getOnlyDate(e.endDate) + " ")) {
+
+        //if timedefined => is_always.
+        if(e.timeDefined){
+            t = t + "Always";
+        }
+        else
+        {
+            //if for only single day, then consider date only once.
+            if(e.startDate == e.endDate){
+                t = t+tLF.getOnlyDate(e.startDate) + ' ';
+            }
+            else{
+                t = t+tLF.getOnlyDate(e.startDate) + ' ';
+                t = t + i.TO + " " + tLF.getOnlyDate(e.endDate) + " "
+            }
             if(e.allDay){
                 t = t + i.ALL_DAY;
             }else{
@@ -746,9 +759,9 @@ var t = {}
                     t = t + tLF.getOnlyTime(e.startTime) + " ",
                     e.endTime && (t = t + i.TO + " " + tLF.getOnlyTime(e.endTime) + " ")
             }
-
         }
-        if (e.recurrenceType) {
+
+        if (e.recurrenceType && e.startDate != e.endDate) {
             var u = 0;
             if (t = t + e.recurrenceType + " ",
             e.recurrenceType === n.MONTHLY && (e.recurrenceAbsolute ? (t = t + i.DAY + " " + e.recurrenceDayOfMonth + " " + i.OF + " ",
@@ -788,7 +801,7 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
             ,$scope.recurrenceWeekOfMonth
             ,$scope.recurrenceDaysOfWeek
         );
-        $scope.label = timelineDescription.updateLabel($scope.timeline);
+        updateTimeLabel();
         //$log.log($scope.timeline);
         updateTimelineObjects($scope.timeline);
     };
@@ -805,11 +818,16 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
             ,$scope.recurrenceAbsolute=timeline.recurrenceAbsolute
             ,$scope.recurrenceDayOfMonth=timeline.recurrenceDayOfMonth
             ,$scope.recurrenceWeekOfMonth=timeline.recurrenceWeekOfMonth
-            ,$scope.recurrenceDaysOfWeek=timeline.recurrenceDaysOfWeek
+            ,$scope.recurrenceDaysOfWeek=timeline.recurrenceDaysOfWeek;
+    }
+
+    var updateTimeLabel = function(){
+         $scope.label = timelineDescription.updateLabel($scope.timeline);
     }
 
     $scope.$watch('timeDefined', function(newValue){
         $scope.timeline.timeDefined = newValue;
+        updateTimeLabel()
     });
 
     $scope.openTimelineModal=function(){
