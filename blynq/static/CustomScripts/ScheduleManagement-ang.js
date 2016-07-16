@@ -141,10 +141,12 @@ sdApp.directive('schedulesList',['$log','scheduleIndexFactory','$uibModal',
                 /*define searchSchedules and groups.
                 Without below watch gives an error as those properties would be for undefined.*/
                 $scope.searchSchedules = {};
-                $scope.searchSchedules.schedule_groups = {};
-                //to make sure search happen for both screen name and group name
+//                $scope.searchSchedules.schedule_groups = {};
+//                //to make sure search happen for both screen name and group name
                 $scope.$watch('searchSchedules.schedule_screens.screen_name', function(newValue){
-                    $scope.searchSchedules['schedule_groups']['group_name'] = newValue;
+                    if(typeof newValue !== "undefined"){
+                        $scope.searchSchedules['schedule_groups']['group_name'] = newValue;
+                    }
                 })
         }
     }
@@ -359,13 +361,6 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
             //copy full screen layout to use when switching between split and non split
             $scope.fullScreenLayout = angular.copy(layouts[0]);
 
-            //Todo : below, not quite right. Improve
-            //set fullscreen as default for new schedule--not quite right
-            if(isNewSchedule)
-            {
-                $scope.schedule.selected_layout = $scope.fullScreenLayout
-            }
-
             //seperate out other layouts for dropdown.
             layouts.shift();
             $scope.layouts =angular.copy(layouts);
@@ -375,15 +370,9 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
     }
     onLoad();
 
-    /* when no splitScreen is selected, number of panes is set to one*/
-    $scope.$watch('schedule.is_split', function(newValue){
-        if(!newValue) //if not split screen, keep only one pane.
+    $scope.splitScreenToggled = function(){
+        if(!$scope.schedule.is_split) //if not split screen, keep only one pane.
         {
-            //Ensure only one pane
-            $scope.schedule.schedule_panes = [];
-            var newPane = new blueprints.Pane();
-            $scope.schedule.schedule_panes.push(newPane);
-
             //Keep selected_layout as  Full Screen Layout
             $scope.schedule.selected_layout = $scope.fullScreenLayout;
         }
@@ -391,18 +380,21 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
         {
             $scope.schedule.selected_layout = $scope.layouts[0];
         }
-    });
+    }
 
     /*when layout changes, the number of panes change. so remove existing panes and insert new.*/
-    $scope.$watch('schedule.selected_layout', function(newLayout){
-        var totalPanes = newLayout.num_of_panes;
-        $scope.schedule.schedule_panes = [];
-        for(i =0; i< totalPanes; i++){
-            $scope.schedule.schedule_panes.push(new blueprints.Pane(newLayout.screen_panes[i]));
+    $scope.$watch('schedule.selected_layout', function(newLayout,oldLayout){
+        if (newLayout !== oldLayout) {
+            var totalPanes = newLayout.num_of_panes;
+            $scope.schedule.schedule_panes = [];
+            for(i =0; i< totalPanes; i++){
+                $scope.schedule.schedule_panes.push(new blueprints.Pane(newLayout.screen_panes[i]));
+            }
+            $scope.activeTabIndex = 0;
         }
-        $scope.activeTabIndex = 0;
     });
 
+    //Todo : Need rewrite this function according to the split screen requirement
     var validateSchedule = function(){
         if($scope.schedule.schedule_playlists.length<1)
         {
@@ -1225,8 +1217,8 @@ sdApp.factory('calendarFactory',[function(){
 
 
 //add schedule
-sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal','blueprints',
-    function($log, sIF, $uibModal,blueprints){
+sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal','blueprints','scheduleDetailsFactory',
+    function($log, sIF, $uibModal,blueprints,sDF){
     return{
         restrict    :   'EA'
         ,scope      :   {
@@ -1238,7 +1230,12 @@ sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal','bluepr
 //                        </a>'
         ,link : function($scope, elem){
                 var openModalPopup = function(index){
-                    var modalInstance = $uibModal.open({
+                    var newSchedule = new blueprints.Schedule();
+                    sDF.getScreenLayouts().then(function(layouts){
+                        newSchedule.selected_layout = layouts[0];
+                        newSchedule.schedule_panes.push(new blueprints.Pane(layouts[0].screen_panes[0]));
+
+                        var modalInstance = $uibModal.open({
                       animation: true,
                       templateUrl: '/static/templates/scheduleManagement/schedule_details.html',
                       controller: 'scheduleDetailsCtrl',
@@ -1246,21 +1243,18 @@ sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal','bluepr
                       ,backdrop: 'static' //disables modal closing by click on the backdrop.
                       ,resolve: {
                         schedule: function(){
-                            var schedule = new blueprints.Schedule();
-                            return schedule
+                            return newSchedule
                         }
                       }
                     });
-                    modalInstance.result.then(function saved(){
-                        $scope.refreshSchedules();
-                    }, function cancelled(){
-                        toastr.warning('schedule cancelled')
+                        modalInstance.result.then(function saved(){
+                            $scope.refreshSchedules();
+                        }, function cancelled(){
+                            toastr.warning('schedule cancelled')
+                        })
                     })
-                };
 
-//                $scope.addSchedule= function(){
-//                    openModalPopup();
-//                };
+                };
 
                 elem.on('click', function(){
                     openModalPopup();

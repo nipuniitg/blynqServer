@@ -20,7 +20,8 @@
                            ng-model="searchSchedules.schedule_screens.screen_name">
                 </th>
                 <th><input type="form-control" placeholder="search"
-                           ng-model="searchSchedules.schedule_panes.schedule_playlists.playlist_title"></th>
+                           ng-model="searchSchedules.schedule_panes.schedule_playlists.playlist_title">
+                </th>
                 <!--<th><input type="form-control" placeholder="search" ng-model="searchSchedules.timeline"></th>-->
             </tr>
             </thead>
@@ -48,9 +49,9 @@
                     </div>
                 </td>
                 <td>
-                    <fieldset ng-repeat="pane in schedule.schedule_panes">
-                        <legend>
-                            <a data-toggle="collapse" data-target="playlist_{[schedule.schedule_id]}_{[$index]}" href="#">
+                    <fieldset ng-repeat="pane in schedule.schedule_panes" class="custom-field-set">
+                        <legend class="custom-field-set">
+                            <a data-toggle="collapse" data-target="#playlist_{[schedule.schedule_id]}_{[$index]}" href="#">
                                 {[ pane.screen_pane.pane_title ]}
                             </a>
                         </legend>
@@ -65,11 +66,11 @@
                     </fieldset>
                 </td>
                 <td>
-                    <fieldset ng-repeat="pane in schedule.schedule_panes">
-                        <legend>{[ pane.screen_pane.pane_title ]}</legend>
+                    <fieldset ng-repeat="pane in schedule.schedule_panes" class="custom-field-set">
+                        <legend class="custom-field-set">{[ pane.screen_pane.pane_title ]}</legend>
                         <div class="tagsinput">
                         <span class="tag">
-                            <span> {[schedule.timeline | timelineLabel]} &nbsp;&nbsp;</span>
+                            <span> {[pane.timeline | timelineLabel]} &nbsp;&nbsp;</span>
                         </span>
                         </div>
                     </fieldset>
