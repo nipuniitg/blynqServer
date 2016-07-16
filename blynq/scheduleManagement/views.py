@@ -54,7 +54,6 @@ def generate_rule_params(interval=1, bymonthday=None, byweekday=None, byweekno=N
     debugFileLog.info("inside generate_rule_params")
     params = interval_param(interval)
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekday', bylistday=byweekday))
-    params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekday', bylistday=byweekday))
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='bymonthday', bylistday=bymonthday))
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekno', bylistday=byweekno))
     return params
