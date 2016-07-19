@@ -127,5 +127,12 @@ def get_ist_time_str(utc_datetime):
     return ist_time
 
 
+def date_changed(received_datetime):
+    if received_datetime.date() < timezone.now().date():
+        return True
+    else:
+        return False
+
+
 debugFileLog = logging.getLogger('debugFileLog')
 consoleLog = logging.getLogger('consoleLog')

@@ -185,8 +185,8 @@ def remove_schedule_screens(sender, instance, **kwargs):
 class ScreenPane(models.Model):
     screen_pane_id = models.AutoField(primary_key=True)
     pane_title = models.CharField(max_length=100, null=True, blank=True)
-    lower_x = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
-    lower_y = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
+    left_margin = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
+    top_margin = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
     width = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
     height = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
     split_screen = models.ForeignKey('SplitScreen', null=True, blank=True, related_name='%(class)s_splitscreen')

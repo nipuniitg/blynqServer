@@ -1,5 +1,7 @@
 import datetime
 import os
+from copy import deepcopy
+from operator import itemgetter
 
 from django.shortcuts import render
 
@@ -11,12 +13,13 @@ from blynq.settings import MEDIA_HOST
 from contentManagement.models import Content
 from contentManagement.serializers import ContentSerializer
 from customLibrary.views_lib import debugFileLog, string_to_dict, default_string_to_datetime, obj_to_json_response, \
-    ajax_response
-from playerManagement.models import PlayerUpdate
+    ajax_response, date_changed
+from playerManagement.models import PlayerUpdate, LocalServer
 from playlistManagement.models import PlaylistItems
 from playlistManagement.serializers import PlaylistSerializer
-from scheduleManagement.models import ScheduleScreens, SchedulePlaylists
+from scheduleManagement.models import ScheduleScreens, SchedulePlaylists, SchedulePane
 from screenManagement.models import ScreenActivationKey, Screen
+from screenManagement.serializers import ScreenPaneSerializer
 
 
 @csrf_exempt
@@ -60,98 +63,138 @@ def activation_key_valid(request):
     return ajax_response(success=success, errors=errors)
 
 
+def schedule_pane_from_occurrence(occur):
+    return occur.event.schedulepane_event
+
+
+def is_conflicting(cur_occur, new_occur):
+    """
+    :param cur_occur: this event occurrence has more priority
+    :param occur: this event occurrence has less priority
+    :return: True if both the occurrences have the same schedule_pane and cur_occur overlaps with occur, else False
+    """
+    if schedule_pane_from_occurrence(cur_occur) == schedule_pane_from_occurrence(new_occur):
+        if (cur_occur.start <= new_occur.start <= cur_occur.end) or (new_occur.start <= cur_occur.start <= new_occur.end):
+            return True
+    return False
+
+
+def merge_occurrence(new_occur, existing_occurrences):
+    """
+    :param new_occur: new event occurrence which has low priority compared to event occurrences in existing_occurrences
+    :param existing_occurrences: the list of event occurrences computed till now
+    :return: modified existing_occurrences based on the start_time and end_time of the new occurrence
+    """
+    # Merge the new occur into existing_occurrences
+    # two occurrences are overlapping only if screen_pane_id is same and time period overlaps
+    new_occur_parts = []
+    for cur_occur in existing_occurrences:
+        if is_conflicting(cur_occur, new_occur):
+            # compare start times with < and end times with >
+            if new_occur.start < cur_occur.start:
+                if new_occur.end <= cur_occur.end:
+                    new_occur.end = cur_occur.start
+                else:
+                    new_occur_part = deepcopy(new_occur)
+                    new_occur.end = cur_occur.start
+                    new_occur_part.start = cur_occur.end
+                    new_occur_parts.append(new_occur_part)
+            else:
+                if new_occur.end <= cur_occur.end:
+                    # new_occur lies in between cur_occur
+                    new_occur = None
+                    break
+                else:
+                    new_occur.start = cur_occur.end
+    if new_occur:
+        existing_occurrences.append(new_occur)
+    for each_new_occur_part in new_occur_parts:
+        existing_occurrences = merge_occurrence(each_new_occur_part, existing_occurrences)
+    return existing_occurrences
+
+
+def event_json_from_occurrences(existing_occurrences):
+    screen_data_json = []
+    for occur in existing_occurrences:
+        schedule_pane = schedule_pane_from_occurrence(occur)
+        schedule = schedule_pane.schedule
+        playlists = schedule_pane.playlists.all()
+        playlists_json = PlaylistSerializer().serialize(playlists, fields=('playlist_id', 'playlist_title',
+                                                                           'playlist_items'))
+        screen_pane_dict = ScreenPaneSerializer().serialize([schedule_pane.screen_pane],
+                                                            fields=('screen_pane_id', 'left_margin', 'top_margin',
+                                                                    'width', 'height'))[0]
+        campaign_dict = {'schedule_id': schedule.schedule_id,
+                         'playlists': playlists_json,
+                         'pane': screen_pane_dict,
+                         'last_updated_time': schedule.last_updated_time,
+                         'start_time': occur.start,
+                         'end_time': occur.end}
+        screen_data_json.append(campaign_dict)
+    sorted_screen_data = sorted(screen_data_json, key=itemgetter('start_time'))
+    return sorted_screen_data
+
+
+def screen_schedule_data(schedule_panes, start_time, end_time):
+    """
+    :param schedule_panes: schedule_panes should be sorted descending by last_updated_time of the schedule
+    :param start_time: start_time of the time interval to calculate event occurrences
+    :param end_time: end_time of the time interval to calculate event occurrences
+    :return: schedule data of non-overlapping event occurrences
+    """
+    existing_occurrences = []
+    for obj in schedule_panes:
+        if obj.event:
+            event_occurrences = obj.event.get_occurrences(start_time, end_time)
+            # existing_occurrences.update(event_occurrences)
+            # Comment below two lines and uncomment above line if merging is to be removed
+            for new_occur in event_occurrences:
+                existing_occurrences = merge_occurrence(new_occur, existing_occurrences)
+    return event_json_from_occurrences(existing_occurrences)
+
+
 @csrf_exempt
 def get_screen_data(request, nof_days=7):
+    """
+    :param request: request object should contain device_key ( unique identifier for the screen ) and
+                    last_received ( datetime when the screen last polled to the server )
+    :param nof_days: optional argument mentioning the time interval for the events
+    :return:
+    """
     debugFileLog.info("inside get_screen_data")
-    # user_details, organization = user_and_organization(request)
-    errors = []
-    screen_data_json = []
-    success = False
-    is_modified = False
     posted_data = string_to_dict(request.body)
-    # the datetime format of last_received should be
+    # the datetime format of last_received should be "%2d%2m%4Y%2H%2M%2S"
     last_received = posted_data.get('last_received')
     unique_device_key = posted_data.get('device_key')
     last_received_datetime = default_string_to_datetime(last_received)
-    last_received_date = last_received_datetime.date()
     try:
-        # screen = Screen.objects.get(screen_id=screen_id)
-        screen = ScreenActivationKey.objects.get(activation_key=unique_device_key, in_use=True).screen
-        calendar = screen.screen_calendar
-        if calendar:
-            current_datetime = timezone.now()
-            calendar_events = calendar.events.exclude(end_recurring_period__lt=current_datetime)
-            start_time = current_datetime.replace(hour=0, minute=0, second=0)
-            time_diff = datetime.timedelta(days=nof_days)
-            end_time = start_time + time_diff
-            if not calendar_events:
-                is_modified = True
-            schedule_for_event = False
-            for event in calendar_events:
-                try:
-                    # Each event should have only one entry in Schedule_Screens
-                    screen_schedule = event.schedulescreens
-                    schedule_for_event = True
-                except Exception as e:
-                    debugFileLog.exception('Event does not exist in the schedule screens')
-                    debugFileLog.exception(e)
-                    continue
-                schedule = screen_schedule.schedule
-                if schedule.last_updated_time > last_received_datetime:
-                    is_modified = True
-                    break
-                elif last_received_date == current_datetime.date():
-                    is_modified = False
-                else:
-                    next_day_after_week = last_received_datetime.replace(hour=0, minute=0, second=0) + \
-                                          datetime.timedelta(days=nof_days)
-                    # The player keeps the data of nof_days=7, so if there is no change in the schedules after the
-                    # last_received_datetime and no occurences on the 8th day
-                    occurrences = event.get_occurrences(next_day_after_week, end_time)
-                    if occurrences:
-                        is_modified = True
-                        break
-            completed_schedules = []
-            if is_modified:
-                for event in calendar_events:
-                    try:
-                        # Each event should have only one entry in Schedule_Screens
-                        screen_schedule = event.schedulescreens
-                        schedule_for_event = True
-                    except Exception as e:
-                        debugFileLog.exception('Event does not exist in the schedule screens')
-                        debugFileLog.exception(e)
-                        continue
-                    schedule = screen_schedule.schedule
-                    if schedule.schedule_id in completed_schedules:
-                        continue
-                    else:
-                        completed_schedules.append(schedule.schedule_id)
-                    occurrences = event.get_occurrences(start_time, end_time)
-                    if not occurrences:
-                        continue
-                    playlists = schedule.playlists.all()
-                    playlists_json = PlaylistSerializer().serialize(playlists, fields=('playlist_id', 'playlist_title',
-                                                                                       'playlist_items'))
-                    for each_occur in occurrences:
-                        campaign_dict = {'schedule_id': screen_schedule.schedule.schedule_id,
-                                         'playlists': playlists_json,
-                                         'last_updated_time': schedule.last_updated_time,
-                                         'start_time': each_occur.start,
-                                         'end_time': each_occur.end}
-                        screen_data_json.append(campaign_dict)
-            if not schedule_for_event:
-                is_modified = True
-        else:
+        start_time = timezone.now()
+        end_time = start_time + datetime.timedelta(days=nof_days)
+        if date_changed(last_received_datetime):
+            schedule_ids_list = ScheduleScreens.objects.filter(screen__unique_device_key=unique_device_key).values_list(
+                'schedule_id', flat=True)
             is_modified = True
-        campaigns_json = {'campaigns': screen_data_json, 'is_modified': is_modified}
-        success = True
-        return obj_to_json_response(campaigns_json)
+        else:
+            schedule_ids_list = ScheduleScreens.objects.filter(
+                screen__unique_device_key=unique_device_key, schedule__last_updated_time__gte=last_received_datetime).\
+                values_list('schedule_id', flat=True)
+            is_modified = False
+        if schedule_ids_list:
+            schedule_panes = SchedulePane.objects.filter(schedule_id__in=schedule_ids_list).\
+                order_by('-schedule__last_updated_time')
+        else:
+            schedule_panes = []
+        if schedule_panes:
+            screen_data_json = screen_schedule_data(schedule_panes, start_time, end_time)
+            campaigns_json = {'campaigns': screen_data_json, 'is_modified': True}
+        else:
+            campaigns_json = {'campaigns': [], 'is_modified': is_modified}
     except Exception as e:
         errors = "Error while fetching the occurences or invalid screen identifier"
         debugFileLog.exception(errors)
         debugFileLog.exception(e)
-    return ajax_response(success=success, errors=errors)
+        campaigns_json = {'campaigns': [], 'is_modified': False}
+    return obj_to_json_response(campaigns_json)
 
 
 @csrf_exempt

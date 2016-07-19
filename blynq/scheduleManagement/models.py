@@ -20,9 +20,6 @@ class ScheduleScreens(models.Model):
                                null=True)
     schedule = models.ForeignKey('Schedule', on_delete=models.CASCADE, related_name='%(class)s_schedule')
     group = models.ForeignKey(Group, on_delete=models.CASCADE, blank=True, null=True)
-    # TODO: Remove null=True for event
-    # Add one event for each ScreenSchedule since each screen has a different calendar
-    event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='schedulescreens')
 
     def __unicode__(self):
         description = self.schedule.schedule_title if self.schedule and self.schedule.schedule_title else ''
@@ -48,24 +45,24 @@ class ScheduleScreens(models.Model):
     #     unique_together = (('screen', 'schedule', 'group'))
 
 
-@receiver(pre_delete, sender=ScheduleScreens)
-def delete_schedule_screen_event(sender, instance, **kwargs):
-    debugFileLog.info("inside delete_schedule_screen")
-    try:
-        if instance.event:
-            event = instance.event
-            if event.rule:
-                # rule = event.rule
-                event.rule = None
-                event.save()
-                # multiple events are having the same rule, so not deleting the rule
-                # rule.delete()
-            instance.event = None
-            instance.save()
-            event.delete()
-    except Exception as e:
-        debugFileLog.exception("Received exception")
-        debugFileLog.exception(e)
+# @receiver(pre_delete, sender=ScheduleScreens)
+# def delete_schedule_screen_event(sender, instance, **kwargs):
+#     debugFileLog.info("inside delete_schedule_screen")
+#     try:
+#         if instance.event:
+#             event = instance.event
+#             if event.rule:
+#                 # rule = event.rule
+#                 event.rule = None
+#                 event.save()
+#                 # multiple events are having the same rule, so not deleting the rule
+#                 # rule.delete()
+#             instance.event = None
+#             instance.save()
+#             event.delete()
+#     except Exception as e:
+#         debugFileLog.exception("Received exception")
+#         debugFileLog.exception(e)
 
 
 class SchedulePlaylists(models.Model):
@@ -94,8 +91,8 @@ class SchedulePane(models.Model):
     event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='%(class)s_event')
 
     def __unicode__(self):
-        schedule_title = self.schedule.schedule_title if self.schedule and self.schedule.schedule_title else ''
-        pane_title = self.screen_pane.pane_title if self.screen_pane and self.screen_pane.pane_title else ''
+        schedule_title = self.schedule.schedule_title if self.schedule.schedule_title else ''
+        pane_title = self.screen_pane.pane_title if self.screen_pane.pane_title else ''
         return schedule_title + ' - ' + pane_title
 
 
