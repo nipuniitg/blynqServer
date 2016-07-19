@@ -70,16 +70,21 @@ def schedule_pane_from_occurrence(occur):
 def is_conflicting(cur_occur, new_occur):
     """
     :param cur_occur: this event occurrence has more priority
-    :param occur: this event occurrence has less priority
+    :param new_occur: this event occurrence has less priority
     :return: True if both the occurrences have the same schedule_pane and cur_occur overlaps with occur, else False
     """
-    if schedule_pane_from_occurrence(cur_occur) == schedule_pane_from_occurrence(new_occur):
-        if (cur_occur.start <= new_occur.start <= cur_occur.end) or (new_occur.start <= cur_occur.start <= new_occur.end):
-            return True
-    return False
+    cur_schedule_pane = schedule_pane_from_occurrence(cur_occur)
+    new_schedule_pane = schedule_pane_from_occurrence(new_occur)
+    if cur_schedule_pane.schedule_id == new_schedule_pane.schedule_id:
+        # Two occurrences of the same schedule can never conflict
+        return False
+    elif (cur_occur.start <= new_occur.start <= cur_occur.end) or (new_occur.start <= cur_occur.start <= new_occur.end):
+        return True
+    else:
+        return False
 
 
-def merge_occurrence(new_occur, existing_occurrences):
+def merge_occurrence(existing_occurrences, new_occur):
     """
     :param new_occur: new event occurrence which has low priority compared to event occurrences in existing_occurrences
     :param existing_occurrences: the list of event occurrences computed till now
@@ -109,7 +114,7 @@ def merge_occurrence(new_occur, existing_occurrences):
     if new_occur:
         existing_occurrences.append(new_occur)
     for each_new_occur_part in new_occur_parts:
-        existing_occurrences = merge_occurrence(each_new_occur_part, existing_occurrences)
+        existing_occurrences = merge_occurrence(existing_occurrences, each_new_occur_part)
     return existing_occurrences
 
 
@@ -149,7 +154,7 @@ def screen_schedule_data(schedule_panes, start_time, end_time):
             # existing_occurrences.update(event_occurrences)
             # Comment below two lines and uncomment above line if merging is to be removed
             for new_occur in event_occurrences:
-                existing_occurrences = merge_occurrence(new_occur, existing_occurrences)
+                existing_occurrences = merge_occurrence(existing_occurrences, new_occur)
     return event_json_from_occurrences(existing_occurrences)
 
 
