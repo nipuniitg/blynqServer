@@ -171,13 +171,13 @@ def get_screen_data(request, nof_days=7):
         start_time = timezone.now()
         end_time = start_time + datetime.timedelta(days=nof_days)
         if date_changed(last_received_datetime):
-            schedule_ids_list = ScheduleScreens.objects.filter(screen__unique_device_key=unique_device_key).values_list(
-                'schedule_id', flat=True)
+            schedule_ids_list = ScheduleScreens.objects.filter(
+                screen__unique_device_key__activation_key=unique_device_key).values_list('schedule_id', flat=True)
             is_modified = True
         else:
             schedule_ids_list = ScheduleScreens.objects.filter(
-                screen__unique_device_key=unique_device_key, schedule__last_updated_time__gte=last_received_datetime).\
-                values_list('schedule_id', flat=True)
+                screen__unique_device_key__activation_key=unique_device_key,
+                schedule__last_updated_time__gte=last_received_datetime).values_list('schedule_id', flat=True)
             is_modified = False
         if schedule_ids_list:
             schedule_panes = SchedulePane.objects.filter(schedule_id__in=schedule_ids_list).\
