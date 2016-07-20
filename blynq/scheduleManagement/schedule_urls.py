@@ -11,7 +11,7 @@ urlpatterns = [
     url(r'^deleteSchedule', views.delete_schedule, name='delete_schedule'),
     url(r'^getScreenSchedules/(?P<screen_id>\d+)', views.get_screen_schedules, name='get_screen_schedules'),
     url(r'^getGroupSchedules/(?P<group_id>\d+)', views.get_group_schedules, name='get_group_schedules'),
-    url(r'^getPlaylistSchedules/(?P<playlist_id>\d+)', views.get_playlist_schedules, name='get_playlist_schedules'),
+    # url(r'^getPlaylistSchedules/(?P<playlist_id>\d+)', views.get_playlist_schedules, name='get_playlist_schedules'),
     url(r'^getScreenEvents', views.get_screen_events, name='get_screen_events'),
     url(r'^getGroupEvents', views.get_group_events, name='get_group_events'),
 ]

@@ -163,12 +163,8 @@ def create_schedule_screens(sender, instance, **kwargs):
     from scheduleManagement.models import ScheduleScreens
     group_schedules = ScheduleScreens.objects.filter(screen__isnull=True, group=group)
     for each_group_schedule in group_schedules:
-        screen_event = each_group_schedule.event
-        screen_event.pk = None
-        screen_event.calendar = screen.screen_calendar
-        screen_event.save()
-        ScheduleScreens.objects.create(screen=screen, schedule=each_group_schedule.schedule, group=group,
-                                       event=screen_event)
+        schedule_screen = ScheduleScreens(screen=screen, schedule=each_group_schedule.schedule, group=group)
+        schedule_screen.save()
     debugFileLog.info("Schedules for the group has been successfully copied to the screen")
 
 
