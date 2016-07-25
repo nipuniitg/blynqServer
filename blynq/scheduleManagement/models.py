@@ -120,3 +120,10 @@ class Schedule(models.Model):
     @staticmethod
     def get_user_relevant_objects(user_details):
         return Schedule.objects.filter(organization=user_details.organization)
+
+    def get_schedule_screens_manager(self):
+        """
+        :return: RelatedManager object of ScheduleScreens related to this Schedule, queries can be fired using
+        self.schedulescreens_schedule.filter( schedule_screen_id = 1 )
+        """
+        return self.schedulescreens_schedule

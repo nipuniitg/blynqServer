@@ -389,34 +389,32 @@ def get_screen_schedules(request, screen_id):
     debugFileLog.info("inside get_screen_schedules")
     screen_id = int(screen_id)
     user_details = get_userdetails(request)
-    screen_schedule_id_list = ScheduleScreens.objects.filter(screen_id=screen_id).values_list(
-        'schedule_id', flat=True).distinct()
-    screen_schedules = Schedule.get_user_relevant_objects(user_details).filter(schedule_id__in=screen_schedule_id_list)
+    screen_schedules = Schedule.get_user_relevant_objects(user_details).filter(screens__screen_id=screen_id).distinct()
     json_data = default_schedule_serializer(querySet=screen_schedules)
     return obj_to_json_response(json_data)
 
 
 def get_group_schedules(request, group_id):
     debugFileLog.info("inside get_group_schedules")
-    screen_id = int(group_id)
+    group_id = int(group_id)
     user_details = get_userdetails(request)
-    group_schedule_id_list = ScheduleScreens.objects.filter(group_id=group_id).values_list(
+    group_schedule_id_list = ScheduleScreens.objects.filter(screen__isnull=True, group_id=group_id).values_list(
         'schedule_id', flat=True).distinct()
-    screen_schedules = Schedule.get_user_relevant_objects(user_details).filter(schedule_id__in=group_schedule_id_list)
-    json_data = default_schedule_serializer(querySet=screen_schedules)
+    group_schedules = Schedule.get_user_relevant_objects(user_details).filter(schedule_id__in=group_schedule_id_list)
+    json_data = default_schedule_serializer(querySet=group_schedules)
     return obj_to_json_response(json_data)
 
 
-def get_playlist_schedules(request, playlist_id):
-    debugFileLog.info("inside get_playlist_schedules")
-    playlist_id = int(playlist_id)
-    user_details = get_userdetails(request)
-    playlist_schedule_id_list = SchedulePlaylists.objects.filter(playlist_id=playlist_id).values_list(
-        'schedule_pane_id', flat=True).distinct()
-    playlist_schedules = Schedule.get_user_relevant_objects(user_details=user_details).filter(
-        schedule_pane_id__in=playlist_schedule_id_list)
-    json_data = default_schedule_serializer(querySet=playlist_schedules)
-    return obj_to_json_response(json_data)
+# def get_playlist_schedules(request, playlist_id):
+#     debugFileLog.info("inside get_playlist_schedules")
+#     playlist_id = int(playlist_id)
+#     user_details = get_userdetails(request)
+#     playlist_schedule_pane_id_list = SchedulePlaylists.objects.filter(playlist_id=playlist_id).values_list(
+#         'schedule_pane_id', flat=True).distinct()
+#     playlist_schedules = Schedule.get_user_relevant_objects(user_details=user_details).filter(
+#         schedule_pane_id__in=playlist_schedule_pane_id_list)
+#     json_data = default_schedule_serializer(querySet=playlist_schedules)
+#     return obj_to_json_response(json_data)
 
 
 def get_schedules(request):
@@ -515,7 +513,6 @@ def delete_schedule(request):
     debugFileLog.info("inside delete schedule")
     user_details = get_userdetails(request)
     errors = []
-    success = False
     try:
         with transaction.atomic():
             posted_data = string_to_dict(request.body)
@@ -534,27 +531,35 @@ def delete_schedule(request):
 
 def calendar_schedules(start_datetime, end_datetime, screen_id=None, group_id=None):
     if screen_id and group_id:
-        schedule_screens = ScheduleScreens.objects.filter(screen_id=screen_id, group_id=group_id)
+        schedule_id_list = ScheduleScreens.objects.filter(screen_id=screen_id, group_id=group_id).values_list(
+            'schedule_id', flat=True).distinct()
     elif screen_id:
-        schedule_screens = ScheduleScreens.objects.filter(screen_id=screen_id)
+        # Show the schedules of the screen as well as the schedule of the group in which screen lies.
+        schedule_id_list = ScheduleScreens.objects.filter(screen_id=screen_id).values_list(
+            'schedule_id', flat=True).distinct()
     elif group_id:
-        schedule_screens = ScheduleScreens.objects.filter(group_id=group_id)
+        schedule_id_list = ScheduleScreens.objects.filter(screen__isnull=True, group_id=group_id).values_list(
+            'schedule_id', flat=True).distinct()
     else:
         return []
+    schedule_panes = SchedulePane.objects.filter(schedule_id__in=schedule_id_list)
     screen_data_json = []
-    for each_schedule_screen in schedule_screens:
-        if each_schedule_screen.event:
-            occurrences = each_schedule_screen.event.get_occurrences(start_datetime, end_datetime)
+    for each_schedule_pane in schedule_panes:
+        if each_schedule_pane.event:
+            occurrences = each_schedule_pane.event.get_occurrences(start_datetime, end_datetime)
             if not occurrences:
                 continue
-            schedule = each_schedule_screen.schedule
+            schedule = each_schedule_pane.schedule
             schedule_json = default_schedule_serializer([schedule])
-            if each_schedule_screen.group:
+            if group_id:
                 display_type = 'special'
             else:
                 display_type = 'info'
+            title = schedule.schedule_title
+            title = title + ' - ' + schedule.split_screen.title if schedule.split_screen else title
+            title = title + ' - ' + each_schedule_pane.screen_pane.pane_title if each_schedule_pane.screen_pane else title
             for each_occur in occurrences:
-                campaign_dict = {'title': schedule.schedule_title,
+                campaign_dict = {'title': title,
                                  'startsAt': get_ist_datetime(each_occur.start),
                                  'endsAt': get_ist_datetime(each_occur.end),
                                  'schedule': schedule_json[0],
@@ -568,27 +573,31 @@ def calendar_schedules(start_datetime, end_datetime, screen_id=None, group_id=No
 
 
 def get_calendar_events(params):
-    screen_id = params.get('screen_id')
-    group_id = params.get('group_id')
-    if screen_id:
-        screen_id = int(screen_id)
-    if group_id:
-        group_id = int(group_id)
-    month = params.get('month')
-    if month:
-        month = int(month)
-    else:
-        month = timezone.now().month
-    year = timezone.now().year
-    (_,days_in_month) = calendar.monthrange(year, month)
-    screen_data = []
-    for day in range(days_in_month):
-        start_datetime = datetime.datetime(year=year, month=month, day=day+1)
-        end_datetime = start_datetime.replace(hour=23, minute=59, second=59)
-        day_schedules = calendar_schedules(start_datetime=get_utc_datetime(start_datetime),
-                                           end_datetime=get_utc_datetime(end_datetime), screen_id=screen_id,
-                                           group_id=group_id)
-        screen_data.extend(day_schedules)
+    try:
+        screen_id = params.get('screen_id')
+        group_id = params.get('group_id')
+        if screen_id:
+            screen_id = int(screen_id)
+        if group_id:
+            group_id = int(group_id)
+        month = params.get('month')
+        if month:
+            month = int(month)
+        else:
+            month = timezone.now().month
+        year = timezone.now().year
+        (_,days_in_month) = calendar.monthrange(year, month)
+        screen_data = []
+        for day in range(days_in_month):
+            start_datetime = datetime.datetime(year=year, month=month, day=day+1)
+            end_datetime = start_datetime.replace(hour=23, minute=59, second=59)
+            day_schedules = calendar_schedules(start_datetime=get_utc_datetime(start_datetime),
+                                               end_datetime=get_utc_datetime(end_datetime), screen_id=screen_id,
+                                               group_id=group_id)
+            screen_data.extend(day_schedules)
+    except Exception as e:
+        screen_data = []
+        debugFileLog.exception(e)
     return obj_to_json_response(screen_data)
 
 
