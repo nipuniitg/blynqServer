@@ -184,8 +184,12 @@ def get_screen_data(request, nof_days=7):
                 screen__unique_device_key__activation_key=unique_device_key)
             schedule_screens_updated = schedule_screens.filter(
                 schedule__last_updated_time__gte=last_received_datetime)
-            schedule_ids_list = schedule_screens.values_list('schedule_id', flat=True)
-            is_modified = False
+            if schedule_screens_updated:
+                schedule_ids_list = schedule_screens.values_list('schedule_id', flat=True)
+                is_modified = True
+            else:
+                schedule_ids_list = []
+                is_modified = False
         if schedule_ids_list:
             schedule_panes = SchedulePane.objects.filter(schedule_id__in=schedule_ids_list).\
                 order_by('-schedule__last_updated_time')
