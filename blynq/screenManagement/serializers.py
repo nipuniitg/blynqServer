@@ -42,3 +42,9 @@ class GroupSerializer(Serializer):
             self._current['screens'] = GroupScreensSerializer().serialize(group_screens, fields=('group_screen_id',
                                                                                                  'screen'))
         self.objects.append(self._current)
+
+
+class AspectRatioSerializer(Serializer):
+    def end_object(self, obj):
+        self._current['aspect_ratio_id'] = obj._get_pk_val()
+        self.objects.append(self._current)

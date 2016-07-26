@@ -12,7 +12,7 @@ from screenManagement.models import Screen, ScreenStatus, Group, GroupScreens, S
 # import the logging library
 
 # Get an instance of a logger
-from screenManagement.serializers import ScreenSerializer, GroupSerializer
+from screenManagement.serializers import ScreenSerializer, GroupSerializer, AspectRatioSerializer
 
 
 # Create your views here.
@@ -224,6 +224,5 @@ def group_index(request):
 
 
 def get_aspect_ratios(request):
-    screen_aspect_ratios = AspectRatio.objects.all()
-    json_data = serializers.serialize('json', screen_aspect_ratios)
+    json_data = AspectRatioSerializer().serialize(AspectRatio.objects.all())
     return obj_to_json_response(json_data)
