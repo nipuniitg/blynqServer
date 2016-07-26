@@ -8,7 +8,8 @@ from layoutManagement.serializers import LayoutSerializer
 
 
 def get_layouts(request):
-    json_data = LayoutSerializer().serialize(Layout.objects.all(), fields=('layout_id', 'title', 'layout_panes'))
+    json_data = LayoutSerializer().serialize(Layout.objects.all(), fields=('layout_id', 'title', 'layout_panes',
+                                                                           'aspect_ratio'))
     return obj_to_json_response(json_data)
 
 

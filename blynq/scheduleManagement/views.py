@@ -294,10 +294,10 @@ def upsert_schedule(request):
             schedule_screens = posted_data.get('schedule_screens')
             schedule_groups = posted_data.get('schedule_groups')
             is_split = posted_data.get('is_split')
-            selected_layout = posted_data.get('selected_layout')
+            layout = posted_data.get('layout')
             schedule_panes = posted_data.get('schedule_panes')
             user_schedules = Schedule.get_user_relevant_objects(user_details=user_details)
-            layout_id = int(selected_layout.get('layout_id'))
+            layout_id = int(layout.get('layout_id'))
             layout = Layout.objects.get(layout_id=layout_id)
             # upsert schedule
             if schedule_id == -1:
@@ -376,7 +376,7 @@ def device_key_active(request):
 
 def default_schedule_serializer(querySet):
     return ScheduleSerializer().serialize(querySet, fields=('schedule_id', 'schedule_title',
-                                                            'schedule_panes', 'is_split', 'selected_layout',
+                                                            'schedule_panes', 'is_split', 'layout',
                                                             'schedule_screens', 'schedule_groups'))
 
 

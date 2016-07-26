@@ -109,11 +109,12 @@ class ScheduleSerializer(Serializer):
             json_data = ScheduleScreensSerializer().serialize(
                 schedule_groups, fields=('schedule_screen_id','group'))
             self._current['schedule_groups'] = json_data
-        if 'selected_layout' in self.selected_fields:
-            query_set = [obj.layout] if obj.layout else []
-            json_data = LayoutSerializer().serialize(query_set, fields=(
-                'layout_id', 'layout_panes', 'title'))
-            self._current['selected_layout'] = json_data[0] if json_data else {}
+        if 'layout' in self.selected_fields and obj.layout:
+            json_data = LayoutSerializer().serialize([obj.layout], fields=(
+                'layout_id', 'layout_panes', 'title', 'aspect_ratio'))
+            self._current['layout'] = json_data[0]
+        else:
+            self._current['layout'] = {}
         if 'schedule_panes' in self.selected_fields:
             schedule_panes = SchedulePane.objects.filter(schedule=obj)
             json_data = SchedulePaneSerializer().serialize(schedule_panes,

@@ -1,6 +1,7 @@
 from django.core.serializers.python import Serializer
 
 from layoutManagement.models import LayoutPane
+from screenManagement.serializers import AspectRatioSerializer
 
 
 class LayoutPaneSerializer(Serializer):
@@ -16,4 +17,8 @@ class LayoutSerializer(Serializer):
             layout_panes = LayoutPane.objects.filter(layout=obj)
             self._current['layout_panes'] = LayoutPaneSerializer().serialize(layout_panes, fields=(
                 'layout_pane_id', 'title', 'left_margin', 'top_margin', 'z_index', 'width', 'height'))
+        if 'aspect_ratio' in self.selected_fields and obj.aspect_ratio:
+            self._current['aspect_ratio'] = AspectRatioSerializer().serialize([obj.aspect_ratio])
+        else:
+            self._current['aspect_ratio'] = {}
         self.objects.append(self._current)
