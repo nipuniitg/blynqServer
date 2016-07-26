@@ -40,13 +40,19 @@ def interval_param(interval):
 
 def list_to_param(key_str, bylistday):
     if bylistday:
-        weekday_string = list_to_comma_string(bylistday)
-        return key_str + ':' + weekday_string
+        try:
+            weekday_string = list_to_comma_string(bylistday)
+            return key_str + ':' + weekday_string
+        except Exception as e:
+            debugFileLog.exception(e)
     return ''
 
 
 def append_params(params, new_keyvalue):
-    return params + ';' + new_keyvalue
+    if new_keyvalue:
+        return params + ';' + new_keyvalue
+    else:
+        return params
 
 
 # byweekday should be a list [0,2,3] meaning 0-Monday, 1-Tuesday, 2-Wednesday, 3-Thursday, 4-Friday, 5-Saturday,6-Sunday
@@ -459,9 +465,9 @@ def calendar_schedules(start_datetime, end_datetime, screen_id=None, group_id=No
     if screen_id and group_id:
         schedule_screens = ScheduleScreens.objects.filter(screen_id=screen_id, group_id=group_id)
     elif screen_id:
-        schedule_screens = ScheduleScreens.objects.filter(screen_id=screen_id)
+        schedule_screens = ScheduleScreens.objects.filter(screen_id=screen_id, group__isnull=True)
     elif group_id:
-        schedule_screens = ScheduleScreens.objects.filter(group_id=group_id)
+        schedule_screens = ScheduleScreens.objects.filter(group_id=group_id, screen__isnull=True)
     else:
         return []
     screen_data_json = []
