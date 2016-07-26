@@ -4,12 +4,11 @@ from django.shortcuts import render
 # Create your views here.
 from customLibrary.views_lib import obj_to_json_response, get_userdetails, string_to_dict, debugFileLog, ajax_response
 from layoutManagement.models import Layout, LayoutPane
-from layoutManagement.serializers import LayoutSerializer
+from layoutManagement.serializers import LayoutSerializer, default_layout_serializer
 
 
 def get_layouts(request):
-    json_data = LayoutSerializer().serialize(Layout.objects.all(), fields=('layout_id', 'title', 'layout_panes',
-                                                                           'aspect_ratio'))
+    json_data = default_layout_serializer(Layout.objects.all())
     return obj_to_json_response(json_data)
 
 

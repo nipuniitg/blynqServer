@@ -5,7 +5,8 @@ from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import SchedulePlaylists, ScheduleScreens, SchedulePane
 from layoutManagement.models import LayoutPane
 from screenManagement.serializers import ScreenSerializer, GroupSerializer
-from layoutManagement.serializers import LayoutPaneSerializer, LayoutSerializer
+from layoutManagement.serializers import LayoutPaneSerializer, LayoutSerializer, default_layout_serializer, \
+    default_layout_pane_serializer
 
 
 class SchedulePlaylistsSerializer(Serializer):
@@ -33,7 +34,7 @@ class SchedulePaneSerializer(Serializer):
             self._current['schedule_playlists'] = json_data
         if 'layout_pane' in self.selected_fields:
             if obj.layout_pane:
-                json_data = LayoutPaneSerializer().serialize([obj.layout_pane], fields=('layout_pane_id', 'title'))
+                json_data = default_layout_pane_serializer([obj.layout_pane])
                 self._current['layout_pane'] = json_data[0]
             else:
                 self._current['layout_pane'] = {}
@@ -109,12 +110,12 @@ class ScheduleSerializer(Serializer):
             json_data = ScheduleScreensSerializer().serialize(
                 schedule_groups, fields=('schedule_screen_id','group'))
             self._current['schedule_groups'] = json_data
-        if 'layout' in self.selected_fields and obj.layout:
-            json_data = LayoutSerializer().serialize([obj.layout], fields=(
-                'layout_id', 'layout_panes', 'title', 'aspect_ratio'))
-            self._current['layout'] = json_data[0]
-        else:
-            self._current['layout'] = {}
+        if 'layout' in self.selected_fields:
+            if obj.layout:
+                json_data = default_layout_serializer([obj.layout])
+                self._current['layout'] = json_data[0]
+            else:
+                self._current['layout'] = {}
         if 'schedule_panes' in self.selected_fields:
             schedule_panes = SchedulePane.objects.filter(schedule=obj)
             json_data = SchedulePaneSerializer().serialize(schedule_panes,
@@ -122,3 +123,9 @@ class ScheduleSerializer(Serializer):
                                                                    'layout_pane', 'timeline'))
             self._current['schedule_panes'] = json_data
         self.objects.append(self._current)
+
+
+def default_schedule_serializer(querySet):
+    return ScheduleSerializer().serialize(querySet, fields=('schedule_id', 'schedule_title',
+                                                            'schedule_panes', 'is_split', 'layout',
+                                                            'schedule_screens', 'schedule_groups'))

@@ -1,20 +1,19 @@
-import datetime
 import calendar
+import datetime
 
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.utils import timezone
-from schedule.models import Event, Rule
-from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
-
+from django.shortcuts import render
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from schedule.models import Event, Rule
 # Create your views here.
 # from schedule.views import calendar
 from customLibrary.views_lib import get_userdetails, ajax_response, obj_to_json_response, string_to_dict, \
     list_to_comma_string, generate_utc_datetime, get_ist_datetime, get_utc_datetime, debugFileLog
 from playlistManagement.models import Playlist
 from scheduleManagement.models import Schedule, SchedulePlaylists, ScheduleScreens, SchedulePane
-from scheduleManagement.serializers import ScheduleSerializer
+from scheduleManagement.serializers import default_schedule_serializer
 from screenManagement.models import Screen, Group, ScreenActivationKey
 from layoutManagement.models import Layout
 
@@ -372,12 +371,6 @@ def device_key_active(request):
             debugFileLog.error(db_error)
         success = False
     return ajax_response(success=success, errors=error)
-
-
-def default_schedule_serializer(querySet):
-    return ScheduleSerializer().serialize(querySet, fields=('schedule_id', 'schedule_title',
-                                                            'schedule_panes', 'is_split', 'layout',
-                                                            'schedule_screens', 'schedule_groups'))
 
 
 def get_screen_schedules(request, screen_id):

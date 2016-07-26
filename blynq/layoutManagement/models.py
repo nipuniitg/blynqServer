@@ -3,6 +3,8 @@ from django.db import models
 
 
 # Create your models here.
+from django.db.models import Q
+
 from authentication.models import Organization
 from screenManagement.models import AspectRatio
 
@@ -30,7 +32,7 @@ class Layout(models.Model):
 
     @staticmethod
     def get_user_relevant_objects(user_details):
-        return Layout.objects.filter(organization=user_details.organization)
+        return Layout.objects.filter(Q(organization=user_details.organization) | Q(organization__isnull=True))
 
     def __unicode__(self):
         return self.title
