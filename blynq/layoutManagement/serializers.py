@@ -14,6 +14,6 @@ class LayoutSerializer(Serializer):
         self._current['layout_id'] = obj._get_pk_val()
         if 'layout_panes' in self.selected_fields:
             layout_panes = LayoutPane.objects.filter(layout=obj)
-            self._current['layout_panes'] = LayoutPaneSerializer().serialize(layout_panes,
-                                                                             fields=('layout_pane_id', 'title'))
+            self._current['layout_panes'] = LayoutPaneSerializer().serialize(layout_panes, fields=(
+                'layout_pane_id', 'title', 'left_margin', 'top_margin', 'z_index', 'width', 'height'))
         self.objects.append(self._current)

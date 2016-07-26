@@ -12,6 +12,7 @@ def get_layouts(request):
     return obj_to_json_response(json_data)
 
 
+@transaction.atomic
 def upsert_layout(request):
     user_details = get_userdetails(request)
     posted_data = string_to_dict(request.body)
@@ -31,6 +32,8 @@ def upsert_layout(request):
                 layout.title = title
                 layout.aspect_ratio_id = aspect_ratio_id
             layout.save()
+            layout_id = layout.layout_id
+            layout_pane_id_list = []
             for each_layout_pane in layout_panes:
                 layout_pane_id = int(each_layout_pane.get('layout_pane_id'))
                 title = each_layout_pane.get('title')
@@ -41,14 +44,38 @@ def upsert_layout(request):
                 height = int(each_layout_pane.get('height'))
                 if layout_pane_id == -1:
                     layout_pane = LayoutPane(title=title, left_margin=left_margin, top_margin=top_margin,
-                                             z_index=z_index, width=width, height=height, layout_id=layout.layout_id)
+                                             z_index=z_index, width=width, height=height, layout_id=layout_id)
                     layout_pane.save()
+                    layout_pane_id = layout_pane.layout_pane_id
                 else:
                     LayoutPane.objects.filter(layout_pane_id=layout_pane_id).update(
                         title=title, left_margin=left_margin, top_margin=top_margin, z_index=z_index, width=width,
-                        height=height, layout_id=layout.layout_id)
+                        height=height, layout_id=layout_id)
+                layout_pane_id_list.append(layout_pane_id)
+            # Remove the remaining layout_pane which are not in layout_pane_id_list
+            layout_panes = LayoutPane.objects.filter(layout_id=layout_id).exclude(layout_pane_id__in=layout_pane_id_list)
+            if layout_panes:
+                layout_panes.delete()
             success = True
     except Exception as e:
         debugFileLog.exception(e)
         errors = ['Error while creating the layout']
+    return ajax_response(success=success, errors=errors)
+
+
+@transaction.atomic
+def delete_layout(request):
+    user_details = get_userdetails(request)
+    posted_data = string_to_dict(request.body)
+    layout_id = int(posted_data.get('layout_id'))
+    success = False
+    errors = []
+    try:
+        layout = Layout.get_user_relevant_objects(user_details).get(layout_id=layout_id)
+        with transaction.atomic():
+            layout.delete()
+            success = True
+    except Exception as e:
+        debugFileLog.exception(e)
+        errors = ['Error while deleting the layout']
     return ajax_response(success=success, errors=errors)

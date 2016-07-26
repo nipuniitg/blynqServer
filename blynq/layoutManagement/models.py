@@ -15,7 +15,7 @@ class LayoutPane(models.Model):
     z_index = models.IntegerField()
     width = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
     height = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
-    layout = models.ForeignKey('Layout', null=True, blank=True, related_name='%(class)s_layout')
+    layout = models.ForeignKey('Layout', on_delete=models.CASCADE, null=True, blank=True, related_name='%(class)s_layout')
 
     def __unicode__(self):
         return self.layout.title + '-' + self.title
