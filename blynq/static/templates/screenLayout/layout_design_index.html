@@ -1,0 +1,52 @@
+<section class="designer-wrapper">
+    <div class="designer-wrapper-expand">
+        <!-- toolbar -->
+        <div class="toolbar-wrapper">
+            <div class="padder">
+                <button class="btn btn-primary" ng-click="lDIC.addPane()">Add Pane</button>
+                <button class="btn btn-danger"
+                        confirm confirm-type="delete" confirm-fn="lDIC.deletePane()"> Delete Pane
+                </button>
+                <div class="pull-right">
+                    <button class="btn btn-primary" ng-click="lDIC.resetLayout()">Reset</button>
+                    <button class="btn btn-success" ng-click="lDIC.saveLayout()">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pane/Layout Properties-->
+        <div class="workspace-wrapper">
+            <div class="padder">
+                <uib-tabset active="1" justified="true">
+                    <uib-tab index="0" heading="Layout">
+                        <!-- Layout Properties -->
+                        <layout-properties>
+                            <!-- has scope of its parent. -->
+                        </layout-properties>
+                    </uib-tab>
+                    <uib-tab index="1" heading="Pane">
+                        <pane-properties>
+                            <!-- has scope of its parent. -->
+                        </pane-properties>
+                    </uib-tab>
+                </uib-tabset>
+
+
+            </div>
+        </div>
+        <!-- Pane Editor-->
+        <div class="editor-wrapper">
+            <div class="canvas-wrapper">
+                <div class="canvas">
+                    <pane-template ng-repeat="pane in screenLayout.panes"
+                                   index="$index"
+                                   pane="pane"
+                                   update-active-pane-fn="updateActivePane"
+                                   active-pane-index="activePaneIndex">
+                    </pane-template>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>

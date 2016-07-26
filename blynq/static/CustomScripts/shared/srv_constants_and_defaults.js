@@ -36,11 +36,57 @@
             return fileIcons
         }
 
+        //screen layout design
+
+        var getPaneDefaults  = function(){
+            /* below values restricts the user to not to go below the mentioned measurements*/
+            var paneDefaults = {
+                minWidth : 5        //in percentage
+                ,minHeight : 5      // in percentage
+            }
+
+            return paneDefaults
+        }
+
+        var getScreenTypes = function(){
+            var screenTypes = [
+                {
+                    title  :  '4:3 Landscape'
+                    ,id : 1
+                    ,width : 4
+                    ,height : 3
+                },
+                {
+                    title : '4:3 Portrait'
+                    ,id : 2
+                    ,width : 3
+                    ,height : 4
+                },
+                {
+                    title : '16:9 Landscape'
+                    ,id : 3
+                    ,width : 16
+                    ,height : 9
+
+                },
+                {
+                    title : '16:9 Portrait'
+                    ,id : 4
+                    ,width : 9
+                    ,height : 16
+                }
+            ];
+
+            return screenTypes
+        }
+
         return{
             defaultSchedulesLayoutType : defaultSchedulesLayoutType
             ,layouts : layouts
             ,getPopOverMessages : getPopOverMessages
             ,getFileIcons : getFileIcons
+            ,getPaneDefaults : getPaneDefaults
+            ,getScreenTypes : getScreenTypes
         }
     }]);
 
