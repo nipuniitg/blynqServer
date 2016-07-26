@@ -128,7 +128,7 @@ def event_json_from_occurrences(existing_occurrences):
                                                                            'playlist_items'))
         layout_pane_dict = LayoutPaneSerializer().serialize([schedule_pane.layout_pane],
                                                             fields=('layout_pane_id', 'left_margin', 'top_margin',
-                                                                    'width', 'height'))[0]
+                                                                    'z_index', 'width', 'height'))[0]
         campaign_dict = {'schedule_id': schedule.schedule_id,
                          'playlists': playlists_json,
                          'pane': layout_pane_dict,

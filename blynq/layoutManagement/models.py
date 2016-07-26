@@ -26,7 +26,6 @@ class Layout(models.Model):
     title = models.CharField(max_length=100)
     aspect_ratio = models.ForeignKey(AspectRatio, null=True, blank=True)
     is_default = models.BooleanField(default=False)
-    num_of_panes = models.IntegerField(default=2)
     organization = models.ForeignKey(Organization, null=True, blank=True, related_name='%(class)s_organization')
 
     @staticmethod
