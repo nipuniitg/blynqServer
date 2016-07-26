@@ -402,3 +402,142 @@ legend.custom-field-set {
     border-bottom:none;
     font-size : 14px;
 }
+
+/* layout designer */
+
+.designer-wrapper{
+    display: inline-block;
+    margin-top: 60px;
+    width: 100%;
+}
+
+.designer-wrapper-expand{
+    position : absolute;
+    height : calc(100vh - 62px);
+    width : calc(100vw - 182px);
+}
+
+.toolbar-wrapper{
+    border : 2px solid grey;
+    height : 45px;
+    display : block;
+    padding : 3px 12px;
+}
+
+.workspace-wrapper{
+    position : absolute;
+    top : 45px;
+    height : calc(100vh - 61px - 45px);
+    width : 300px;
+    border : 1px solid grey;
+    overflow : scroll;
+    background : white;
+}
+
+.editor-wrapper{
+    position : absolute;
+    top : 45px;
+    left : 300px;
+    height : calc(100vh - 61px - 45px);
+    width : calc(100vw - 180px - 300px);
+    border : 2px solid grey;
+    padding : 10px;
+    background : #f8f8f8;
+    opacity : .5;
+    overflow : auto;
+}
+
+/* toolBar -css */
+.toolbar-wrapper .padder{
+
+}
+
+/* end-toolBar -css */
+
+/* workspace- css*/
+.workspace-wrapper .padder{
+    padding : 10px;
+}
+
+.workspace-wrapper .input-field{
+    padding : 4px 6px;
+}
+/* end-workspace- css*/
+
+/* editor- css*/
+.editor-wrapper .canvas-wrapper{
+    position : relative;
+    height : 100%;
+    width : 60%;
+    overflow : auto;
+    padding : 15px 5%;
+    margin : 0 auto;
+}
+
+.editor-wrapper .canvas{
+    position : absolute;
+    width : 90%;
+    background : #717506;
+    -webkit-box-shadow: 10px 10px 26px 9px rgba(0,0,0,0.7);
+    -moz-box-shadow: 10px 10px 26px 9px rgba(0,0,0,0.7);
+    box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.7);
+}
+
+.pane{
+    background : black;
+    position : absolute;
+    opacity : 0.5;
+}
+
+
+.active-pane{
+    background : white;
+    opacity : 1;
+    cursor : move;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+
+.pane-description-tag{
+    text-align : center;
+    overflow : hidden;
+}
+
+.pane-description-tag p{
+    color : black;
+}
+
+.pane-editing-tag{
+    position : absolute;
+    bottom : 0px;
+    width : 100%;
+    background : grey;
+    color : green;
+    height : 20px;
+    overflow : hidden;
+}
+
+/* end editor- css*/
+
+/* layout designer*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

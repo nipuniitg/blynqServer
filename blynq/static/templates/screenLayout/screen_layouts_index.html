@@ -1,0 +1,36 @@
+<section class="wrapper fixed-wrapper">
+    <div class="row fill">
+        <div class="col-md-12 fill">
+            <div class="panel panel-default fill">
+                <div class="panel-heading">
+                    Screen Layouts
+                    <span class="pull-right">
+                        <a class="btn  btn-primary pull-right" ng-click="sLIC.createNewLayout()">
+                           <i class="fa fa-plus"></i>
+                            Add Layout
+                        </a>
+                    </span>
+                </div>
+                <div class="panel-body fill overflow-y">
+                    <div class="item-container-wrap">
+                        <div class="item-container-header">
+                            Some Layout
+                        </div>
+                        <div class="item-container">
+
+                        </div>
+                        <div class="item-container-footer">
+                            <span class="pull-right">
+                                <a confirm-fn="deleteSingleContent(file.content_id)" confirm confirm-type="delete">
+                                    <i class="fa fa-trash-o pointer"></i></a>
+                            </span>
+                            <a ng-click="editContent(file, $index)">
+                                    <i class="fa fa-pencil pointer"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

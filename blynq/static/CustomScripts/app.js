@@ -73,9 +73,18 @@ mainApp.config(function($locationProvider,$stateProvider, $urlRouterProvider) {
     })
     .state('screenPartition', {
         url: "/screenPartition"
-        ,templateUrl:'/static/templates/screenPartition/screen_partition_index.html'
-        ,controller : 'screenPartitionIndexCtrl'
-        ,controllerAs : 'sPIC'
+        ,templateUrl:'/static/templates/screenLayout/screen_layouts_index.html'
+        ,controller : 'screenLayoutsIndexCtrl'
+        ,controllerAs : 'sLIC'
+    })
+    .state('layoutDesign',{
+        url : "/layoutDesign"
+        ,params: {
+            screenLayout : null
+        }
+        ,templateUrl : '/static/templates/screenLayout/layout_design_index.html'
+        ,controller : 'layoutDesignIndexCtrl'
+        ,controllerAs : 'lDIC'
     })
     .state('logout',{
         template : ' '

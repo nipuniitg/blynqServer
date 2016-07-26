@@ -26,6 +26,8 @@
 //                ,byweekday  :null
 //                ,bymonthday :null
 //            }
+
+        //Todo : Below naming is inappropriate, as it is not pane but schedule Pane
         function Pane(screen_pane){
             this.schedule_pane_id = -1;
             this.screen_pane = angular.copy(screen_pane);
@@ -103,6 +105,25 @@
         }
 
 
+        function ScreenLayout(){
+            this.split_screen_id = -1;
+            this.title = "New layout";
+            this.screen_type = {};
+            this.panes=[];
+        }
+
+        function LayoutPane(number){
+            var numberAvailable = (typeof number !== "undefined");
+            this.pane_id = -1;
+            this.title = numberAvailable ? "Pane" + number : "Pane"
+            this.margin_left = 0;    //in percentage
+            this.margin_top = 0;    //in percentage
+            this.height = 20;       //in percentage
+            this.width = 25;        // in percentage
+            this.z_index = numberAvailable ? number : 0;
+        }
+
+
         return{
             Schedule : Schedule
             ,Pane : Pane
@@ -111,6 +132,8 @@
             ,playlistBlueprint : playlistBlueprint
             ,playlistItemBlueprint : playlistItemBlueprint
             ,PlaylistItem : PlaylistItem
+            ,ScreenLayout : ScreenLayout
+            ,LayoutPane : LayoutPane
         }
     }]);
 }());

@@ -1,0 +1,57 @@
+<h3>Pane Properties</h3>
+<form class="form" name="pane_properties_form" novalidate>
+    <div class="form-group">
+        <label class="control-label">Name</label>
+        <div class="">
+            <input type="text" class="form-control" ng-model="screenLayout.panes[activePaneIndex].title">
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-addon input-field">width</span>
+                    <input class="form-control input-field" type="number"
+                           ng-model="screenLayout.panes[activePaneIndex].width">
+                    <span class="input-group-addon input-field">%</span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-addon input-field">left(x)</span>
+                    <input class="form-control input-field" type="number"
+                        ng-model="screenLayout.panes[activePaneIndex].margin_left">
+                    <span class="input-group-addon input-field">%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-addon input-field">height</span>
+                    <input class="form-control input-field" type="number"
+                        ng-model="screenLayout.panes[activePaneIndex].height">
+                    <span class="input-group-addon input-field">%</span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-addon input-field">top(y)</span>
+                    <input class="form-control input-field" type="number"
+                        ng-model="screenLayout.panes[activePaneIndex].margin_top">
+                    <span class="input-group-addon input-field">%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label">z-index</label>
+        <div class="row">
+            <div class="col-md-6">
+                <input class="form-control" type="number" ng-model="screenLayout.panes[activePaneIndex].z_index">
+            </div>
+        </div>
+    </div>
+</form>

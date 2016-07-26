@@ -26,8 +26,7 @@
     "jquery-ui": "^1.11.4",
     "moment": "^2.13.0",
     "toastr": "^2.1.2",
-    "jquery": "2.2.4",
-    "angular-resizable": "^1.2.0"
+    "jquery": "2.2.4"
   },
   "resolutions": {
     "angular": "1.5.7"

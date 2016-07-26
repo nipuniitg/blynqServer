@@ -1,0 +1,14 @@
+<div class="pane" ng-class="{'active-pane' : setActiveClass }"
+    style="height : {[ paneObj.height + '%' ]}; width : {[ paneObj.width + '%' ]};
+        left : {[ paneObj.margin_left + '%' ]};
+         top : {[ paneObj.margin_top + '%' ]}">
+    <div class="pane-description-tag">
+        {[ paneObj.title ]}
+    </div>
+
+    <div class="pane-editing-tag" ng-show="setActiveClass">
+        <p>editing</p>
+    </div>
+</div>
+
+<!--activePaneIndex == index-->
