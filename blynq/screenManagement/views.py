@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.core import serializers
 from django.db import transaction
 from django.shortcuts import render
 from schedule.models import Calendar
@@ -7,11 +8,11 @@ from authentication.models import City
 from authentication.serializers import CitySerializer
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, debugFileLog
 from screenManagement.forms import AddScreenForm, AddGroup
-from screenManagement.models import Screen, ScreenStatus, Group, GroupScreens, ScreenActivationKey, SplitScreen
+from screenManagement.models import Screen, ScreenStatus, Group, GroupScreens, ScreenActivationKey, AspectRatio
 # import the logging library
 
 # Get an instance of a logger
-from screenManagement.serializers import ScreenSerializer, GroupSerializer, SplitScreenSerializer
+from screenManagement.serializers import ScreenSerializer, GroupSerializer
 
 
 # Create your views here.
@@ -222,8 +223,7 @@ def group_index(request):
     return render(request, 'screen/groups.html', context_dic)
 
 
-def valid_screen_layouts(request):
-    json_data = SplitScreenSerializer().serialize(SplitScreen.objects.all(), fields=('split_screen_id', 'title',
-                                                                                     'num_of_panes',
-                                                                                     'screen_panes'))
+def get_aspect_ratios(request):
+    screen_aspect_ratios = AspectRatio.objects.all()
+    json_data = serializers.serialize('json', screen_aspect_ratios)
     return obj_to_json_response(json_data)

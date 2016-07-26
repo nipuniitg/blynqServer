@@ -10,18 +10,13 @@ from django.db import transaction
 
 # Create your views here.
 # from schedule.views import calendar
-from authentication.models import Organization
-from playerManagement.models import LocalServer
-from contentManagement.models import Content
-from contentManagement.serializers import ContentSerializer
-from customLibrary.views_lib import get_userdetails, ajax_response, obj_to_json_response, string_to_dict, list_to_comma_string, \
-    default_string_to_datetime, generate_utc_datetime, debugFileLog, get_ist_datetime, get_utc_datetime
-from playlistManagement.models import Playlist, PlaylistItems
-from playlistManagement.serializers import PlaylistSerializer
+from customLibrary.views_lib import get_userdetails, ajax_response, obj_to_json_response, string_to_dict, \
+    list_to_comma_string, generate_utc_datetime, get_ist_datetime, get_utc_datetime, debugFileLog
+from playlistManagement.models import Playlist
 from scheduleManagement.models import Schedule, SchedulePlaylists, ScheduleScreens, SchedulePane
 from scheduleManagement.serializers import ScheduleSerializer
-from screenManagement.models import Screen, Group, ScreenActivationKey, SplitScreen, ScreenPane
-from screenManagement.views import debugFileLog
+from screenManagement.models import Screen, Group, ScreenActivationKey
+from layoutManagement.models import Layout
 
 
 @login_required
@@ -237,15 +232,15 @@ def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists
     return True, error
 
 
-def upsert_schedule_panes(user_details, schedule, schedule_panes, split_screen):
+def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
     debugFileLog.info("inside upsert_schedule_panes")
     error = ''
     schedule_pane_id_list = []
     for item in schedule_panes:
         schedule_pane_id = int(item.get('schedule_pane_id'))
         schedule_playlists = item.get('schedule_playlists')
-        screen_pane = item.get('screen_pane')
-        screen_pane_id = int(screen_pane.get('screen_pane_id'))
+        layout_pane = item.get('layout_pane')
+        layout_pane_id = int(layout_pane.get('layout_pane_id'))
         timeline = item.get('timeline')
         is_always = timeline.get('is_always')
         all_day = timeline.get('all_day')
@@ -256,7 +251,7 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, split_screen):
         event = Event(**event_dict)
         event.save()
         if schedule_pane_id == -1:
-            schedule_pane = SchedulePane(schedule=schedule, screen_pane_id=screen_pane_id,
+            schedule_pane = SchedulePane(schedule=schedule, layout_pane_id=layout_pane_id,
                                          is_always=is_always, all_day=all_day, recurrence_absolute=recurrence_absolute,
                                          event=event)
             schedule_pane.save()
@@ -264,7 +259,7 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, split_screen):
         else:
             schedule_pane = SchedulePane.objects.get(schedule_pane_id=schedule_pane_id)
             schedule_pane.schedule = schedule
-            schedule_pane.screen_pane_id = screen_pane_id
+            schedule_pane.layout_pane_id = layout_pane_id
             schedule_pane.is_always = is_always
             schedule_pane.all_day = all_day
             schedule_pane.recurrence_absolute = recurrence_absolute
@@ -302,18 +297,18 @@ def upsert_schedule(request):
             selected_layout = posted_data.get('selected_layout')
             schedule_panes = posted_data.get('schedule_panes')
             user_schedules = Schedule.get_user_relevant_objects(user_details=user_details)
-            split_screen_id = int(selected_layout.get('split_screen_id'))
-            split_screen = SplitScreen.objects.get(split_screen_id=split_screen_id)
+            layout_id = int(selected_layout.get('layout_id'))
+            layout = Layout.objects.get(layout_id=layout_id)
             # upsert schedule
             if schedule_id == -1:
                 schedule = Schedule(schedule_title=schedule_title, created_by=user_details, is_split=is_split,
-                                    split_screen=split_screen, last_updated_by=user_details,
+                                    layout=layout, last_updated_by=user_details,
                                     organization=user_details.organization)
             else:
                 schedule = user_schedules.get(schedule_id=schedule_id)
                 schedule.schedule_title = schedule_title
                 schedule.is_split = is_split
-                schedule.split_screen = split_screen
+                schedule.layout = layout
                 schedule.last_updated_by = user_details
             schedule.save()
 
@@ -326,7 +321,7 @@ def upsert_schedule(request):
             errors.append(error)
 
             success_panes, error = upsert_schedule_panes(user_details=user_details, schedule=schedule,
-                                                         schedule_panes=schedule_panes, split_screen=split_screen)
+                                                         schedule_panes=schedule_panes, layout=layout)
             success = success_screens and success_groups and success_panes
             errors.append(error)
     except Exception as e:
@@ -556,8 +551,8 @@ def calendar_schedules(start_datetime, end_datetime, screen_id=None, group_id=No
             else:
                 display_type = 'info'
             title = schedule.schedule_title
-            title = title + ' - ' + schedule.split_screen.title if schedule.split_screen else title
-            title = title + ' - ' + each_schedule_pane.screen_pane.pane_title if each_schedule_pane.screen_pane else title
+            title = title + ' - ' + schedule.layout.title if schedule.layout else title
+            title = title + ' - ' + each_schedule_pane.layout_pane.title if each_schedule_pane.layout_pane else title
             for each_occur in occurrences:
                 campaign_dict = {'title': title,
                                  'startsAt': get_ist_datetime(each_occur.start),

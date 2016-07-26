@@ -19,7 +19,7 @@ from playlistManagement.models import PlaylistItems
 from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import ScheduleScreens, SchedulePlaylists, SchedulePane
 from screenManagement.models import ScreenActivationKey, Screen
-from screenManagement.serializers import ScreenPaneSerializer
+from layoutManagement.serializers import LayoutPaneSerializer
 
 
 @csrf_exempt
@@ -91,7 +91,7 @@ def merge_occurrence(existing_occurrences, new_occur):
     :return: modified existing_occurrences based on the start_time and end_time of the new occurrence
     """
     # Merge the new occur into existing_occurrences
-    # two occurrences are overlapping only if screen_pane_id is same and time period overlaps
+    # two occurrences are overlapping only if layout_pane_id is same and time period overlaps
     new_occur_parts = []
     for cur_occur in existing_occurrences:
         if is_conflicting(cur_occur, new_occur):
@@ -126,12 +126,12 @@ def event_json_from_occurrences(existing_occurrences):
         playlists = schedule_pane.playlists.all()
         playlists_json = PlaylistSerializer().serialize(playlists, fields=('playlist_id', 'playlist_title',
                                                                            'playlist_items'))
-        screen_pane_dict = ScreenPaneSerializer().serialize([schedule_pane.screen_pane],
-                                                            fields=('screen_pane_id', 'left_margin', 'top_margin',
+        layout_pane_dict = LayoutPaneSerializer().serialize([schedule_pane.layout_pane],
+                                                            fields=('layout_pane_id', 'left_margin', 'top_margin',
                                                                     'width', 'height'))[0]
         campaign_dict = {'schedule_id': schedule.schedule_id,
                          'playlists': playlists_json,
-                         'pane': screen_pane_dict,
+                         'pane': layout_pane_dict,
                          'last_updated_time': schedule.last_updated_time,
                          'start_time': occur.start,
                          'end_time': occur.end}

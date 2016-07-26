@@ -1,6 +1,6 @@
 from django.core.serializers.python import Serializer
 
-from screenManagement.models import GroupScreens, ScreenPane
+from screenManagement.models import GroupScreens
 
 
 class GroupScreensSerializer(Serializer):
@@ -41,20 +41,4 @@ class GroupSerializer(Serializer):
             group_screens = GroupScreens.objects.filter(group=obj)
             self._current['screens'] = GroupScreensSerializer().serialize(group_screens, fields=('group_screen_id',
                                                                                                  'screen'))
-        self.objects.append(self._current)
-
-
-class ScreenPaneSerializer(Serializer):
-    def end_object(self, obj):
-        self._current['screen_pane_id'] = obj._get_pk_val()
-        self.objects.append(self._current)
-
-
-class SplitScreenSerializer(Serializer):
-    def end_object(self, obj):
-        self._current['split_screen_id'] = obj._get_pk_val()
-        if 'screen_panes' in self.selected_fields:
-            screen_panes = ScreenPane.objects.filter(split_screen=obj)
-            self._current['screen_panes'] = ScreenPaneSerializer().serialize(screen_panes,
-                                                                             fields=('screen_pane_id', 'pane_title'))
         self.objects.append(self._current)

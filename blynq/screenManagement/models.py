@@ -1,11 +1,28 @@
-from django.core.validators import MaxValueValidator
 from django.db import models
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from schedule.models import Calendar
+
 from authentication.models import Organization, UserDetails, City
 from customLibrary.views_lib import debugFileLog
+
+
 # Create your models here.
+
+
+class AspectRatio(models.Model):
+    aspect_ratio_id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=100)
+    ORIENTATION_CHOICES = (
+        ('LANDSCAPE', 'Landscape Orientation'),
+        ('PORTRAIT', 'Portrait Orientation'),
+    )
+    orientation = models.CharField(max_length=20, choices=ORIENTATION_CHOICES, default=ORIENTATION_CHOICES[0][0])
+    width_component = models.IntegerField()
+    height_component = models.IntegerField()
+
+    def __unicode__(self):
+        return self.title
 
 
 # Possible screen status
@@ -86,7 +103,7 @@ class Group(models.Model):
         return self.group_name
 
     def natural_key(self):
-        return ({'group_id': self.group_id, 'group_name': self.group_name})
+        return {'group_id': self.group_id, 'group_name': self.group_name}
 
     # Only used once, try to refractor more code using functions like this
     @staticmethod
@@ -176,26 +193,3 @@ def remove_schedule_screens(sender, instance, **kwargs):
     from scheduleManagement.models import ScheduleScreens
     schedule_screens = ScheduleScreens.objects.filter(group=instance.group, screen=instance.screen)
     schedule_screens.delete()
-
-
-class ScreenPane(models.Model):
-    screen_pane_id = models.AutoField(primary_key=True)
-    pane_title = models.CharField(max_length=100, null=True, blank=True)
-    left_margin = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
-    top_margin = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
-    width = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
-    height = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
-    split_screen = models.ForeignKey('SplitScreen', null=True, blank=True, related_name='%(class)s_splitscreen')
-
-    def __unicode__(self):
-        return self.split_screen.title + '-' + self.pane_title
-
-
-class SplitScreen(models.Model):
-    split_screen_id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=100)
-    is_default = models.BooleanField(default=False)
-    num_of_panes = models.IntegerField(default=2)
-
-    def __unicode__(self):
-        return self.title

@@ -4,6 +4,7 @@ from django.conf import settings
 from django.views.static import serve
 from authentication import authentication_urls
 from authentication import views as auth_views
+from layoutManagement import layout_urls
 from playerManagement import player_urls
 from screenManagement import views as screen_views
 from screenManagement import screen_urls
@@ -20,6 +21,7 @@ urlpatterns = [
     , url(r'^api/login', auth_views.login, name='login')
     , url(r'^api/schedule/', include(schedule_urls))
     , url(r'^api/screen/', include(screen_urls))
+    , url(r'^api/layout/', include(layout_urls))
     , url(r'^api/content/', include(content_urls))
     , url(r'^api/playlist/', include(playlist_urls))
     , url(r'^admin', include(admin.site.urls))

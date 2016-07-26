@@ -8,7 +8,8 @@ from django.utils.translation import ugettext_lazy as _
 from authentication.models import UserDetails, Organization
 from customLibrary.views_lib import debugFileLog
 from playlistManagement.models import Playlist
-from screenManagement.models import Screen, Group, SplitScreen, ScreenPane
+from screenManagement.models import Screen, Group
+from layoutManagement.models import LayoutPane, Layout
 from schedule.models import Event
 
 
@@ -83,7 +84,7 @@ class SchedulePlaylists(models.Model):
 class SchedulePane(models.Model):
     schedule_pane_id = models.AutoField(primary_key=True)
     schedule = models.ForeignKey('Schedule', on_delete=models.CASCADE, related_name='%(class)s_schedule')
-    screen_pane = models.ForeignKey(ScreenPane, on_delete=models.PROTECT)
+    layout_pane = models.ForeignKey(LayoutPane, on_delete=models.PROTECT, null=True, blank=True)
     playlists = models.ManyToManyField(Playlist, through=SchedulePlaylists)
     is_always = models.BooleanField(default=True)
     all_day = models.BooleanField(default=True)
@@ -92,7 +93,7 @@ class SchedulePane(models.Model):
 
     def __unicode__(self):
         schedule_title = self.schedule.schedule_title if self.schedule.schedule_title else ''
-        pane_title = self.screen_pane.pane_title if self.screen_pane.pane_title else ''
+        pane_title = self.layout_pane.title if self.layout_pane.title else ''
         return schedule_title + ' - ' + pane_title
 
 
@@ -101,8 +102,8 @@ class Schedule(models.Model):
     schedule_title = models.CharField(max_length=100)
     screens = models.ManyToManyField(Screen, through=ScheduleScreens)
     is_split = models.BooleanField(default=False)
-    split_screen = models.ForeignKey(SplitScreen, on_delete=models.PROTECT, null=True)
-    schedule_panes = models.ManyToManyField(ScreenPane, through=SchedulePane)
+    layout = models.ForeignKey(Layout, on_delete=models.PROTECT, null=True)
+    schedule_panes = models.ManyToManyField(LayoutPane, through=SchedulePane)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
 
     created_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True, related_name='%(class)s_created_by')
