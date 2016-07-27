@@ -358,9 +358,13 @@ def move_content(request):
     posted_data = string_to_dict(request.body)
     content_ids = posted_data.get('content_ids')
     parent_folder_id = int(posted_data.get('parent_folder_id'))
+    debugFileLog.info( 'parent_folder_id is %d' % parent_folder_id )
     user_content = Content.get_user_relevant_objects(user_details=user_details)
     try:
-        parent_folder = user_content.get(content_id=parent_folder_id)
+        if parent_folder_id == -1:
+            parent_folder = None
+        else:
+            parent_folder = user_content.get(content_id=parent_folder_id)
         # assert parent_folder.is_folder == True
     except Content.DoesNotExist:
         success = False

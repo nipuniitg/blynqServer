@@ -24,7 +24,6 @@ from layoutManagement.serializers import LayoutPaneSerializer, default_layout_pa
 
 @csrf_exempt
 def player_update_available(request):
-    debugFileLog.info("inside player_update_available")
     errors = []
     posted_data = string_to_dict(request.body)
     unique_device_key = posted_data.get('device_key')
@@ -47,20 +46,66 @@ def player_update_available(request):
 
 
 @csrf_exempt
-def activation_key_valid(request):
+def device_key_active(request):
+    """
+    :param request:
+    :return: Json dict of success and error, success will be True if the activation_key sent in the post request
+     is not in_use and verified.
+     If the activation_key is not in the database, then adding it here and manually check the verified through the
+     admin portal
+    """
+    success = False
+    error = ''
     posted_data = string_to_dict(request.body)
     activation_key = posted_data.get('device_key')
-    errors = []
+    if not activation_key:
+        error = 'Activation key not found'
+        return ajax_response(success=success, errors=error)
     try:
-        screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key, in_use=True, verified=True)
-        success = True
+        screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key)
+        if not screen_activation_key.verified:
+            error = 'New device with device key %s is asking for activation. ' % activation_key
+            error += 'Check the verified boolean if the device is valid.'
+            debugFileLog.warning(error)
+            # elif screen_activation_key.in_use:
+            #     error = 'Device activation key %s is already in use.' % activation_key
+            #     debugFileLog.warning(error)
+        elif screen_activation_key.in_use:
+            success = True
+        else:
+            success = False
     except ScreenActivationKey.DoesNotExist:
-        errors = ['Invalid activation key, try another or contact support']
+        error = 'Activation key %s doesn\'t exist in the database.\n ' % activation_key
+        error += 'Adding it, check the verified boolean if the device is valid.\n'
+        debugFileLog.warning(error)
+        try:
+            screen_activation_key = ScreenActivationKey(activation_key=activation_key, verified=True)
+            screen_activation_key.save()
+        except Exception as e:
+            db_error = 'Adding the above activation_key to the database failed with the exception {0} \n'.format(str(e))
+            debugFileLog.error(db_error)
         success = False
-    except Exception as e:
-        success = False        
-        errors = ['Invalid activation key, try another or contact support']
-    return ajax_response(success=success, errors=errors)
+    return ajax_response(success=success, errors=error)
+
+
+@csrf_exempt
+def activation_key_valid(request):
+    debugFileLog.info( "Inside activation_key_valid" )
+    return device_key_active(request)
+    # posted_data = string_to_dict(request.body)
+    # activation_key = posted_data.get('device_key')
+    # debugFileLog.exception("%s " % activation_key )
+    # errors = []
+    # try:
+    #     screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key, in_use=True, verified=True)
+    #     success = True
+    # except ScreenActivationKey.DoesNotExist:
+    #     errors = ['Invalid activation key, try another or contact support']
+    #     success = False
+    # except Exception as e:
+    #     success = False        
+    #     errors = ['Invalid activation key, try another or contact support']
+    # return ajax_response(success=success, errors=errors)
 
 
 def schedule_pane_from_occurrence(occur):
@@ -169,6 +214,7 @@ def get_screen_data(request, nof_days=7):
     # the datetime format of last_received should be "%2d%2m%4Y%2H%2M%2S"
     last_received = posted_data.get('last_received')
     unique_device_key = posted_data.get('device_key')
+    debugFileLog.info( "device_key is %s last_received is %s " % ( unique_device_key, last_received ) )
     last_received_datetime = default_string_to_datetime(last_received)
     try:
         start_time = timezone.now()

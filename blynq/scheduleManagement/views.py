@@ -14,7 +14,7 @@ from customLibrary.views_lib import get_userdetails, ajax_response, obj_to_json_
 from playlistManagement.models import Playlist
 from scheduleManagement.models import Schedule, SchedulePlaylists, ScheduleScreens, SchedulePane
 from scheduleManagement.serializers import default_schedule_serializer
-from screenManagement.models import Screen, Group, ScreenActivationKey
+from screenManagement.models import Screen, Group
 from layoutManagement.models import Layout
 
 
@@ -34,20 +34,25 @@ def interval_param(interval):
 
 def list_to_param(key_str, bylistday):
     if bylistday:
-        weekday_string = list_to_comma_string(bylistday)
-        return key_str + ':' + weekday_string
+        try:
+            weekday_string = list_to_comma_string(bylistday)
+            return key_str + ':' + weekday_string
+        except Exception as e:
+            debugFileLog.exception(e)
     return ''
 
 
 def append_params(params, new_keyvalue):
-    return params + ';' + new_keyvalue
+    if new_keyvalue:
+        return params + ';' + new_keyvalue
+    else:
+        return params
 
 
 # byweekday should be a list [0,2,3] meaning 0-Monday, 1-Tuesday, 2-Wednesday, 3-Thursday, 4-Friday, 5-Saturday,6-Sunday
 def generate_rule_params(interval=1, bymonthday=None, byweekday=None, byweekno=None):
     debugFileLog.info("inside generate_rule_params")
     params = interval_param(interval)
-    params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekday', bylistday=byweekday))
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekday', bylistday=byweekday))
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='bymonthday', bylistday=bymonthday))
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekno', bylistday=byweekno))
@@ -330,47 +335,6 @@ def upsert_schedule(request):
         debugFileLog.exception(e)
         errors.append(error)
     return ajax_response(success=success, errors=errors)
-
-
-@csrf_exempt
-def device_key_active(request):
-    """
-    :param request:
-    :return: Json dict of success and error, success will be True if the activation_key sent in the post request
-     is not in_use and verified.
-     If the activation_key is not in the database, then adding it here and manually check the verified through the
-     admin portal
-    """
-    success = False
-    error = ''
-    posted_data = string_to_dict(request.body)
-    activation_key = posted_data.get('device_key')
-    if not activation_key:
-        error = 'Activation key not found'
-        return ajax_response(success=success, errors=error)
-    try:
-        screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key)
-        if not screen_activation_key.verified:
-            error = 'New device with device key %s is asking for activation. ' % activation_key
-            error += 'Check the verified boolean if the device is valid.'
-            debugFileLog.warning(error)
-            # elif screen_activation_key.in_use:
-            #     error = 'Device activation key %s is already in use.' % activation_key
-            #     debugFileLog.warning(error)
-        else:
-            success = True
-    except ScreenActivationKey.DoesNotExist:
-        error = 'Activation key %s doesn\'t exist in the database.\n ' % activation_key
-        error += 'Adding it, check the verified boolean if the device is valid.\n'
-        debugFileLog.warning(error)
-        try:
-            screen_activation_key = ScreenActivationKey(activation_key=activation_key)
-            screen_activation_key.save()
-        except Exception as e:
-            db_error = 'Adding the above activation_key to the database failed with the exception {0} \n'.format(str(e))
-            debugFileLog.error(db_error)
-        success = False
-    return ajax_response(success=success, errors=error)
 
 
 def get_screen_schedules(request, screen_id):

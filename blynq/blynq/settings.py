@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '1ig8fo2929x)i=c7k$z0qe#@1n())0o2rt7*45^j^td5_duj$m'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 if DEBUG:
     ALLOWED_HOSTS = []
@@ -150,7 +150,7 @@ LOGIN_URL = '/authentication/login/'  # The page users are directed to if they a
 
 # Content related settings
 DEFAULT_DISPLAY_TIME = 10
-STORAGE_LIMIT_PER_ORGANIZATION = 1*1024*1024*1024  # 1 gb 1*1024*1024*1024
+STORAGE_LIMIT_PER_ORGANIZATION = 5*1024*1024*1024  # 1 gb 1*1024*1024*1024
 
 
 today = timezone.now().strftime("%Y%m%d")
@@ -189,8 +189,13 @@ LOGGING = {
             'propagate': True,
         },
         'debugFileLog': {
+            'level': 'DEBUG',
             'handlers': ['debug'],
             'propagate': True,
+        },
+        'core.handlers': {
+            'level': 'DEBUG',
+            'handlers': ['debug']
         }
     },
 }
