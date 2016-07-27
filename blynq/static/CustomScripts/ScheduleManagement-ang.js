@@ -736,7 +736,8 @@ var t = {}
         else
         {
             //if for only single day, then consider date only once.
-            if(e.startDate == e.endDate){
+            //set Hours is to compare only the date part and to avoid time comparision
+            if(e.startDate.setHours(0,0,0,0) == e.endDate.setHours(0,0,0,0)){
                 t = t+tLF.getOnlyDate(e.startDate) + ' ';
             }
             else{
@@ -751,8 +752,9 @@ var t = {}
                     e.endTime && (t = t + i.TO + " " + tLF.getOnlyTime(e.endTime) + " ")
             }
         }
-
-        if (e.recurrenceType && e.startDate != e.endDate) {
+        
+        //set Hours is to compare only the date part and to avoid time comparision
+        if (e.recurrenceType && e.startDate.setHours(0,0,0,0) != e.endDate.setHours(0,0,0,0)) {
             var u = 0;
             if (t = t + e.recurrenceType + " ",
             e.recurrenceType === n.MONTHLY && (e.recurrenceAbsolute ? (t = t + i.DAY + " " + e.recurrenceDayOfMonth + " " + i.OF + " ",
