@@ -27,7 +27,7 @@ class LayoutSerializer(Serializer):
             self._current['layout_panes'] = default_layout_pane_serializer(layout_panes)
         if 'aspect_ratio' in self.selected_fields:
             if obj.aspect_ratio:
-                self._current['aspect_ratio'] = AspectRatioSerializer().serialize([obj.aspect_ratio])
+                self._current['aspect_ratio'] = AspectRatioSerializer().serialize([obj.aspect_ratio])[0]
             else:
                 self._current['aspect_ratio'] = {}
         self.objects.append(self._current)
