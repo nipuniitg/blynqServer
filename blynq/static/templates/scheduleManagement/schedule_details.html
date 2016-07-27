@@ -1,4 +1,4 @@
-<div id="timelineModal">
+<div id="">
     <div class="modal-header">
         <button type="button" class="close" ng-click="cancel()" aria-hidden="true"><i class="fa fa-times"></i></button>
         <h3 class="modal-title">{[title]}</h3>
@@ -7,7 +7,7 @@
         <div class="row">
             <div class="col-md-12" style="min-height:400px; overflow-y: scroll">
                 <div class="panel panel-default" style="border-right:1px solid grey">
-                    <div class="panel-heading">Schedule Details</div>
+                    <!--<div class="panel-heading">Schedule Details</div>-->
                     <div class="panel-body">
                         <form id="form_schedule_details" name="scheduleDetailsForm" class="form-horizontal"
                               enctype="multipart/form-data">
@@ -47,8 +47,12 @@
                                 <div class="control-label col-md-2">Layout Type</div>
                                 <div class="col-md-3">
                                     <select ng-model="schedule.layout" ng-options="layout.title for layout
-                                    in layouts track by layout.layout_id">
+                                    in layouts track by layout.layout_id" ng-show="layouts.length > 0">
                                     </select>
+                                    <div class="well" ng-show="layouts.length == 0">
+                                        No saved split screen layouts to show. Please
+                                        <a ui-sref="layoutDesign">create</a> one.
+                                    </div>
                                 </div>
                                 <!-- default Layouts structures -->
                                 <div class="col-md-7">
@@ -105,7 +109,7 @@
                                 <div class="col-md-12">
                                     <uib-tabset>{[active]}
                                         <uib-tab index="[{$index}]" ng-repeat="pane in schedule.schedule_panes"
-                                                 heading="Pane-{[$index + 1]}">
+                                                 heading="{[ pane.layout_pane.title ]}">
                                             <div class="panel">
                                                 <div class="panel-body">
                                                     <form class="form-horizontal">
