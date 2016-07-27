@@ -34,7 +34,7 @@
                 <td>{[ schedule.schedule_title ]}</td>
                 <td>
                     <span ng-show="!schedule.is_split">Full Screen</span>
-                    <span ng-show="schedule.is_split">Split Screen-(Layout: {[schedule.selected_layout.title]})</span>
+                    <span ng-show="schedule.is_split">Split Screen-(Layout: {[schedule.layout.title]})</span>
                 </td>
                 <td>
                     <div class="tagsinput">
@@ -52,7 +52,7 @@
                     <fieldset ng-repeat="pane in schedule.schedule_panes" class="custom-field-set">
                         <legend class="custom-field-set">
                             <a data-toggle="collapse" data-target="#playlist_{[schedule.schedule_id]}_{[$index]}" href="#">
-                                {[ pane.screen_pane.pane_title ]}
+                                {[ pane.layout_pane.title ]}
                             </a>
                         </legend>
                         <div class="col collapse in" id="playlist_{[schedule.schedule_id]}_{[$index]}">
@@ -67,7 +67,7 @@
                 </td>
                 <td>
                     <fieldset ng-repeat="pane in schedule.schedule_panes" class="custom-field-set">
-                        <legend class="custom-field-set">{[ pane.screen_pane.pane_title ]}</legend>
+                        <legend class="custom-field-set">{[ pane.layout_pane.title ]}</legend>
                         <div class="tagsinput">
                         <span class="tag">
                             <span> {[pane.timeline | timelineLabel]} &nbsp;&nbsp;</span>

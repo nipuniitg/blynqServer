@@ -1,12 +1,12 @@
 (function(){
     'use strict';
-
-var sPApp = angular.module("sPApp",[]).config(function($interpolateProvider) {
+//layout App
+var lApp = angular.module("lApp",[]).config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('{[');
     $interpolateProvider.endSymbol(']}');
     });
 
-sPApp.config(function($httpProvider) {
+lApp.config(function($httpProvider) {
     $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
@@ -15,31 +15,75 @@ sPApp.config(function($httpProvider) {
 
 /* screen Layouts index*/
 //Controllers
-sPApp.controller('screenLayoutsIndexCtrl',['$scope', 'screenLayoutsIndexFactory','blueprints', '$state','$uibModal',
- function($scope, sLIF,blueprints, $state, $uibModal){
-    var sLIC = this;
+lApp.controller('layoutsIndexCtrl',['$scope', 'layoutsIndexFactory','blueprints', '$state','$uibModal',
+ function($scope, lIF,blueprints, $state, $uibModal){
+    var lIC = this;
 
     var onLoad = function(){
-        sLIF.getScreenLayouts().then(function getScreenLayoutsSuccess(layouts){
-            sLIC.screenLayouts = layouts;
-        },function getScreenLayoutsReject(){
+        refreshLayouts();
+    }
+
+    var refreshLayouts = function(){
+        lIF.getLayouts().then(function getLayoutsSuccess(layouts){
+            lIC.layouts = layouts;
+        },function getLayoutsReject(){
             toastr.warning('Oops! some error occurred while fetching screen layouts. Please refresh page and try again')
         });
     }
 
-    sLIC.createNewLayout = function(){
+    lIC.createNewLayout = function(){
         $state.go('layoutDesign');
+    }
+
+    lIC.editLayout = function(index){
+        $state.go('layoutDesign', {layout : lIC.layouts[index]});
+    }
+
+    lIC.deleteLayout = function(index){
+        var delete_layout_id = lIC.layouts[index].layout_id;
+        lIF.deleteLayout(delete_layout_id).then(function deleteSuccess(data){
+            if(data.success){
+                toastr.success('layout deleted');
+                refreshLayouts();
+            }
+            else{
+                toastr.warning('Oops!There was some internal error')
+                console.log(data.errors);
+            }
+        }, function(data){
+            toastr.warning('Oops! Some error occurred.');
+        })
     }
     onLoad();
 }]);
 
 //Factories
-sPApp.factory('screenLayoutsIndexFactory',['$http','$q', function($http, $q){
-    var getScreenLayouts = function(){
+lApp.factory('layoutsIndexFactory',['$http','$q', function($http, $q){
+
+    var getLayouts = function(){
         var deferred = $q.defer();
         $http({
             method : "GET",
-            url : "/api/screenLayouts/getScreenLayouts"
+            url : "/api/layout/getLayouts"
+        }).then(function mySucces(response) {
+            deferred.resolve(response.data);
+        }, function myError(response) {
+            console.log(response.statusText);
+            deferred.reject(response.Text)
+        });
+        return deferred.promise
+    }
+
+    var deleteLayout = function(delete_layout_id){
+        var deferred = $q.defer();
+        var postData = {
+            layout_id : delete_layout_id
+        }
+
+        $http({
+            method : "POST",
+            url : "/api/layout/deleteLayout",
+            data : postData
         }).then(function mySucces(response) {
             deferred.resolve(response.data);
         }, function myError(response) {
@@ -50,7 +94,8 @@ sPApp.factory('screenLayoutsIndexFactory',['$http','$q', function($http, $q){
     }
 
     return{
-        getScreenLayouts : getScreenLayouts
+        getLayouts : getLayouts
+        ,deleteLayout : deleteLayout
     }
 
 }]);
@@ -59,16 +104,30 @@ sPApp.factory('screenLayoutsIndexFactory',['$http','$q', function($http, $q){
 
 /* screen Layouts Design index */
 
-sPApp.factory('layoutDesignFactory',['$http', '$q',
+lApp.factory('layoutDesignFactory',['$http', '$q',
  function($http, $q){
 
-    var upsertScreenLayout = function(screenLayout){
+    var upsertLayout = function(layout){
         var deferred = $q.defer();
 
         $http({
+            method : "POST",
+            url : "/api/layout/upsertLayout",
+            data : layout
+        }).then(function mySucces(response) {
+            deferred.resolve(response.data);
+        }, function myError(response) {
+            console.log(response.statusText);
+            deferred.reject(response.Text)
+        });
+        return deferred.promise
+    }
+
+    var getAspectRatios = function(){
+        var deferred = $q.defer();
+        $http({
             method : "GET",
-            url : "/api/screenLayouts/upsertScreenLayout",
-            data : screenLayout
+            url : "/api/screen/getAspectRatios"
         }).then(function mySucces(response) {
             deferred.resolve(response.data);
         }, function myError(response) {
@@ -79,12 +138,13 @@ sPApp.factory('layoutDesignFactory',['$http', '$q',
     }
 
     return{
-        upsertScreenLayout : upsertScreenLayout
+        upsertLayout : upsertLayout
+        ,getAspectRatios : getAspectRatios
     }
 
  }]);
 
-sPApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints','constantsAndDefaults',
+lApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints','constantsAndDefaults',
 'layoutDesignFactory',
  function($scope, sP, blueprints, cAD, lDF){
     /*
@@ -97,41 +157,55 @@ sPApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints',
     var parentCanvas = angular.element(document.getElementsByClassName('canvas'));
 
     var onLoad = function(){
-        // selecting default screenType (portrait/landscape/resolution)
-        $scope.screenTypes = cAD.getScreenTypes();
+        // selecting default aspectRatio (portrait/landscape/resolution)
+        lDF.getAspectRatios().then(function getAspectRatiosSuccess(data){
+            $scope.aspectRatios = data;
+            //layout obtained from stateParams
+            $scope.layout = sP.layout;
+            if($scope.layout == null){
+                var newLayout = new blueprints.Layout();
+                newLayout.layout_panes.push(new blueprints.LayoutPane(0));
+                $scope.layout = newLayout;
+                $scope.layout.aspect_ratio = $scope.aspectRatios[0];
+            }
+
+            setCanvasDimensions();
+
+            lDIC.selected_aspect_ratio = angular.copy($scope.layout.aspect_ratio);
+            lDIC.resetLayoutBackup = angular.copy($scope.layout);
+            $scope.activePaneIndex = 0;
+        },function reject(){
+
+        })
 
 
-        //layout obtained from stateParams
-        $scope.screenLayout = sP.screenLayout;
-        if($scope.screenLayout == null){
-            var newLayout = new blueprints.ScreenLayout();
-            newLayout.panes.push(new blueprints.LayoutPane(0));
-            $scope.screenLayout = newLayout;
-            $scope.screenLayout.screen_type = $scope.screenTypes[0];
-        }
 
-        setCanvasDimensions();
-
-        lDIC.selected_screen_type = angular.copy($scope.screenLayout.screen_type);
-        lDIC.resetScreenLayoutBackup = angular.copy($scope.screenLayout);
-        $scope.activePaneIndex = 0;
     };
 
     var setCanvasDimensions = function(){
+        var computed_height;
+        if($scope.layout.aspect_ratio.orientation == 'LANDSCAPE'){
+            //width*(orientationHeightComponent/orientationWidthComponent)
+            computed_height = parentCanvas.width()*($scope.layout.aspect_ratio.height_component/$scope.layout.aspect_ratio.width_component)
+        }
+        else{
+            computed_height =  parentCanvas.width()*($scope.layout.aspect_ratio.width_component/$scope.layout.aspect_ratio.height_component)
+        }
+
         parentCanvas.css({
-            height : parentCanvas.width()*($scope.screenLayout.screen_type.height/$scope.screenLayout.screen_type.width)
+            height : computed_height
         });
     }
 
-    lDIC.screenTypeChanged = function(){
+    lDIC.aspectRatioChanged = function(){
         //set layout
-        var newLayout = new blueprints.ScreenLayout();
-        newLayout.panes.push(new blueprints.LayoutPane(0));
-        $scope.screenLayout = newLayout;
-        $scope.screenLayout.screen_type = angular.copy(lDIC.selected_screen_type);
+        var newLayout = new blueprints.Layout();
+        newLayout.layout_panes.push(new blueprints.LayoutPane(0));
+        $scope.layout = newLayout;
+        $scope.layout.aspect_ratio = angular.copy(lDIC.selected_aspect_ratio);
 
         //set new layout defaults
-        lDIC.resetScreenLayoutBackup = angular.copy($scope.screenLayout);
+        lDIC.resetLayoutBackup = angular.copy($scope.layout);
         $scope.activePaneIndex = 0;
 
         //set canvas heights accroding to the resolution selected
@@ -139,13 +213,13 @@ sPApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints',
     }
 
     lDIC.addPane = function(){
-        $scope.screenLayout.panes.push(new blueprints.LayoutPane($scope.screenLayout.panes.length));
-        $scope.activePaneIndex = $scope.screenLayout.panes.length-1;
+        $scope.layout.layout_panes.push(new blueprints.LayoutPane($scope.layout.layout_panes.length));
+        $scope.activePaneIndex = $scope.layout.layout_panes.length-1;
         toastr.success('Pane added')
     }
 
     lDIC.deletePane = function(){
-        $scope.screenLayout.panes.splice($scope.activePaneIndex, 1);
+        $scope.layout.layout_panes.splice($scope.activePaneIndex, 1);
         if($scope.activePaneIndex != 0){
             $scope.activePaneIndex = 0;
         }
@@ -156,7 +230,7 @@ sPApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints',
     }
 
     lDIC.saveLayout = function(){
-        lDF.upsertScreenLayout($scope.screenLayout).then(function resolved(data){
+        lDF.upsertLayout($scope.layout).then(function resolved(data){
             if(data.success){
                 toastr.success('layout saved');
             }
@@ -166,7 +240,7 @@ sPApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints',
     };
 
     lDIC.resetLayout = function(){
-        $scope.screenLayout = angular.copy(lDIC.resetScreenLayoutBackup);
+        $scope.layout = angular.copy(lDIC.resetLayoutBackup);
         toastr.success('layout reset complete');
     }
 
@@ -185,7 +259,7 @@ sPApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints',
 
 }]);
 
-sPApp.directive('paneTemplate',['constantsAndDefaults',
+lApp.directive('paneTemplate',['constantsAndDefaults',
   function(cAD){
     /*
         This directive has isolate scope and is
@@ -200,7 +274,7 @@ return{
         ,paneObj : '=pane'
         ,index : '='
     }
-    ,templateUrl : '/static/templates/screenLayout/_editor_pane_template.html'
+    ,templateUrl : '/static/templates/layoutManagement/_editor_pane_template.html'
     ,link: function($scope, element, attr) {
         //declarations
         var parentCanvas = angular.element(document.getElementsByClassName('canvas'));
@@ -210,11 +284,11 @@ return{
             ,containment : '.canvas'
             ,appendTo:'body'
             ,drag : function(event, ui){
-                            var margin_left_in_percentage = getPercentage(ui.position.left, parentCanvas.width());
-                            var margin_top_in_percentage = getPercentage(ui.position.top, parentCanvas.height());
+                            var left_margin_in_percentage = getPercentage(ui.position.left, parentCanvas.width());
+                            var top_margin_in_percentage = getPercentage(ui.position.top, parentCanvas.height());
                             $scope.$apply(function(){
-                                $scope.paneObj.margin_left = margin_left_in_percentage;
-                                $scope.paneObj.margin_top = margin_top_in_percentage;
+                                $scope.paneObj.left_margin = left_margin_in_percentage;
+                                $scope.paneObj.top_margin = top_margin_in_percentage;
                             });
                         }
 
@@ -285,28 +359,28 @@ return{
 
 }])
 
-sPApp.directive('paneProperties', [function(){
+lApp.directive('paneProperties', [function(){
     /*
         This directive has scope of its
         parent which is layoutDesignIndexCtrl.
      */
     return{
         restrict : 'E'
-        ,templateUrl : '/static/templates/screenLayout/_pane_properties.html'
+        ,templateUrl : '/static/templates/layoutManagement/_pane_properties.html'
         ,link : function ($scope, elem, attr){
         }
     }
 
 }]);
 
-sPApp.directive('layoutProperties', [function(){
+lApp.directive('layoutProperties', [function(){
     /*
         This directive has scope of its
         parent which is layoutDesignIndexCtrl.
      */
     return{
         restrict : 'E'
-        ,templateUrl : '/static/templates/screenLayout/_layout_properties.html'
+        ,templateUrl : '/static/templates/layoutManagement/_layout_properties.html'
         ,link : function ($scope, elem, attr){
         }
     }

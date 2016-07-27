@@ -8,7 +8,7 @@
             this.schedule_screens = [],
             this.schedule_groups = [],
             this.is_split = false,
-            this.selected_layout = {},
+            this.layout = {},
             this.schedule_panes =[];
         };
         //            schedule_playlists:[],
@@ -28,9 +28,9 @@
 //            }
 
         //Todo : Below naming is inappropriate, as it is not pane but schedule Pane
-        function Pane(screen_pane){
+        function SchedulePane(layout_pane){
             this.schedule_pane_id = -1;
-            this.screen_pane = angular.copy(screen_pane);
+            this.layout_pane = angular.copy(layout_pane);
             this.schedule_playlists = [];
             this.timeline ={
                 is_always   : !0
@@ -105,19 +105,19 @@
         }
 
 
-        function ScreenLayout(){
-            this.split_screen_id = -1;
+        function Layout(){
+            this.layout_id = -1;
             this.title = "New layout";
-            this.screen_type = {};
-            this.panes=[];
+            this.aspect_ratio = {};
+            this.layout_panes=[];
         }
 
         function LayoutPane(number){
             var numberAvailable = (typeof number !== "undefined");
-            this.pane_id = -1;
+            this.layout_pane_id = -1;
             this.title = numberAvailable ? "Pane" + number : "Pane"
-            this.margin_left = 0;    //in percentage
-            this.margin_top = 0;    //in percentage
+            this.left_margin = 0;    //in percentage
+            this.top_margin = 0;    //in percentage
             this.height = 20;       //in percentage
             this.width = 25;        // in percentage
             this.z_index = numberAvailable ? number : 0;
@@ -126,13 +126,13 @@
 
         return{
             Schedule : Schedule
-            ,Pane : Pane
+            ,SchedulePane : SchedulePane
             ,screenBlueprint : screenBlueprint
             ,groupBlueprint : groupBlueprint
             ,playlistBlueprint : playlistBlueprint
             ,playlistItemBlueprint : playlistItemBlueprint
             ,PlaylistItem : PlaylistItem
-            ,ScreenLayout : ScreenLayout
+            ,Layout : Layout
             ,LayoutPane : LayoutPane
         }
     }]);

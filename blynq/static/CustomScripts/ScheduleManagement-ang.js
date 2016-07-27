@@ -326,26 +326,25 @@ sdApp.factory('scheduleDetailsFactory', ['$log','$http','$q', function($log, $ht
         });
     };
 
-    var getScreenLayouts = function(){
+    var getLayouts = function(){
         var deferred = $q.defer();
         $http({
-             method : "GET",
-             url : '/api/screen/validScreenLayouts'
-         }).then(function mySucces(response){
-               deferred.resolve(response.data);
-            }, function myError(response) {
-                console.log(response.statusText);
-                deferred.reject();
-            });
-
-         return deferred.promise
+            method : "GET",
+            url : "/api/layout/getLayouts"
+        }).then(function mySucces(response) {
+            deferred.resolve(response.data);
+        }, function myError(response) {
+            console.log(response.statusText);
+            deferred.reject(response.Text)
+        });
+        return deferred.promise
     }
 
     return{
         selectedBoolSetter : selectedBoolSetter
         ,getSelectedItems : getSelectedItems
         ,upsertScheduleDetails : upsertScheduleDetails
-        ,getScreenLayouts : getScreenLayouts
+        ,getLayouts : getLayouts
     }
 }]);
 
@@ -357,7 +356,7 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
     var onLoad = function(){
         $scope.schedule = schedule;
         isNewSchedule = schedule.schedule_id == -1 ? !0 : !1;
-        sDF.getScreenLayouts().then(function(layouts){
+        sDF.getLayouts().then(function(layouts){
             //copy full screen layout to use when switching between split and non split
             $scope.fullScreenLayout = angular.copy(layouts[0]);
 
@@ -374,21 +373,21 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
         if(!$scope.schedule.is_split) //if not split screen, keep only one pane.
         {
             //Keep selected_layout as  Full Screen Layout
-            $scope.schedule.selected_layout = $scope.fullScreenLayout;
+            $scope.schedule.layout = $scope.fullScreenLayout;
         }
         else //keep the default selected to one from the layouts
         {
-            $scope.schedule.selected_layout = $scope.layouts[0];
+            $scope.schedule.layout = $scope.layouts[0];
         }
     }
 
     /*when layout changes, the number of panes change. so remove existing panes and insert new.*/
-    $scope.$watch('schedule.selected_layout', function(newLayout,oldLayout){
+    $scope.$watch('schedule.layout', function(newLayout,oldLayout){
         if (newLayout !== oldLayout) {
-            var totalPanes = newLayout.num_of_panes;
+            var totalPanes = newLayout.layout_panes.length;
             $scope.schedule.schedule_panes = [];
             for(i =0; i< totalPanes; i++){
-                $scope.schedule.schedule_panes.push(new blueprints.Pane(newLayout.screen_panes[i]));
+                $scope.schedule.schedule_panes.push(new blueprints.SchedulePane(newLayout.layout_panes[i]));
             }
             $scope.activeTabIndex = 0;
         }
@@ -1231,9 +1230,9 @@ sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal','bluepr
         ,link : function($scope, elem){
                 var openModalPopup = function(index){
                     var newSchedule = new blueprints.Schedule();
-                    sDF.getScreenLayouts().then(function(layouts){
-                        newSchedule.selected_layout = layouts[0];
-                        newSchedule.schedule_panes.push(new blueprints.Pane(layouts[0].screen_panes[0]));
+                    sDF.getLayouts().then(function(layouts){
+                        newSchedule.layout = layouts[0];
+                        newSchedule.schedule_panes.push(new blueprints.SchedulePane(layouts[0].layout_panes[0]));
 
                         var modalInstance = $uibModal.open({
                       animation: true,

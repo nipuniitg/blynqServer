@@ -46,24 +46,24 @@
                             <div class="form-group" ng-if="schedule.is_split">
                                 <div class="control-label col-md-2">Layout Type</div>
                                 <div class="col-md-3">
-                                    <select ng-model="schedule.selected_layout" ng-options="layout.title for layout
-                                    in layouts track by layout.split_screen_id">
+                                    <select ng-model="schedule.layout" ng-options="layout.title for layout
+                                    in layouts track by layout.layout_id">
                                     </select>
                                 </div>
                                 <!-- default Layouts structures -->
                                 <div class="col-md-7">
                                     <div style="width:160px;height:90px;border:1px solid #333;display:flex"
-                                         ng-show="schedule.selected_layout.split_screen_id == 2">
+                                         ng-show="schedule.layout.split_screen_id == 2">
                                         <div style="border:1px solid #333;flex : 1"> Pane-1</div>
                                         <div style="border:1px solid #333;flex : 1">Pane-2</div>
                                     </div>
                                     <div style="width:160px;height:90px;border:1px solid #333;"
-                                         ng-show="schedule.selected_layout.split_screen_id == 3">
+                                         ng-show="schedule.layout.split_screen_id == 3">
                                         <div style="border:1px solid #333;height : 80%">Pane-1</div>
                                         <div style="border:1px solid #333;height : 20%">Pane-2</div>
                                     </div>
                                     <div style="width:160px;height:90px;border:1px solid #333;"
-                                         ng-show="schedule.selected_layout.split_screen_id == 4">
+                                         ng-show="schedule.layout.split_screen_id == 4">
                                         <div style="border:1px solid #333;height : 80%;display:flex">
                                             <div style="border:1px solid #333;flex : 1"> Pane-1</div>
                                             <div style="border:1px solid #333;flex : 1">Pane-2</div>
