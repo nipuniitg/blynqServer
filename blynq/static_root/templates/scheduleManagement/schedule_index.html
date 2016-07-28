@@ -1,12 +1,15 @@
-<section class="wrapper fixed-wrapper" ng-controller="scheduleIndexCtrl" style="width:100%">
+<section class="wrapper fixed-wrapper">
     <div class="row fill">
-        <div class="col-md-10 col-fluid fill">
+        <div class="col-md-12 col-fluid fill">
             <section class="panel panel-default">
                 <header class="panel-heading">
-                    Schedules-Calendar
+                    Schedules
                     <span class="pull-right">
-                        <add-schedule refresh-schedules-fn="refreshScreenSchedulesAndEvents()">
-                        </add-schedule>
+                        <a add-schedule refresh-schedules-fn="refreshSchedules()"
+                            class="btn  btn-primary pull-right">
+                                <i class="fa fa-plus"></i>
+                                Add Schedule
+                        </a>
                     </span>
                 </header>
                 <schedules-list schedules="schedules"
@@ -14,7 +17,6 @@
                                 title="All Schedules">
                 </schedules-list>
             </section>
-
         </div>
     </div>
 </section>

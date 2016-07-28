@@ -94,27 +94,34 @@
                     Schedules-Calendar
                     <span class="pull-right">
                         <div class="btn-group">
-                            <a class="btn btn-primary" ng-model="schedulesView"
-                               uib-btn-radio="'list'">
+                            <a class="btn btn-primary" ng-model="schedulesView" uib-btn-radio="'list'"
+                               uib-popover="{[ popOverMessages.listView ]}" popover-trigger="mouseenter">
                                 <i class="icon_table"></i>
                             </a>
-                            <a class="btn btn-primary" ng-model="schedulesView"
-                               uib-btn-radio="'calendar'">
+                            <a class="btn btn-primary" ng-model="schedulesView" uib-btn-radio="'calendar'"
+                               uib-popover="{[ popOverMessages.calendarView ]}" popover-trigger="mouseenter">
                                 <i class=" icon_calendar"></i>
                             </a>
-                            <add-schedule refresh-schedules-fn="refreshGroupSchedulesAndEvents()">
-                            </add-schedule>
+                            <a add-schedule refresh-schedules-fn="refreshGroupSchedulesAndEvents()"
+                               class="btn  btn-primary pull-right">
+                                <i class="fa fa-plus"></i>
+                                Add Schedule
+                            </a>
                         </div>
                     </span>
                 </header>
-                <schedules-list ng-show="schedulesView == 'list'"
-                                schedules="groupSchedules"
-                                refresh-schedules-fn="refreshGroupSchedules()">
-                </schedules-list>
-                <schedules-calendar ng-show="schedulesView == 'calendar'"
-                                    events="groupEvents"
-                                    refresh-events-fn="refreshGroupEvents">
-                </schedules-calendar>
+                <div class="row fill">
+                    <div class="col-md-12 fill">
+                        <schedules-list ng-show="schedulesView == 'list'"
+                                        schedules="groupSchedules"
+                                        refresh-schedules-fn="refreshGroupSchedules()">
+                        </schedules-list>
+                        <schedules-calendar ng-show="schedulesView == 'calendar'"
+                                            events="groupEvents"
+                                            refresh-events-fn="refreshGroupEvents">
+                        </schedules-calendar>
+                    </div>
+                </div>
             </section>
 
         </div>

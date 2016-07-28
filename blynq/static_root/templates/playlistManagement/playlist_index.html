@@ -27,6 +27,8 @@
                             <i class="pull-right fa fa-trash-o pointer" confirm-fn="deletePlaylist($index)"
                                confirm confirm-type="delete" data-toggle="modal"></i>
                             <i class="pull-right fa fa-pencil pointer" ng-click="editPlaylist($index)"></i>
+                            </br>
+                            <span style="font-size:11px">{[ playlist | playlistTotalTime ]}</span>
                         </li>
                     </ul>
                 </div>
@@ -58,7 +60,8 @@
                     </div>
                 </div>
                 <div droppable add-content-function="addContentToPlaylistItems"
-                     add-folder-function="addFolderContentToPlaylistItems" class="listContainer">
+                     add-folder-function="addFolderContentToPlaylistItems" class="listContainer"
+                    style="{[ playlistQueueEditMode ? 'top:119px;' : '']}">
                     <ul id="ul-playlistQueue" class="list-group"
                         data-as-sortable=""
                         is-disabled="is_sortable_disabled"
@@ -91,11 +94,40 @@
                 <div class="panel-heading ">
                     <div class="pull-left">Item Details</div>
                 </div>
-                <div class="panel-body fill">
-                    <div class="item-container" style="width:50%; margin:0 auto">
-                        <img ng-src="{[ activePlaylistItem.url ]}">
+                <div class="panel-body fill overflow-y">
+                    <div style="margin:0 auto;text-align : center;">
+                        <!--<img ng-src="{[ activePlaylistItem.url ]}">-->
+                        <!-- image-->
+                        <div ng-if="activePlaylistItem.content_type.indexOf('image')>-1" class="">
+                            <img ng-src="{[ activePlaylistItem.url]}" class="max-fit">
+                        </div>
+                        <!-- pdf -->
+                        <div ng-if="activePlaylistItem.content_type.indexOf('pdf')>-1" class="">
+                            <pdf-section class="max-fit">
+                                <button ng-click="prevPage()">&lt;</button>
+                                <button ng-click="nextPage()">&gt;</button>
+                                <br>
+                                <span>{[currentPage]}/{[totalPages]}</span>
+                                <br>
+                                <pdfviewer src="{[ activePlaylistItem.url | trusted ]}"
+                                           on-page-load='pageLoaded(page,total)'
+                                           id="viewer"></pdfviewer>
+                            </pdf-section>
+                        </div>
+                        <!-- video -->
+                        <div ng-if="activePlaylistItem.content_type.indexOf('video')>-1" class="">
+                            <video controls class="max-fit" ng-src="{[activePlaylistItem.url | trusted]}">
+                                <!--<source ng-src="{[file.url | trusted]}">-->
+                                Your browser does not support HTML5 video.
+                            </video>
+                        </div>
+
+                        <!-- url, that is not image, pdf, video. Hence, shown in iframe-->
+                        <div ng-if="activePlaylistItem.content_type.indexOf('url/web')>-1" class="">
+                            <iframe class="max-fit" ng-src="{[ activePlaylistItem.url | trusted]}"></iframe>
+                        </div>
                     </div>
-                    <form class="form-horizontal" role="form">
+                    <form class="form-horizontal" role="form" name="contentDetailsForm" novalidate>
                         <div class="form-group">
                             <label class="col-md-3 control-label">Item Name</label>
                             <div class="col-md-9">
@@ -105,12 +137,12 @@
                             </div>
                         </div>
                         <!--<div class="form-group">-->
-                            <!--<label class="col-md-3 control-label">Resolution</label>-->
-                            <!--<div class="col-md-9">-->
-                                <!--<div class="form-control-static">-->
-                                    <!--{[ activePlaylistItem.itemResolution ]}-->
-                                <!--</div>-->
-                            <!--</div>-->
+                        <!--<label class="col-md-3 control-label">Resolution</label>-->
+                        <!--<div class="col-md-9">-->
+                        <!--<div class="form-control-static">-->
+                        <!--{[ activePlaylistItem.itemResolution ]}-->
+                        <!--</div>-->
+                        <!--</div>-->
                         <!--</div>-->
                         <div class="form-group" ng-show="!playlistQueueEditMode">
                             <label class="col-md-3 control-label">Duration</label>
@@ -123,28 +155,45 @@
                         <div class="form-group" ng-show="playlistQueueEditMode">
                             <label class="col-md-3 control-label">Duration</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" placeholder="30"
-                                       ng-model="activePlaylistItem.display_time">
+                                <div class="input-group">
+                                    <input type="number" class="form-control" placeholder="30" name="display_time"
+                                           ng-model="activePlaylistItem.display_time" required>
+                                    <span class="input-group-addon">seconds</span>
+                                </div>
+                            </div>
+                            <div class="col-md-offset-3 col-md-9"
+                                 ng-show="contentDetailsForm.$submitted || contentDetailsForm.display_time.$touched">
+                                <span ng-show="contentDetailsForm.display_time.$error.required" style="color:red">
+                                    Duration is required</span>
                             </div>
                         </div>
-
                         <div class="form-group">
-                            <div class="col-md-offset-3 col-md-8" ng-show="playlistQueueEditMode">
-                                <!--<button type="button" class="btn btn-default pull-right" ng-click="cancelItemDurationUpdate()">
-                                    Close
-                                </button>-->
-                                <button type="button" class="btn btn-success pull-right"
-                                        ng-click="saveItemDurationUpdate()">Save and close
-                                </button>
-                            </div>
-                            <div class="col-md-offset-3 col-md-8" ng-show="!playlistQueueEditMode">
-                                <button type="button" class="btn btn-default pull-right"
+                            <div class="col-md-offset-3 col-md-8">
+                                <button type="button" class="btn btn-default pull-right" style="margin-left : 5px"
                                         ng-click="closeQueueItemDetails()">Close
                                 </button>
+                                <div ng-show="playlistQueueEditMode">
+                                    <button type="submit" class="btn btn-success pull-right"
+                                            ng-click="saveItemDurationUpdate()">update
+                                    </button>
+                                </div>
+                                <div ng-show="!playlistQueueEditMode">
+                                    <button type="button" class="btn btn-primary pull-right"
+                                            ng-click="editPlaylistItems()">Edit
+                                    </button>
+                                </div>
                             </div>
                         </div>
-
                     </form>
+                    <!-- Below html is used to get the duration of videos. Not related to the above code.-->
+                    <div id="video_meta_data" ng-show="false">
+                        <video controls class="max-fit" ng-src="{[file.url | trusted]}" id="video_for_duration"
+                               preload="metadata">
+                            <!--<source ng-src="{[file.url | trusted]}">-->
+                            Your browser does not support HTML5 video.
+                        </video>
+                    </div>
+
                 </div>
 
             </div>

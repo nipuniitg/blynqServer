@@ -13,27 +13,31 @@
                 <div class="table-responsive fill">
                     <table class="table  table-hover table-advanced table-striped ">
                         <thead>
-                            <tr>
-                                <th>Edit</th>
-                                <!--<th>Status</th>-->
-                                <th>Screen Name</th>
-                                <th>City</th>
-                                <th class="fix">Address</th>
-                                <th class="fix">Groups</th>
-                            </tr>
-                            <tr>
+                        <tr>
+                            <th>Edit</th>
+                            <!--<th>Status</th>-->
+                            <th>Screen Name</th>
+                            <th>City</th>
+                            <th class="fix">Address</th>
+                            <th class="fix">Groups</th>
+                        </tr>
+                        <tr>
                             <th></th>
                             <!--<th></th>-->
-                            <th><input type="form-control" ng-model="searchScreens.screen_name" placeholder="search Name"></th>
-                            <th><input type="form-control" ng-model="searchScreens.city.city_name" placeholder="search"></th>
+                            <th><input type="form-control" ng-model="searchScreens.screen_name"
+                                       placeholder="search Name"></th>
+                            <th><input type="form-control" ng-model="searchScreens.city.city_name" placeholder="search">
+                            </th>
                             <th><input type="form-control" ng-model="searchScreens.address" placeholder="search"></th>
                             <th><input type="form-control" ng-model="searchScreens.groups.group_name"
                                        placeholder="search"></th>
                         </tr>
                         </thead>
                         <tbody style=" height: 230px;overflow-y: auto;width: 100%;">
-                        <tr class="pointer" ng-repeat="screen in screens | filter: searchScreens" ng-click="clickedOnScreen($index)">
-                            <td><a href="#" ng-click="editScreenDetails($index)"><i class="fa fa-pencil pointer"></i> </a></td>
+                        <tr class="pointer" ng-repeat="screen in screens | filter: searchScreens"
+                            ng-click="clickedOnScreen($index)">
+                            <td><a href="#" ng-click="editScreenDetails($index)"><i class="fa fa-pencil pointer"></i>
+                            </a></td>
                             <!--<td><i class="fa fa-circle online"></i>{[ screen.status ]} </td>-->
                             <td class="fix">{[ screen.screen_name ]}</td>
                             <td class="">{[ screen.city.city_name]}</td>
@@ -60,27 +64,35 @@
                     Schedules-Calendar
                     <span class="pull-right">
                         <div class="btn-group">
-                            <a class="btn btn-primary" ng-model="schedulesView"
-                                   uib-btn-radio="'list'">
+                            <a class="btn btn-primary" ng-model="schedulesView" uib-btn-radio="'list'"
+                               uib-popover="{[ popOverMessages.listView ]}" popover-trigger="mouseenter">
                                 <i class="icon_table"></i>
                             </a>
-                            <a class="btn btn-primary" ng-model="schedulesView"
-                                   uib-btn-radio="'calendar'">
-                                <i class=" icon_calendar"></i>
+                            <a class="btn btn-primary" ng-model="schedulesView" uib-btn-radio="'calendar'"
+                               uib-popover="{[ popOverMessages.calendarView ]}" popover-trigger="mouseenter">
+                                <i class="icon_calendar"></i>
                             </a>
-                            <add-schedule refresh-schedules-fn="refreshScreenSchedulesAndEvents()">
-                            </add-schedule>
+                            <a add-schedule refresh-schedules-fn="refreshScreenSchedulesAndEvents()"
+                               class="btn  btn-primary pull-right">
+                                <i class="fa fa-plus"></i>
+                                Add Schedule
+                            </a>
                         </div>
                     </span>
                 </header>
-                <schedules-list ng-show="schedulesView == 'list'"
-                                schedules="screenSchedules"
-                                refresh-schedules-fn="refreshScreenSchedules()">
-                </schedules-list>
-                <schedules-calendar ng-show="schedulesView == 'calendar'"
-                                    events="screenEvents"
-                                    refresh-events-fn="refreshScreenEvents">
-                </schedules-calendar>
+                <div class="row fill">
+                    <div class="col-md-12 fill">
+                        <schedules-list ng-show="schedulesView == 'list'"
+                                        schedules="screenSchedules"
+                                        refresh-schedules-fn="refreshScreenSchedules()">
+                        </schedules-list>
+                        <schedules-calendar ng-show="schedulesView == 'calendar'"
+                                            events="screenEvents"
+                                            refresh-events-fn="refreshScreenEvents">
+                        </schedules-calendar>
+                    </div>
+                </div>
+
             </section>
         </div>
     </div>

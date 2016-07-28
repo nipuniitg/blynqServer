@@ -118,7 +118,17 @@ div#display_screen{
     background-image: -webkit-linear-gradient(-45deg, rgb(76, 76, 76) 0px, rgb(89, 89, 89) 12%, 
         rgb(102, 102, 102) 25%, rgb(71, 71, 71) 39%, rgb(44, 44, 44) 50%, rgb(0, 0, 0) 50%, 
         rgb(17, 17, 17) 60%, rgb(43, 43, 43) 76%, rgb(28, 28, 28) 91%, rgb(19, 19, 19) 100%);
-    }
+
+    background-image : --o-linear-gradient(-45deg, rgb(76, 76, 76) 0px, rgb(89, 89, 89) 12%,
+        rgb(102, 102, 102) 25%, rgb(71, 71, 71) 39%, rgb(44, 44, 44) 50%, rgb(0, 0, 0) 50%,
+        rgb(17, 17, 17) 60%, rgb(43, 43, 43) 76%, rgb(28, 28, 28) 91%, rgb(19, 19, 19) 100%);
+    background-image : -moz-linear-gradient(-45deg, rgb(76, 76, 76) 0px, rgb(89, 89, 89) 12%,
+        rgb(102, 102, 102) 25%, rgb(71, 71, 71) 39%, rgb(44, 44, 44) 50%, rgb(0, 0, 0) 50%,
+        rgb(17, 17, 17) 60%, rgb(43, 43, 43) 76%, rgb(28, 28, 28) 91%, rgb(19, 19, 19) 100%);
+    background-image : linear-gradient(-45deg, rgb(76, 76, 76) 0px, rgb(89, 89, 89) 12%,
+        rgb(102, 102, 102) 25%, rgb(71, 71, 71) 39%, rgb(44, 44, 44) 50%, rgb(0, 0, 0) 50%,
+        rgb(17, 17, 17) 60%, rgb(43, 43, 43) 76%, rgb(28, 28, 28) 91%, rgb(19, 19, 19) 100%);
+        }
 div#screen_wrapper{
     height: 100%;
     overflow: hidden;
