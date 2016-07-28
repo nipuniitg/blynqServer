@@ -194,7 +194,7 @@ def create_schedule_screens(sender, instance, **kwargs):
     screen = instance.screen
     group = instance.group
     from scheduleManagement.models import ScheduleScreens
-    group_schedules = ScheduleScreens.objects.filter(screen__isnull=True, group=group)
+    group_schedules = ScheduleScreens.objects.filter(schedule__deleted=False, screen__isnull=True, group=group)
     for each_group_schedule in group_schedules:
         schedule_screen = ScheduleScreens(screen=screen, schedule=each_group_schedule.schedule, group=group)
         schedule_screen.save()

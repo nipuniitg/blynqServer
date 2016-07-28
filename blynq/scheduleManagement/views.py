@@ -261,7 +261,7 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
             schedule_pane.save()
             schedule_pane_id = schedule_pane.schedule_pane_id
         else:
-            schedule_pane = SchedulePane.objects.get(schedule_pane_id=schedule_pane_id)
+            schedule_pane = SchedulePane.objects.get(schedule_pane_id=schedule_pane_id, schedule__deleted=False)
             schedule_pane.schedule = schedule
             schedule_pane.layout_pane_id = layout_pane_id
             schedule_pane.is_always = is_always
@@ -275,7 +275,7 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
         schedule_pane_id_list.append(schedule_pane_id)
 
     # Remove Schedule Panes which are not in the post request
-    remove_schedule_panes = SchedulePane.objects.filter(schedule=schedule).exclude(
+    remove_schedule_panes = SchedulePane.objects.filter(schedule=schedule, deleted=False).exclude(
         schedule_pane_id__in=schedule_pane_id_list)
     if remove_schedule_panes:
         remove_schedule_panes.delete()
@@ -350,7 +350,8 @@ def get_group_schedules(request, group_id):
     debugFileLog.info("inside get_group_schedules")
     group_id = int(group_id)
     user_details = get_userdetails(request)
-    group_schedule_id_list = ScheduleScreens.objects.filter(screen__isnull=True, group_id=group_id).values_list(
+    group_schedule_id_list = ScheduleScreens.objects.filter(schedule__deleted=False, screen__isnull=True,
+                                                            group_id=group_id).values_list(
         'schedule_id', flat=True).distinct()
     group_schedules = Schedule.get_user_relevant_objects(user_details).filter(schedule_id__in=group_schedule_id_list)
     json_data = default_schedule_serializer(querySet=group_schedules)
@@ -471,7 +472,9 @@ def delete_schedule(request):
             schedule_id = int(posted_data.get('schedule_id'))
             schedule = Schedule.get_user_relevant_objects(user_details=user_details).get(schedule_id=schedule_id)
             # Cascading delete would delete all the schedule screens
-            schedule.delete()
+            # schedule.delete()
+            schedule.deleted = True
+            schedule.save()
             success = True
     except Exception as e:
         success = False
@@ -483,14 +486,16 @@ def delete_schedule(request):
 
 def calendar_schedules(start_datetime, end_datetime, screen_id=None, group_id=None):
     if screen_id and group_id:
-        schedule_id_list = ScheduleScreens.objects.filter(screen_id=screen_id, group_id=group_id).values_list(
+        schedule_id_list = ScheduleScreens.objects.filter(schedule__deleted=False, screen_id=screen_id,
+                                                          group_id=group_id).values_list(
             'schedule_id', flat=True).distinct()
     elif screen_id:
         # Show the schedules of the screen as well as the schedule of the group in which screen lies.
-        schedule_id_list = ScheduleScreens.objects.filter(screen_id=screen_id).values_list(
+        schedule_id_list = ScheduleScreens.objects.filter(schedule__deleted=False, screen_id=screen_id).values_list(
             'schedule_id', flat=True).distinct()
     elif group_id:
-        schedule_id_list = ScheduleScreens.objects.filter(screen__isnull=True, group_id=group_id).values_list(
+        schedule_id_list = ScheduleScreens.objects.filter(schedule__deleted=False, screen__isnull=True,
+                                                          group_id=group_id).values_list(
             'schedule_id', flat=True).distinct()
     else:
         return []

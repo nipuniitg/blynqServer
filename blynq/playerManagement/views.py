@@ -214,7 +214,7 @@ def get_screen_data(request, nof_days=7):
     # the datetime format of last_received should be "%2d%2m%4Y%2H%2M%2S"
     last_received = posted_data.get('last_received')
     unique_device_key = posted_data.get('device_key')
-    debugFileLog.info( "device_key is %s last_received is %s " % ( unique_device_key, last_received ) )
+    debugFileLog.info("device_key is %s last_received is %s " % ( unique_device_key, last_received ))
     last_received_datetime = default_string_to_datetime(last_received)
     try:
         start_time = timezone.now()
@@ -224,7 +224,7 @@ def get_screen_data(request, nof_days=7):
         screen.update_status()
         if date_changed(last_received_datetime):
             schedule_ids_list = ScheduleScreens.objects.filter(
-                screen=screen).values_list('schedule_id', flat=True)
+                screen=screen, schedule__deleted=False).values_list('schedule_id', flat=True)
             is_modified = True
         else:
             schedule_screens = ScheduleScreens.objects.filter(
@@ -236,7 +236,7 @@ def get_screen_data(request, nof_days=7):
                 is_modified = True
             else:
                 schedule_ids_list = []
-                is_modified = True
+                is_modified = False
         if schedule_ids_list:
             schedule_panes = SchedulePane.objects.filter(schedule_id__in=schedule_ids_list).\
                 order_by('-schedule__last_updated_time')
@@ -269,7 +269,7 @@ def get_content_urls_local(request, nof_days=1):
         local_server = LocalServer.objects.get(unique_key=unique_key)
         organization = local_server.organization
         screens = Screen.objects.filter(owned_by=organization)
-        schedule_screens = ScheduleScreens.objects.filter(screen__in=screens)
+        schedule_screens = ScheduleScreens.objects.filter(screen__in=screens, schedule__deleted=False)
         current_datetime = timezone.now()
         next_day = current_datetime + datetime.timedelta(days=1)
         start_time = next_day.replace(hour=0, minute=0, second=0)
