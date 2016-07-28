@@ -32,7 +32,7 @@ class ScreenSerializer(Serializer):
             self._current['groups'] = GroupScreensSerializer().serialize(
                 group_screens, fields=('group_screen_id', 'group'))
         if 'status' in self.selected_fields:
-            self._current['status'] = obj.current_status()
+            self._current['status'] = obj.current_status
         self.objects.append( self._current )
 
 

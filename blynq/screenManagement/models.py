@@ -5,7 +5,7 @@ from django.utils import timezone
 from schedule.models import Calendar
 
 from authentication.models import Organization, UserDetails, City
-from blynq.settings import PLAYER_POLL_TIME
+from blynq.settings import PLAYER_INACTIVE_THRESHOLD
 from customLibrary.views_lib import debugFileLog
 
 
@@ -176,8 +176,9 @@ class Screen(models.Model):
     def get_user_relevant_objects(user_details):
         return Screen.objects.filter(owned_by=user_details.organization)
 
+    @property
     def current_status(self):
-        if (timezone.now() - self.last_active_time).total_seconds() > 2 * PLAYER_POLL_TIME:
+        if (timezone.now() - self.last_active_time).total_seconds() > PLAYER_INACTIVE_THRESHOLD:
             return 'Offline'
         else:
             return 'Online'

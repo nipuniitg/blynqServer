@@ -212,6 +212,7 @@ else:
 
 PLAYER_UPDATES_DIR = 'player_updates'
 PLAYER_POLL_TIME = 60  # Time difference in seconds between successive polls of the player
+PLAYER_INACTIVE_THRESHOLD = 2 * PLAYER_POLL_TIME    # Wait this time (in seconds) to change status of screen as inactive
 
 # in MEDIA_ROOT
 # the uploaded content of each user is present in /media/usercontent/userdetails.user.id/

@@ -1,11 +1,14 @@
+import datetime
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
+from django.utils import timezone
 
 from authentication.forms import RequestQuoteForm
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from blynq import settings
+from blynq.settings import PLAYER_INACTIVE_THRESHOLD
 from customLibrary.views_lib import string_to_dict, ajax_response, get_userdetails, send_mail_blynq, obj_to_json_response, \
     debugFileLog
 from scheduleManagement.models import Schedule
@@ -116,9 +119,14 @@ def organization_homepage_summary(request):
     user_details = get_userdetails(request=request)
     context_dic = {}
     try:
-        screen_count = Screen.get_user_relevant_objects(user_details=user_details).count()
+        total_screen_count = Screen.get_user_relevant_objects(user_details=user_details).count()
+        minimum_last_active_time = timezone.now() - datetime.timedelta(seconds=PLAYER_INACTIVE_THRESHOLD)
+        active_screen_count = Screen.get_user_relevant_objects(user_details=user_details).filter(
+            last_active_time__gte=minimum_last_active_time).count()
         schedule_count = Schedule.get_user_relevant_objects(user_details=user_details).count()
-        context_dic['screen_count'] = screen_count
+        context_dic['total_screen_count'] = total_screen_count
+        context_dic['active_screen_count'] = active_screen_count
+        context_dic['inactive_screen_count'] = total_screen_count - active_screen_count
         context_dic['schedule_count'] = schedule_count
         organization = user_details.organization
         context_dic['used_storage'] = organization.used_file_size
