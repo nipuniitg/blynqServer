@@ -81,7 +81,7 @@ class SchedulePlaylists(models.Model):
 class SchedulePane(models.Model):
     schedule_pane_id = models.AutoField(primary_key=True)
     schedule = models.ForeignKey('Schedule', on_delete=models.CASCADE, related_name='%(class)s_schedule')
-    layout_pane = models.ForeignKey(LayoutPane, on_delete=models.PROTECT, null=True, blank=True)
+    layout_pane = models.ForeignKey(LayoutPane, on_delete=models.CASCADE, null=True, blank=True)
     playlists = models.ManyToManyField(Playlist, through=SchedulePlaylists)
     is_always = models.BooleanField(default=True)
     all_day = models.BooleanField(default=True)
