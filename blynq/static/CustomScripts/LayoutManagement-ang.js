@@ -232,6 +232,7 @@ lApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints','
     lDIC.saveLayout = function(){
         lDF.upsertLayout($scope.layout).then(function resolved(data){
             if(data.success){
+                $scope.layout.layout_id = angular.copy(data.saved_layout.layout_id);
                 toastr.success('layout saved');
             }
         }, function upsertFail(){
