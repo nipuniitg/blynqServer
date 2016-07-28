@@ -251,9 +251,12 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
         recurrence_absolute = timeline.get('recurrence_absolute')
         if not recurrence_absolute:
             recurrence_absolute = False
-        event_dict = event_dict_from_timeline(timeline=timeline, schedule=schedule)
-        event = Event(**event_dict)
-        event.save()
+        if schedule_playlists:
+            event_dict = event_dict_from_timeline(timeline=timeline, schedule=schedule)
+            event = Event(**event_dict)
+            event.save()
+        else:
+            event = None
         if schedule_pane_id == -1:
             schedule_pane = SchedulePane(schedule=schedule, layout_pane_id=layout_pane_id,
                                          is_always=is_always, all_day=all_day, recurrence_absolute=recurrence_absolute,
