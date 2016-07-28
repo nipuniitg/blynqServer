@@ -72,7 +72,7 @@ sdApp.filter('timelineLabel', ['timelineFactory','timelineDescription', function
     return function(timeline){
         var cookedTimeline = tF.getTimeline(
             timeline.is_always
-            ,tF.getDateTimeFromDate(timeline.startDate)
+            ,tF.getDateTimeFromDate(timeline.start_date)
             ,tF.getDateTimeFromDate(timeline.end_recurring_period)
             ,timeline.all_day
             ,tF.getDateTimeFromTime(timeline.start_time)
