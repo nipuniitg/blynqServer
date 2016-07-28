@@ -9,57 +9,82 @@
             <div class="col-sm-12">
                 <uib-tabset active="active">
                     <uib-tab index="0" heading="Screens">
-                        <div class="panel" >
+                        <div class="panel">
                             <div class="panel-body" style="max-height:400px;overflow:scroll">
                                 <table class="table bootstrap-datatable">
                                     <thead>
-                                        <tr>
-                                            <th>Select</th>
-                                            <th>Screen Name</th>
-                                            <th>Address</th>
-                                        </tr>
-                                        <tr>
-                                            <th></th>
-                                            <th><input type="form-control" ng-model="searchScreens.screen_name" placeholder="search Name"></th>
-                                            <th><input type="form-control" ng-model="searchScreens.address" placeholder="search Address"></th>
-                                        </tr>
+                                    <tr>
+                                        <th>Select</th>
+                                        <th>Screen Name</th>
+                                        <th>Address</th>
+                                        <th>Groups</th>
+                                    </tr>
+                                    <tr>
+                                        <th></th>
+                                        <th><input type="form-control" ng-model="searchScreens.screen_name"
+                                                   placeholder="search Name"></th>
+                                        <th><input type="form-control" ng-model="searchScreens.address"
+                                                   placeholder="search Address"></th>
+                                        <th><input type="form-control" ng-model="searchScreens.groups.group_name"
+                                                   placeholder="search group"></th>
+                                    </tr>
                                     </thead>
                                     <tbody>
-                                        <tr ng-repeat="screen in allScreens| filter:searchScreens">
-                                            <td><input type="checkbox" ng-model="screen.selected" ng-click="alert('selected')"></td>
-                                            <td>{[screen.screen_name]}</td>
-                                            <td>{[screen.address]}</td>
-                                        </tr>
+                                    <tr ng-repeat="screen in allScreens| filter:searchScreens">
+                                        <td><input type="checkbox" ng-model="screen.selected"
+                                                   ng-click="alert('selected')"></td>
+                                        <td>{[screen.screen_name]}</td>
+                                        <td>{[screen.address]}</td>
+                                        <td>
+                                            <div class="tagsinput " style="height: 100%;">
+                                                    <span class="tag" ng-repeat="group in screen.groups">
+                                                        <span> {[group.group_name]} &nbsp;&nbsp;</span>
+                                                    </span>
+                                            </div>
+                                        </td>
+                                    </tr>
                                     </tbody>
                                 </table>
-						    </div>
+                            </div>
                         </div>
                     </uib-tab>
                     <uib-tab index="1" heading="Groups" active="tab.active">
-                        <div class="panel" >
+                        <div class="panel">
                             <div class="panel-body" style="max-height:400px;overflow:scroll">
                                 <table class="table bootstrap-datatable countries">
                                     <thead>
-                                        <tr>
-                                            <th>Select</th>
-                                            <th>Group Name</th>
-                                            <th>Description</th>
-                                        </tr>
-                                        <tr>
-                                            <th></th>
-                                            <th><input type="form-control" ng-model="searchGroups.group_name" placeholder="search Name"></th>
-                                            <th><input type="form-control" ng-model="searchGroups.description" placeholder="search Address"></th>
-                                        </tr>
+                                    <tr>
+                                        <th>Select</th>
+                                        <th>Group Name</th>
+                                        <th>Description</th>
+                                        <th>Screens</th>
+                                    </tr>
+                                    <tr>
+                                        <th></th>
+                                        <th><input type="form-control" ng-model="searchGroups.group_name"
+                                                   placeholder="search name"></th>
+                                        <th><input type="form-control" ng-model="searchGroups.description"
+                                                   placeholder="search description"></th>
+                                        <th><input type="form-control" ng-model="searchScreens.screens.screen_name"
+                                                   placeholder="search screen"></th>
+                                    </tr>
                                     </thead>
                                     <tbody>
-                                        <tr ng-repeat="group in allGroups">
-                                            <td><input type="checkbox" ng-model="group.selected"></td>
-                                            <td>{[ group.group_name ]}</td>
-                                            <td>{[ group.description]} </td>
-                                        </tr>
+                                    <tr ng-repeat="group in allGroups">
+                                        <td><input type="checkbox" ng-model="group.selected"></td>
+                                        <td>{[ group.group_name ]}</td>
+                                        <td>{[ group.description]}</td>
+                                        <td>
+                                            <div class="tagsinput " style="height: 100%;">
+                                                <span class="tag" ng-repeat="screen in group.screens">
+                                                    <span> {[screen.screen_name]} &nbsp;&nbsp;</span>
+                                                </span>
+                                            </div>
+                                        </td>
+                                    </tr>
                                     </tbody>
                                 </table>
-						    </div>
+                            </div>
                         </div>
                     </uib-tab>
                 </uib-tabset>
