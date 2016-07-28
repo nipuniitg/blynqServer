@@ -261,7 +261,7 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
             schedule_pane.save()
             schedule_pane_id = schedule_pane.schedule_pane_id
         else:
-            schedule_pane = SchedulePane.objects.get(schedule_pane_id=schedule_pane_id, schedule__deleted=False)
+            schedule_pane = SchedulePane.objects.get(schedule_pane_id=schedule_pane_id)
             schedule_pane.schedule = schedule
             schedule_pane.layout_pane_id = layout_pane_id
             schedule_pane.is_always = is_always
@@ -275,7 +275,7 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
         schedule_pane_id_list.append(schedule_pane_id)
 
     # Remove Schedule Panes which are not in the post request
-    remove_schedule_panes = SchedulePane.objects.filter(schedule=schedule, deleted=False).exclude(
+    remove_schedule_panes = SchedulePane.objects.filter(schedule=schedule).exclude(
         schedule_pane_id__in=schedule_pane_id_list)
     if remove_schedule_panes:
         remove_schedule_panes.delete()

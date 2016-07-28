@@ -227,6 +227,7 @@ def get_screen_data(request, nof_days=7):
                 screen=screen, schedule__deleted=False).values_list('schedule_id', flat=True)
             is_modified = True
         else:
+            # Include deleted schedules as well by not checking the deleted flag
             schedule_screens = ScheduleScreens.objects.filter(
                 screen=screen)
             schedule_screens_updated = schedule_screens.filter(
