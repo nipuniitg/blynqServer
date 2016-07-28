@@ -1,63 +1,84 @@
-
 <section class="wrapper">
-	<div class="row">
-		<div class="col-md-4">
-			<div class="well">
-				<h2>Step 1</h2>
-				Go to
-				<a ui-sref="screens">Screens</a> page and click on 'Add Screen'
-			</div>
-		</div>
-		<div class="col-md-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="well">
+                <h2>Step 1</h2>
+                Go to
+                <a ui-sref="screens">Screens</a> page and click on 'Add Screen'
+            </div>
+        </div>
+        <div class="col-md-4">
 
-			<div class="well">
-				<h2>Step 2</h2>
-				Go to
-				 <a ui-sref="playlists">Playlists</a> page and click on 'Add Playlist'
-			</div>
+            <div class="well">
+                <h2>Step 2</h2>
+                Go to
+                <a ui-sref="playlists">Playlists</a> page and click on 'Add Playlist'
+            </div>
 
-		</div>
-		<div class="col-md-4">
-			<div class="well">
-				<h2>Step 3</h2>
-				Go to
-				<a ui-sref="schedules">Schedules</a> page and click on 'Add Schedule'.
-			</div>
-		</div>
+        </div>
+        <div class="col-md-4">
+            <div class="well">
+                <h2>Step 3</h2>
+                Go to
+                <a ui-sref="schedules">Schedules</a> page and click on 'Add Schedule'.
+            </div>
+        </div>
 
-	</div>
+    </div>
 
-	<!--overview start-->
-	<div class="row">
-		<div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-			<div class="info-box blue-bg pointer" ng-click="navigateTo('screens')">
-				<i class="icon_desktop"></i>
-				<div class="count">{[screen_count]}</div>
-				<div class="title">Screens</div>
-			</div><!--/.info-box-->
-		</div><!--/.col-->
+    <!--overview start-->
+    <div class="row">
+        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+            <div class="info-box blue-bg pointer" ng-click="navigateTo('screens')">
+                <i class="icon_desktop info-icon"></i>
+                <div class="count">{[total_screen_count]}</div>
+                <div class="title">Screens</div>
+                <div class="row desc">
+                    <div class="col-md-6">
+                        <i class="fa fa-circle online"></i>
+						<span>
+							{[ active_screen_count ]} Active
+						</span>
+                    </div>
+                    <div class="col-md-6">
+                        <i class="fa fa-circle offline"></i>
+						<span>
+							{[ inactive_screen_count ]} Inactive
+						</span>
+                    </div>
+                </div>
+            </div><!--/.info-box-->
+        </div><!--/.col-->
 
-		<div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-			<div class="info-box brown-bg pointer" ng-click="navigateTo('contentLibrary')">
-				<i class="fa fa-folder-open-o"></i>
-				<!--<i class="fa fa-shopping-cart"></i>-->
-				<div class="count">{[ used_storage | memoryInGB ]} GB</div>
-				<div class="title">Space used</div>
-			</div><!--/.info-box-->
-		</div><!--/.col-->
+        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+            <div class="info-box brown-bg pointer" ng-click="navigateTo('contentLibrary')">
+                <i class="fa fa-folder-open-o info-icon"></i>
+                <!--<i class="fa fa-shopping-cart"></i>-->
+                <div class="count">{[ used_storage | memoryInGB ]} GB</div>
+                <div class="title">/{[ total_storage | memoryInGB ]} GB Space used</div>
+                <div class="row desc">
+                    <div class="col-md-12">
+                        <div class="progress thin">
+                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="73"
+                                 aria-valuemin="0" aria-valuemax="100" style=" width : {[ used_storage_percentage ]};">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!--/.info-box-->
+        </div><!--/.col-->
 
-		<div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-			<div class="info-box dark-bg pointer" ng-click="navigateTo('schedules')">
-				<i class="fa fa-paper-plane-o"></i>
-				<!--<i class="fa fa-thumbs-o-up"></i>-->
-				<div class="count">{[ schedule_count ]}</div>
-				<div class="title">Schedules</div>
-			</div><!--/.info-box-->
-		</div><!--/.col-->
+        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+            <div class="info-box dark-bg pointer" ng-click="navigateTo('schedules')">
+                <i class="fa fa-paper-plane-o info-icon"></i>
+                <!--<i class="fa fa-thumbs-o-up"></i>-->
+                <div class="count">{[ schedule_count ]}</div>
+                <div class="title">Schedules</div>
+            </div><!--/.info-box-->
+        </div><!--/.col-->
 
 
-
-	</div><!--/.row-->
+    </div><!--/.row-->
 
 </section>
 

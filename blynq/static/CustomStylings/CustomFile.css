@@ -196,9 +196,15 @@ margin : 0px;
     border-radius:0px;
 }
 
-.online{color:#00FF00;}
+.fa.online{color:#00FF00;}
 
-.offline{color:#CCC }
+.fa.offline{color:#CCC }
+
+.fa.online-and-offline{
+    color: transparent;
+    background: linear-gradient(to right, #868789 0%, #868789 50%, #00FF00 50%, #00FF00 100%);
+    border-radius: 50%;
+}
 
 .item-search-row{
 height : 50px;
@@ -529,6 +535,10 @@ input[type=number]::-webkit-outer-spin-button {
 
 /* layout designer*/
 
+
+.dropdown-menu i{
+    margin-right : 5px
+}
 
 
 

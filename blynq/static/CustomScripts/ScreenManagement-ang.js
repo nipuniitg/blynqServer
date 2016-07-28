@@ -697,5 +697,25 @@ sagApp.controller('mdlScreenSelectionCtrl',['$scope','$uibModalInstance', 'selec
 }]);
 
 
+//Screen-status setter
 
+sagApp.directive('setScreenStatusClass',[function(){
+    return{
+        restrict : 'A'
+        ,link : function($scope, elem, attr){
 
+            var onLoad = function(){
+                switch (attr.setScreenStatusClass) {
+                    case "Online" :
+                        elem.addClass('online')
+                        break;
+                    case "Offline" :
+                        elem.addClass('offline')
+                        break;
+                }
+            }
+
+            onLoad();
+        }
+    }
+}]);
