@@ -86,7 +86,7 @@ class SchedulePane(models.Model):
     is_always = models.BooleanField(default=True)
     all_day = models.BooleanField(default=True)
     recurrence_absolute = models.BooleanField(default=False)
-    event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='%(class)s_event')
+    event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, blank=True, related_name='%(class)s_event')
 
     def __unicode__(self):
         schedule_title = self.schedule.schedule_title if self.schedule.schedule_title else ''

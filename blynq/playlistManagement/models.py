@@ -63,9 +63,10 @@ def post_save_playlist(sender, instance, **kwargs):
     try:
         schedule_playlists = SchedulePlaylists.objects.filter(playlist_id=instance.playlist_id)
         for each_schedule_playlist in schedule_playlists:
-            schedule = each_schedule_playlist.schedule
-            if not schedule.deleted:
-                schedule.save()
+            if each_schedule_playlist.schedule_pane:
+                schedule = each_schedule_playlist.schedule_pane.schedule
+                if not schedule.deleted:
+                    schedule.save()
     except Exception as e:
         debugFileLog.exception("Error while updating the last_updated_time of the schedules "
                                "corresponding to playlist %s" % instance.playlist.playlist_title)
