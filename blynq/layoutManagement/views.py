@@ -8,7 +8,8 @@ from layoutManagement.serializers import LayoutSerializer, default_layout_serial
 
 
 def get_layouts(request):
-    json_data = default_layout_serializer(Layout.objects.all())
+    user_details = get_userdetails(request)
+    json_data = default_layout_serializer(Layout.get_user_relevant_objects(user_details=user_details))
     return obj_to_json_response(json_data)
 
 
