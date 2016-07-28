@@ -2,13 +2,10 @@ import datetime
 import os
 from copy import deepcopy
 from operator import itemgetter
-
 from django.shortcuts import render
-
 # Create your views here.
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-
 from blynq.settings import MEDIA_HOST
 from contentManagement.models import Content
 from contentManagement.serializers import ContentSerializer
@@ -28,7 +25,7 @@ def player_update_available(request):
     posted_data = string_to_dict(request.body)
     unique_device_key = posted_data.get('device_key')
     version_name = posted_data.get('version_name')
-    player_json={'is_update_available': False, 'url': None}
+    player_json = {'is_update_available': False, 'url': None}
     try:
         screen = ScreenActivationKey.objects.get(activation_key=unique_device_key, verified=True)
         updates = PlayerUpdate.objects.order_by('-uploaded_time')
@@ -90,7 +87,7 @@ def device_key_active(request):
 
 @csrf_exempt
 def activation_key_valid(request):
-    debugFileLog.info( "Inside activation_key_valid" )
+    debugFileLog.info("Inside activation_key_valid")
     return device_key_active(request)
     # posted_data = string_to_dict(request.body)
     # activation_key = posted_data.get('device_key')
@@ -118,15 +115,21 @@ def is_conflicting(cur_occur, new_occur):
     :param new_occur: this event occurrence has less priority
     :return: True if both the occurrences have the same schedule_pane and cur_occur overlaps with occur, else False
     """
-    cur_schedule_pane = schedule_pane_from_occurrence(cur_occur)
-    new_schedule_pane = schedule_pane_from_occurrence(new_occur)
-    if cur_schedule_pane.schedule_id == new_schedule_pane.schedule_id:
-        # Two occurrences of the same schedule can never conflict
-        return False
-    elif (cur_occur.start <= new_occur.start <= cur_occur.end) or (new_occur.start <= cur_occur.start <= new_occur.end):
-        return True
-    else:
-        return False
+    try:
+        cur_schedule_pane = schedule_pane_from_occurrence(cur_occur)
+        new_schedule_pane = schedule_pane_from_occurrence(new_occur)
+        if cur_schedule_pane.schedule_id == new_schedule_pane.schedule_id:
+            # Two occurrences of the same schedule can never conflict
+            return False
+        elif cur_schedule_pane.schedule.layout_id == new_schedule_pane.schedule.layout_id and \
+                        cur_schedule_pane.layout_pane_id != new_schedule_pane.layout_pane_id:
+            # Two occurrences from same layout and different layout_pane_id can never conflict
+            return False
+        elif (cur_occur.start <= new_occur.start <= cur_occur.end) or (new_occur.start <= cur_occur.start <= new_occur.end):
+            return True
+    except Exception as e:
+        debugFileLog.exception(e)
+    return False
 
 
 def merge_occurrence(existing_occurrences, new_occur):
@@ -209,12 +212,11 @@ def get_screen_data(request, nof_days=7):
     :param nof_days: optional argument mentioning the time interval for the events
     :return:
     """
-    debugFileLog.info("inside get_screen_data")
     posted_data = string_to_dict(request.body)
     # the datetime format of last_received should be "%2d%2m%4Y%2H%2M%2S"
     last_received = posted_data.get('last_received')
     unique_device_key = posted_data.get('device_key')
-    debugFileLog.info("device_key is %s last_received is %s " % ( unique_device_key, last_received ))
+    debugFileLog.info("get_screen_data device_key is %s last_received is %s " % (unique_device_key, last_received))
     last_received_datetime = default_string_to_datetime(last_received)
     try:
         start_time = timezone.now()
@@ -233,13 +235,14 @@ def get_screen_data(request, nof_days=7):
             schedule_screens_updated = schedule_screens.filter(
                 schedule__last_updated_time__gte=last_received_datetime)
             if schedule_screens_updated:
-                schedule_ids_list = schedule_screens.filter(schedule__deleted=False).values_list('schedule_id', flat=True)
+                schedule_ids_list = schedule_screens.filter(schedule__deleted=False).values_list(
+                    'schedule_id', flat=True).distinct()
                 is_modified = True
             else:
                 schedule_ids_list = []
                 is_modified = False
         if schedule_ids_list:
-            schedule_panes = SchedulePane.objects.filter(schedule_id__in=schedule_ids_list).\
+            schedule_panes = SchedulePane.objects.filter(schedule_id__in=schedule_ids_list). \
                 order_by('-schedule__last_updated_time')
         else:
             schedule_panes = []
@@ -294,6 +297,6 @@ def get_content_urls_local(request, nof_days=1):
         return obj_to_json_response(json_obj)
     except Exception as e:
         debugFileLog.exception(e)
-        success=False
+        success = False
         errors = str(e)
         return ajax_response(success=success, errors=errors)
