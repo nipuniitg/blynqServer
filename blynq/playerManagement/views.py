@@ -19,7 +19,7 @@ from playlistManagement.models import PlaylistItems
 from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import ScheduleScreens, SchedulePlaylists, SchedulePane
 from screenManagement.models import ScreenActivationKey, Screen
-from layoutManagement.serializers import LayoutPaneSerializer, default_layout_pane_serializer
+from layoutManagement.serializers import default_layout_pane_serializer
 
 
 @csrf_exempt
