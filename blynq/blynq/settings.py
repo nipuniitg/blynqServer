@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '1ig8fo2929x)i=c7k$z0qe#@1n())0o2rt7*45^j^td5_duj$m'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 if DEBUG:
     ALLOWED_HOSTS = []
@@ -211,6 +211,7 @@ else:
     DELETED_CONTENT_DIR = 'deletedcontent'
 
 PLAYER_UPDATES_DIR = 'player_updates'
+PLAYER_POLL_TIME = 60  # Time difference in seconds between successive polls of the player
 
 # in MEDIA_ROOT
 # the uploaded content of each user is present in /media/usercontent/userdetails.user.id/

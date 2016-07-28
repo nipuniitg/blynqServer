@@ -219,13 +219,16 @@ def get_screen_data(request, nof_days=7):
     try:
         start_time = timezone.now()
         end_time = start_time + datetime.timedelta(days=nof_days)
+        screen = Screen.objects.get(unique_device_key__activation_key=unique_device_key)
+        # Update the screen status saying that it is active
+        screen.update_status()
         if date_changed(last_received_datetime):
             schedule_ids_list = ScheduleScreens.objects.filter(
-                screen__unique_device_key__activation_key=unique_device_key).values_list('schedule_id', flat=True)
+                screen=screen).values_list('schedule_id', flat=True)
             is_modified = True
         else:
             schedule_screens = ScheduleScreens.objects.filter(
-                screen__unique_device_key__activation_key=unique_device_key)
+                screen=screen)
             schedule_screens_updated = schedule_screens.filter(
                 schedule__last_updated_time__gte=last_received_datetime)
             if schedule_screens_updated:

@@ -1,9 +1,11 @@
 from django.db import models
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
+from django.utils import timezone
 from schedule.models import Calendar
 
 from authentication.models import Organization, UserDetails, City
+from blynq.settings import PLAYER_POLL_TIME
 from customLibrary.views_lib import debugFileLog
 
 
@@ -140,6 +142,9 @@ class Screen(models.Model):
     activated_on = models.DateTimeField(auto_now_add=True)
     activated_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True, blank=True,
                                      related_name='%(class)s_activated_by')
+
+    last_active_time = models.DateTimeField(default=timezone.now)
+
     last_updated_time = models.DateTimeField(auto_now=True, null=True)
     last_updated_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True, blank=True,
                                         related_name='%(class)s_last_updated_by')
@@ -170,6 +175,16 @@ class Screen(models.Model):
     @staticmethod
     def get_user_relevant_objects(user_details):
         return Screen.objects.filter(owned_by=user_details.organization)
+
+    def current_status(self):
+        if (timezone.now() - self.last_active_time).total_seconds() > 2 * PLAYER_POLL_TIME:
+            return 'Offline'
+        else:
+            return 'Online'
+
+    def update_status(self):
+        self.last_active_time = timezone.now()
+        self.save()
 
 
 @receiver(post_save, sender=GroupScreens)

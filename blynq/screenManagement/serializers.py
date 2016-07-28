@@ -17,7 +17,7 @@ class GroupScreensSerializer(Serializer):
         if 'screen' in self.selected_fields:
             json_data = ScreenSerializer().serialize([obj.screen],
                                                      fields=('screen_name', 'screen_size', 'aspect_ratio', 'resolution',
-                                                             'address', 'city', 'screen_id'),
+                                                             'status', 'address', 'city', 'screen_id'),
                                                      use_natural_foreign_keys=True)
             self.add_dict_to_current(json_data)
             del self._current['screen']
@@ -31,6 +31,8 @@ class ScreenSerializer(Serializer):
             group_screens = GroupScreens.objects.filter(screen=obj)
             self._current['groups'] = GroupScreensSerializer().serialize(
                 group_screens, fields=('group_screen_id', 'group'))
+        if 'status' in self.selected_fields:
+            self._current['status'] = obj.current_status()
         self.objects.append( self._current )
 
 
