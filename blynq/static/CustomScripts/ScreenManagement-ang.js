@@ -421,8 +421,8 @@ function(groupsFactory, dataAccessFactory, $scope,$uibModal, cAD){
 
 //screen Index Cntrl
 sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','$uibModal','constantsAndDefaults',
-'$interval',
-  function(screensFactory,dataAccessFactory, $scope, $uibModal, cAD, $interval){
+'$interval','$state',
+  function(screensFactory,dataAccessFactory, $scope, $uibModal, cAD, $interval,$state){
 
     //private functions
     var onLoad = function(){
@@ -442,7 +442,9 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
     //refreshing screens every 'x' seconds.
     var intervalReturnPromise ;
     intervalReturnPromise = $interval(function(){
-        $scope.refreshScreens();
+        if($state.get() == 'screens'){
+            $scope.refreshScreens();
+        }
     }, 20000);
 
     //public functions
