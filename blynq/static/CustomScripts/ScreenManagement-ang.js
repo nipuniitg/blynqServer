@@ -442,7 +442,7 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
     //refreshing screens every 'x' seconds.
     var intervalReturnPromise ;
     intervalReturnPromise = $interval(function(){
-        if($state.get() == 'screens'){
+        if($state.is('screens')){
             $scope.refreshScreens();
         }
     }, 20000);
