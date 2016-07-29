@@ -12,15 +12,20 @@
                     </span>
                 </div>
                 <div class="panel-body fill overflow-y">
-                    <div class="item-container-wrap"
-                          ng-repeat="layout in lIC.layouts">
-                        <div class="item-container-header">
+                    <div class="layout-info-wrapper"
+                         ng-repeat="layout in lIC.layouts">
+                        <div class="layout-info-header">
                             {[ layout.title]}
                         </div>
-                        <div class="item-container">
-
+                        <div class="layout-preview-wrapper">
+                            <div class="layout-preview">
+                                <pane-template ng-repeat="pane in layout.layout_panes"
+                                               index="$index"
+                                               pane="pane">
+                                </pane-template>
+                            </div>
                         </div>
-                        <div class="item-container-footer">
+                        <div class="layout-info-footer">
                             <span class="pull-right">
                                 <a confirm-fn="lIC.deleteLayout($index)" confirm confirm-type="delete">
                                     <i class="fa fa-trash-o pointer"></i></a>

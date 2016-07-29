@@ -66,7 +66,7 @@ border:solid 1px #e5e5e5;
 float : left;
 }
 
-.item-container-wrap:hover{
+div.item-container-wrap:hover, div.layout-info-wrapper:hover {
     outline: none;
     border-color: #9ecaed;
     box-shadow: 0 0 10px #9ecaed
@@ -532,6 +532,32 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 /* end editor- css*/
+
+/* layout preview */
+
+.layout-preview-wrapper{
+    position : relative;
+    width : 200px;
+    height : 200px;
+    border : 1px solid black;
+}
+
+.layout-info-wrapper{
+    padding : 5px;
+    width : 210px;
+    height : 260px;
+    border:solid 1px #e5e5e5;
+    float : left;
+    margin : 10px;
+}
+
+.layout-info-header, .layout-info-header{
+    padding : 0px 5px;
+    overflow : hidden;
+    max-height : 25px;
+}
+
+/* end layout preview */
 
 /* layout designer*/
 

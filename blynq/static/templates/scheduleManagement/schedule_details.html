@@ -35,7 +35,7 @@
                             </div>
 
                             <div class="form-group">
-                                <div class="control-label col-md-2">Split Screen </div>
+                                <div class="control-label col-md-2">Split Screen</div>
                                 <div class="col-md-10">
                                     <input ng-model="schedule.is_split" type="checkbox"
                                            ng-change="splitScreenToggled()"
@@ -56,23 +56,11 @@
                                 </div>
                                 <!-- default Layouts structures -->
                                 <div class="col-md-7">
-                                    <div style="width:160px;height:90px;border:1px solid #333;display:flex"
-                                         ng-show="schedule.layout.split_screen_id == 2">
-                                        <div style="border:1px solid #333;flex : 1"> Pane-1</div>
-                                        <div style="border:1px solid #333;flex : 1">Pane-2</div>
-                                    </div>
-                                    <div style="width:160px;height:90px;border:1px solid #333;"
-                                         ng-show="schedule.layout.split_screen_id == 3">
-                                        <div style="border:1px solid #333;height : 80%">Pane-1</div>
-                                        <div style="border:1px solid #333;height : 20%">Pane-2</div>
-                                    </div>
-                                    <div style="width:160px;height:90px;border:1px solid #333;"
-                                         ng-show="schedule.layout.split_screen_id == 4">
-                                        <div style="border:1px solid #333;height : 80%;display:flex">
-                                            <div style="border:1px solid #333;flex : 1"> Pane-1</div>
-                                            <div style="border:1px solid #333;flex : 1">Pane-2</div>
-                                        </div>
-                                        <div style="border:1px solid #333;height : 20%">Pane-3</div>
+                                    <div class="layout-preview-wrapper">
+                                        <pane-template ng-repeat="pane in schedule.layout.layout_panes"
+                                                       index="$index"
+                                                       pane="pane">
+                                        </pane-template>
                                     </div>
                                 </div>
                             </div>
