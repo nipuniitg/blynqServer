@@ -908,7 +908,7 @@ div[data-role="editor-toolbar"] {
 /* .info-box
 =================================================================== */
 .info-box {
-  min-height: 140px;
+  min-height: 200px;
   margin-bottom: 30px;
   padding: 20px;
   color: white;
