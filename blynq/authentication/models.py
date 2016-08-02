@@ -82,6 +82,18 @@ class Role(models.Model):
         return self.role_name
 
 
+# class models.User
+#     username
+#     first_name    optional
+#     last_name     optional
+#     email         optional
+#     password
+#     groups
+#     user_permissions
+#     is_staff
+#     is_active
+#     is_superuser
+#     last_login
 class UserDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
@@ -111,17 +123,3 @@ class RequestedQuote(models.Model):
 # Remove this function
 def upload_to_dir(instance, filename):
     pass
-
-
-# class models.User
-#     username
-#     first_name    optional
-#     last_name     optional
-#     email         optional
-#     password
-#     groups
-#     user_permissions
-#     is_staff
-#     is_active
-#     is_superuser
-#     last_login
