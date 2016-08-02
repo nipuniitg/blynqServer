@@ -202,14 +202,15 @@ LOGGING = {
 
 
 if DEBUG:
-    MEDIA_HOST = 'http://127.0.0.1:8000'
+    HOST_URL = 'http://127.0.0.1:8000'
     USERCONTENT_DIR = 'test_usercontent'
     DELETED_CONTENT_DIR = 'test_deletedcontent'
 else:
-    MEDIA_HOST = 'http://test.blynq.in'
+    HOST_URL = 'http://test.blynq.in'
     USERCONTENT_DIR = 'usercontent'
     DELETED_CONTENT_DIR = 'deletedcontent'
 
+MEDIA_HOST = HOST_URL
 PLAYER_UPDATES_DIR = 'player_updates'
 PLAYER_POLL_TIME = 60  # Time difference in seconds between successive polls of the player
 PLAYER_INACTIVE_THRESHOLD = PLAYER_POLL_TIME + 1    # Wait this time (in seconds) to change status of screen as inactive
@@ -217,7 +218,6 @@ PLAYER_INACTIVE_THRESHOLD = PLAYER_POLL_TIME + 1    # Wait this time (in seconds
 # in MEDIA_ROOT
 # the uploaded content of each user is present in /media/usercontent/userdetails.user.id/
 # the deleted files are moved to /media/deletedcontent/organization.organization_id
-
 
 
 EMAIL_USE_TLS = True

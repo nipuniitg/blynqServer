@@ -7,4 +7,5 @@ urlpatterns = [
     url(r'^activationKeyValid', views.activation_key_valid, name='activation_key_valid'),
     # url(r'^deviceKeyActive', views.device_key_active, name='device_key_active'),
     url(r'^updateAvailable', views.player_update_available, name='player_update_available'),
+    url(r'^config', views.player_config, name='player_config'),
 ]

@@ -46,7 +46,7 @@ from screenManagement.models import Screen
 def login(request):
     context_dic ={}
     if request.user.is_authenticated():
-        print 'authenticated'
+        debugFileLog.info('authenticated')
         return HttpResponseRedirect(reverse('index_page'))
     else:
         if request.method == 'POST':
@@ -57,7 +57,7 @@ def login(request):
             # print username, password
             user = authenticate(username=username, password=password)
             if user:
-                print "authenticate successfull"
+                debugFileLog.info("authenticate successful")
                 auth_login(request, user)
                 success = True
                 return ajax_response(success=success)
@@ -162,14 +162,13 @@ def request_quote(request):
                 send_mail_blynq(subject='[Auto-Generated] Quote Requested', message=message)
                 success = True
             except Exception as e:
-                print "Exception is ", e
+                debugFileLog.exception(e)
                 error = "Error while saving the requested Quote"
                 errors.append(error)
-                print error
         else:
             error = "Request Quote form data is not valid"
+            debugFileLog.exception(error)
             errors.append(error)
-            print error
     return ajax_response(success=success, errors=errors)
 
 
@@ -192,7 +191,7 @@ def organization_homepage_summary(request):
         context_dic['used_storage'] = organization.used_file_size
         context_dic['total_storage'] = organization.total_file_size_limit
     except Exception as e:
-        print "Exception is ", e
+        debugFileLog.exception(e)
         context_dic['used_storage'] = 0
         context_dic['total_storage'] = settings.STORAGE_LIMIT_PER_ORGANIZATION
     return obj_to_json_response(context_dic)

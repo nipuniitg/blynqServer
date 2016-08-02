@@ -64,11 +64,10 @@ def upsert_group(request):
                     removed_group_screens.delete()
                     success = True
             except Exception as e:
-                print "Exception is ", e
-                errors = ['Error while adding the group details to database']
-                print errors[0]
+                debugFileLog.exception(e)
+                errors = ['Error while adding the group details']
         else:
-            print 'Add/Edit Group Form is not valid'
+            debugFileLog.exception('Add/Edit Group Form is not valid')
             print add_group_form.errors
             errors = add_group_form.errors
     return ajax_response(success=success, errors=errors)
@@ -176,9 +175,8 @@ def upsert_screen(request):
             # TODO: The above case only handles the PRIVATE businessType, add a check
             success = True
     except Exception as e:
-        print "Exception is ", e
+        debugFileLog.exception(e)
         errors = ['Error while adding the screen details to database']
-        print errors[0]
         success = False
     return ajax_response(success=success, errors=errors)
 
