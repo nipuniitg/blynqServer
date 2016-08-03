@@ -96,6 +96,11 @@
                         });
                         return deferred.promise
                         break;
+                    case 'web' :
+                        var duration = 150;
+                        deferred.resolve(duration);
+                        return deferred.promise
+                        break;
                     default :
                         var duration = 15;
                         deferred.resolve(duration);

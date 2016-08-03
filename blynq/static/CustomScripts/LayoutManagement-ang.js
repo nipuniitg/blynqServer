@@ -47,7 +47,7 @@ lApp.controller('layoutsIndexCtrl',['$scope', 'layoutsIndexFactory','blueprints'
                 refreshLayouts();
             }
             else{
-                toastr.warning('Oops!There was some internal error')
+                toastr.warning(data.errors.join(','));
                 console.log(data.errors);
             }
         }, function(data){
