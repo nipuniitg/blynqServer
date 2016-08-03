@@ -25,12 +25,18 @@
     </div>
     <!-- video -->
     <div ng-if="file.content_type.indexOf('video')>-1" class="content-detail-container">
-        <video controls class="max-fit" ng-src="{[file.url | trusted]}">
+        <video controls autoplay class="max-fit" ng-src="{[file.url | trusted]}">
             <!--<source ng-src="{[file.url | trusted]}">-->
             Your browser does not support HTML5 video.
         </video>
     </div>
-
+    <!-- audio -->
+    <div ng-if="file.content_type.indexOf('audio')>-1" class="content-detail-container">
+        <audio controls autoplay class="max-fit" ng-src="{[file.url | trusted]}">
+            <!--<source ng-src="{[file.url | trusted]}">-->
+            Your browser does not support HTML5 video.
+        </audio>
+    </div>
     <!-- url, that is not image, pdf, video. Hence, shown in iframe-->
     <div ng-if="file.content_type.indexOf('url/web')>-1" class="content-detail-container">
         <iframe ng-src="{[ file.url | trusted]}"></iframe>

@@ -340,8 +340,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
         {
             toastr.success('Dropped. Adding in progress..')
             var contentDropped = ctFactory.getFilesObj()[index];
-            //:TODO If the dropped content is video, duration time should be set as per that video duration
-            var newPlaylistItem = new blueprints.PlaylistItem(contentDropped, getVideoDuration);
+            var newPlaylistItem = new blueprints.PlaylistItem(contentDropped, getContentDuration);
             newPlaylistItem.setDuration(contentDropped).then(function(duration){
                 if(duration == NaN)
                 {
@@ -413,20 +412,26 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
     };
 
     //video drag drop duration
-    var getVideoDuration = function(contentFile, callback){
+    var getContentDuration = function(contentFile, callback){
         var duration;
-        var video = document.getElementById("video_for_duration");
+        var contentElement;
+        if(contentFile.content_type.indexOf('audio')>-1){
+            contentElement = document.getElementById("audio_for_duration");
+        }
+        if(contentFile.content_type.indexOf('video')>-1){
+            contentElement = document.getElementById("video_for_duration");
+        }
         //if same item dropped, then take duration from the existing
-        if(video.src == contentFile.url){
-            duration =  Math.ceil(video.duration);
+        if(contentElement.src == contentFile.url){
+            duration =  Math.ceil(contentElement.duration);
             callback(duration);
         }
         else{
             $scope.$apply(function(){
-                $scope.file = contentFile;
+                $scope.durationFile = contentFile;
             });
-            video.onloadedmetadata = function(){
-                duration = Math.ceil(video.duration);
+            contentElement.onloadedmetadata = function(){
+                duration = Math.ceil(contentElement.duration);
                 callback(duration);
             };
         }

@@ -78,7 +78,7 @@
             ,title: ''
         }
 
-        function PlaylistItem(contentFile, videoDurationFn){
+        function PlaylistItem(contentFile, getDurationFn){
             this.is_folder = false;
             this.title = contentFile.title;
             this.url = contentFile.url;
@@ -91,7 +91,13 @@
                 var deferred = $q.defer();
                 switch (this.content_type.split("/")[1]){
                     case 'video':
-                        videoDurationFn(contentFile, function(duration){
+                        getDurationFn(contentFile, function(duration){
+                            deferred.resolve(duration)
+                        });
+                        return deferred.promise
+                        break;
+                    case 'audio':
+                        getDurationFn(contentFile, function(duration){
                             deferred.resolve(duration)
                         });
                         return deferred.promise

@@ -32,6 +32,7 @@
                 ,video : '/static/images/video_icon.png'
                 ,folder : '/static/images/folder-icon.png'
                 ,url : '/static/images/url_icon.png'
+                ,audio : '/static/images/audio_icon.png'
             };
             return fileIcons
         }
