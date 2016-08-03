@@ -12,7 +12,4 @@ class ContentSerializer(Serializer):
             else:
                 self._current['url'] = obj.url
             del self._current['document']
-        if 'content_type' in self.selected_fields:
-            if obj.content_type and (obj.content_type.file_type == 'file/audio/mpeg' or obj.content_type.file_type == 'file/audio/mp3'):
-                self._current['content_type'] = 'file/video/mp4'
         self.objects.append(self._current)

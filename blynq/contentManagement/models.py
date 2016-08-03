@@ -113,6 +113,7 @@ class Content(models.Model):
             if self.document:
                 raise ValidationError(_('Invalid File extension'), code='invalid')
             debugFileLog.exception("file type does not exist, might be an url")
+
             def check_youtube_url(url):
                 import re
                 youtube_url_regex = '^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$'
