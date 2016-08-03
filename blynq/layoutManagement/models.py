@@ -4,7 +4,7 @@ from django.db import models
 
 # Create your models here.
 from django.db.models import Q
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
 from authentication.models import Organization
@@ -48,3 +48,13 @@ def post_save_layout(sender, instance, **kwargs):
     layout_schedules = Schedule.objects.filter(deleted=False, layout_id=instance.layout_id)
     for each_schedule in layout_schedules:
         each_schedule.save()
+
+
+@receiver(pre_delete, sender=Layout)
+def remove_layout(sender, instance, **kwargs):
+    if instance.is_default:
+        raise Exception('Cannot delete the default Full Screen layout')
+    from scheduleManagement.models import Schedule
+    schedules = Schedule.objects.filter(layout=instance, deleted=False)
+    if schedules:
+        raise Exception('Cannot delete layout as it is already in use')

@@ -6,7 +6,7 @@ from django.shortcuts import render
 # Create your views here.
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-from blynq.settings import MEDIA_HOST
+from blynq.settings import MEDIA_HOST, HOST_URL, PLAYER_POLL_TIME
 from contentManagement.models import Content
 from contentManagement.serializers import ContentSerializer
 from customLibrary.views_lib import debugFileLog, string_to_dict, default_string_to_datetime, obj_to_json_response, \
@@ -20,8 +20,15 @@ from layoutManagement.serializers import default_layout_pane_serializer
 
 
 @csrf_exempt
+def player_config(request):
+    # posted_data = string_to_dict(request.body)
+    # unique_device_key = posted_data.get('device_key')
+    config_json = {'host_url': HOST_URL, 'poll_interval': PLAYER_POLL_TIME}
+    return obj_to_json_response(config_json)
+
+
+@csrf_exempt
 def player_update_available(request):
-    errors = []
     posted_data = string_to_dict(request.body)
     unique_device_key = posted_data.get('device_key')
     version_name = posted_data.get('version_name')
@@ -36,7 +43,7 @@ def player_update_available(request):
                 player_json['is_update_available'] = True
                 player_json['url'] = MEDIA_HOST + updates[0].executable.url
     except ScreenActivationKey.DoesNotExist:
-        debugFileLog.exception('Screen activation key does not exist')
+        debugFileLog.exception('Screen activation key %s does not exist' % unique_device_key)
     except Exception as e:
         debugFileLog.exception(e)
     return obj_to_json_response(player_json)

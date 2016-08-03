@@ -90,5 +90,5 @@ def delete_layout(request):
             success = True
     except Exception as e:
         debugFileLog.exception(e)
-        errors = ['Error while deleting the layout']
+        errors = ['Error while deleting the layout, Layout is already in use']
     return ajax_response(success=success, errors=errors)

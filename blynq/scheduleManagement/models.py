@@ -99,7 +99,7 @@ class Schedule(models.Model):
     schedule_title = models.CharField(max_length=100)
     screens = models.ManyToManyField(Screen, through=ScheduleScreens)
     is_split = models.BooleanField(default=False)
-    layout = models.ForeignKey(Layout, on_delete=models.PROTECT, null=True)
+    layout = models.ForeignKey(Layout, on_delete=models.SET_NULL, null=True)
     schedule_panes = models.ManyToManyField(LayoutPane, through=SchedulePane)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
 
