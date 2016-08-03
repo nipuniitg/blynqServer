@@ -66,7 +66,8 @@
         }
     }])
 
-    uDApp.controller('changePasswordCtrl',['$scope','uDDataAccessFactory','$timeout', function($scope,uDAF,$timeout){
+    uDApp.controller('changePasswordCtrl',['$scope','uDDataAccessFactory','$timeout','$state',
+     function($scope,uDAF,$timeout,$state){
         var cPCtrl = this;
         var onLoad = function(){
             cPCtrl.passwordsMatch = true;
@@ -82,7 +83,15 @@
                     reenter_new_password : cPCtrl.reenter_new_password
                 }
                 uDAF.changePassword(passwordsObj).then(function(data){
-                    toastr.success('Password updated successfully');
+                    if(data.success){
+                        toastr.success('Password updated successfully. Please login again.');
+                        $timeout(function(){
+                            $state.go('logout');
+                        }, 5*1000);
+                    }
+                    else{
+                        toastr.warning(data.errors.join(','));
+                    }
                 },function(response){
                     toastr.error('Oops! Some error occured. Please refresh the page and try again.');
                     console.log(response.statusText);
@@ -92,36 +101,49 @@
             }
         }
 
-        $scope.$watch(angular.bind(this, function(){
-            return cPCtrl.reenter_new_password;
-        }), function (newVal) {
-          if(typeof cPCtrl.reenter_new_password !=='undefined' && cPCtrl.reenter_new_password.length>0 && cPCtrl.reenter_new_password.length != newVal){
-            cPCtrl.passwordsMatch = false;
-          }
-          else{
-            cPCtrl.passwordsMatch = true;
-          }
+        $scope.$watchGroup([ function(){
+            return cPCtrl.new_password
+        }, function(){
+            return  cPCtrl.reenter_new_password
+        }], function (newVals) {
+            if(newVals[0] !== 'undefined' && newVals[1] !== 'undefined'){
+                if(newVals[0] !== newVals[1]){
+                    cPCtrl.passwordsMatch = false;
+                }else{
+                    cPCtrl.passwordsMatch = true;
+                }
+            }
         });
 
     }]);
 
     uDApp.controller('updateUserDetailsCtrl',['$scope','uDDataAccessFactory',function($scope,uDAF){
         var uUDCtrl = this;
+        uUDCtrl.userDetails={};
 
         var onLoad = function(){
+            uUDCtrl.refreshDetails();
+        };
+
+        uUDCtrl.refreshDetails = function(){
             uDAF.getUserDetails().then(function(data){
                 uUDCtrl.userDetails = data;
             },function(){
                 toastr.warning('Oops!There was some error while loading user details. Please refresh the page and try again.')
             });
-        };
+        }
 
         onLoad();
 
         uUDCtrl.updateUserDetails = function(){
             if($scope.userDetailsForm.$valid){
                 uDAF.updateUserDetails(uUDCtrl.userDetails).then(function(data){
-                    toastr.success('Details saved successfully');
+                    if(data.success){
+                        uUDCtrl.refreshDetails();
+                        toastr.success('Details saved successfully');
+                    }else{
+                        toastr.warning(data.errors.join(','));
+                    }
                 },function(response){
                     toastr.error('Oops! Some error occured. Please refresh the page and try again.');
                     console.log(response.statusText);
