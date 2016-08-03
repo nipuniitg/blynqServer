@@ -1,6 +1,7 @@
 import os
 
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 from django.db import models
 # See https://docs.djangoproject.com/en/1.8/ref/contrib/auth/ for User model details
 from blynq.settings import STORAGE_LIMIT_PER_ORGANIZATION, MEDIA_ROOT, PLAYER_UPDATES_DIR
@@ -94,10 +95,15 @@ class Role(models.Model):
 #     is_active
 #     is_superuser
 #     last_login
+
+mobile_number_regex = RegexValidator(regex=r'^(\+\d{1,3}[- ]?)?\d{10}$',
+                                     message="Invalid Mobile Number, make sure mobile number is 10 digits")
+
+
 class UserDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
-    mobile_number = models.CharField(max_length=12)
+    mobile_number = models.CharField(max_length=14, validators=[mobile_number_regex], null=True)
     role = models.ForeignKey(Role)
 
     def __unicode__(self):
@@ -110,7 +116,7 @@ class UserDetails(models.Model):
 class RequestedQuote(models.Model):
     name = models.CharField(max_length=100)
     email = models.CharField(max_length=100)
-    mobile_number = models.CharField(max_length=12)
+    mobile_number = models.CharField(max_length=14, validators=[mobile_number_regex], null=True)
     num_of_devices = models.IntegerField()
     additional_details = models.TextField(blank=True, null=True)
     requested_on = models.DateTimeField(auto_now_add=True)
