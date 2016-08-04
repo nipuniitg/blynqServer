@@ -134,5 +134,9 @@ def date_changed(received_datetime):
         return False
 
 
+def today_date():
+    return timezone.now().date()
+
+
 debugFileLog = logging.getLogger('debugFileLog')
 consoleLog = logging.getLogger('consoleLog')

@@ -5,8 +5,8 @@ from django.utils import timezone
 from schedule.models import Calendar
 
 from authentication.models import Organization, UserDetails, City
-from blynq.settings import PLAYER_INACTIVE_THRESHOLD
-from customLibrary.views_lib import debugFileLog
+from blynq.settings import PLAYER_INACTIVE_THRESHOLD, PLAYER_POLL_TIME
+from customLibrary.views_lib import debugFileLog, today_date
 
 
 # Create your models here.
@@ -185,6 +185,11 @@ class Screen(models.Model):
 
     def update_status(self):
         self.last_active_time = timezone.now()
+        screen_analytics, created = self.screenanalytics_set.get_or_create(screen_id=self.screen_id,
+                                                                           date=timezone.now().date())
+        if not created:
+            screen_analytics.time_online += PLAYER_POLL_TIME
+            screen_analytics.save()
         self.save()
 
 
@@ -209,3 +214,9 @@ def remove_schedule_screens(sender, instance, **kwargs):
     from scheduleManagement.models import ScheduleScreens
     schedule_screens = ScheduleScreens.objects.filter(group=instance.group, screen=instance.screen)
     schedule_screens.delete()
+
+
+class ScreenAnalytics(models.Model):
+    screen = models.ForeignKey(Screen, related_name='%(class)s_screen')
+    date = models.DateField(default=today_date)
+    time_online = models.PositiveIntegerField(default=0)    # in seconds
