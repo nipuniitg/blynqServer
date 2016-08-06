@@ -15,7 +15,7 @@ from playerManagement.models import PlayerUpdate, LocalServer
 from playlistManagement.models import PlaylistItems
 from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import ScheduleScreens, SchedulePlaylists, SchedulePane
-from screenManagement.models import ScreenActivationKey, Screen
+from screenManagement.models import ScreenActivationKey, Screen, ORIENTATION_CHOICES
 from layoutManagement.serializers import default_layout_pane_serializer
 from screenManagement.serializers import AspectRatioSerializer
 
@@ -184,12 +184,12 @@ def event_json_from_occurrences(existing_occurrences):
                                                                            'playlist_items'))
         aspect_ratio_list = [schedule.layout.aspect_ratio] if schedule.layout and schedule.layout.aspect_ratio else []
         aspect_ratio = AspectRatioSerializer().serialize(aspect_ratio_list)
-        aspect_ratio = aspect_ratio[0] if aspect_ratio else None
+        orientation = aspect_ratio[0]['orientation'] if aspect_ratio else ORIENTATION_CHOICES[0][0]
         layout_pane_dict = default_layout_pane_serializer([schedule_pane.layout_pane])[0]
+        layout_pane_dict['orientation'] = orientation
         campaign_dict = {'schedule_id': schedule.schedule_id,
                          'playlists': playlists_json,
                          'pane': layout_pane_dict,
-                         'aspect_ratio': aspect_ratio,
                          'last_updated_time': schedule.last_updated_time,
                          'start_time': occur.start,
                          'end_time': occur.end}

@@ -10,15 +10,15 @@ from customLibrary.views_lib import debugFileLog, today_date
 
 
 # Create your models here.
+ORIENTATION_CHOICES = (
+    ('LANDSCAPE', 'Landscape Orientation'),
+    ('PORTRAIT', 'Portrait Orientation'),
+)
 
 
 class AspectRatio(models.Model):
     aspect_ratio_id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100)
-    ORIENTATION_CHOICES = (
-        ('LANDSCAPE', 'Landscape Orientation'),
-        ('PORTRAIT', 'Portrait Orientation'),
-    )
     orientation = models.CharField(max_length=20, choices=ORIENTATION_CHOICES, default=ORIENTATION_CHOICES[0][0])
     width_component = models.IntegerField()
     height_component = models.IntegerField()
