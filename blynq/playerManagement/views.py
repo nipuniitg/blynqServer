@@ -16,7 +16,7 @@ from playlistManagement.models import PlaylistItems
 from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import ScheduleScreens, SchedulePlaylists, SchedulePane
 from screenManagement.models import ScreenActivationKey, Screen
-from layoutManagement.serializers import default_layout_pane_serializer
+from layoutManagement.serializers import default_layout_pane_serializer, LayoutSerializer
 
 
 @csrf_exempt
@@ -181,10 +181,13 @@ def event_json_from_occurrences(existing_occurrences):
         playlists = schedule_pane.playlists.all()
         playlists_json = PlaylistSerializer().serialize(playlists, fields=('playlist_id', 'playlist_title',
                                                                            'playlist_items'))
+        aspect_ratio = LayoutSerializer().serialize([schedule.layout], fields=('aspect_ratio'))
+        aspect_ratio = aspect_ratio[0] if aspect_ratio else None
         layout_pane_dict = default_layout_pane_serializer([schedule_pane.layout_pane])[0]
         campaign_dict = {'schedule_id': schedule.schedule_id,
                          'playlists': playlists_json,
                          'pane': layout_pane_dict,
+                         'aspect_ratio': aspect_ratio,
                          'last_updated_time': schedule.last_updated_time,
                          'start_time': occur.start,
                          'end_time': occur.end}
