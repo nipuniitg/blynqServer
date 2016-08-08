@@ -7,6 +7,7 @@ from django.conf import settings
 from authentication.models import UserDetails, Organization
 from contentManagement.models import Content
 from customLibrary.views_lib import debugFileLog
+from screenManagement.models import Screen
 
 
 class PlaylistItems(models.Model):

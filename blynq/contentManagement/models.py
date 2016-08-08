@@ -2,17 +2,14 @@ import shutil
 
 from django.core.exceptions import ValidationError
 from django.db import models, NotSupportedError
-from django.conf import settings
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
-from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
-from django.core.files.base import ContentFile
 import os
-import hashlib
+
 # Create your models here.
 from authentication.models import UserDetails, Organization
-from blynq.settings import BASE_DIR, MEDIA_ROOT, USERCONTENT_DIR, DELETED_CONTENT_DIR
+from blynq.settings import MEDIA_ROOT, USERCONTENT_DIR, DELETED_CONTENT_DIR
 from customLibrary.views_lib import debugFileLog
 
 

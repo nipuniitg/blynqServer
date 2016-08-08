@@ -30,7 +30,7 @@ DEBUG = True
 if DEBUG:
     ALLOWED_HOSTS = []
 else:
-    ALLOWED_HOSTS = ['http://www.test.blynq.in', 'test.blynq.in']
+    ALLOWED_HOSTS = ['http://blynq.in', 'http://www.blynq.in', 'www.blynq.in']
 
 
 # Application definition
@@ -54,6 +54,7 @@ INSTALLED_APPS = (
     'playerManagement',
     'scheduleManagement',
     'layoutManagement',
+    'analytics',
     #'django_js_reverse',
 )
 
@@ -154,7 +155,7 @@ STORAGE_LIMIT_PER_ORGANIZATION = 5*1024*1024*1024  # 1 gb 1*1024*1024*1024
 
 
 today = timezone.now().strftime("%Y%m%d")
-LOG_DIRECTORY = os.path.join(BASE_DIR, 'logs')
+SERVER_LOG_DIRECTORY = os.path.join(BASE_DIR, 'logs/server')
 
 LOGGING = {
     'version': 1,
@@ -175,7 +176,7 @@ LOGGING = {
         'debug': {
             'class': 'logging.FileHandler',
             'formatter': 'verbose',
-            'filename': os.path.join(LOG_DIRECTORY, 'debug%s.log' % today),
+            'filename': os.path.join(SERVER_LOG_DIRECTORY, 'debug%s.log' % today),
         },
     },
     'loggers': {
@@ -206,11 +207,12 @@ if DEBUG:
     USERCONTENT_DIR = 'test_usercontent'
     DELETED_CONTENT_DIR = 'test_deletedcontent'
 else:
-    HOST_URL = 'http://test.blynq.in'
+    HOST_URL = ALLOWED_HOSTS[0] if ALLOWED_HOSTS else 'http://blynq.in'
     USERCONTENT_DIR = 'usercontent'
     DELETED_CONTENT_DIR = 'deletedcontent'
 
 MEDIA_HOST = HOST_URL
+PLAYER_LOG_DIRECTORY = os.path.join(BASE_DIR, 'logs/player')
 PLAYER_UPDATES_DIR = 'player_updates'
 PLAYER_POLL_TIME = 60  # Time difference in seconds between successive polls of the player
 PLAYER_INACTIVE_THRESHOLD = PLAYER_POLL_TIME + 1    # Wait this time (in seconds) to change status of screen as inactive
