@@ -103,7 +103,7 @@ mobile_number_regex = RegexValidator(regex=r'^(\+\d{1,3}[- ]?)?\d{10}$',
 class UserDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
-    mobile_number = models.CharField(max_length=14, validators=[mobile_number_regex], null=True)
+    mobile_number = models.CharField(max_length=14, validators=[mobile_number_regex], null=True, blank=True)
     role = models.ForeignKey(Role)
 
     def __unicode__(self):
