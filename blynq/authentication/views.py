@@ -137,7 +137,6 @@ def homePage(request):
     return render(request, 'Home.html')
 
 
-
 def divertToLandingPage(request):
     if request.user.is_authenticated():
         return HttpResponseRedirect(reverse('index_page', args=(request)))
