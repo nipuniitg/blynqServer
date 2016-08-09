@@ -47,6 +47,7 @@ INSTALLED_APPS = (
     'schedule', # https://github.com/llazzaro/django-scheduler
     'reversion',    # http://django-reversion.readthedocs.io/en/latest/
     'coverage',
+    'fcm',
     'authentication',
     'screenManagement',
     'contentManagement',
