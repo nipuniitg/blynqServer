@@ -1,6 +1,7 @@
 (function(){
     'use strict';
-    var mainApp =  angular.module('mainApp', ['ui.router','sdApp', 'plApp','sagApp','hApp','mwl.calendar'])
+    var mainApp =  angular.module('mainApp', ['ui.router','sdApp', 'plApp','sagApp','hApp','lApp','uDApp',
+     'mwl.calendar','ui.bootstrap'])
     .config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('{[');
     $interpolateProvider.endSymbol(']}');
@@ -70,6 +71,21 @@ mainApp.config(function($locationProvider,$stateProvider, $urlRouterProvider) {
         ,controller : 'scheduleIndexCtrl'
         ,controllerAs : 'scheduleIndexCtrl'
     })
+    .state('layouts', {
+        url: "/layouts"
+        ,templateUrl:'/static/templates/layoutManagement/layouts_index.html'
+        ,controller : 'layoutsIndexCtrl'
+        ,controllerAs : 'lIC'
+    })
+    .state('layoutDesign',{
+        url : "/layoutDesign"
+        ,params: {
+            layout : null
+        }
+        ,templateUrl : '/static/templates/layoutManagement/layout_design_index.html'
+        ,controller : 'layoutDesignIndexCtrl'
+        ,controllerAs : 'lDIC'
+    })
     .state('logout',{
         template : ' '
         ,resolve : {
@@ -78,10 +94,23 @@ mainApp.config(function($locationProvider,$stateProvider, $urlRouterProvider) {
             }]
         }
     })
+    .state('changePassword', {
+        url : '/changePassword'
+        ,templateUrl : '/static/templates/authentication/change_password.html'
+        ,controller : 'changePasswordCtrl',
+        controllerAs : 'cPCtrl'
+    })
+    .state('updateUserDetails', {
+        url : '/userDetails'
+        ,templateUrl : '/static/templates/authentication/update_user_details.html'
+        ,controller : 'updateUserDetailsCtrl',
+        controllerAs : 'uUDCtrl'
+    })
+
 });
 
 mainApp.factory("PrintToConsole", ["$rootScope", function ($rootScope) {
-    var handler = { active: false };
+    var handler = { active: true };
     handler.toggle = function () { handler.active = !handler.active; };
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         if (handler.active) {
@@ -140,10 +169,17 @@ mainApp.factory('logoutService',['$http','$window', function ($http, $window) {
     }
 }]);
 
-mainApp.config(function(calendarConfig) {
+mainApp.config(['calendarConfig', '$uibTooltipProvider', function(calendarConfig,$uibTooltipProvider) {
 
     console.log(calendarConfig); //view all available config
+
+
+    $uibTooltipProvider.options({
+        placement : 'right'
+        ,appendToBody : true
+        //,trigger : ['mourseenter', 'click']
     });
+    }])
 
 
 }());

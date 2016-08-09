@@ -1,6 +1,6 @@
 //This file to maintain Screen and Group (SAG) management
 
-var sagApp = angular.module("sagApp",['sdApp', 'ui.bootstrap']).config(function($interpolateProvider) {
+var sagApp = angular.module("sagApp",['sdApp']).config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('{[');
     $interpolateProvider.endSymbol(']}');
     });
@@ -314,9 +314,12 @@ sagApp.controller('groupCtrl',['groupsFactory', 'dataAccessFactory', '$scope','$
 function(groupsFactory, dataAccessFactory, $scope,$uibModal, cAD){
 
    var onLoad = function(){
-          refreshGroups();
-          setActiveGroupIndex(0);
-          $scope.schedulesView = cAD.defaultSchedulesLayoutType();
+      refreshGroups();
+      setActiveGroupIndex(0);
+      $scope.schedulesView = cAD.defaultSchedulesLayoutType();
+
+      //popOver Messages
+      $scope.popOverMessages = cAD.getPopOverMessages();
    }
 
    var setActiveGroupIndex = function(index){
@@ -426,6 +429,9 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
         $scope.activeScreenIndex = 0;
         //Intialising default view of schedules as list view
         $scope.schedulesView = cAD.defaultSchedulesLayoutType();
+
+        //popOverMessages
+        $scope.popOverMessages = cAD.getPopOverMessages();
     };
 
     var setActiveScreenIndex = function(index){

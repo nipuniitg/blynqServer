@@ -421,7 +421,8 @@ function(groupsFactory, dataAccessFactory, $scope,$uibModal, cAD){
 
 //screen Index Cntrl
 sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','$uibModal','constantsAndDefaults',
-  function(screensFactory,dataAccessFactory, $scope, $uibModal, cAD){
+'$interval','$state',
+  function(screensFactory,dataAccessFactory, $scope, $uibModal, cAD, $interval,$state){
 
     //private functions
     var onLoad = function(){
@@ -438,6 +439,13 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
         $scope.activeScreenIndex =index;
     };
 
+    //refreshing screens every 'x' seconds.
+    var intervalReturnPromise ;
+    intervalReturnPromise = $interval(function(){
+        if($state.is('screens')){
+            $scope.refreshScreens();
+        }
+    }, 20000);
 
     //public functions
      $scope.refreshScreens = function(){
@@ -697,5 +705,25 @@ sagApp.controller('mdlScreenSelectionCtrl',['$scope','$uibModalInstance', 'selec
 }]);
 
 
+//Screen-status setter
 
+sagApp.directive('setScreenStatusClass',[function(){
+    return{
+        restrict : 'A'
+        ,link : function($scope, elem, attr){
 
+            var onLoad = function(){
+                switch (attr.setScreenStatusClass) {
+                    case "Online" :
+                        elem.addClass('online')
+                        break;
+                    case "Offline" :
+                        elem.addClass('offline')
+                        break;
+                }
+            }
+
+            onLoad();
+        }
+    }
+}]);

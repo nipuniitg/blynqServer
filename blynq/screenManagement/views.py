@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.core import serializers
 from django.db import transaction
 from django.shortcuts import render
 from schedule.models import Calendar
@@ -7,11 +8,11 @@ from authentication.models import City
 from authentication.serializers import CitySerializer
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, debugFileLog
 from screenManagement.forms import AddScreenForm, AddGroup
-from screenManagement.models import Screen, ScreenStatus, Group, GroupScreens, ScreenActivationKey, SplitScreen
+from screenManagement.models import Screen, ScreenStatus, Group, GroupScreens, ScreenActivationKey, AspectRatio
 # import the logging library
 
 # Get an instance of a logger
-from screenManagement.serializers import ScreenSerializer, GroupSerializer, SplitScreenSerializer
+from screenManagement.serializers import ScreenSerializer, GroupSerializer, AspectRatioSerializer
 
 
 # Create your views here.
@@ -63,11 +64,10 @@ def upsert_group(request):
                     removed_group_screens.delete()
                     success = True
             except Exception as e:
-                print "Exception is ", e
-                errors = ['Error while adding the group details to database']
-                print errors[0]
+                debugFileLog.exception(e)
+                errors = ['Error while adding the group details']
         else:
-            print 'Add/Edit Group Form is not valid'
+            debugFileLog.exception('Add/Edit Group Form is not valid')
             print add_group_form.errors
             errors = add_group_form.errors
     return ajax_response(success=success, errors=errors)
@@ -175,9 +175,8 @@ def upsert_screen(request):
             # TODO: The above case only handles the PRIVATE businessType, add a check
             success = True
     except Exception as e:
-        print "Exception is ", e
+        debugFileLog.exception(e)
         errors = ['Error while adding the screen details to database']
-        print errors[0]
         success = False
     return ajax_response(success=success, errors=errors)
 
@@ -222,8 +221,6 @@ def group_index(request):
     return render(request, 'screen/groups.html', context_dic)
 
 
-def valid_screen_layouts(request):
-    json_data = SplitScreenSerializer().serialize(SplitScreen.objects.all(), fields=('split_screen_id', 'title',
-                                                                                     'num_of_panes',
-                                                                                     'screen_panes'))
+def get_aspect_ratios(request):
+    json_data = AspectRatioSerializer().serialize(AspectRatio.objects.all())
     return obj_to_json_response(json_data)

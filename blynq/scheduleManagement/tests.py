@@ -9,8 +9,9 @@ from customLibrary.tests_lib import create_schedule, create_schedule_playlist, c
     create_userdetails, generate_random_string, verify_posted_dict, generate_screen_dict, generate_playlist_dict, \
     generate_schedule_dict, verify_get_result, generate_schedule_timeline
 from customLibrary.views_lib import generate_utc_datetime, get_ist_datetime, time_fmt, date_fmt
+from playerManagement.views import device_key_active
 from scheduleManagement.models import Schedule, SchedulePlaylists, ScheduleScreens
-from scheduleManagement.views import device_key_active, get_schedules, get_screen_schedules, get_playlist_schedules, \
+from scheduleManagement.views import get_schedules, get_screen_schedules, \
     get_group_schedules, upsert_schedule, delete_schedule
 from screenManagement.models import ScreenActivationKey, GroupScreens
 
@@ -80,15 +81,15 @@ class ScheduleViewsTest(TestCase):
                           group_id=group.group_id)
         print 'test_get_group_schedules completed successfully'
 
-    def test_get_playlist_schedules(self):
-        schedule_playlist = create_schedule_playlist(default_schedule_playlist=True)
-        schedule_playlist2 = create_schedule_playlist(default_schedule_playlist=False)
-        playlist_id = schedule_playlist.playlist_id
-        url = reverse('get_playlist_schedules', kwargs={'playlist_id': playlist_id})
-        expected_result = [generate_schedule_dict(schedule_playlist.schedule)]
-        verify_get_result(self, expected_result=expected_result, url=url, view_func=get_playlist_schedules,
-                          playlist_id=playlist_id)
-        print 'test_get_playlist_schedules completed successfully'
+    # def test_get_playlist_schedules(self):
+    #     schedule_playlist = create_schedule_playlist(default_schedule_playlist=True)
+    #     schedule_playlist2 = create_schedule_playlist(default_schedule_playlist=False)
+    #     playlist_id = schedule_playlist.playlist_id
+    #     url = reverse('get_playlist_schedules', kwargs={'playlist_id': playlist_id})
+    #     expected_result = [generate_schedule_dict(schedule_playlist.schedule)]
+    #     verify_get_result(self, expected_result=expected_result, url=url, view_func=get_playlist_schedules,
+    #                       playlist_id=playlist_id)
+    #     print 'test_get_playlist_schedules completed successfully'
 
     def test_device_key_active(self):
         url = reverse('device_key_active')

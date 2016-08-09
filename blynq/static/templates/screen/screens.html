@@ -7,7 +7,9 @@
                     <div class="widget-icons pull-right">
                         <a class="btn  btn-primary" ng-click="addNewScreen()">
                             <i class="fa fa-plus"></i>Add Screen</a>
-
+                        <a class="btn btn-primary" ng-click="refreshScreens()">
+                            <i class="fa fa-refresh"></i>
+                        </a>
                     </div>
                 </header>
                 <div class="table-responsive fill">
@@ -15,7 +17,7 @@
                         <thead>
                         <tr>
                             <th>Edit</th>
-                            <!--<th>Status</th>-->
+                            <th>Status</th>
                             <th>Screen Name</th>
                             <th>City</th>
                             <th class="fix">Address</th>
@@ -23,7 +25,39 @@
                         </tr>
                         <tr>
                             <th></th>
-                            <!--<th></th>-->
+                            <th>
+                                <div class="btn-group" uib-dropdown>
+                                    <button type="button" class="btn btn-primary" uib-dropdown-toggle>
+                                        <i class="fa fa-adjust online-and-offline" ng-show="searchScreens.status==''"></i>
+                                        <i class="fa fa-circle online" ng-show="searchScreens.status=='Online'"></i>
+                                        <i class="fa fa-circle offline" ng-show="searchScreens.status=='Offline'"></i>
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" uib-dropdown-menu role="menu">
+                                        <li role="menuitem">
+                                            <a ng-click="searchScreens.status=''">
+                                                <i class="fa fa-adjust online-and-offline"></i>
+                                                <span>All</span>
+                                            </a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li role="menuitem">
+                                            <a ng-click="searchScreens.status='Online'">
+                                                <i class="fa fa-circle online"></i>
+                                                <span>Online</span>
+                                            </a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li role="menuitem">
+                                            <a ng-click="searchScreens.status='Offline'">
+                                                <i class="fa fa-circle offline"></i>
+                                                <span>Offline</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                            </th>
                             <th><input type="form-control" ng-model="searchScreens.screen_name"
                                        placeholder="search Name"></th>
                             <th><input type="form-control" ng-model="searchScreens.city.city_name" placeholder="search">
@@ -38,7 +72,7 @@
                             ng-click="clickedOnScreen($index)">
                             <td><a href="#" ng-click="editScreenDetails($index)"><i class="fa fa-pencil pointer"></i>
                             </a></td>
-                            <!--<td><i class="fa fa-circle online"></i>{[ screen.status ]} </td>-->
+                            <td><i class="fa fa-circle" set-screen-status-class="{[screen.status]}"></i></td>
                             <td class="fix">{[ screen.screen_name ]}</td>
                             <td class="">{[ screen.city.city_name]}</td>
                             <td class="fix">{[ screen.address ]}</td>

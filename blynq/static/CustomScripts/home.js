@@ -44,10 +44,14 @@ hApp.controller('homeCtrl', ['$scope','homeDataAccessFactory','$state',
  function($scope, hDAF, $state){
     var onLoad = function(){
         hDAF.getHomePageSummary(function(returnData){
-            $scope.screen_count = returnData.screen_count;
-            $scope.schedule_count = returnData.schedule_count
-            $scope.used_storage= returnData.used_storage
-            $scope.total_storage= returnData.total_storage
+            $scope.total_screen_count = returnData.total_screen_count;
+            $scope.schedule_count = returnData.schedule_count;
+            $scope.used_storage= returnData.used_storage;
+            $scope.total_storage= returnData.total_storage;
+            $scope.active_screen_count = returnData.active_screen_count;
+            $scope.inactive_screen_count = returnData.inactive_screen_count;
+
+            $scope.used_storage_percentage = ($scope.used_storage/$scope.total_storage)*100 + '%';
         })
     };
     onLoad();

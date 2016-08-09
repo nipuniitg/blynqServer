@@ -121,6 +121,12 @@
                                 Your browser does not support HTML5 video.
                             </video>
                         </div>
+                        <!-- audio -->
+                        <div ng-if="activePlaylistItem.content_type.indexOf('audio')>-1" class="">
+                            <audio controls class="max-fit" ng-src="{[activePlaylistItem.url | trusted]}">
+                                Your browser does not support HTML5 video.
+                            </audio>
+                        </div>
 
                         <!-- url, that is not image, pdf, video. Hence, shown in iframe-->
                         <div ng-if="activePlaylistItem.content_type.indexOf('url/web')>-1" class="">
@@ -185,15 +191,21 @@
                             </div>
                         </div>
                     </form>
-                    <!-- Below html is used to get the duration of videos. Not related to the above code.-->
+                    <!-- Below html is used to automatically get  the duration of videos.
+                     Not related to the above code.-->
                     <div id="video_meta_data" ng-show="false">
-                        <video controls class="max-fit" ng-src="{[file.url | trusted]}" id="video_for_duration"
+                        <video controls class="max-fit" ng-src="{[durationFile.url | trusted]}" id="video_for_duration"
                                preload="metadata">
                             <!--<source ng-src="{[file.url | trusted]}">-->
                             Your browser does not support HTML5 video.
                         </video>
                     </div>
-
+                    <div id="audio_meta_data" ng-show="false">
+                        <audio controls class="max-fit" ng-src="{[durationFile.url | trusted]}" id="audio_for_duration"
+                               preload="metadata">
+                            Your browser does not support HTML5 audio.
+                        </audio>
+                    </div>
                 </div>
 
             </div>

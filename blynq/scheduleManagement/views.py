@@ -1,27 +1,21 @@
-import datetime
 import calendar
+import datetime
 
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.utils import timezone
-from schedule.models import Event, Rule
-from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
-
+from django.shortcuts import render
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from schedule.models import Event, Rule
 # Create your views here.
 # from schedule.views import calendar
-from authentication.models import Organization
-from playerManagement.models import LocalServer
-from contentManagement.models import Content
-from contentManagement.serializers import ContentSerializer
-from customLibrary.views_lib import get_userdetails, ajax_response, obj_to_json_response, string_to_dict, list_to_comma_string, \
-    default_string_to_datetime, generate_utc_datetime, debugFileLog, get_ist_datetime, get_utc_datetime
-from playlistManagement.models import Playlist, PlaylistItems
-from playlistManagement.serializers import PlaylistSerializer
+from customLibrary.views_lib import get_userdetails, ajax_response, obj_to_json_response, string_to_dict, \
+    list_to_comma_string, generate_utc_datetime, get_ist_datetime, get_utc_datetime, debugFileLog
+from playlistManagement.models import Playlist
 from scheduleManagement.models import Schedule, SchedulePlaylists, ScheduleScreens, SchedulePane
-from scheduleManagement.serializers import ScheduleSerializer
-from screenManagement.models import Screen, Group, ScreenActivationKey, SplitScreen, ScreenPane
-from screenManagement.views import debugFileLog
+from scheduleManagement.serializers import default_schedule_serializer
+from screenManagement.models import Screen, Group
+from layoutManagement.models import Layout
 
 
 @login_required
@@ -40,20 +34,25 @@ def interval_param(interval):
 
 def list_to_param(key_str, bylistday):
     if bylistday:
-        weekday_string = list_to_comma_string(bylistday)
-        return key_str + ':' + weekday_string
+        try:
+            weekday_string = list_to_comma_string(bylistday)
+            return key_str + ':' + weekday_string
+        except Exception as e:
+            debugFileLog.exception(e)
     return ''
 
 
 def append_params(params, new_keyvalue):
-    return params + ';' + new_keyvalue
+    if new_keyvalue:
+        return params + ';' + new_keyvalue
+    else:
+        return params
 
 
 # byweekday should be a list [0,2,3] meaning 0-Monday, 1-Tuesday, 2-Wednesday, 3-Thursday, 4-Friday, 5-Saturday,6-Sunday
 def generate_rule_params(interval=1, bymonthday=None, byweekday=None, byweekno=None):
     debugFileLog.info("inside generate_rule_params")
     params = interval_param(interval)
-    params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekday', bylistday=byweekday))
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekday', bylistday=byweekday))
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='bymonthday', bylistday=bymonthday))
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekno', bylistday=byweekno))
@@ -237,26 +236,29 @@ def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists
     return True, error
 
 
-def upsert_schedule_panes(user_details, schedule, schedule_panes, split_screen):
+def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
     debugFileLog.info("inside upsert_schedule_panes")
     error = ''
     schedule_pane_id_list = []
     for item in schedule_panes:
         schedule_pane_id = int(item.get('schedule_pane_id'))
         schedule_playlists = item.get('schedule_playlists')
-        screen_pane = item.get('screen_pane')
-        screen_pane_id = int(screen_pane.get('screen_pane_id'))
+        layout_pane = item.get('layout_pane')
+        layout_pane_id = int(layout_pane.get('layout_pane_id'))
         timeline = item.get('timeline')
         is_always = timeline.get('is_always')
         all_day = timeline.get('all_day')
         recurrence_absolute = timeline.get('recurrence_absolute')
         if not recurrence_absolute:
             recurrence_absolute = False
-        event_dict = event_dict_from_timeline(timeline=timeline, schedule=schedule)
-        event = Event(**event_dict)
-        event.save()
+        if schedule_playlists:
+            event_dict = event_dict_from_timeline(timeline=timeline, schedule=schedule)
+            event = Event(**event_dict)
+            event.save()
+        else:
+            event = None
         if schedule_pane_id == -1:
-            schedule_pane = SchedulePane(schedule=schedule, screen_pane_id=screen_pane_id,
+            schedule_pane = SchedulePane(schedule=schedule, layout_pane_id=layout_pane_id,
                                          is_always=is_always, all_day=all_day, recurrence_absolute=recurrence_absolute,
                                          event=event)
             schedule_pane.save()
@@ -264,7 +266,7 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, split_screen):
         else:
             schedule_pane = SchedulePane.objects.get(schedule_pane_id=schedule_pane_id)
             schedule_pane.schedule = schedule
-            schedule_pane.screen_pane_id = screen_pane_id
+            schedule_pane.layout_pane_id = layout_pane_id
             schedule_pane.is_always = is_always
             schedule_pane.all_day = all_day
             schedule_pane.recurrence_absolute = recurrence_absolute
@@ -299,21 +301,21 @@ def upsert_schedule(request):
             schedule_screens = posted_data.get('schedule_screens')
             schedule_groups = posted_data.get('schedule_groups')
             is_split = posted_data.get('is_split')
-            selected_layout = posted_data.get('selected_layout')
+            layout = posted_data.get('layout')
             schedule_panes = posted_data.get('schedule_panes')
             user_schedules = Schedule.get_user_relevant_objects(user_details=user_details)
-            split_screen_id = int(selected_layout.get('split_screen_id'))
-            split_screen = SplitScreen.objects.get(split_screen_id=split_screen_id)
+            layout_id = int(layout.get('layout_id'))
+            layout = Layout.objects.get(layout_id=layout_id)
             # upsert schedule
             if schedule_id == -1:
                 schedule = Schedule(schedule_title=schedule_title, created_by=user_details, is_split=is_split,
-                                    split_screen=split_screen, last_updated_by=user_details,
+                                    layout=layout, last_updated_by=user_details,
                                     organization=user_details.organization)
             else:
                 schedule = user_schedules.get(schedule_id=schedule_id)
                 schedule.schedule_title = schedule_title
                 schedule.is_split = is_split
-                schedule.split_screen = split_screen
+                schedule.layout = layout
                 schedule.last_updated_by = user_details
             schedule.save()
 
@@ -326,7 +328,7 @@ def upsert_schedule(request):
             errors.append(error)
 
             success_panes, error = upsert_schedule_panes(user_details=user_details, schedule=schedule,
-                                                         schedule_panes=schedule_panes, split_screen=split_screen)
+                                                         schedule_panes=schedule_panes, layout=layout)
             success = success_screens and success_groups and success_panes
             errors.append(error)
     except Exception as e:
@@ -336,53 +338,6 @@ def upsert_schedule(request):
         debugFileLog.exception(e)
         errors.append(error)
     return ajax_response(success=success, errors=errors)
-
-
-@csrf_exempt
-def device_key_active(request):
-    """
-    :param request:
-    :return: Json dict of success and error, success will be True if the activation_key sent in the post request
-     is not in_use and verified.
-     If the activation_key is not in the database, then adding it here and manually check the verified through the
-     admin portal
-    """
-    success = False
-    error = ''
-    posted_data = string_to_dict(request.body)
-    activation_key = posted_data.get('device_key')
-    if not activation_key:
-        error = 'Activation key not found'
-        return ajax_response(success=success, errors=error)
-    try:
-        screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key)
-        if not screen_activation_key.verified:
-            error = 'New device with device key %s is asking for activation. ' % activation_key
-            error += 'Check the verified boolean if the device is valid.'
-            debugFileLog.warning(error)
-            # elif screen_activation_key.in_use:
-            #     error = 'Device activation key %s is already in use.' % activation_key
-            #     debugFileLog.warning(error)
-        else:
-            success = True
-    except ScreenActivationKey.DoesNotExist:
-        error = 'Activation key %s doesn\'t exist in the database.\n ' % activation_key
-        error += 'Adding it, check the verified boolean if the device is valid.\n'
-        debugFileLog.warning(error)
-        try:
-            screen_activation_key = ScreenActivationKey(activation_key=activation_key)
-            screen_activation_key.save()
-        except Exception as e:
-            db_error = 'Adding the above activation_key to the database failed with the exception {0} \n'.format(str(e))
-            debugFileLog.error(db_error)
-        success = False
-    return ajax_response(success=success, errors=error)
-
-
-def default_schedule_serializer(querySet):
-    return ScheduleSerializer().serialize(querySet, fields=('schedule_id', 'schedule_title',
-                                                            'schedule_panes', 'is_split', 'selected_layout',
-                                                            'schedule_screens', 'schedule_groups'))
 
 
 def get_screen_schedules(request, screen_id):
@@ -398,7 +353,8 @@ def get_group_schedules(request, group_id):
     debugFileLog.info("inside get_group_schedules")
     group_id = int(group_id)
     user_details = get_userdetails(request)
-    group_schedule_id_list = ScheduleScreens.objects.filter(screen__isnull=True, group_id=group_id).values_list(
+    group_schedule_id_list = ScheduleScreens.objects.filter(schedule__deleted=False, screen__isnull=True,
+                                                            group_id=group_id).values_list(
         'schedule_id', flat=True).distinct()
     group_schedules = Schedule.get_user_relevant_objects(user_details).filter(schedule_id__in=group_schedule_id_list)
     json_data = default_schedule_serializer(querySet=group_schedules)
@@ -519,7 +475,9 @@ def delete_schedule(request):
             schedule_id = int(posted_data.get('schedule_id'))
             schedule = Schedule.get_user_relevant_objects(user_details=user_details).get(schedule_id=schedule_id)
             # Cascading delete would delete all the schedule screens
-            schedule.delete()
+            # schedule.delete()
+            schedule.deleted = True
+            schedule.save()
             success = True
     except Exception as e:
         success = False
@@ -531,14 +489,16 @@ def delete_schedule(request):
 
 def calendar_schedules(start_datetime, end_datetime, screen_id=None, group_id=None):
     if screen_id and group_id:
-        schedule_id_list = ScheduleScreens.objects.filter(screen_id=screen_id, group_id=group_id).values_list(
+        schedule_id_list = ScheduleScreens.objects.filter(schedule__deleted=False, screen_id=screen_id,
+                                                          group_id=group_id).values_list(
             'schedule_id', flat=True).distinct()
     elif screen_id:
         # Show the schedules of the screen as well as the schedule of the group in which screen lies.
-        schedule_id_list = ScheduleScreens.objects.filter(screen_id=screen_id).values_list(
+        schedule_id_list = ScheduleScreens.objects.filter(schedule__deleted=False, screen_id=screen_id).values_list(
             'schedule_id', flat=True).distinct()
     elif group_id:
-        schedule_id_list = ScheduleScreens.objects.filter(screen__isnull=True, group_id=group_id).values_list(
+        schedule_id_list = ScheduleScreens.objects.filter(schedule__deleted=False, screen__isnull=True,
+                                                          group_id=group_id).values_list(
             'schedule_id', flat=True).distinct()
     else:
         return []
@@ -556,8 +516,8 @@ def calendar_schedules(start_datetime, end_datetime, screen_id=None, group_id=No
             else:
                 display_type = 'info'
             title = schedule.schedule_title
-            title = title + ' - ' + schedule.split_screen.title if schedule.split_screen else title
-            title = title + ' - ' + each_schedule_pane.screen_pane.pane_title if each_schedule_pane.screen_pane else title
+            title = title + ' - ' + schedule.layout.title if schedule.layout else title
+            title = title + ' - ' + each_schedule_pane.layout_pane.title if each_schedule_pane.layout_pane else title
             for each_occur in occurrences:
                 campaign_dict = {'title': title,
                                  'startsAt': get_ist_datetime(each_occur.start),

@@ -210,20 +210,16 @@ plApp.factory('ctFactory', ['ctDataAccessFactory', function(ctDataAccessFactory)
 
 }]);
 
-plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', '$uibModal',
-function($scope, ctFactory, ctDataAccessFactory, $uibModal ){
+plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', '$uibModal','constantsAndDefaults',
+function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
 
     //private functions
     var onLoad = function(){
         $scope.currentFolderId = -1  //-1 represents root folder. And hence fetches the data in root folder.
         $scope.refreshContent($scope.currentFolderId);
 
-//        $uibTooltip.options=
-//            {
-//                'popover-append-to-body' : true,
-//                'popover-trigger' : 'mouseenter'
-//            }
-//        ;
+        $scope.fileIcons = cAD.getFileIcons();
+        $scope.popOverMessages = cAD.getPopOverMessages();
     };
 
     var getCheckedContentItems = function(){
@@ -245,13 +241,6 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal ){
             return false;
         }
     }
-
-    $scope.fileIcons = {
-        pdf : '/static/images/pdf_logo.png'
-        ,video : '/static/images/video_icon.png'
-        ,folder : '/static/images/folder-icon.png'
-        ,url : '/static/images/url_icon.png'
-    };
 
     $scope.refreshContent = function(folderId){
 
@@ -453,7 +442,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal ){
               animation: true
               ,templateUrl: '/static/templates/contentManagement/_move_content_mdl.html'
               ,controller: 'mdlContentMoveCtrl'
-              ,size: 'lg'
+              ,size: 'md'
               ,backdrop: 'static' //disables modal closing by click on the backdrop.
               ,resolve : {
                     content_ids : function(){
@@ -694,9 +683,10 @@ plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentS
         $scope.currentFolderId = parentScopeObj.currentFolderId;
         $scope.files=[];
         $scope.uploadProgressIndicator = 0;
+        $scope.uploadInProgress = false;
         ctDAF.getValidContentTypes(function(returnData){
             validFileTypes = returnData
-        })
+        });
 
     };
 
@@ -730,29 +720,37 @@ plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentS
     }
 
     $scope.uploadFiles = function(){
-        if($scope.validateFiles())
+        if(!$scope.uploadInProgress)
         {
-            var formData = new FormData();
-            var filesArr = [];
+            if($scope.validateFiles()){
+                var formData = new FormData();
+                var filesArr = [];
 
-            for(var i in $scope.files){
-                formData.append('file'+i, $scope.files[i]);
+                for(var i in $scope.files){
+                    formData.append('file'+i, $scope.files[i]);
+                }
+                formData.append('currentFolderId', $scope.currentFolderId);
+                formData.append('totalFiles', $scope.files.length);
+
+
+                // ADD LISTENERS.
+                var objXhr = new XMLHttpRequest();
+                var csrftoken = $cookies.get('csrftoken');
+                //using upload is necessary. It triggers the progress bar.
+                objXhr.upload.onprogress = updateProgress;
+                objXhr.addEventListener("load", transferComplete, false);
+
+                // SEND FILE DETAILS TO THE API.
+                objXhr.open("POST", "/api/content/uploadContent/");
+                objXhr.setRequestHeader("X-CSRFToken", csrftoken);
+                objXhr.send(formData);
+
+                //set uploadInProgress
+                $scope.uploadInProgress = true;
             }
-            formData.append('currentFolderId', $scope.currentFolderId);
-            formData.append('totalFiles', $scope.files.length);
-
-
-            // ADD LISTENERS.
-            var objXhr = new XMLHttpRequest();
-            var csrftoken = $cookies.get('csrftoken');
-            //using upload is necessary. It triggers the progress bar.
-            objXhr.upload.onprogress = updateProgress;
-            objXhr.addEventListener("load", transferComplete, false);
-
-            // SEND FILE DETAILS TO THE API.
-            objXhr.open("POST", "/api/content/uploadContent/");
-            objXhr.setRequestHeader("X-CSRFToken", csrftoken);
-            objXhr.send(formData);
+        }
+        else{
+            toastr.warning('upload already in progress');
         }
     }
 
@@ -766,9 +764,17 @@ plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentS
         }
     };
 
-    var transferComplete = function(){
-        toastr.success('upload Complete');
-        $uibModalInstance.close();
+    var transferComplete = function(progressEvent){
+        var response = JSON.parse(progressEvent.currentTarget.responseText);
+        if(response.success){
+            toastr.success('upload Complete');
+            $uibModalInstance.close();
+        }
+        else{
+            $scope.uploadInProgress = false;
+            toastr.warning('upload aborted');
+            toastr.warning(response.errors.join());
+        }
     };
 
     $scope.cancel = function(){

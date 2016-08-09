@@ -1,11 +1,29 @@
-from django.core.validators import MaxValueValidator
 from django.db import models
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
+from django.utils import timezone
 from schedule.models import Calendar
+
 from authentication.models import Organization, UserDetails, City
+from blynq.settings import PLAYER_INACTIVE_THRESHOLD, PLAYER_POLL_TIME
 from customLibrary.views_lib import debugFileLog
+
 # Create your models here.
+ORIENTATION_CHOICES = (
+    ('LANDSCAPE', 'Landscape Orientation'),
+    ('PORTRAIT', 'Portrait Orientation'),
+)
+
+
+class AspectRatio(models.Model):
+    aspect_ratio_id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=100)
+    orientation = models.CharField(max_length=20, choices=ORIENTATION_CHOICES, default=ORIENTATION_CHOICES[0][0])
+    width_component = models.IntegerField()
+    height_component = models.IntegerField()
+
+    def __unicode__(self):
+        return self.title
 
 
 # Possible screen status
@@ -86,7 +104,7 @@ class Group(models.Model):
         return self.group_name
 
     def natural_key(self):
-        return ({'group_id': self.group_id, 'group_name': self.group_name})
+        return {'group_id': self.group_id, 'group_name': self.group_name}
 
     # Only used once, try to refractor more code using functions like this
     @staticmethod
@@ -123,6 +141,9 @@ class Screen(models.Model):
     activated_on = models.DateTimeField(auto_now_add=True)
     activated_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True, blank=True,
                                      related_name='%(class)s_activated_by')
+
+    last_active_time = models.DateTimeField(default=timezone.now)
+
     last_updated_time = models.DateTimeField(auto_now=True, null=True)
     last_updated_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True, blank=True,
                                         related_name='%(class)s_last_updated_by')
@@ -154,6 +175,21 @@ class Screen(models.Model):
     def get_user_relevant_objects(user_details):
         return Screen.objects.filter(owned_by=user_details.organization)
 
+    @property
+    def current_status(self):
+        if (timezone.now() - self.last_active_time).total_seconds() > PLAYER_INACTIVE_THRESHOLD:
+            return 'Offline'
+        else:
+            return 'Online'
+
+    def update_status(self):
+        self.last_active_time = timezone.now()
+        screen_analytics, created = self.screenanalytics_screen.get_or_create(date=timezone.now().date())
+        if not created:
+            screen_analytics.time_online += PLAYER_POLL_TIME
+            screen_analytics.save()
+        self.save()
+
 
 @receiver(post_save, sender=GroupScreens)
 def create_schedule_screens(sender, instance, **kwargs):
@@ -161,7 +197,7 @@ def create_schedule_screens(sender, instance, **kwargs):
     screen = instance.screen
     group = instance.group
     from scheduleManagement.models import ScheduleScreens
-    group_schedules = ScheduleScreens.objects.filter(screen__isnull=True, group=group)
+    group_schedules = ScheduleScreens.objects.filter(schedule__deleted=False, screen__isnull=True, group=group)
     for each_group_schedule in group_schedules:
         schedule_screen = ScheduleScreens(screen=screen, schedule=each_group_schedule.schedule, group=group)
         schedule_screen.save()
@@ -176,26 +212,3 @@ def remove_schedule_screens(sender, instance, **kwargs):
     from scheduleManagement.models import ScheduleScreens
     schedule_screens = ScheduleScreens.objects.filter(group=instance.group, screen=instance.screen)
     schedule_screens.delete()
-
-
-class ScreenPane(models.Model):
-    screen_pane_id = models.AutoField(primary_key=True)
-    pane_title = models.CharField(max_length=100, null=True, blank=True)
-    left_margin = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
-    top_margin = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
-    width = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
-    height = models.PositiveIntegerField(validators=[MaxValueValidator(100),])
-    split_screen = models.ForeignKey('SplitScreen', null=True, blank=True, related_name='%(class)s_splitscreen')
-
-    def __unicode__(self):
-        return self.split_screen.title + '-' + self.pane_title
-
-
-class SplitScreen(models.Model):
-    split_screen_id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=100)
-    is_default = models.BooleanField(default=False)
-    num_of_panes = models.IntegerField(default=2)
-
-    def __unicode__(self):
-        return self.title

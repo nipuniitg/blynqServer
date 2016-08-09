@@ -1,18 +1,21 @@
-<div class="col-sm-12">
-    <div id="inpPlaylists" class="tagsinput " style="height: 100%;">
-        <span class="tag" ng-repeat="playlist in selectedPlaylists">
-            <span> {[playlist.playlist_title]} &nbsp;&nbsp;</span>
+<div class="row">
+    <div class="col-sm-12">
+        <div id="inpPlaylists" class="tagsinput " style="height: 100%;" data-as-sortable=""
+                                     data-ng-model="selectedPlaylists">
+        <span class="tag" ng-repeat="playlist in selectedPlaylists" data-as-sortable-item>
+            <span data-as-sortable-item-handle> {[playlist.playlist_title]} &nbsp;&nbsp;</span>
             <a class="tagsinput-remove-link"
                ng-click="removePlaylist($index)"></a>
         </span>
-        <div class="tagsinput-add-container">
-            <div class="tagsinput-add"
-                 ng-click="openPlaylistSelectorModal()"></div>
-            <input value="" data-default=""
-                   style="color: rgb(102, 102, 102); width: 7px;">
+            <div class="tagsinput-add-container">
+                <div class="tagsinput-add"
+                     ng-click="openPlaylistSelectorModal()"></div>
+                <input value="" data-default=""
+                       style="color: rgb(102, 102, 102); width: 7px;">
+            </div>
         </div>
     </div>
-</div>
-<div class="help-block with-errors col-sm-offset-3 col-sm-9" ng-show="selectedPlaylists.length < 1">
-    select atleast one playlist
+    <div class="help-block with-errors col-sm-offset-3 col-sm-9" ng-show="selectedPlaylists.length < 1">
+        select atleast one playlist
+    </div>
 </div>

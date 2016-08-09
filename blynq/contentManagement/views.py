@@ -211,10 +211,8 @@ def create_folder(request):
                                is_folder=True)
         success = True
     except Exception as e:
-        print "Exception is ", e
-        error = 'Error with the submitted data in create folder'
-        print error
-        errors.append(error)
+        debugFileLog.exception(e)
+        errors = 'Error with the submitted data in create folder'
     return ajax_response(success=success, errors=errors)
 
 
@@ -284,9 +282,9 @@ def get_content_helper(request, parent_folder_id=-1, is_folder=False):
                                                   fields=('title', 'document', 'content_type', 'content_id',
                                                           'is_folder'), use_natural_foreign_keys=True)
     except Exception as e:
-        print "Exception is ", e
+        debugFileLog.exception(e)
         json_data = []
-        error = "Error while fetching the content or invalid parent folder id"
+        debugFileLog.exception("Error while fetching the content or invalid parent folder id")
     return obj_to_json_response(json_data)
 
 
@@ -343,10 +341,9 @@ def update_content_title(request):
             content.save()
             success = True
         except Exception as e:
-            print "Exception is ", e
-            error = 'Invalid content_id or Error while saving the title to the database'
+            debugFileLog.exception(e)
+            error = 'Error while saving the title to the database'
             errors.append(error)
-            print error
     return ajax_response(success=success, errors=errors)
 
 
@@ -358,9 +355,13 @@ def move_content(request):
     posted_data = string_to_dict(request.body)
     content_ids = posted_data.get('content_ids')
     parent_folder_id = int(posted_data.get('parent_folder_id'))
+    debugFileLog.info( 'parent_folder_id is %d' % parent_folder_id )
     user_content = Content.get_user_relevant_objects(user_details=user_details)
     try:
-        parent_folder = user_content.get(content_id=parent_folder_id)
+        if parent_folder_id == -1:
+            parent_folder = None
+        else:
+            parent_folder = user_content.get(content_id=parent_folder_id)
         # assert parent_folder.is_folder == True
     except Content.DoesNotExist:
         success = False

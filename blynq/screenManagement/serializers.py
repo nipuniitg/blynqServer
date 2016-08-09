@@ -1,6 +1,6 @@
 from django.core.serializers.python import Serializer
 
-from screenManagement.models import GroupScreens, ScreenPane
+from screenManagement.models import GroupScreens
 
 
 class GroupScreensSerializer(Serializer):
@@ -17,7 +17,7 @@ class GroupScreensSerializer(Serializer):
         if 'screen' in self.selected_fields:
             json_data = ScreenSerializer().serialize([obj.screen],
                                                      fields=('screen_name', 'screen_size', 'aspect_ratio', 'resolution',
-                                                             'address', 'city', 'screen_id'),
+                                                             'status', 'address', 'city', 'screen_id'),
                                                      use_natural_foreign_keys=True)
             self.add_dict_to_current(json_data)
             del self._current['screen']
@@ -31,6 +31,8 @@ class ScreenSerializer(Serializer):
             group_screens = GroupScreens.objects.filter(screen=obj)
             self._current['groups'] = GroupScreensSerializer().serialize(
                 group_screens, fields=('group_screen_id', 'group'))
+        if 'status' in self.selected_fields:
+            self._current['status'] = obj.current_status
         self.objects.append( self._current )
 
 
@@ -44,17 +46,7 @@ class GroupSerializer(Serializer):
         self.objects.append(self._current)
 
 
-class ScreenPaneSerializer(Serializer):
+class AspectRatioSerializer(Serializer):
     def end_object(self, obj):
-        self._current['screen_pane_id'] = obj._get_pk_val()
-        self.objects.append(self._current)
-
-
-class SplitScreenSerializer(Serializer):
-    def end_object(self, obj):
-        self._current['split_screen_id'] = obj._get_pk_val()
-        if 'screen_panes' in self.selected_fields:
-            screen_panes = ScreenPane.objects.filter(split_screen=obj)
-            self._current['screen_panes'] = ScreenPaneSerializer().serialize(screen_panes,
-                                                                             fields=('screen_pane_id', 'pane_title'))
+        self._current['aspect_ratio_id'] = obj._get_pk_val()
         self.objects.append(self._current)

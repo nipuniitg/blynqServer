@@ -1,6 +1,6 @@
 (function(){
     'use strict';
-    var mainApp =  angular.module('mainApp', ['ui.router','sdApp', 'plApp','sagApp','hApp','sPApp','uDApp',
+    var mainApp =  angular.module('mainApp', ['ui.router','sdApp', 'plApp','sagApp','hApp','lApp','uDApp',
      'mwl.calendar','ui.bootstrap'])
     .config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('{[');
@@ -71,11 +71,20 @@ mainApp.config(function($locationProvider,$stateProvider, $urlRouterProvider) {
         ,controller : 'scheduleIndexCtrl'
         ,controllerAs : 'scheduleIndexCtrl'
     })
-    .state('screenPartition', {
-        url: "/screenPartition"
-        ,templateUrl:'/static/templates/screenPartition/screen_partition_index.html'
-        ,controller : 'screenPartitionIndexCtrl'
-        ,controllerAs : 'sPIC'
+    .state('layouts', {
+        url: "/layouts"
+        ,templateUrl:'/static/templates/layoutManagement/layouts_index.html'
+        ,controller : 'layoutsIndexCtrl'
+        ,controllerAs : 'lIC'
+    })
+    .state('layoutDesign',{
+        url : "/layoutDesign"
+        ,params: {
+            layout : null
+        }
+        ,templateUrl : '/static/templates/layoutManagement/layout_design_index.html'
+        ,controller : 'layoutDesignIndexCtrl'
+        ,controllerAs : 'lDIC'
     })
     .state('logout',{
         template : ' '

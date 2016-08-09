@@ -1,0 +1,42 @@
+<section class="wrapper fixed-wrapper">
+    <div class="row fill">
+        <div class="col-md-12 fill">
+            <div class="panel panel-default fill">
+                <div class="panel-heading">
+                    Screen Layouts
+                    <span class="pull-right">
+                        <a class="btn  btn-primary pull-right" ng-click="lIC.createNewLayout()">
+                            <i class="fa fa-plus"></i>
+                            Add Layout
+                        </a>
+                    </span>
+                </div>
+                <div class="panel-body fill overflow-y">
+                    <div class="layout-info-wrapper"
+                         ng-repeat="layout in lIC.layouts">
+                        <div class="layout-info-header">
+                            {[ layout.title]}
+                        </div>
+                        <div class="layout-preview-wrapper">
+                            <div class="layout-preview">
+                                <pane-template ng-repeat="pane in layout.layout_panes"
+                                               index="$index"
+                                               pane="pane">
+                                </pane-template>
+                            </div>
+                        </div>
+                        <div class="layout-info-footer">
+                            <span class="pull-right">
+                                <a confirm-fn="lIC.deleteLayout($index)" confirm confirm-type="delete">
+                                    <i class="fa fa-trash-o pointer"></i></a>
+                            </span>
+                            <a ng-click="lIC.editLayout($index)">
+                                <i class="fa fa-pencil pointer"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

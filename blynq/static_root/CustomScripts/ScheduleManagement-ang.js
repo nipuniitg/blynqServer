@@ -1,4 +1,4 @@
-var sdApp = angular.module("sdApp",['ui.bootstrap']).config(function($interpolateProvider) {
+var sdApp = angular.module("sdApp",[]).config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('{[');
     $interpolateProvider.endSymbol(']}');
     });
@@ -67,6 +67,26 @@ sdApp.factory('scheduleIndexFactory', ['$http', function($http){
         ,deleteSchedule : deleteSchedule
     }
 }]);
+
+sdApp.filter('timelineLabel', ['timelineFactory','timelineDescription', function(tF, tD) {
+    return function(timeline){
+        var cookedTimeline = tF.getTimeline(
+            timeline.is_always
+            ,tF.getDateTimeFromDate(timeline.startDate)
+            ,tF.getDateTimeFromDate(timeline.end_recurring_period)
+            ,timeline.all_day
+            ,tF.getDateTimeFromTime(timeline.start_time)
+            ,tF.getDateTimeFromTime(timeline.end_time)
+            ,timeline.frequency
+            ,timeline.interval
+            ,timeline.recurrence_absolute
+            ,timeline.bymonthday
+            ,timeline.byweekno
+            ,timeline.byweekday
+        );
+        return tD.updateLabel(cookedTimeline);
+    };
+}]);
 //**end schedule index material
 
 //schedules-list and schedules-calendar
@@ -117,6 +137,17 @@ sdApp.directive('schedulesList',['$log','scheduleIndexFactory','$uibModal',
                         }
                     });
                 };
+
+                /*define searchSchedules and groups.
+                Without below watch gives an error as those properties would be for undefined.*/
+                $scope.searchSchedules = {};
+//                $scope.searchSchedules.schedule_groups = {};
+//                //to make sure search happen for both screen name and group name
+                $scope.$watch('searchSchedules.schedule_screens.screen_name', function(newValue){
+                    if(typeof newValue !== "undefined"){
+                        $scope.searchSchedules['schedule_groups']['group_name'] = newValue;
+                    }
+                })
         }
     }
 }]);
@@ -233,7 +264,7 @@ sdApp.directive('schedulesCalendar',['$log','scheduleIndexFactory','$uibModal',
 
 
 //schedule Details material
-sdApp.factory('scheduleDetailsFactory', ['$log','$http', function($log, $http){
+sdApp.factory('scheduleDetailsFactory', ['$log','$http','$q', function($log, $http,$q){
 
     var selectedBoolSetter = function(allItems, selectedItems, key, schedule_key_id){
         var r = []
@@ -295,22 +326,74 @@ sdApp.factory('scheduleDetailsFactory', ['$log','$http', function($log, $http){
         });
     };
 
+    var getLayouts = function(){
+        var deferred = $q.defer();
+        $http({
+            method : "GET",
+            url : "/api/layout/getLayouts"
+        }).then(function mySucces(response) {
+            deferred.resolve(response.data);
+        }, function myError(response) {
+            console.log(response.statusText);
+            deferred.reject(response.Text)
+        });
+        return deferred.promise
+    }
+
     return{
         selectedBoolSetter : selectedBoolSetter
         ,getSelectedItems : getSelectedItems
         ,upsertScheduleDetails : upsertScheduleDetails
+        ,getLayouts : getLayouts
     }
 }]);
 
-sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleDetailsFactory',
-'$uibModalInstance','schedule', function($scope, $uibModal, $log, sDF, $uibModalInstance, schedule){
+sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleDetailsFactory','constantsAndDefaults',
+'$uibModalInstance','schedule','blueprints',
+ function($scope, $uibModal, $log, sDF,cAD, $uibModalInstance, schedule,blueprints){
 
-    $scope.schedule = schedule;
+    var isNewSchedule;
+    var onLoad = function(){
+        $scope.schedule = schedule;
+        isNewSchedule = schedule.schedule_id == -1 ? !0 : !1;
+        sDF.getLayouts().then(function(layouts){
+            //copy full screen layout to use when switching between split and non split
+            $scope.fullScreenLayout = angular.copy(layouts[0]);
 
-    var isNewSchedule = schedule.schedule_id == -1 ? !0 : !1
+            //seperate out other layouts for dropdown.
+            layouts.shift();
+            $scope.layouts =angular.copy(layouts);
+        });
+        $scope.title = isNewSchedule? 'Add Schedule' : 'Edit Schedule';
+        $scope.activeTabIndex=0;
+    }
+    onLoad();
 
-    $scope.title = isNewSchedule? 'Add Schedule' : 'Edit Schedule';
+    $scope.splitScreenToggled = function(){
+        if(!$scope.schedule.is_split) //if not split screen, keep only one pane.
+        {
+            //Keep selected_layout as  Full Screen Layout
+            $scope.schedule.layout = $scope.fullScreenLayout;
+        }
+        else //keep the default selected to one from the layouts
+        {
+            $scope.schedule.layout = $scope.layouts[0];
+        }
+    }
 
+    /*when layout changes, the number of panes change. so remove existing panes and insert new.*/
+    $scope.$watch('schedule.layout', function(newLayout,oldLayout){
+        if (newLayout !== oldLayout) {
+            var totalPanes = newLayout.layout_panes.length;
+            $scope.schedule.schedule_panes = [];
+            for(i =0; i< totalPanes; i++){
+                $scope.schedule.schedule_panes.push(new blueprints.SchedulePane(newLayout.layout_panes[i]));
+            }
+            $scope.activeTabIndex = 0;
+        }
+    });
+
+    //Todo : Need rewrite this function according to the split screen requirement
     var validateSchedule = function(){
         if($scope.schedule.schedule_playlists.length<1)
         {
@@ -330,11 +413,11 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
         else{
             toastr.warning('Plese fill all required fields');
         }
-    }
+    };
 
     $scope.saveSchedule= function(){
         $log.log($scope.schedule);
-        if(validateSchedule()){
+        //if(validateSchedule()){
             sDF.upsertScheduleDetails($scope.schedule, function(data){
             if(data.success)
             {
@@ -352,14 +435,12 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
                 toastr.warning('Oops!.There was some error while updating the schedule.');
             }
         });
-        }
+        //}
     };
 
     $scope.cancel = function(){
         $uibModalInstance.dismiss();
     };
-
-    //onLoad();
 }]);
 //**end schedule details material
 
@@ -618,10 +699,10 @@ return{
 sdApp.factory('timelineDescription',['$filter','timelineFactory', function(e, tLF){
 var t = {}
       , n = {
-        DAILY: "Daily",
-        WEEKLY: "Weekly",
-        MONTHLY: "Monthly",
-        YEARLY: "Yearly"
+        DAILY: "DAILY",
+        WEEKLY: "WEEKLY",
+        MONTHLY: "MONTHLY",
+        YEARLY: "YEARLY"
     }
       , i = {
         EVERY_DAY: "Every Day",
@@ -647,8 +728,22 @@ var t = {}
     var updateLabel = function(e) {
         var t = ""
           , l = "dd-MMM-yyyy";
-        if (e.startDate && (t = t + tLF.getOnlyDate(e.startDate) + " "),
-        e.endDate && (t = t + i.TO + " " + tLF.getOnlyDate(e.endDate) + " ")) {
+
+        //if timedefined => is_always.
+        if(e.timeDefined){
+            t = t + "Always";
+        }
+        else
+        {
+            //if for only single day, then consider date only once.
+            //set Hours is to compare only the date part and to avoid time comparision
+            if(e.startDate.setHours(0,0,0,0) == e.endDate.setHours(0,0,0,0)){
+                t = t+tLF.getOnlyDate(e.startDate) + ' ';
+            }
+            else{
+                t = t+tLF.getOnlyDate(e.startDate) + ' ';
+                t = t + i.TO + " " + tLF.getOnlyDate(e.endDate) + " "
+            }
             if(e.allDay){
                 t = t + i.ALL_DAY;
             }else{
@@ -656,9 +751,10 @@ var t = {}
                     t = t + tLF.getOnlyTime(e.startTime) + " ",
                     e.endTime && (t = t + i.TO + " " + tLF.getOnlyTime(e.endTime) + " ")
             }
-
         }
-        if (e.recurrenceType) {
+        
+        //set Hours is to compare only the date part and to avoid time comparision
+        if (e.recurrenceType && e.startDate.setHours(0,0,0,0) != e.endDate.setHours(0,0,0,0)) {
             var u = 0;
             if (t = t + e.recurrenceType + " ",
             e.recurrenceType === n.MONTHLY && (e.recurrenceAbsolute ? (t = t + i.DAY + " " + e.recurrenceDayOfMonth + " " + i.OF + " ",
@@ -698,8 +794,8 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
             ,$scope.recurrenceWeekOfMonth
             ,$scope.recurrenceDaysOfWeek
         );
-        $scope.label = timelineDescription.updateLabel($scope.timeline);
-        $log.log($scope.timeline);
+        updateTimeLabel();
+        //$log.log($scope.timeline);
         updateTimelineObjects($scope.timeline);
     };
 
@@ -715,13 +811,17 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
             ,$scope.recurrenceAbsolute=timeline.recurrenceAbsolute
             ,$scope.recurrenceDayOfMonth=timeline.recurrenceDayOfMonth
             ,$scope.recurrenceWeekOfMonth=timeline.recurrenceWeekOfMonth
-            ,$scope.recurrenceDaysOfWeek=timeline.recurrenceDaysOfWeek
+            ,$scope.recurrenceDaysOfWeek=timeline.recurrenceDaysOfWeek;
+    }
+
+    var updateTimeLabel = function(){
+         $scope.label = timelineDescription.updateLabel($scope.timeline);
     }
 
     $scope.$watch('timeDefined', function(newValue){
         $scope.timeline.timeDefined = newValue;
+        updateTimeLabel()
     });
-
 
     $scope.openTimelineModal=function(){
         var modalInstance = $uibModal.open({
@@ -1118,20 +1218,25 @@ sdApp.factory('calendarFactory',[function(){
 
 
 //add schedule
-sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal',
-    function($log, sIF, $uibModal){
+sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal','blueprints','scheduleDetailsFactory',
+    function($log, sIF, $uibModal,blueprints,sDF){
     return{
-        restrict    :   'E'
+        restrict    :   'EA'
         ,scope      :   {
             refreshSchedules : '&refreshSchedulesFn'
         }
-        ,template:   '<a class="btn  btn-primary pull-right" ng-click="addSchedule()">\
-                        <i class="fa fa-plus"></i> \
-                        Add Schedule\
-                        </a>'
-        ,controller : ['$scope','blueprints', function($scope, blueprints){
+//        ,template:   '<a class="btn  btn-primary pull-right" ng-click="addSchedule()">\
+//                        <i class="fa fa-plus"></i> \
+//                        Add Schedule\
+//                        </a>'
+        ,link : function($scope, elem){
                 var openModalPopup = function(index){
-                    var modalInstance = $uibModal.open({
+                    var newSchedule = new blueprints.Schedule();
+                    sDF.getLayouts().then(function(layouts){
+                        newSchedule.layout = layouts[0];
+                        newSchedule.schedule_panes.push(new blueprints.SchedulePane(layouts[0].layout_panes[0]));
+
+                        var modalInstance = $uibModal.open({
                       animation: true,
                       templateUrl: '/static/templates/scheduleManagement/schedule_details.html',
                       controller: 'scheduleDetailsCtrl',
@@ -1139,21 +1244,23 @@ sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal',
                       ,backdrop: 'static' //disables modal closing by click on the backdrop.
                       ,resolve: {
                         schedule: function(){
-                            return angular.copy(blueprints.scheduleBlueprint);
+                            return newSchedule
                         }
                       }
                     });
-                    modalInstance.result.then(function saved(){
-                        $scope.refreshSchedules();
-                    }, function cancelled(){
-                        toastr.warning('schedule cancelled')
+                        modalInstance.result.then(function saved(){
+                            $scope.refreshSchedules();
+                        }, function cancelled(){
+                            toastr.warning('schedule cancelled')
+                        })
                     })
+
                 };
 
-                $scope.addSchedule= function(){
+                elem.on('click', function(){
                     openModalPopup();
-                };
-        }]
+                })
+        }
     }
 }]);
 

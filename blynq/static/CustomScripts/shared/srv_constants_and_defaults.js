@@ -32,8 +32,21 @@
                 ,video : '/static/images/video_icon.png'
                 ,folder : '/static/images/folder-icon.png'
                 ,url : '/static/images/url_icon.png'
+                ,audio : '/static/images/audio_icon.png'
             };
             return fileIcons
+        }
+
+        //screen layout design
+
+        var getPaneDefaults  = function(){
+            /* below values restricts the user to not to go below the mentioned measurements*/
+            var paneDefaults = {
+                minWidth : 5        //in percentage
+                ,minHeight : 5      // in percentage
+            }
+
+            return paneDefaults
         }
 
         return{
@@ -41,6 +54,7 @@
             ,layouts : layouts
             ,getPopOverMessages : getPopOverMessages
             ,getFileIcons : getFileIcons
+            ,getPaneDefaults : getPaneDefaults
         }
     }]);
 

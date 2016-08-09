@@ -1,0 +1,20 @@
+<h3>Layout Properties</h3>
+<form class="form" name="layout_properties_form" novalidate>
+    <div class="form-group">
+        <label class="control-label">Layout Name</label>
+        <div class="">
+            <input type="text" class="form-control" ng-model="layout.title">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label">Layout type</label>
+        <div class="">
+            <!--Todo: Need to implenent a drowdown. which on changing will reset the whole layout-->
+            <select ng-model="lDIC.selected_aspect_ratio"
+                    ng-options="aspectRatio.title for aspectRatio in aspectRatios track by aspectRatio.aspect_ratio_id"
+                    class="form-control"
+                    ng-change="lDIC.aspectRatioChanged()">
+             </select>
+        </div>
+    </div>
+</form>

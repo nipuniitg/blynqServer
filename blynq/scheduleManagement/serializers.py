@@ -3,8 +3,10 @@ from django.core.serializers.python import Serializer
 from customLibrary.views_lib import get_ist_date_str, get_ist_time_str, debugFileLog
 from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import SchedulePlaylists, ScheduleScreens, SchedulePane
-from screenManagement.models import ScreenPane
-from screenManagement.serializers import ScreenSerializer, GroupSerializer, ScreenPaneSerializer, SplitScreenSerializer
+from layoutManagement.models import LayoutPane
+from screenManagement.serializers import ScreenSerializer, GroupSerializer
+from layoutManagement.serializers import LayoutPaneSerializer, LayoutSerializer, default_layout_serializer, \
+    default_layout_pane_serializer
 
 
 class SchedulePlaylistsSerializer(Serializer):
@@ -30,10 +32,12 @@ class SchedulePaneSerializer(Serializer):
             json_data = SchedulePlaylistsSerializer().serialize(
                 schedule_playlists, fields=('schedule_playlist_id','playlist'))
             self._current['schedule_playlists'] = json_data
-        if 'screen_pane' in self.selected_fields:
-            json_data = ScreenPaneSerializer().serialize([obj.screen_pane], fields=('screen_pane_id', 'pane_title',
-                                                                                    ))
-            self._current['screen_pane'] = json_data[0]
+        if 'layout_pane' in self.selected_fields:
+            if obj.layout_pane:
+                json_data = default_layout_pane_serializer([obj.layout_pane])
+                self._current['layout_pane'] = json_data[0]
+            else:
+                self._current['layout_pane'] = {}
         if 'timeline' in self.selected_fields:
             self._current['timeline'] = get_schedule_timeline(obj)
         self.objects.append(self._current)
@@ -62,8 +66,8 @@ class ScheduleScreensSerializer(Serializer):
 
 
 def default_timeline():
-    return {'is_always': True, 'recurrence_absolute': False, 'all_day': True, 'start_date':None,
-            'end_recurring_period': None, 'start_time': None, 'end_time': None, 'frequency':None, 'interval': None,
+    return {'is_always': True, 'recurrence_absolute': False, 'all_day': True, 'start_date': None,
+            'end_recurring_period': None, 'start_time': None, 'end_time': None, 'frequency': None, 'interval': None,
             'byweekday': None, 'bymonthday': None, 'byweekno': None }
 
 
@@ -106,15 +110,22 @@ class ScheduleSerializer(Serializer):
             json_data = ScheduleScreensSerializer().serialize(
                 schedule_groups, fields=('schedule_screen_id','group'))
             self._current['schedule_groups'] = json_data
-        if 'selected_layout' in self.selected_fields:
-            query_set = [obj.split_screen] if obj.split_screen else []
-            json_data = SplitScreenSerializer().serialize(query_set, fields=(
-                'split_screen_id', 'screen_panes', 'title', 'num_of_panes'))
-            self._current['selected_layout'] = json_data[0] if json_data else {}
+        if 'layout' in self.selected_fields:
+            if obj.layout:
+                json_data = default_layout_serializer([obj.layout])
+                self._current['layout'] = json_data[0]
+            else:
+                self._current['layout'] = {}
         if 'schedule_panes' in self.selected_fields:
             schedule_panes = SchedulePane.objects.filter(schedule=obj)
             json_data = SchedulePaneSerializer().serialize(schedule_panes,
                                                            fields=('schedule_pane_id', 'schedule_playlists',
-                                                                   'screen_pane', 'timeline'))
+                                                                   'layout_pane', 'timeline'))
             self._current['schedule_panes'] = json_data
         self.objects.append(self._current)
+
+
+def default_schedule_serializer(querySet):
+    return ScheduleSerializer().serialize(querySet, fields=('schedule_id', 'schedule_title',
+                                                            'schedule_panes', 'is_split', 'layout',
+                                                            'schedule_screens', 'schedule_groups'))

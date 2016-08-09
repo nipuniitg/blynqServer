@@ -11,5 +11,5 @@ urlpatterns = [
     url(r'^upsertGroup', views.upsert_group, name='upsert_group'),
     url(r'^deleteGroup', views.delete_group, name='delete_group'),
     url(r'^getCityOptionsJson', views.get_city_options, name='city_options'),
-    url(r'^validScreenLayouts', views.valid_screen_layouts, name='valid_screen_layouts'),
+    url(r'^getAspectRatios', views.get_aspect_ratios, name='aspect_ratios'),
 ]
