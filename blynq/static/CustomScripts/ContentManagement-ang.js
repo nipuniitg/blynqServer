@@ -5,6 +5,39 @@
 
 plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
 
+    var getWidgets = function(callback) {
+        var URL = 'api/content/getWidgets'
+        $http({
+             method : "POST"
+             ,url : URL
+         }).then(function mySuccess(response){
+                if(callback)
+                {
+                    callback(response.data);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
+    }
+
+    var deleteWidget = function(widget_id, callback){
+        var postData = {
+            widget_id : widget_id
+        };
+        $http({
+             method : "POST"
+             ,url : '/api/content/deleteWidget'
+             ,data : postData
+         }).then(function mySuccess(response){
+                if(callback)
+                {
+                    callback(response.data);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
+    };
+
     var deleteContent = function(content_ids, callback){
         var postData = {
             content_ids : content_ids
@@ -119,6 +152,23 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
             });
     }
 
+    var upsertWidget = function(widget, callback){
+        var postData = {}
+        postData = widget;
+        $http({
+             method : "POST",
+             url : '/api/content/upsertWidget',
+             data : postData
+         }).then(function mySuccess(response){
+                if(callback)
+                {
+                    callback(response.data);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
+    }
+
     var upsertUrl = function(content, parent_folder_id, callback ){
         var postData = {};
         postData.content = content;
@@ -155,11 +205,13 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
         deleteContent : deleteContent
         ,getFiles : getFilesJson
         ,getFolders : getFoldersJson
+        ,getWidgets : getWidgets
         ,createFolder : createFolder
         ,updateContentTitle : updateContentTitle
         ,getFolderPath : getFolderPath
         ,moveContent    :   moveContent
         ,upsertUrl  : upsertUrl
+        ,upsertWidget: upsertWidget
         ,getValidContentTypes : getValidContentTypes
     }
 
@@ -171,6 +223,7 @@ plApp.factory('ctFactory', ['ctDataAccessFactory', function(ctDataAccessFactory)
     // These are used by the playlist controller.
     var folders =null;
     var files = null;
+    var widgets = null;
 
 
     var getFolders = function(folderId, callback)
@@ -191,6 +244,13 @@ plApp.factory('ctFactory', ['ctDataAccessFactory', function(ctDataAccessFactory)
         });
     };
 
+    var getWidgets = function(callback){
+        ctDataAccessFactory.getWidgets(function(data){
+            widgets = data;
+            callback(data)
+        });
+    };
+
     var getFoldersObj = function()
     {
         return folders;
@@ -201,11 +261,17 @@ plApp.factory('ctFactory', ['ctDataAccessFactory', function(ctDataAccessFactory)
         return files;
     };
 
+    var getWidgetsObj = function(){
+        return widgets;
+    };
+
     return{
         getFolders : getFolders
         ,getFiles : getFiles
+        ,getWidgets : getWidgets
         ,getFoldersObj : getFoldersObj
         ,getFilesObj : getFilesObj
+        ,getWidgetsObj : getWidgetsObj
     }
 
 }]);
@@ -242,6 +308,13 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
         }
     }
 
+    $scope.refreshWidget = function(){
+        ctFactory.getWidgets(function(data)
+        {
+            $scope.widgets = data;
+        })
+    }
+
     $scope.refreshContent = function(folderId){
 
         ctFactory.getFolders(folderId, function(data)
@@ -252,6 +325,11 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
         ctFactory.getFiles(folderId, function(data)
         {
             $scope.files = data;
+        });
+
+        ctFactory.getWidgets(function(data)
+        {
+            $scope.widgets = data;
         });
 
         clearCheckedLists();
@@ -268,6 +346,19 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
     };
 
     //public or Scope releated functions
+    $scope.deleteWidget = function(widget_id){
+        ctDataAccessFactory.deleteWidget(widget_id,  function(data){
+            if(data.success)
+            {
+                $scope.refreshWidget();
+                toastr.success('Widget deleted successfully.');
+            }
+            else{
+                toastr.warning("Oops!!There was some error. Please try again later.");
+            }
+        });
+    }
+
     $scope.deleteSingleContent = function(content_id){
         ctDataAccessFactory.deleteContent([content_id],  function(data){
             if(data.success)
@@ -514,6 +605,95 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
             $scope.refreshContent($scope.currentFolderId);
         }, function cancelled(){
         });
+    }
+
+    // upsertWidget
+    var newWidget = -1;
+
+    $scope.addNewWidget = function(){
+        openUpsertWidgetModal(newWidget)
+    }
+
+    $scope.editWidget = function(index){
+        openUpsertWidgetModal(index)
+    }
+
+    var openUpsertWidgetModal = function(index){
+        var isNewWidget = index == newWidget ? !0 : !1;
+
+        var modalInstance = $uibModal.open({
+            animation: true
+            , templateUrl: '/static/templates/contentManagement/_widget_mdl.html'
+            , size: 'md'
+            ,resolve : {
+                    widgetObj : function(){
+                        if(isNewWidget)
+                        {
+                            return {
+                                widget_id : -1
+                                ,title : ''
+                                ,text : ''
+                            }
+                        }
+                        else{
+                            return angular.copy($scope.widgets[index]);
+                        }
+                    }
+              }
+              ,controller : function($scope, $uibModalInstance,ctDataAccessFactory, widgetObj,$log){
+                    var isNewWidget;
+                    var onLoad = function(){
+                        $scope.widgetObj = widgetObj;
+                        isNewWidget = widgetObj.widget_id == -1 ? !0 : !1
+                        if(isNewWidget){
+                            $scope.modalTitle = 'Add Widget';
+                            $scope.saveVerbose = 'Add';
+                        }
+                        else{
+                            $scope.modalTitle = 'Update Widget';
+                            $scope.saveVerbose = 'Update';
+                        }
+                    }
+                    onLoad();
+
+                    var validate = function(){
+                        if($scope.widgetUpsertForm.$valid){
+                            return !0
+                        }else{ return !1}
+                    }
+
+                    $scope.save = function(){
+                        if(validate()){
+                            ctDataAccessFactory.upsertWidget($scope.widgetObj, function(returnData){
+                                if(returnData.success){
+                                    if(isNewWidget){
+                                        toastr.success('Widget Added Successfully');
+                                    }else{
+                                        toastr.success('Widget updated Successfully');
+                                    }
+                                    $uibModalInstance.close();
+                                }else{
+                                    toastr.warning('Oops! some error occured while '+ (isNewWidget ? 'adding.':'updating.')
+                                    +'Please try after refreshing the page');
+                                    $log.log(returnData.errors);
+                                }
+                            })
+                        }else{
+                            toastr.warning('There are some error in the form. Please correct them');
+                        }
+                    }
+
+                    $scope.cancel = function(){
+                        $uibModalInstance.dismiss();
+                    }
+              }
+            });
+
+        modalInstance.result.then(function saved(){
+            $scope.refreshWidget();
+        }, function cancelled(){
+        });
+
     }
 
     //upsertURl

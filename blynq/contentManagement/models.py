@@ -2,6 +2,7 @@ import shutil
 
 from django.core.exceptions import ValidationError
 from django.db import models, NotSupportedError
+from django.db.models import Q
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
@@ -59,7 +60,7 @@ def upload_to_dir(instance, filename):
 class Content(models.Model):
     # This class includes both files and folders as Content
     content_id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=100, verbose_name=_('name'))
+    title = models.CharField(max_length=100, verbose_name=_('title'))
 
     document = models.FileField(upload_to=upload_to_dir, null=True)
     url = models.CharField(max_length=255, blank=True, null=True)
@@ -309,3 +310,17 @@ def pre_delete_content(sender, instance, **kwargs):
             debugFileLog.exception("Unknown exception while deleting content")
             debugFileLog.exception(e)
     save_relevant_playlists(content_id=instance.content_id)
+
+
+class Widget(models.Model):
+    widget_id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=100)
+    # text can be a url or xml or text
+    text = models.TextField()
+    type = models.ForeignKey(ContentType, null=True, on_delete=models.PROTECT)
+    # organization = null implies it is visible to all the organizations
+    organization = models.ForeignKey(Organization, null=True, on_delete=models.CASCADE)
+
+    @staticmethod
+    def get_user_relevant_objects(user_details):
+        return Widget.objects.filter(Q(organization=user_details.organization) | Q(organization__isnull=True))

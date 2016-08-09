@@ -8,9 +8,9 @@ from django.db import transaction
 from django.shortcuts import render
 
 from blynq.settings import MEDIA_ROOT
-from contentManagement.serializers import ContentSerializer
+from contentManagement.serializers import ContentSerializer, default_widget_serializer
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, debugFileLog
-from contentManagement.models import Content, ContentType
+from contentManagement.models import Content, ContentType, Widget
 
 
 # Create your views here.
@@ -376,4 +376,49 @@ def move_content(request):
         except Content.DoesNotExist:
             success = False
             error = 'Error occured while moving the items. please refresh and try again.'
+    return ajax_response(success=success, errors=errors)
+
+
+def get_widgets(request):
+    user_details = get_userdetails(request)
+    json_data = default_widget_serializer(Widget.get_user_relevant_objects(user_details=user_details))
+    return obj_to_json_response(json_data)
+
+
+def delete_widget(request):
+    success = False
+    errors = []
+    import pdb;pdb.set_trace()
+    try:
+        user_details = get_userdetails(request)
+        posted_data = string_to_dict(request.body)
+        widget_id = posted_data.get('widget_id')
+        widget = Widget.get_user_relevant_objects(user_details=user_details).get(widget_id=widget_id)
+        success = True
+    except Exception as e:
+        errors = ['Access denied to delete this widget']
+        debugFileLog.exception(e)
+    return ajax_response(success=success, errors=errors)
+
+
+def upsert_widget(request):
+    debugFileLog.info("Inside upsert widget")
+    success = False
+    errors = []
+    try:
+        user_details = get_userdetails(request)
+        posted_data = string_to_dict(request.body)
+        widget_id = int(posted_data.get('widget_id'))
+        # TODO: Remove this hard-coding of widget/rss/text
+        content_type, created = ContentType.objects.get_or_create(file_type='widget/rss/text')
+        if widget_id == -1:
+            widget_id = None
+        widget, created = Widget.get_user_relevant_objects(user_details=user_details).update_or_create(
+            widget_id=widget_id, defaults={'title': posted_data.get('title'), 'text': posted_data.get('url'),
+                                           'type_id': content_type.content_type_id,
+                                           'organization_id': user_details.organization.organization_id})
+        success = True
+    except Exception as e:
+        debugFileLog.exception(e)
+        errors = ['Invalid widget details']
     return ajax_response(success=success, errors=errors)
