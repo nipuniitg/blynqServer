@@ -10,8 +10,7 @@ from playlistManagement.models import Playlist, PlaylistItems
 
 
 # Create your views here.
-from playlistManagement.serializers import PlaylistSerializer
-from scheduleManagement.models import SchedulePlaylists
+from playlistManagement.serializers import PlaylistSerializer, default_playlist_serializer
 
 
 @login_required
@@ -76,8 +75,7 @@ def upsert_playlist(request):
             for content in removed_playlist_content:
                 content.delete()
 
-            json_data = PlaylistSerializer().serialize([playlist],
-                                                       fields=('playlist_id', 'playlist_title', 'playlist_items'))
+            json_data = default_playlist_serializer([playlist])
             assert len(json_data) > 0
             obj_dict = {'playlist': json_data[0]}
             success = True
@@ -140,8 +138,7 @@ def get_playlists(request):
     """
     user_details = get_userdetails(request)
     user_playlists = Playlist.get_user_relevant_objects(user_details=user_details)
-    json_data = PlaylistSerializer().serialize(user_playlists,
-                                               fields=('playlist_id', 'playlist_title','playlist_items'))
+    json_data = default_playlist_serializer(user_playlists)
     return obj_to_json_response(json_data)
 
 

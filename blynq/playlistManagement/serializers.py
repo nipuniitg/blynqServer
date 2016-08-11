@@ -20,6 +20,11 @@ class PlaylistItemsSerializer(Serializer):
         self.objects.append(self._current)
 
 
+def default_playlist_serializer(query_set):
+    return PlaylistSerializer().serialize(query_set, fields=('playlist_id', 'playlist_title',
+                                                            'playlist_items'))
+
+
 class PlaylistSerializer(Serializer):
     def end_object(self, obj):
         self._current['playlist_id'] = obj._get_pk_val()
