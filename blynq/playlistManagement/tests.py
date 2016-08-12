@@ -8,7 +8,7 @@ from customLibrary.tests_lib import create_playlist, create_playlist_items, crea
     verify_get_result, generate_content_dict, create_content, verify_posted_dict, generate_playlist_dict, \
     generate_playlist_item_dict
 from playlistManagement.models import Playlist, PlaylistItems
-from playlistManagement.views import get_playlists, get_files_recursively_json, upsert_playlist, delete_playlist
+from playlistManagement.views import get_user_playlists, get_files_recursively_json, upsert_playlist, delete_playlist
 
 
 class PlaylistTest(TestCase):
@@ -21,7 +21,7 @@ class PlaylistTest(TestCase):
         new_organization = create_organization(default_organization=False)
         new_userdetails = create_userdetails(default_userdetails=False, organization=new_organization)
         playlist2 = create_playlist(default_playlist=False, userdetails=new_userdetails)
-        user_playlists = Playlist.get_user_relevant_objects(user_details=new_userdetails)
+        user_playlists = Playlist.get_user_visible_objects(user_details=new_userdetails)
         self.assertEqual(list(user_playlists), list([playlist2]))
 
     def test_playlist_items(self):
@@ -48,7 +48,7 @@ class PlaylistViewsTest(TestCase):
         playlist_item2 = create_playlist_items(default_playlist_item=False, playlist=playlist1)
         playlist2 = create_playlist(default_playlist=False)
         expected_result = [generate_playlist_dict(playlist1), generate_playlist_dict(playlist2)]
-        verify_get_result(self, expected_result=expected_result, url=url, view_func=get_playlists)
+        verify_get_result(self, expected_result=expected_result, url=url, view_func=get_user_playlists)
         playlist_item1.content.delete()
         playlist_item2.content.delete()
         print 'test_get_playlists completed successfully'

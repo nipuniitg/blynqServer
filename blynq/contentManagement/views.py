@@ -11,7 +11,7 @@ from django.shortcuts import render
 from blynq.settings import MEDIA_ROOT
 from contentManagement.serializers import ContentSerializer, default_content_serializer
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, debugFileLog
-from contentManagement.models import Content, ContentType, get_user_widgets, get_user_filesystem
+from contentManagement.models import Content, ContentType
 
 
 # Create your views here.
@@ -36,7 +36,7 @@ def upsert_url(request):
         if parent_folder_id == -1:
             parent_folder = None
         else:
-            parent_folder = get_user_filesystem(user_details=user_details).get(
+            parent_folder = Content.get_user_filesystem(user_details=user_details).get(
                 content_id=parent_folder_id)
         posted_content = posted_data.get('content')
         content_id = int(posted_content.get('content_id'))
@@ -46,7 +46,7 @@ def upsert_url(request):
         if url:
             content_dict = dict(title=title, url=url, uploaded_by=user_details, parent_folder=parent_folder,
                                 last_modified_by=user_details, organization=user_details.organization)
-            instance, created = get_user_filesystem(user_details=user_details).get_or_create(
+            instance, created = Content.get_user_filesystem(user_details=user_details).get_or_create(
                 content_id=content_id, defaults=content_dict)
             if not created:
                 for attr, value in content_dict.iteritems():
@@ -129,7 +129,7 @@ def upload_content(request):
                 if parent_folder_id == -1:
                     parent_folder = None
                 else:
-                    parent_folder = get_user_filesystem(user_details).get(content_id=parent_folder_id)
+                    parent_folder = Content.get_user_filesystem(user_details).get(content_id=parent_folder_id)
                     assert parent_folder.is_folder
                 content = Content(title=title, document=document, uploaded_by=user_details,
                                   last_modified_by=user_details, organization=user_details.organization,
@@ -165,7 +165,7 @@ def upload_content(request):
 def delete_content(request):
     user_details = get_userdetails(request)
     # user_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
-    user_content = get_user_filesystem(user_details=user_details)
+    user_content = Content.get_user_filesystem(user_details=user_details)
     posted_data = string_to_dict(request.body)
     content_ids = posted_data.get('content_ids')
     deleted_content_ids = []
@@ -200,7 +200,7 @@ def create_folder(request):
         if parent_folder_id == -1:
             parent_folder = None
         else:
-            parent_folder = get_user_filesystem(user_details=user_details).get(
+            parent_folder = Content.get_user_filesystem(user_details=user_details).get(
                 content_id=parent_folder_id)
         title = posted_data.get('title')
         Content.objects.create(title=title,
@@ -229,7 +229,7 @@ def create_folder(request):
 
 def get_files_recursively(request, parent_folder_id=-1):
     user_details = get_userdetails(request)
-    user_content = get_user_filesystem(user_details=user_details)
+    user_content = Content.get_user_filesystem(user_details=user_details)
     parent_folder_id = int(parent_folder_id)
     if parent_folder_id == -1:
         parent_folder = None
@@ -253,7 +253,7 @@ def folder_path(request, current_folder_id):
     user_details = get_userdetails(request)
     path = []
     if current_folder_id != -1:
-        user_content = get_user_filesystem(user_details=user_details).get(content_id=current_folder_id)
+        user_content = Content.get_user_filesystem(user_details=user_details).get(content_id=current_folder_id)
         path = user_content.logical_path_list()
     home_folder = {'content_id': -1, 'title': 'Home'}
     path.insert(0, home_folder)
@@ -271,7 +271,7 @@ def get_content_helper(request, parent_folder_id=-1, is_folder=False):
         user_details = get_userdetails(request)
         # Below line is to get content for both user and organization
         # user_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
-        user_content = get_user_filesystem(user_details=user_details)
+        user_content = Content.get_user_filesystem(user_details=user_details)
         parent_folder_id = int(parent_folder_id)
         if parent_folder_id == -1:
             user_content = user_content.filter(parent_folder=None)
@@ -335,7 +335,7 @@ def update_content_title(request):
     content_id = int(content_id)
     if content_id != -1:
         try:
-            content = get_user_filesystem(user_details=user_details).get(content_id=content_id)
+            content = Content.get_user_filesystem(user_details=user_details).get(content_id=content_id)
             content.title = title
             content.save()
             success = True
@@ -355,7 +355,7 @@ def move_content(request):
     content_ids = posted_data.get('content_ids')
     parent_folder_id = int(posted_data.get('parent_folder_id'))
     debugFileLog.info( 'parent_folder_id is %d' % parent_folder_id )
-    user_content = get_user_filesystem(user_details=user_details)
+    user_content = Content.get_user_filesystem(user_details=user_details)
     try:
         if parent_folder_id == -1:
             parent_folder = None
@@ -380,7 +380,7 @@ def move_content(request):
 
 def get_widgets(request):
     user_details = get_userdetails(request)
-    widgets = get_user_widgets(user_details=user_details)
+    widgets = Content.get_user_widgets(user_details=user_details)
     json_data = default_content_serializer(widgets, fields=('title', 'content_id', 'widget_text'))
     return obj_to_json_response(json_data)
 
@@ -392,13 +392,22 @@ def delete_widget(request):
         user_details = get_userdetails(request)
         posted_data = string_to_dict(request.body)
         content_id = int(posted_data.get('content_id'))
-        widget = get_user_widgets(user_details=user_details).get(content_id=content_id)
+        widget = Content.get_user_widgets(user_details=user_details).get(content_id=content_id)
         widget.delete()
         success = True
     except Exception as e:
         errors = ['Access denied to delete this widget']
         debugFileLog.exception(e)
     return ajax_response(success=success, errors=errors)
+
+
+def create_playlist_from_content(content):
+    from playlistManagement.models import Playlist, PlaylistItems
+    playlist = Playlist(playlist_title=content.title, user_visible=False, created_by=content.uploaded_by,
+                        last_updated_by=content.last_modified_by, organization=content.organization)
+    playlist.save()
+    playlist_item = PlaylistItems(playlist=playlist, content=content)
+    playlist_item.save()
 
 
 def upsert_widget(request):
@@ -411,13 +420,20 @@ def upsert_widget(request):
         content_id = int(posted_data.get('content_id'))
         # TODO: Remove this hard-coding of widget/rss/text
         content_type, created = ContentType.objects.get_or_create(file_type='widget/rss/text')
+        new_widget = False
         if content_id == -1:
             content_id = None
-        widget, created = get_user_widgets(user_details=user_details).update_or_create(
+            new_widget = True
+        widget, created = Content.get_user_widgets(user_details=user_details).update_or_create(
             content_id=content_id, defaults={'title': posted_data.get('title'),
                                              'widget_text': posted_data.get('widget_text'),
                                              'content_type_id': content_type.content_type_id,
-                                             'organization_id': user_details.organization.organization_id})
+                                             'organization_id': user_details.organization.organization_id,
+                                             'last_modified_by': user_details})
+        if new_widget:
+            widget.uploaded_by = user_details
+            widget.save()
+            create_playlist_from_content(content=widget)
         success = True
     except Exception as e:
         debugFileLog.exception(e)

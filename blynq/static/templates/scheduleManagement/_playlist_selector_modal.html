@@ -49,17 +49,16 @@
                             </tr>
                             <tr>
                                 <th></th>
-                                <th><input type="form-control" ng-model="searchWidget.title"
+                                <th><input type="form-control" ng-model="searchWidget.playlist_title"
                                            placeholder="search Name"></th>
                                 <!--<th><input type="form-control" ng-model="searchPlaylist.description"-->
                                            <!--placeholder="search Description"></th>-->
                             </tr>
                             </thead>
                             <tbody>
-                            <tr>hello</tr>
-                            <tr ng-repeat="widget in allWidgets">
+                            <tr ng-repeat="widget in allWidgets | filter : searchWidget">
                                 <td><input type="checkbox" ng-model="widget.selected"></td>
-                                <td>{[widget.title]}</td>
+                                <td>{[widget.playlist_title]}</td>
                             </tr>
                             </tbody>
                         </table>

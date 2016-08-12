@@ -20,7 +20,7 @@ class PlaylistItemsSerializer(Serializer):
 
 def default_playlist_serializer(query_set):
     return PlaylistSerializer().serialize(query_set, fields=('playlist_id', 'playlist_title',
-                                                            'playlist_items'))
+                                                             'playlist_items'))
 
 
 class PlaylistSerializer(Serializer):

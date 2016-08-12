@@ -16,6 +16,8 @@ class ContentSerializer(Serializer):
             else:
                 self._current['url'] = obj.url
             del self._current['document']
+        if obj.is_widget:
+            self._current['widget_text'] = obj.widget_text
         self.objects.append(self._current)
 
 

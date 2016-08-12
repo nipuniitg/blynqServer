@@ -217,7 +217,7 @@ def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists
     for pos_index, item in enumerate(schedule_playlists):
         schedule_playlist_id = int(item.get('schedule_playlist_id'))
         playlist_id = int(item.get('playlist_id'))
-        playlist = Playlist.get_user_relevant_objects(user_details).get(playlist_id=playlist_id)
+        playlist = Playlist.get_user_visible_objects(user_details).get(playlist_id=playlist_id)
         if schedule_playlist_id == -1:
             entry = SchedulePlaylists(schedule_pane_id=schedule_pane_id, playlist=playlist, position_index=pos_index)
             entry.save()

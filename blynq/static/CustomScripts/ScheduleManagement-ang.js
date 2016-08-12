@@ -1113,6 +1113,7 @@ sdApp.directive('playlistTextbox',['$uibModal', function($uibModal){
         restrict:'E'
         ,scope : {
             selectedPlaylists : '='
+            ,selectedWidgets : '='
         }
         ,templateUrl : '/static/templates/scheduleManagement/_playlist_textbox.html'
         ,link : function($scope, elements,attr){
@@ -1168,7 +1169,7 @@ sdApp.factory('playlistSelectorFactory', ['scheduleDetailsFactory','$http', func
     var getWidgetsJson = function(callback){
         $http({
              method : "GET",
-             url : '/api/playlist/getWidgets'
+             url : '/api/playlist/getWidgetPlaylists'
          }).then(function mySucces(response){
                 if(callback)
                 {
@@ -1190,7 +1191,7 @@ sdApp.factory('playlistSelectorFactory', ['scheduleDetailsFactory','$http', func
 
     var getWidgetsListWithSelectedBool = function(selectedWidgets, callback){
         getWidgetsJson(function(allWidgets){
-            var allWidgetsWithSelectedBool = sDF.selectedBoolSetter(allWidgets, selectedWidgets, 'content_id'
+            var allWidgetsWithSelectedBool = sDF.selectedBoolSetter(allWidgets, selectedWidgets, 'playlist_id'
             , 'schedule_playlist_id');
             callback(allWidgetsWithSelectedBool);
         })

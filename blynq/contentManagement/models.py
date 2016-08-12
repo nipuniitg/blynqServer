@@ -34,17 +34,6 @@ def upload_to_dir(instance, filename):
     return '%s/user%d/%s' % (USERCONTENT_DIR, instance.uploaded_by.id, filename)
 
 
-def get_user_widgets(user_details):
-    return Content.objects.filter(Q(organization=user_details.organization) | Q(organization__isnull=True)).filter(
-        content_type__file_type__icontains='widget')
-
-
-# This includes both files, folders and URLs
-def get_user_filesystem(user_details):
-    return Content.get_user_relevant_objects(user_details=user_details).exclude(
-        content_type__file_type__icontains='widget')
-
-
 class Content(models.Model):
     # This class includes both files and folders as Content
     content_id = models.AutoField(primary_key=True)
@@ -135,6 +124,13 @@ class Content(models.Model):
         self.increment_size()
         super(Content, self).save(*args, **kwargs)
 
+    @property
+    def is_widget(self):
+        widget = False
+        if self.content_type and self.content_type.file_type:
+            widget = 'widget' in self.content_type.file_type
+        return widget
+
     def __unicode__(self):
         return self.title
 
@@ -168,6 +164,16 @@ class Content(models.Model):
     def get_user_relevant_objects(user_details):
         return Content.objects.filter(organization=user_details.organization)
 
+    @staticmethod
+    def get_user_widgets(user_details):
+        return Content.objects.filter(Q(organization=user_details.organization) | Q(organization__isnull=True)).filter(
+            content_type__file_type__icontains='widget')
+
+    # This includes both files, folders and URLs
+    @staticmethod
+    def get_user_filesystem(user_details):
+        return Content.get_user_relevant_objects(user_details=user_details).exclude(
+            content_type__file_type__icontains='widget')
 
         # class Meta:
         #     unique_together = (('title', 'parent_folder', 'uploaded_by'))

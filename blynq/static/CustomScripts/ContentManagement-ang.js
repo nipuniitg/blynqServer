@@ -21,9 +21,9 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
     }
 
     var deleteWidget = function(content_id, callback){
-        var postData = {
-            content_id : content_id
-        };
+        var postData = {};
+        postData.content_id = content_id;
+
         $http({
              method : "POST"
              ,url : '/api/content/deleteWidget'
