@@ -56,8 +56,9 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="widget in allWidgets | filter : searchWidget">
-                                <td><input type="checkbox" ng-model="playlist.selected"></td>
+                            <tr>hello</tr>
+                            <tr ng-repeat="widget in allWidgets">
+                                <td><input type="checkbox" ng-model="widget.selected"></td>
                                 <td>{[widget.title]}</td>
                             </tr>
                             </tbody>

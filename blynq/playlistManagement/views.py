@@ -2,8 +2,8 @@ from django.db import transaction
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
-from contentManagement.models import Content
-from contentManagement.serializers import ContentSerializer
+from contentManagement.models import Content, get_user_filesystem
+from contentManagement.serializers import default_content_serializer
 from contentManagement.views import get_files_recursively
 from customLibrary.views_lib import get_userdetails, string_to_dict, ajax_response, obj_to_json_response
 from playlistManagement.models import Playlist, PlaylistItems
@@ -159,10 +159,9 @@ def get_files_recursively_json(request, parent_folder_id):
 
     all_files_content_ids = get_files_recursively(request, parent_folder_id=parent_folder_id)
     user_details = get_userdetails(request)
-    user_content = Content.get_user_relevant_objects(user_details=user_details)
+    user_content = get_user_filesystem(user_details=user_details)
     all_files = user_content.filter(content_id__in=all_files_content_ids)
-    json_data = ContentSerializer().serialize(all_files, fields=('title', 'document', 'content_type', 'content_id'),
-                                              use_natural_foreign_keys=True)
+    json_data = default_content_serializer(all_files, fields=('title', 'document', 'content_type', 'content_id'))
     return obj_to_json_response(json_data)
 
 

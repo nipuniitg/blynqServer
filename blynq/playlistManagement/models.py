@@ -36,6 +36,7 @@ class Playlist(models.Model):
     playlist_items = models.ManyToManyField(Content, through=PlaylistItems)
     playlist_total_time = models.IntegerField(default=0, blank=True, null=True)
 
+    user_visible = models.BooleanField(default=True)
     created_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_created_by',
                                    null=True)
     created_time = models.DateTimeField(_('created time'), auto_now_add=True)
@@ -53,7 +54,7 @@ class Playlist(models.Model):
 
     @staticmethod
     def get_user_relevant_objects(user_details):
-        return Playlist.objects.filter(organization=user_details.organization)
+        return Playlist.objects.filter(organization=user_details.organization, user_visible=True)
 
 
 @receiver(post_save, sender=Playlist)

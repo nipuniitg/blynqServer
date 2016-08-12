@@ -1,6 +1,6 @@
 from django.core.serializers.python import Serializer
 
-from contentManagement.serializers import ContentSerializer
+from contentManagement.serializers import ContentSerializer, default_content_serializer
 from playlistManagement.models import PlaylistItems
 
 
@@ -12,9 +12,7 @@ class PlaylistItemsSerializer(Serializer):
     def end_object(self, obj):
         self._current['playlist_item_id'] = obj._get_pk_val()
         if 'content' in self.selected_fields:
-            json_data = ContentSerializer().serialize([obj.content],
-                                                      fields=('title', 'document', 'content_type','content_id',
-                                                              'is_folder'), use_natural_foreign_keys=True)
+            json_data =default_content_serializer([obj.content])
             self.add_dict_to_current(json_data)
             del self._current['content']
         self.objects.append(self._current)

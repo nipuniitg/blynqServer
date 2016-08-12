@@ -20,9 +20,9 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
             });
     }
 
-    var deleteWidget = function(widget_id, callback){
+    var deleteWidget = function(content_id, callback){
         var postData = {
-            widget_id : widget_id
+            content_id : content_id
         };
         $http({
              method : "POST"
@@ -347,7 +347,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
 
     //public or Scope releated functions
     $scope.deleteWidget = function(widget_id){
-        ctDataAccessFactory.deleteWidget(widget_id,  function(data){
+        ctDataAccessFactory.deleteWidget(content_id,  function(data){
             if(data.success)
             {
                 $scope.refreshWidget();
@@ -630,9 +630,9 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
                         if(isNewWidget)
                         {
                             return {
-                                widget_id : -1
+                                content_id : -1
                                 ,title : ''
-                                ,text : ''
+                                ,widget_text : ''
                             }
                         }
                         else{
@@ -644,7 +644,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
                     var isNewWidget;
                     var onLoad = function(){
                         $scope.widgetObj = widgetObj;
-                        isNewWidget = widgetObj.widget_id == -1 ? !0 : !1
+                        isNewWidget = widgetObj.content_id == -1 ? !0 : !1
                         if(isNewWidget){
                             $scope.modalTitle = 'Add Widget';
                             $scope.saveVerbose = 'Add';
