@@ -25,6 +25,16 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-addon input-field">width</span>
+                    <input class="form-control input-field" type="number"
+                           data-ng-model="layout.layout_panes[activePaneIndex].width*1024/100">
+                    <span class="input-group-addon input-field">px</span>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="form-group">
         <div class="row">
@@ -42,6 +52,16 @@
                     <input class="form-control input-field" type="number"
                         ng-model="layout.layout_panes[activePaneIndex].top_margin">
                     <span class="input-group-addon input-field">%</span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-addon input-field">width</span>
+                    <input class="form-control input-field" type="number"
+                           data-ng-model="layout.layout_panes[activePaneIndex].height*768/100">
+                    <span class="input-group-addon input-field">px</span>
                 </div>
             </div>
         </div>
