@@ -210,14 +210,21 @@ def upsert_schedule_groups(user_details, schedule, schedule_groups):
 
 
 # upsert schedule playlists
-def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists):
+def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists, schedule_widgets):
     debugFileLog.info("inside upsert_schedule_playlists")
     error = ''
     schedule_playlist_id_list = []
+    if schedule_playlists and schedule_widgets:
+        schedule_playlists.extend(schedule_widgets)
+    elif schedule_widgets:
+        schedule_playlists = schedule_widgets
+    elif not schedule_playlists:
+        # Both schedule_palylists and schedule_widgets doesn't exist
+        return
     for pos_index, item in enumerate(schedule_playlists):
         schedule_playlist_id = int(item.get('schedule_playlist_id'))
         playlist_id = int(item.get('playlist_id'))
-        playlist = Playlist.get_user_visible_objects(user_details).get(playlist_id=playlist_id)
+        playlist = Playlist.get_all_playlists(user_details).get(playlist_id=playlist_id)
         if schedule_playlist_id == -1:
             entry = SchedulePlaylists(schedule_pane_id=schedule_pane_id, playlist=playlist, position_index=pos_index)
             entry.save()
@@ -243,6 +250,7 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
     for item in schedule_panes:
         schedule_pane_id = int(item.get('schedule_pane_id'))
         schedule_playlists = item.get('schedule_playlists')
+        schedule_widgets = item.get('schedule_widgets')
         layout_pane = item.get('layout_pane')
         layout_pane_id = int(layout_pane.get('layout_pane_id'))
         timeline = item.get('timeline')
@@ -251,7 +259,7 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
         recurrence_absolute = timeline.get('recurrence_absolute')
         if not recurrence_absolute:
             recurrence_absolute = False
-        if schedule_playlists:
+        if schedule_playlists or schedule_widgets:
             event_dict = event_dict_from_timeline(timeline=timeline, schedule=schedule)
             event = Event(**event_dict)
             event.save()
@@ -274,7 +282,7 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
             schedule_pane.event = event
             schedule_pane.save()
         upsert_schedule_playlists(user_details=user_details, schedule_pane_id=schedule_pane_id,
-                                  schedule_playlists=schedule_playlists)
+                                  schedule_playlists=schedule_playlists, schedule_widgets=schedule_widgets)
         schedule_pane_id_list.append(schedule_pane_id)
 
     # Remove Schedule Panes which are not in the post request

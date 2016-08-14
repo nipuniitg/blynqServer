@@ -28,10 +28,16 @@ class SchedulePaneSerializer(Serializer):
     def end_object(self, obj):
         self._current['schedule_pane_id'] = obj._get_pk_val()
         if 'schedule_playlists' in self.selected_fields:
-            schedule_playlists = SchedulePlaylists.objects.filter(schedule_pane=obj)
+            schedule_playlists = SchedulePlaylists.objects.filter(schedule_pane=obj, playlist__user_visible=True)
             json_data = SchedulePlaylistsSerializer().serialize(
                 schedule_playlists, fields=('schedule_playlist_id','playlist'))
             self._current['schedule_playlists'] = json_data
+        if 'schedule_widgets' in self.selected_fields:
+            # TODO: Change this logic of checking user_visible=False for widgets
+            schedule_playlists = SchedulePlaylists.objects.filter(schedule_pane=obj, playlist__user_visible=False)
+            json_data = SchedulePlaylistsSerializer().serialize(
+                schedule_playlists, fields=('schedule_playlist_id','playlist'))
+            self._current['schedule_widgets'] = json_data
         if 'layout_pane' in self.selected_fields:
             if obj.layout_pane:
                 json_data = default_layout_pane_serializer([obj.layout_pane])
@@ -120,6 +126,7 @@ class ScheduleSerializer(Serializer):
             schedule_panes = SchedulePane.objects.filter(schedule=obj)
             json_data = SchedulePaneSerializer().serialize(schedule_panes,
                                                            fields=('schedule_pane_id', 'schedule_playlists',
+                                                                   'schedule_widgets',
                                                                    'layout_pane', 'timeline'))
             self._current['schedule_panes'] = json_data
         self.objects.append(self._current)
