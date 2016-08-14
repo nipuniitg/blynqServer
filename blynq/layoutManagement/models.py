@@ -40,6 +40,9 @@ class Layout(models.Model):
     def __unicode__(self):
         return self.title
 
+    class Meta:
+        ordering = ['layout_id']
+
 
 @receiver(post_save, sender=Layout)
 def post_save_layout(sender, instance, **kwargs):
