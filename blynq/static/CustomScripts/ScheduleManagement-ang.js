@@ -1113,11 +1113,15 @@ sdApp.directive('playlistTextbox',['$uibModal', function($uibModal){
         restrict:'E'
         ,scope : {
             selectedPlaylists : '='
+            ,selectedWidgets : '='
         }
         ,templateUrl : '/static/templates/scheduleManagement/_playlist_textbox.html'
         ,link : function($scope, elements,attr){
             $scope.removePlaylist = function(index){
                 $scope.selectedPlaylists.splice(index,1);
+            }
+            $scope.removeWidget = function(index){
+                $scope.selectedWidgets.splice(index,1);
             }
             $scope.openPlaylistSelectorModal = function(){
                 var modalInstance = $uibModal.open({
@@ -1130,10 +1134,14 @@ sdApp.directive('playlistTextbox',['$uibModal', function($uibModal){
                     selectedPlaylists: function(){
                         return angular.copy($scope.selectedPlaylists);
                     }
+                    ,selectedWidgets: function(){
+                        return angular.copy($scope.selectedWidgets);
+                    }
                   }
                 });
-                modalInstance.result.then(function apply(selectedPlaylists){
-                    $scope.selectedPlaylists= selectedPlaylists;
+                modalInstance.result.then(function apply(selectedList){
+                    $scope.selectedPlaylists= angular.copy(selectedList.playlists);
+                    $scope.selectedWidgets = angular.copy(selectedList.widgets);
                 }, function cancel(){
                     toastr.warning('cancelled');
                 })
@@ -1158,12 +1166,34 @@ sdApp.factory('playlistSelectorFactory', ['scheduleDetailsFactory','$http', func
             });
     };
 
+    var getWidgetsJson = function(callback){
+        $http({
+             method : "GET",
+             url : '/api/playlist/getWidgetPlaylists'
+         }).then(function mySucces(response){
+                if(callback)
+                {
+                    callback(response.data);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
+    };
+
     //public functions
     var getPlaylistsListWithSelectedBool = function(selectedPlaylists, callback){
         getPlaylistsJson(function(allPlaylists){
             var allPlaylistsWithSelectedBool = sDF.selectedBoolSetter(allPlaylists,selectedPlaylists, 'playlist_id'
             ,'schedule_playlist_id');
             callback(allPlaylistsWithSelectedBool);
+        })
+    };
+
+    var getWidgetsListWithSelectedBool = function(selectedWidgets, callback){
+        getWidgetsJson(function(allWidgets){
+            var allWidgetsWithSelectedBool = sDF.selectedBoolSetter(allWidgets, selectedWidgets, 'playlist_id'
+            , 'schedule_playlist_id');
+            callback(allWidgetsWithSelectedBool);
         })
     };
 
@@ -1174,21 +1204,32 @@ sdApp.factory('playlistSelectorFactory', ['scheduleDetailsFactory','$http', func
 
     return{
         getPlaylistsListWithSelectedBool : getPlaylistsListWithSelectedBool
+        ,getWidgetsListWithSelectedBool : getWidgetsListWithSelectedBool
         ,getSelectedItems : getSelectedItems
     }
 }]);
 
 sdApp.controller('playlistSelectorController', ['$scope', '$log','$uibModalInstance','selectedPlaylists',
-'playlistSelectorFactory', function($scope, $log, $uibModalInstance, selectedPlaylists, pSF){
+ 'selectedWidgets', 'playlistSelectorFactory', function($scope, $log, $uibModalInstance, selectedPlaylists,
+    selectedWidgets, pSF){
+
     var onLoad = function(){
         pSF.getPlaylistsListWithSelectedBool(selectedPlaylists,function(data) {
             $scope.allPlaylists = data;
         });
+        pSF.getWidgetsListWithSelectedBool(selectedWidgets, function(data) {
+            $scope.allWidgets = data;
+        });
     };
 
     $scope.apply = function(){
-        var selectedPlaylists = pSF.getSelectedItems($scope.allPlaylists)
-        $uibModalInstance.close(selectedPlaylists);
+        var selectedPlaylists = pSF.getSelectedItems($scope.allPlaylists);
+        var selectedWidgets = pSF.getSelectedItems($scope.allWidgets);
+        var selectedItems = {
+            playlists : selectedPlaylists,
+            widgets : selectedWidgets
+        };
+        $uibModalInstance.close(selectedItems);
     };
     $scope.cancel = function(){
         $uibModalInstance.dismiss();

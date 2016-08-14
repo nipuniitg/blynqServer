@@ -7,7 +7,9 @@
     <div class="modal-body">
         <div class="row">
             <div class="col-sm-12">
-                <div class="panel">
+                <uib-tabset active="active">
+                    <uib-tab index="0" heading="Playlists">
+                        <div class="panel">
                     <div class="panel-body" style="max-height:400px;overflow:scroll">
                         <table class="table bootstrap-datatable">
                             <thead>
@@ -34,6 +36,36 @@
                         </table>
                     </div>
                 </div>
+                    </uib-tab>
+                    <uib-tab index="1" heading="Widgets" active="tab.active">
+                        <div class="panel">
+                    <div class="panel-body" style="max-height:400px;overflow:scroll">
+                        <table class="table bootstrap-datatable">
+                            <thead>
+                            <tr>
+                                <th>Select</th>
+                                <th>Widgets Name</th>
+                                <!--<th>Description</th>-->
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th><input type="form-control" ng-model="searchWidget.playlist_title"
+                                           placeholder="search Name"></th>
+                                <!--<th><input type="form-control" ng-model="searchPlaylist.description"-->
+                                           <!--placeholder="search Description"></th>-->
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="widget in allWidgets | filter : searchWidget">
+                                <td><input type="checkbox" ng-model="widget.selected"></td>
+                                <td>{[widget.playlist_title]}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                    </uib-tab>
+                </uib-tabset>
             </div>
         </div>
     </div>
