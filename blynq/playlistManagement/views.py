@@ -3,12 +3,15 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
 from contentManagement.models import Content
-from contentManagement.serializers import default_content_serializer
+from contentManagement.serializers import ContentSerializer
 from contentManagement.views import get_files_recursively
 from customLibrary.views_lib import get_userdetails, string_to_dict, ajax_response, obj_to_json_response
 from playlistManagement.models import Playlist, PlaylistItems
+
+
 # Create your views here.
-from playlistManagement.serializers import default_playlist_serializer
+from playlistManagement.serializers import PlaylistSerializer
+from scheduleManagement.models import SchedulePlaylists
 
 
 @login_required
@@ -30,7 +33,7 @@ def upsert_playlist(request):
             playlist_id = int(posted_data.get('playlist_id'))
             playlist_title = posted_data.get('playlist_title')
             playlist_items = posted_data.get('playlist_items')
-            user_playlists = Playlist.get_user_visible_objects(user_details=user_details)
+            user_playlists = Playlist.get_user_relevant_objects(user_details=user_details)
 
             # upsert playlist
             if playlist_id == -1:
@@ -73,7 +76,8 @@ def upsert_playlist(request):
             for content in removed_playlist_content:
                 content.delete()
 
-            json_data = default_playlist_serializer([playlist])
+            json_data = PlaylistSerializer().serialize([playlist],
+                                                       fields=('playlist_id', 'playlist_title', 'playlist_items'))
             assert len(json_data) > 0
             obj_dict = {'playlist': json_data[0]}
             success = True
@@ -94,7 +98,7 @@ def delete_playlist(request):
     errors = []
     success = False
     try:
-        playlist = Playlist.get_user_visible_objects(user_details=user_details).get(playlist_id=playlist_id)
+        playlist = Playlist.get_user_relevant_objects(user_details=user_details).get(playlist_id=playlist_id)
         playlist.delete()
         success = True
     except Exception as e:
@@ -105,7 +109,7 @@ def delete_playlist(request):
     return ajax_response(success=success, errors=errors)
 
 
-def get_user_playlists(request):
+def get_playlists(request):
     """
     :param request:
     :return:
@@ -135,15 +139,9 @@ def get_user_playlists(request):
     ]
     """
     user_details = get_userdetails(request)
-    user_playlists = Playlist.get_user_visible_objects(user_details=user_details)
-    json_data = default_playlist_serializer(user_playlists)
-    return obj_to_json_response(json_data)
-
-
-def get_widget_playlists(request):
-    user_details = get_userdetails(request)
-    user_playlists = Playlist.get_user_invisible_playlists(user_details=user_details)
-    json_data = default_playlist_serializer(user_playlists)
+    user_playlists = Playlist.get_user_relevant_objects(user_details=user_details)
+    json_data = PlaylistSerializer().serialize(user_playlists,
+                                               fields=('playlist_id', 'playlist_title','playlist_items'))
     return obj_to_json_response(json_data)
 
 
@@ -164,9 +162,10 @@ def get_files_recursively_json(request, parent_folder_id):
 
     all_files_content_ids = get_files_recursively(request, parent_folder_id=parent_folder_id)
     user_details = get_userdetails(request)
-    user_content = Content.get_user_filesystem(user_details=user_details)
+    user_content = Content.get_user_relevant_objects(user_details=user_details)
     all_files = user_content.filter(content_id__in=all_files_content_ids)
-    json_data = default_content_serializer(all_files, fields=('title', 'document', 'content_type', 'content_id'))
+    json_data = ContentSerializer().serialize(all_files, fields=('title', 'document', 'content_type', 'content_id'),
+                                              use_natural_foreign_keys=True)
     return obj_to_json_response(json_data)
 
 

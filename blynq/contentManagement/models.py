@@ -2,15 +2,17 @@ import shutil
 
 from django.core.exceptions import ValidationError
 from django.db import models, NotSupportedError
-from django.db.models import Q
+from django.conf import settings
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
+from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
+from django.core.files.base import ContentFile
 import os
-
+import hashlib
 # Create your models here.
 from authentication.models import UserDetails, Organization
-from blynq.settings import MEDIA_ROOT, USERCONTENT_DIR, DELETED_CONTENT_DIR
+from blynq.settings import BASE_DIR, MEDIA_ROOT, USERCONTENT_DIR, DELETED_CONTENT_DIR
 from customLibrary.views_lib import debugFileLog
 
 
@@ -29,6 +31,29 @@ class ContentType(models.Model):
         return self.file_type
 
 
+# def create_dir(parent_dir_path, dir_name ):
+#     try:
+#         os.mkdir(os.path.join(parent_dir_path,dir_name))
+#     except OSError as e:
+#         if e.errno == 17:
+#             # Dir already exists. No biggie.
+#             pass
+#         else:
+#             print "Error in os.mkdir : " % e.errno
+
+
+# def move_file(instance, new_file_path):
+#     # Ref : https://docs.djangoproject.com/en/1.8/topics/files/
+#     initial_path = instance.document.path
+#     instance.document.name = new_file_path
+#     new_path = settings.MEDIA_ROOT + instance.document.name
+#     try:
+#         os.rename(initial_path, new_path)
+#     except OSError as e:
+#         print "Error in os.rename : " % e.errno
+#     instance.save()
+
+
 def upload_to_dir(instance, filename):
     filename = os.path.basename(filename)
     return '%s/user%d/%s' % (USERCONTENT_DIR, instance.uploaded_by.id, filename)
@@ -37,11 +62,10 @@ def upload_to_dir(instance, filename):
 class Content(models.Model):
     # This class includes both files and folders as Content
     content_id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=100, verbose_name=_('title'))
+    title = models.CharField(max_length=100, verbose_name=_('name'))
 
-    document = models.FileField(upload_to=upload_to_dir, null=True, blank=True)
+    document = models.FileField(upload_to=upload_to_dir, null=True)
     url = models.CharField(max_length=255, blank=True, null=True)
-    widget_text = models.TextField(null=True, blank=True)
 
     sha1_hash = models.CharField(_('sha1'), max_length=40, blank=True, default='')
 
@@ -58,26 +82,11 @@ class Content(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
 
     # is_inside = null implies the files are in the home directory of the user
-    parent_folder = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+    parent_folder = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
     is_folder = models.BooleanField(default=False)
 
     # TODO: call logical_path to update this relative_path when a Content object is created or modified
     relative_path = models.CharField(max_length=1025, default='/')
-
-    def increment_size(self):
-        # Now increment the used_file_size of the organization if the file is being saved for the first time
-        if self.document and self.pk is None:
-            if self.organization.used_file_size + self.document.size <= self.organization.total_file_size_limit:
-                self.organization.used_file_size = self.organization.used_file_size + self.document.size
-                try:
-                    self.organization.save()
-                except Exception as e:
-                    debugFileLog.exception("Received exception while increasing the organization file usage size")
-                    debugFileLog.exception(e)
-            else:
-                debugFileLog.warning("The organization " + self.organization.organization_name +
-                                     " total file size limit exceeded")
-                debugFileLog.error("Can't upload file")
 
     def save(self, *args, **kwargs):
         if self.is_folder:
@@ -103,9 +112,6 @@ class Content(models.Model):
         except ContentType.DoesNotExist:
             if self.document:
                 raise ValidationError(_('Invalid File extension'), code='invalid')
-            elif self.widget_text:
-                super(Content, self).save(*args, **kwargs)
-                return
             debugFileLog.exception("file type does not exist, might be an url")
 
             def check_youtube_url(url):
@@ -121,15 +127,19 @@ class Content(models.Model):
             debugFileLog.exception(e)
             raise NotSupportedError('%s is not supported at the moment' % full_file_type)
         self.content_type = content_type
-        self.increment_size()
+        # Now increment the used_file_size of the organization if the file is being saved for the first time
+        if self.document and self.pk is None:
+            if self.organization.used_file_size + self.document.size <= self.organization.total_file_size_limit:
+                self.organization.used_file_size = self.organization.used_file_size + self.document.size
+                try:
+                    self.organization.save()
+                except Exception as e:
+                    debugFileLog.exception("Recieved exception while increasing the organization file usage size")
+                    debugFileLog.exception(e)
+            else:
+                debugFileLog.warning("The organization " + self.organization.organization_name + " total file size limit exceeded")
+                debugFileLog.error("Can't upload file")
         super(Content, self).save(*args, **kwargs)
-
-    @property
-    def is_widget(self):
-        widget = False
-        if self.content_type and self.content_type.file_type:
-            widget = 'widget' in self.content_type.file_type
-        return widget
 
     def __unicode__(self):
         return self.title
@@ -164,19 +174,46 @@ class Content(models.Model):
     def get_user_relevant_objects(user_details):
         return Content.objects.filter(organization=user_details.organization)
 
-    @staticmethod
-    def get_user_widgets(user_details):
-        return Content.objects.filter(Q(organization=user_details.organization) | Q(organization__isnull=True)).filter(
-            content_type__file_type__icontains='widget')
-
-    # This includes both files, folders and URLs
-    @staticmethod
-    def get_user_filesystem(user_details):
-        return Content.get_user_relevant_objects(user_details=user_details).exclude(
-            content_type__file_type__icontains='widget')
-
         # class Meta:
         #     unique_together = (('title', 'parent_folder', 'uploaded_by'))
+
+
+        # def _move_file(self, dst_file_name ):
+        #     """
+        #     Move the file from src to dst.
+        #     """
+        #     # TODO : Validate the dst_file_name
+        #
+        #     src_file_name = self.document.name
+        #     # dst_file_name = self._meta.get_field('file').generate_filename(
+        #     #     self, self.original_filename)
+        #     storage = self.document.storage
+        #     src_file = storage.open(src_file_name)
+        #     src_file.open()
+        #     self.document = storage.save(dst_file_name,
+        #         ContentFile(src_file.read()))
+        #     storage.delete(src_file_name)
+        #
+        # def _copy_file(self, destination, overwrite=False):
+        #     """
+        #     Copies the file to a destination files and returns it.
+        #     """
+        #
+        #     if overwrite:
+        #         # If the destination file already exists default storage backend
+        #         # does not overwrite it but generates another filename.
+        #         # TODO: Find a way to override this behavior.
+        #         raise NotImplementedError
+        #
+        #     src_file_name = self.document.name
+        #     storage = self.document.storage
+        #
+        #     # This is needed because most of the remote File Storage backend do not
+        #     # open the file.
+        #     src_file = storage.open(src_file_name)
+        #     src_file.open()
+        #     return storage.save(destination, ContentFile(src_file.read()))
+        #
         # def generate_sha1(self):
         #     sha = hashlib.sha1()
         #     self.document.seek(0)
@@ -189,6 +226,40 @@ class Content(models.Model):
         #     # to make sure later operations can read the whole file
         #     self.document.seek(0)
         #
+        # @property
+        # def path(self):
+        #     try:
+        #         return self.document.path
+        #     except:
+        #         return ""
+        #
+        # @property
+        # def size(self):
+        #     return self._file_size or 0
+        #
+        # def save(self, *args, **kwargs):
+        #     # cache the file size
+        #     # TODO: only do this if needed (depending on the storage backend the whole file will be downloaded)
+        #     try:
+        #         self._file_size = self.file.size
+        #     except:
+        #         pass
+        #     # generate SHA1 hash
+        #     # TODO: only do this if needed (depending on the storage backend the whole file will be downloaded)
+        #     try:
+        #         self.generate_sha1()
+        #     except Exception:
+        #         pass
+        #     super(Content, self).save(*args, **kwargs)
+        # save.alters_data = True
+        #
+        # def delete(self, *args, **kwargs):
+        #     # Delete the model before the file
+        #     super(Content, self).delete(*args, **kwargs)
+        #     # Delete the file if there are no other Files referencing it.
+        #     if not Content.objects.filter(document=self.document.name, is_public=self.is_public).exists():
+        #         self.document.delete(False)
+        # delete.alters_data = True
 
 
 def save_relevant_playlists(content_id):
@@ -241,17 +312,3 @@ def pre_delete_content(sender, instance, **kwargs):
             debugFileLog.exception("Unknown exception while deleting content")
             debugFileLog.exception(e)
     save_relevant_playlists(content_id=instance.content_id)
-
-
-# class Widget(models.Model):
-#     widget_id = models.AutoField(primary_key=True)
-#     title = models.CharField(max_length=100)
-#     # text can be a url or xml or text
-#     text = models.TextField()
-#     type = models.ForeignKey(ContentType, null=True, on_delete=models.PROTECT)
-#     # organization = null implies it is visible to all the organizations
-#     organization = models.ForeignKey(Organization, null=True, on_delete=models.CASCADE)
-#
-#     @staticmethod
-#     def get_user_relevant_objects(user_details):
-#         return Widget.objects.filter(Q(organization=user_details.organization) | Q(organization__isnull=True))

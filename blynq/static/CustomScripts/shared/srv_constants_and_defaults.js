@@ -19,7 +19,6 @@
             var popOverMessages = {
                 uploadFile : 'Upload Images /videos /gifs /pdfs'
                 ,addURL : 'Add youtube video links/Website urls'
-                ,addWidget: 'Add RSS feed/ live event updates like weather etc'
                 ,draggable : 'draggable'
                 ,listView : 'List View'
                 ,calendarView : 'Calendar View'

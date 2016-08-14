@@ -6,7 +6,8 @@ from schedule.models import Calendar
 
 from authentication.models import Organization, UserDetails, City
 from blynq.settings import PLAYER_INACTIVE_THRESHOLD, PLAYER_POLL_TIME
-from customLibrary.views_lib import debugFileLog
+from customLibrary.views_lib import debugFileLog, today_date
+
 
 # Create your models here.
 ORIENTATION_CHOICES = (
@@ -212,3 +213,9 @@ def remove_schedule_screens(sender, instance, **kwargs):
     from scheduleManagement.models import ScheduleScreens
     schedule_screens = ScheduleScreens.objects.filter(group=instance.group, screen=instance.screen)
     schedule_screens.delete()
+
+
+class ScreenAnalytics(models.Model):
+    screen = models.ForeignKey(Screen, related_name='%(class)s_screen')
+    date = models.DateField(default=today_date)
+    time_online = models.PositiveIntegerField(default=0)    # in seconds

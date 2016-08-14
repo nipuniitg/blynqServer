@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from blynq.settings import MEDIA_HOST, HOST_URL, PLAYER_POLL_TIME
 from contentManagement.models import Content
-from contentManagement.serializers import default_content_serializer
+from contentManagement.serializers import ContentSerializer
 from customLibrary.views_lib import debugFileLog, string_to_dict, default_string_to_datetime, obj_to_json_response, \
     ajax_response, date_changed
 from playerManagement.models import PlayerUpdate, LocalServer
@@ -301,7 +301,7 @@ def get_content_urls_local(request, nof_days=1):
             'playlist_id', flat=True)
         content_ids = PlaylistItems.objects.filter(playlist_id__in=playlist_ids).values_list('content_id', flat=True)
         contents = Content.objects.filter(content_id__in=content_ids).exclude(content_type__file_type__contains='web')
-        json_data = default_content_serializer(contents, fields=('document'))
+        json_data = ContentSerializer().serialize(contents, fields='document')
         url_list = [str(element['url']) for element in json_data]
         json_obj = dict()
         json_obj['urls'] = url_list
