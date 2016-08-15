@@ -18,6 +18,7 @@ from scheduleManagement.models import ScheduleScreens, SchedulePlaylists, Schedu
 from screenManagement.models import ScreenActivationKey, Screen, ORIENTATION_CHOICES
 from layoutManagement.serializers import default_layout_pane_serializer
 from screenManagement.serializers import AspectRatioSerializer
+from fcm.models import Device
 
 
 @csrf_exempt
@@ -269,6 +270,24 @@ def get_screen_data(request, nof_days=7):
         debugFileLog.exception(e)
         campaigns_json = {'campaigns': [], 'is_modified': False}
     return obj_to_json_response(campaigns_json)
+
+
+@csrf_exempt
+def fcm_register(request):
+    try:
+        posted_data = string_to_dict(request.body)
+        reg_id = posted_data.get('reg_id')  # registration token
+        dev_id = posted_data.get('dev_id')
+        fcm_device, created = Device.objects.get_or_create(reg_id=reg_id,
+                                                           defaults={'dev_id': dev_id, 'is_active': True})
+        screen = Screen.objects.get(unique_device_key__activation_key=dev_id)
+        screen.fcm_device = fcm_device
+        screen.save()
+        success = True
+    except Exception as e:
+        debugFileLog.exception(e)
+        success = False
+    return ajax_response(success=success)
 
 
 @csrf_exempt

@@ -157,6 +157,8 @@ STORAGE_LIMIT_PER_ORGANIZATION = 5*1024*1024*1024  # 1 gb 1*1024*1024*1024
 
 today = timezone.now().strftime("%Y%m%d")
 SERVER_LOG_DIRECTORY = os.path.join(BASE_DIR, 'logs/server')
+if not os.path.exists(SERVER_LOG_DIRECTORY):
+    os.makedirs(SERVER_LOG_DIRECTORY)
 
 LOGGING = {
     'version': 1,
@@ -214,6 +216,9 @@ else:
 
 MEDIA_HOST = HOST_URL
 PLAYER_LOG_DIRECTORY = os.path.join(BASE_DIR, 'logs/player')
+if not os.path.exists(PLAYER_LOG_DIRECTORY):
+    os.makedirs(PLAYER_LOG_DIRECTORY)
+
 PLAYER_UPDATES_DIR = 'player_updates'
 PLAYER_POLL_TIME = 60  # Time difference in seconds between successive polls of the player
 PLAYER_INACTIVE_THRESHOLD = PLAYER_POLL_TIME + 1    # Wait this time (in seconds) to change status of screen as inactive
