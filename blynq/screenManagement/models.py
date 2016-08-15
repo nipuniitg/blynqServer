@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils import timezone
-from fcm.models import Device
+# from fcm.models import Device
 from schedule.models import Calendar
 
 from authentication.models import Organization, UserDetails, City
@@ -169,7 +169,7 @@ class Screen(models.Model):
     # Remove null=True for screen_calendar
     screen_calendar = models.ForeignKey(Calendar, on_delete=models.SET_NULL, null=True, blank=True)
 
-    fcm_device = models.OneToOneField(Device, null=True, blank=True, on_delete=models.SET_NULL)
+    # fcm_device = models.OneToOneField(Device, null=True, blank=True, on_delete=models.SET_NULL)
 
     def __unicode__(self):
         return self.screen_name
