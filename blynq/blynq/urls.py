@@ -16,7 +16,7 @@ urlpatterns = [
     url(r'^$', auth_views.divertToLandingPage, name='landing_page')
     , url(r'^/$', auth_views.divert_to_index_page, name='index_page')
     , url(r'^authentication/', include(authentication_urls))
-    # , url(r'fcm/', include('fcm.urls'))
+    , url(r'fcm/', include('fcm.urls'))
     , url(r'^api/requestQuote', auth_views.request_quote, name='request_quote')
     , url(r'^api/player/', include(player_urls))
     , url(r'^api/login', auth_views.login, name='login')
