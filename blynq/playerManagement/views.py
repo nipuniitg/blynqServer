@@ -289,6 +289,16 @@ def fcm_register(request):
     return ajax_response(success=success)
 
 
+def notify_player(screen):
+    try:
+        if screen.fcm_device:
+            screen.fcm_device.send_message(data='{modified : True}')
+        else:
+            raise Exception('FCM details does not exist for the screen %s' % screen.screen_name)
+    except Exception as e:
+        debugFileLog.exception(e)
+
+
 @csrf_exempt
 def get_content_urls_local(request, nof_days=1):
     """

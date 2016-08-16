@@ -1,9 +1,12 @@
 from django.db import models
 
 # Create your models here.
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 
 from authentication.models import UserDetails, Organization
+from customLibrary.views_lib import debugFileLog
 from playlistManagement.models import Playlist
 from screenManagement.models import Screen, Group
 from layoutManagement.models import LayoutPane, Layout
@@ -126,3 +129,11 @@ class Schedule(models.Model):
         self.schedulescreens_schedule.filter( schedule_screen_id = 1 )
         """
         return self.schedulescreens_schedule
+
+
+@receiver(post_save, sender=Schedule)
+def notify_modified_schedules(sender, instance, **kwargs):
+    debugFileLog.info("Inside notify_modified_schedules post_save")
+    for screen in instance.screens.all():
+        from playerManagement.views import notify_player
+        notify_player(screen)
