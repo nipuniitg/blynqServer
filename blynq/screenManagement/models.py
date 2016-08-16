@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils import timezone
-from fcm.models import Device
+from fcm.models import Device, AbstractDevice
 from schedule.models import Calendar
 
 from authentication.models import Organization, UserDetails, City
@@ -125,6 +125,10 @@ class GroupScreens(models.Model):
         return self.screen.screen_name + '-' + self.group.group_name
 
 
+class FcmDevice(AbstractDevice):
+    fcm_device_id = models.AutoField(primary_key=True)
+
+
 class Screen(models.Model):
     screen_id = models.AutoField(primary_key=True)
     screen_name = models.CharField(max_length=100)
@@ -165,11 +169,11 @@ class Screen(models.Model):
     status = models.ForeignKey(ScreenStatus, on_delete=models.PROTECT, null=True)
     groups = models.ManyToManyField(Group, blank=True, through=GroupScreens)
 
+    fcm_device = models.ForeignKey(FcmDevice, null=True, blank=True, on_delete=models.SET_NULL)
+
     # Each screen should have a separate calendar
     # Remove null=True for screen_calendar
     screen_calendar = models.ForeignKey(Calendar, on_delete=models.SET_NULL, null=True, blank=True)
-
-    fcm_device = models.OneToOneField(Device, null=True, blank=True, on_delete=models.SET_NULL)
 
     def __unicode__(self):
         return self.screen_name

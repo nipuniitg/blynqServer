@@ -231,6 +231,7 @@ PLAYER_INACTIVE_THRESHOLD = PLAYER_POLL_TIME + 1    # Wait this time (in seconds
 INTERNET_ENABLED = True
 
 FCM_SERVER_KEY = 'AIzaSyD0ecm7y8DC0tQ2ut62S4WgLL0GnrsQ_wc'
+FCM_DEVICE_MODEL = 'screenManagement.models.FcmDevice'
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.zoho.com'
