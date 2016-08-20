@@ -58,7 +58,7 @@ class PlayerLog(models.Model):
     uploaded_time = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
-        player_str = file.name if file else 'No filename exists'
+        player_str = self.file.name if self.file else 'No filename exists'
         return player_str
 
 

@@ -285,9 +285,11 @@ def media_stats(request):
         media_analytics = MediaAnalytics(content_id=content_id, playlist_item_id=playlist_item_id, count=count,
                                          date=converted_date)
         media_analytics.save()
+        success = True
     except Exception as e:
+        success = False
         debugFileLog.exception(e)
-    return ajax_response(success=True)
+    return ajax_response(success=success)
 
 
 @csrf_exempt
