@@ -82,8 +82,9 @@ def compress_image(file_path, parent_folder=None, user_details=None, organizatio
     img = img.resize(img.size, Image.ANTIALIAS)
     filename = os.path.basename(file_path)
     title, ext = os.path.splitext(filename)
-    img.save('temp_' + filename, optimize=True, quality=95)
-    img_file = open(filename)
+    dest_filepath = filename
+    img.save(dest_filepath, optimize=True, quality=95)
+    img_file = open(dest_filepath)
     django_file = File(img_file)
     content = Content(title=title, document=django_file, uploaded_by=user_details, last_modified_by=user_details,
                       organization=user_details.organization, parent_folder=parent_folder, is_folder=False)
@@ -177,7 +178,7 @@ def upload_content(request):
                 errors.append(error_str)
             except Exception as e:
                 success = False
-                error_str = 'Error while uploading the file %s ' % document.title
+                error_str = 'Error while uploading the file %s ' % document.name
                 debugFileLog.exception(error_str)
                 errors.append(error_str)
         success = success and conversion_success
