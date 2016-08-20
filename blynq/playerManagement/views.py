@@ -272,6 +272,13 @@ def get_screen_data(request, nof_days=7):
 
 
 @csrf_exempt
+def media_stats(request):
+    posted_data = string_to_dict(request.body)
+    debugFileLog.info(posted_data)
+    return ajax_response(success=True)
+
+
+@csrf_exempt
 def get_content_urls_local(request, nof_days=1):
     """
     :param request:
