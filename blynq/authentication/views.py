@@ -62,7 +62,7 @@ def login(request):
                 success = True
                 return ajax_response(success=success)
             else:
-                return ajax_response(success = success)
+                return ajax_response(success=success)
     return render(request, 'authentication/login.html', context_dic)
 
 

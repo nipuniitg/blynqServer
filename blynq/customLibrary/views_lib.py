@@ -5,8 +5,9 @@ import logging
 from django.core.mail import send_mail
 from django.http import JsonResponse, Http404
 from django.utils import timezone
-import json, pytz
+import json, pytz, os
 from authentication.models import UserDetails
+from blynq.settings import MEDIA_ROOT
 
 
 def ajax_response(success=False, errors=[], obj_dict=None):
@@ -136,6 +137,10 @@ def date_changed(received_datetime):
 
 def today_date():
     return timezone.now().date()
+
+
+def full_file_path(relative_path=''):
+    return os.path.join(MEDIA_ROOT, relative_path)
 
 
 debugFileLog = logging.getLogger('debugFileLog')
