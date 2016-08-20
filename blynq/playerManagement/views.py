@@ -11,7 +11,7 @@ from contentManagement.models import Content
 from contentManagement.serializers import ContentSerializer
 from customLibrary.views_lib import debugFileLog, string_to_dict, default_string_to_datetime, obj_to_json_response, \
     ajax_response, date_changed
-from playerManagement.models import PlayerUpdate, LocalServer
+from playerManagement.models import PlayerUpdate, LocalServer, PlayerLog, MediaAnalytics
 from playlistManagement.models import PlaylistItems
 from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import ScheduleScreens, SchedulePlaylists, SchedulePane
@@ -274,8 +274,19 @@ def get_screen_data(request, nof_days=7):
 @csrf_exempt
 def media_stats(request):
     debugFileLog.info('Inside media stats player')
-    posted_data = string_to_dict(request.body)
-    debugFileLog.info(posted_data)
+    try:
+        posted_data = string_to_dict(request.body)
+        media_stats = posted_data.get('media_item_stats_list')
+        content_id = int(media_stats.get('content_id'))
+        playlist_item_id = int(media_stats.get('playlist_item_id'))
+        count = int(media_stats.get('count'))
+        date = media_stats.get('date')
+        converted_date = default_string_to_datetime(date)
+        media_analytics = MediaAnalytics(content_id=content_id, playlist_item_id=playlist_item_id, count=count,
+                                         date=converted_date)
+        media_analytics.save()
+    except Exception as e:
+        debugFileLog.exception(e)
     return ajax_response(success=True)
 
 
@@ -283,12 +294,15 @@ def media_stats(request):
 def insert_logs(request):
     debugFileLog.info('Inside insert player logs')
     try:
-        pass
-        # posted_data = string_to_dict(request.body)
-        # debugFileLog.info(posted_data)
+        for key in request.FILES.keys():
+            file = request.FILES[key]
+            player_log = PlayerLog(file=file)
+            player_log.save()
+        success = True
     except Exception as e:
         debugFileLog.exception(e)
-    return ajax_response(success=True)
+        success = False
+    return ajax_response(success=success)
 
 
 @csrf_exempt
