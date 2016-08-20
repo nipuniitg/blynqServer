@@ -273,8 +273,21 @@ def get_screen_data(request, nof_days=7):
 
 @csrf_exempt
 def media_stats(request):
+    debugFileLog.info('Inside media stats player')
     posted_data = string_to_dict(request.body)
     debugFileLog.info(posted_data)
+    return ajax_response(success=True)
+
+
+@csrf_exempt
+def insert_logs(request):
+    debugFileLog.info('Inside insert player logs')
+    try:
+        pass
+        # posted_data = string_to_dict(request.body)
+        # debugFileLog.info(posted_data)
+    except Exception as e:
+        debugFileLog.exception(e)
     return ajax_response(success=True)
 
 
