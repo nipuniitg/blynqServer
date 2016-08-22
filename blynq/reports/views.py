@@ -5,6 +5,7 @@ from django.shortcuts import render
 from customLibrary.views_lib import get_userdetails, generate_utc_datetime, get_ist_date_str, obj_to_json_response, \
     debugFileLog
 from reports.models import ScreenAnalytics
+from screenManagement.models import Screen
 
 
 def date_range(start_date, end_date):
@@ -17,15 +18,14 @@ def date_time_filters(filter_set):
     start_time_str = filter_set.get('start_time')
     start_time_str = start_time_str if start_time_str else "00:00"
     start_datetime = generate_utc_datetime(start_date_str, start_time_str)
-    start_date = start_datetime.date()
-    start_time = start_datetime.time()
     end_date_str = filter_set.get('end_date')
     end_time_str = filter_set.get('end_time')
     end_time_str = end_time_str if end_time_str else "23:59"
-    end_datetime = generate_utc_datetime(end_date_str, end_time_str)
-    end_date = end_datetime.date() + timedelta(days=1)  # Adding one day to end_date so that the end_date is also included
-    end_time = end_datetime.time()
-    return start_date, end_date, start_time, end_time
+    start_date_end_time = generate_utc_datetime(start_date_str, end_time_str)
+    time_difference = start_date_end_time - start_datetime
+    end_date_start_time = generate_utc_datetime(end_date_str, start_time_str)
+    end_date = end_date_start_time.date() + timedelta(days=1)
+    return start_datetime, end_date, time_difference
 
 
 def intersection_time(event1_start, event1_end, event2_start, event2_end):
@@ -49,6 +49,7 @@ def intersection_time(event1_start, event1_end, event2_start, event2_end):
         delta = new_delta
     return delta
 
+
 def screen_reports(request):
     json_dict = {}
     try:
@@ -61,29 +62,31 @@ def screen_reports(request):
         # output : For each screen: screen object, time_active (seconds),
         #       total_time (end_date - start_date + 1)*(end_time - start_time)
         all_screens = filter_set.get('all_screens')
-        screen_objects = filter_set.get('screens')
-        screen_ids = ( item['screen_id'] for item in screen_objects )
-        start_date, end_date, start_time, end_time = date_time_filters(filter_set=filter_set)
-        if end_date < start_date or end_time < start_time:
+        if all_screens:
+            screen_ids = Screen.get_user_relevant_objects(user_details=user_details).values_list('screen_id', flat=True)
+        else:
+            screen_objects = filter_set.get('screens')
+            screen_ids = (item['screen_id'] for item in screen_objects)
+        start_datetime, end_date, time_difference = date_time_filters(filter_set=filter_set)
+        total_days = (end_date - start_datetime.date()).days
+        total_time_requested = total_days * time_difference.seconds
+        if end_date <= start_datetime.date():
             return obj_to_json_response(json_dict)
-        for single_date in date_range(start_date=start_date, end_date=end_date):
-            start = datetime.combine(single_date, start_time)
-            end = datetime.combine(single_date, end_time)
-            if all_screens:
-                screen_analytics = ScreenAnalytics.objects.exclude(session_start_time__gte=end,
-                                                                   session_end_time__lte=start).order_by('screen_id')
-            else:
-                screen_analytics = ScreenAnalytics.objects.exclude(screen_id__in=screen_ids, session_start_time__gte=end,
-                                                                   session_end_time__lte=start).order_by('screen_id')
+        for single_date in date_range(start_date=start_datetime.date(), end_date=end_date):
+            start = datetime.combine(single_date, start_datetime.time())
+            end = start + time_difference
+            screen_analytics = ScreenAnalytics.objects.exclude(
+                screen_id__in=screen_ids, session_start_time__gte=end, session_end_time__lte=start_datetime).order_by('screen_id')
             all_screens_dict = {}
             for obj in screen_analytics:
-                time_active = intersection_time(start, end, obj.session_start_time, obj.session_end_time)
+                time_active = intersection_time(start_datetime, end, obj.session_start_time, obj.session_end_time)
                 screen_id_key = str(obj.screen_id)
                 if all_screens_dict.get(screen_id_key) and all_screens_dict[screen_id_key]['time_active']:
                     all_screens_dict[str(obj.screen_id)]['time_active'] += time_active
                 else:
-                    all_screens_dict[str(obj.screen_id)] = {'screen_id': obj.screen_id, 'screen_name': obj.screen_name,
-                                                            'time_active': time_active}
+                    all_screens_dict[str(obj.screen_id)] = {
+                        'screen_id': obj.screen_id, 'screen_name': obj.screen_name, 'time_active': time_active,
+                        'total_time_requested': total_time_requested}
             date_key = get_ist_date_str(datetime.combine(single_date, datetime.min.time()))
             json_dict[date_key] = list(all_screens_dict.values())
     except Exception as e:
