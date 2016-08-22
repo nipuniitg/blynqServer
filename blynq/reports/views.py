@@ -3,7 +3,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from customLibrary.views_lib import get_userdetails, generate_utc_datetime, get_ist_date_str, obj_to_json_response, \
-    debugFileLog
+    debugFileLog, string_to_dict
 from reports.models import ScreenAnalytics
 from screenManagement.models import Screen
 
@@ -51,11 +51,11 @@ def intersection_time(event1_start, event1_end, event2_start, event2_end):
 
 
 def screen_reports(request):
-    json_dict = {}
+    screen_report_list = []
     try:
         user_details = get_userdetails(request)
-        params = request.GET
-        filter_set = params.get('filterset')
+        posted_data = string_to_dict(request.body)
+        filter_set = posted_data.get('filterset')
         # Input filter_set
         # start_date, end_date, start_time, end_time : ist datetime
         # all_screens : bool, screens : array of screen objects
@@ -70,11 +70,12 @@ def screen_reports(request):
         start_datetime, end_date, time_difference = date_time_filters(filter_set=filter_set)
         total_days = (end_date - start_datetime.date()).days
         total_time_requested = total_days * time_difference.seconds
-        if end_date <= start_datetime.date():
-            return obj_to_json_response(json_dict)
+        if end_date < start_datetime.date():
+            return obj_to_json_response(screen_report_list)
         for single_date in date_range(start_date=start_datetime.date(), end_date=end_date):
             start = datetime.combine(single_date, start_datetime.time())
             end = start + time_difference
+            date_str = get_ist_date_str(start)
             screen_analytics = ScreenAnalytics.objects.exclude(
                 screen_id__in=screen_ids, session_start_time__gte=end, session_end_time__lte=start_datetime).order_by('screen_id')
             all_screens_dict = {}
@@ -85,13 +86,12 @@ def screen_reports(request):
                     all_screens_dict[str(obj.screen_id)]['time_active'] += time_active
                 else:
                     all_screens_dict[str(obj.screen_id)] = {
-                        'screen_id': obj.screen_id, 'screen_name': obj.screen_name, 'time_active': time_active,
-                        'total_time_requested': total_time_requested}
-            date_key = get_ist_date_str(datetime.combine(single_date, datetime.min.time()))
-            json_dict[date_key] = list(all_screens_dict.values())
+                        'date_str': date_str, 'screen_id': obj.screen_id, 'screen_name': obj.screen_name,
+                        'time_active': time_active, 'total_time_requested': total_time_requested}
+            screen_report_list.extend(list(all_screens_dict.values()))
     except Exception as e:
         debugFileLog.exception(e)
-    return obj_to_json_response(json_dict)
+    return obj_to_json_response(screen_report_list)
 
 
 def playlist_reports(request):
