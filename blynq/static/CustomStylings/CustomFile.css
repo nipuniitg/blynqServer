@@ -571,13 +571,92 @@ input[type=number]::-webkit-outer-spin-button {
     color : red;
 }
 
+/* Reports section */
+
+.chart-div{
+    margin : 20px 0
+}
+
+/* filters side nav */
+.filters-nav{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 25%;
+    background-color: #fff;
+    position: absolute;
+    top : 0;
+    bottom : 0;
+    overflow: auto;
+}
+
+.filters-nav li {
+    display: block;
+    padding: 16px 30px;
+    text-decoration: none;
+    cursor : pointer;
+    font-size : 16px;
+}
 
 
+.filters-nav li:hover:not(.active) {
+    background-color: #337ab7;
+    color: white;
+    border : 1px solid  #337ab7;
+}
 
+.filter-properties{
+    margin-left : 25%;
+    padding: 0 20px;
+    height : 400px;
+    overflow : auto;
+}
 
+.filter-properties .properties-header{
+    margin-bottom : 5px;
+    border-bottom : 1px solid #ccc;
+    text-align : center;
+    font-size : 24px;
+}
 
+.filter-properties table.selectable-list{
+    background-color : #fff;
+}
 
+.selectable-list .selected{
+    background-color : #528c52;
+    color : #fff
+}
 
+.selectable-list .fa-check{
+    font-size : 16px;
+    color : #fff;
+}
 
+/* filters text box*/
+.filters-textbox{
+    font-size : 11px;
+}
 
+.filters-textbox .badge{
+    font-weight : 400;
+    border-radius : 0px;
+}
+
+.filters-textbox .badge i{
+    margin-left : 2px;
+    margin-bottom : 2px;
+    border-left : 1px solid #fff;
+    padding-left : 2px;
+    cursor : pointer
+}
+
+.filters-textbox span.badge{
+    margin-bottom: 2px;
+    margin-right : 2px;
+}
+
+.filters-textbox .filter-names-holder{
+    display : inline
+}
 

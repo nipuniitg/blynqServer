@@ -78,6 +78,11 @@
     <link href="{% static 'bower_components/angular-bootstrap-calendar/dist/css/angular-bootstrap-calendar.css' %}"
           rel="stylesheet"/>
 
+    <!-- angular charts -->
+    <script src="{% static 'bower_components/chart.js/dist/Chart.min.js' %}"></script>
+    <script src="{% static 'bower_components/angular-chart.js/dist/angular-chart.min.js' %}"></script>
+
+
     <!-- angular Custom Scripts -->
     <script src="{% static 'CustomScripts/app.js' %}"></script>
     <script src="{% static 'CustomScripts/home.js' %}"></script>
@@ -87,6 +92,8 @@
     <script src="{% static 'CustomScripts/ScheduleManagement-ang.js' %}"></script>
     <script src="{% static 'CustomScripts/LayoutManagement-ang.js' %}"></script>
     <script src="{% static 'CustomScripts/UserDetails-ang.js' %}"></script>
+    <script src="{% static 'CustomScripts/reports-ang.js' %}"></script>
+    <script src="{% static 'CustomScripts/Shared-ang.js' %}"></script>
 
     <script src="{% static 'CustomScripts/shared/confirmDirective.js' %}"></script>
     <script src="{% static 'CustomScripts/shared/blueprints.js' %}"></script>
@@ -215,7 +222,12 @@
                         <span>Screen Partition</span>
                     </a>
                 </li>
-
+                <li>
+                    <a class="" ui-sref="reports" ui-sref-active="active">
+                        <i class="fa fa-bar-chart-o"></i>
+                        <span>Reports</span>
+                    </a>
+                </li>
 
 
                 <!--<li>-->

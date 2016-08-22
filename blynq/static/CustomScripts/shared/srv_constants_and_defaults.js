@@ -49,12 +49,19 @@
             return paneDefaults
         }
 
+        //content - all files recursive home folder : -1
+
+        var getAllFilesHomeFolder = function(){
+            return -1
+        }
+
         return{
             defaultSchedulesLayoutType : defaultSchedulesLayoutType
             ,layouts : layouts
             ,getPopOverMessages : getPopOverMessages
             ,getFileIcons : getFileIcons
             ,getPaneDefaults : getPaneDefaults
+            ,getAllFilesHomeFolder : getAllFilesHomeFolder
         }
     }]);
 

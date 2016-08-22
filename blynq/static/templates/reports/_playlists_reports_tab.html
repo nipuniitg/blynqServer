@@ -1,0 +1,48 @@
+<!--directive : playlistsReportsTab; controller : pylRprtsCtrl -->
+
+<!-- charts View -->
+<filters optional-filters-choices="pylRprtsCtrl.optionalFiltersChoices"
+         refresh-data-fn ='refreshPlaylistsData'>
+</filters>
+
+<!-- charts View -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="chart-div">
+            <canvas id="line" class="chart chart-line" chart-data="data"
+                    chart-labels="labels" chart-series="series" chart-options="options"
+                    chart-dataset-override="datasetOverride" chart-click="onClick">
+            </canvas>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="chart-div">
+            <canvas id="doughnut" class="chart chart-doughnut"
+                    chart-data="pieData" chart-labels="pieLabels">
+            </canvas>
+        </div>
+    </div>
+</div>
+
+<!-- tables View -->
+<div class="row">
+    <div class="col-md-12">
+        <div>
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th> Playlist Name</th>
+                    <th> Repetitions</th>
+                    <th> Hours played</th>
+                    <th> % time played</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
