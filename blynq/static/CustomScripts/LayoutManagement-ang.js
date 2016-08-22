@@ -174,6 +174,9 @@ lApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints','
             lDIC.selected_aspect_ratio = angular.copy($scope.layout.aspect_ratio);
             lDIC.resetLayoutBackup = angular.copy($scope.layout);
             $scope.activePaneIndex = 0;
+
+            //setActiveTabIndex
+            setActiveTabIndex(0);
         },function reject(){
 
         })
@@ -197,6 +200,10 @@ lApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints','
         });
     }
 
+    var setActiveTabIndex = function(index){
+        $scope.activeTabIndex = index;
+    }
+
     lDIC.aspectRatioChanged = function(){
         //set layout
         var newLayout = new blueprints.Layout();
@@ -216,6 +223,8 @@ lApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints','
         $scope.layout.layout_panes.push(new blueprints.LayoutPane($scope.layout.layout_panes.length));
         $scope.activePaneIndex = $scope.layout.layout_panes.length-1;
         toastr.success('Pane added')
+
+        setActiveTabIndex(1);
     }
 
     lDIC.deletePane = function(){
@@ -251,10 +260,10 @@ lApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints','
     $scope.updateActivePane = function(index){
         $scope.$apply(function(){
             $scope.activePaneIndex = angular.copy(index);
+            setActiveTabIndex(1);
         });
         //paneToDirectiveSrv.setActivePaneIndex();
     }
-
 
     onLoad();
 
