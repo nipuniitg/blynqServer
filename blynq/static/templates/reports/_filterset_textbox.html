@@ -1,0 +1,67 @@
+<!-- directive: filtersetTextbox; controller : as parents  -->
+
+<div class="filters-textbox">
+
+    <!-- Date -->
+    <span class="badge bg-primary">
+        From: {[filterset.start_date | showOnlyDate]}
+    </span>
+    <span class="badge bg-primary">
+        To : {[filterset.end_date | showOnlyDate ]}
+    </span>
+
+    <!-- Times -->
+    <span class="badge bg-primary">
+        From: {[filterset.start_time | showOnlyTime]}
+    </span>
+    <span class="badge bg-primary">
+        To : {[filterset.end_time | showOnlyTime]}
+    </span>
+
+
+    <!-- Screns -->
+    <div class="filter-names-holder" ng-if="optionalFiltersChoices.screens">
+        <span ng-show="filterset.all_screens">
+            <span class="badge bg-primary">All Screens
+            </span>
+        </span>
+        <span ng-if="!filterset.all_screens">
+            <span class="badge bg-primary"
+              ng-repeat="screen in filterset.screens">
+                {[screen.screen_name]}
+                <i class="fa fa-remove" ng-click="removeScreen($index)"></i>
+            </span>
+        </span>
+    </div>
+
+    <!-- Playlists -->
+    <div class="filter-names-holder" ng-if="optionalFiltersChoices.playlists">
+        <span ng-show="filterset.all_playlists">
+            <span class="badge bg-primary"> All Playlists
+            </span>
+        </span>
+        <span ng-if="!filterset.all_playlists">
+            <span class="badge bg-primary"
+              ng-repeat="playlist in filterset.playlists">
+                {[playlist.playlist_title]}
+                <i class="fa fa-remove" ng-click="removePlaylist($index)"></i>
+            </span>
+        </span>
+    </div>
+
+    <!-- ContentFiles -->
+    <div class="filter-names-holder" ng-if="optionalFiltersChoices.content_files">
+        <span ng-show="filterset.all_content_files">
+            <span class="badge bg-primary">  All Files
+            </span>
+        </span>
+        <span ng-if="!filterset.all_content_files">
+            <span class="badge bg-primary"
+                  ng-repeat="file in filterset.content_files">
+                {[file.title]}
+                <i class="fa fa-remove" ng-click="removeContentFile($index)"></i>
+            </span>
+        </span>
+    </div>
+
+</div>

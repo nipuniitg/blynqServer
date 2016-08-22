@@ -1,0 +1,50 @@
+<!--directive : screensReportsTab; controller : scrRprtsCtrl -->
+
+<!-- charts View -->
+<filters optional-filters-choices="scrRprtsCtrl.optionalFiltersChoices"
+         refresh-data-fn ='refreshScreensData'>
+</filters>
+
+<!-- charts View -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="chart-div">
+            <canvas id="line" class="chart chart-line" chart-data="data"
+                    chart-labels="labels" chart-series="series" chart-options="options"
+                    chart-dataset-override="datasetOverride" chart-click="onClick">
+            </canvas>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="chart-div">
+            <canvas id="doughnut" class="chart chart-doughnut"
+                    chart-data="pieData" chart-labels="pieLabels">
+            </canvas>
+        </div>
+    </div>
+</div>
+
+<!-- tables View -->
+<div class="row">
+    <div class="col-md-12">
+        <div>
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th> Screen Name</th>
+                    <th> Hours Online</th>
+                    <th> % time Online</th>
+                    <th> Last Online</th>
+                    <!--<th> Playlists</th>-->
+                    <!--<th> unique content shown</th>-->
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng="screenData in screensData">
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

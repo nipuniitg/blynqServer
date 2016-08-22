@@ -1,0 +1,344 @@
+<!--controller:filtersetMdlCtrl -->
+<div id="filtersetModal">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="filtersetMdlCtrl.cancel()" aria-hidden="true">
+            <i class="fa fa-times"></i>
+        </button>
+        <h3 class="modal-title">Filters</h3>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <!-- filterset fields -->
+            <div>
+                <ul class="list-group filters-nav">
+                    <li class="list-group-item" ng-class="{active : (filtersetMdlCtrl.activeTab ==0) }"
+                        ng-click="filtersetMdlCtrl.navigateToTab(0)">
+                        Dates
+                    </li>
+                    <li class="list-group-item" ng-class="{active : (filtersetMdlCtrl.activeTab ==1) }"
+                        ng-click="filtersetMdlCtrl.navigateToTab(1)">
+                        Time
+                    </li>
+                    <li class="list-group-item" ng-class="{active : (filtersetMdlCtrl.activeTab ==2) }"
+                        ng-click="filtersetMdlCtrl.navigateToTab(2)"
+                        ng-if="filtersetMdlCtrl.optionalFiltersChoices.screens">
+                        Screens
+                    </li>
+                    <li class="list-group-item" ng-class="{active : (filtersetMdlCtrl.activeTab ==3) }"
+                        ng-click="filtersetMdlCtrl.navigateToTab(3)"
+                        ng-if="filtersetMdlCtrl.optionalFiltersChoices.playlists">
+                        Playlists
+                    </li>
+                    <li class="list-group-item" ng-class="{active : (filtersetMdlCtrl.activeTab ==4) }"
+                        ng-click="filtersetMdlCtrl.navigateToTab(4)"
+                        ng-if="filtersetMdlCtrl.optionalFiltersChoices.content_files">
+                        Content Files
+                    </li>
+                </ul>
+            </div>
+
+            <!-- filterset field properties -->
+            <div class="filter-properties">
+                <form role="form" name="filterDatesForm" novalidate="">
+
+
+                    <!-- Dates -->
+                    <div ng-show="filtersetMdlCtrl.activeTab == 0">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="properties-header">
+                                    <p>
+                                        Dates
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-offset-1 col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label">Start Date</label>
+                                    <div class="input-group">
+                                        <input type="text" id="startDate"
+                                               name="startDate" class="form-control"
+                                               datepicker-popup="dd-MMM-yyyy"
+                                               ng-model="filterset.start_date"
+                                               is-open="filtersetMdlCtrl.popUp1.opened"
+                                               uib-datepicker-popup
+                                               datepicker-options="filtersetMdlCtrl.startDateOptions"
+                                               datepicker-localdate="true"
+                                               close-text="Close" required="required">
+                                        <!-- ngIf: isOpen -->
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default"
+                                                ng-click="filtersetMdlCtrl.openDatepicker('startDate')">
+                                            <i class="fa fa-calendar"></i>
+                                        </button>
+                                    </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-offset-2 col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label">End Date</label>
+                                    <div class="input-group">
+                                        <input type="text" id="endDate" name="endDate" class="form-control"
+                                               datepicker-popup="dd-MMM-yyyy"
+                                               ng-model="filterset.end_date"
+                                               is-open="filtersetMdlCtrl.popUp2.opened"
+                                               uib-datepicker-popup
+                                               datepicker-options="filtersetMdlCtrl.endDateOptions"
+                                               datepicker-localdate="true"
+                                               close-text="Close" required
+                                               larger-than-date><!-- ngIf: isOpen -->
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default"
+                                                ng-click="filtersetMdlCtrl.openDatepicker('endDate')">
+                                            <i class="fa fa-calendar"></i>
+                                        </button>
+                                    </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-danger" ng-show="filterDatesForm.startDate.$error.required">Start Date is a
+                            required
+                            field</p>
+                        <p class="text-danger" ng-show="filterDatesForm.endDate.$error.required">End Date is a required
+                            field</p>
+                        <p class="text-danger" ng-show="filterDatesForm.endDate.$invalid">
+                            End Date must occur after Start Date</p>
+
+                    </div>
+
+                    <!-- Time -->
+                    <div ng-show="filtersetMdlCtrl.activeTab == 1">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="properties-header">
+                                    <p>
+                                        Time
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row ">
+                            <div class="col-md-offset-1 col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label">Start Time</label>
+                                    <uib-timepicker ng-model="filterset.start_time" ng-change="changed()"
+                                                    hour-step="1" minute-step="1" show-meridian="true"
+                                                    name="startTime"></uib-timepicker>
+                                </div>
+                            </div>
+                            <div class="col-md-offset-2 col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label">End Time</label>
+                                    <div class="time-picker">
+                                        <uib-timepicker ng-model="filterset.end_time" ng-change="changed()"
+                                                        hour-step="1"
+                                                        minute-step="1" show-meridian="true" larger-than-time
+                                                        name="endTime"></uib-timepicker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-danger" ng-show="filterDatesForm.endTime.$invalid">
+                            End Time must occur after start time.
+                        </p>
+                    </div>
+
+                    <!-- Screens -->
+                    <div ng-show="filtersetMdlCtrl.activeTab == 2"
+                         ng-if="filtersetMdlCtrl.optionalFiltersChoices.screens">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="properties-header">
+                                    <p>
+                                        Screens
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="table selectable-list">
+                            <thead>
+                            <tr>
+                                <th>Selected</th>
+                                <th>Status</th>
+                                <th>Screen Name</th>
+                                <th>City</th>
+                                <th class="fix">Address</th>
+                                <th class="fix">Groups</th>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th>
+                                    <div class="btn-group" uib-dropdown>
+                                        <button type="button" class="btn btn-primary" uib-dropdown-toggle>
+                                            <i class="fa fa-adjust online-and-offline"
+                                               ng-show="searchScreens.status==''"></i>
+                                            <i class="fa fa-circle online" ng-show="searchScreens.status=='Online'"></i>
+                                            <i class="fa fa-circle offline"
+                                               ng-show="searchScreens.status=='Offline'"></i>
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" uib-dropdown-menu role="menu">
+                                            <li role="menuitem">
+                                                <a ng-click="searchScreens.status=''">
+                                                    <i class="fa fa-adjust online-and-offline"></i>
+                                                    <span>All</span>
+                                                </a>
+                                            </li>
+                                            <li class="divider"></li>
+                                            <li role="menuitem">
+                                                <a ng-click="searchScreens.status='Online'">
+                                                    <i class="fa fa-circle online"></i>
+                                                    <span>Online</span>
+                                                </a>
+                                            </li>
+                                            <li class="divider"></li>
+                                            <li role="menuitem">
+                                                <a ng-click="searchScreens.status='Offline'">
+                                                    <i class="fa fa-circle offline"></i>
+                                                    <span>Offline</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </th>
+                                <th><input type="form-control" ng-model="searchScreens.screen_name"
+                                           placeholder="search Name"></th>
+                                <th><input type="form-control" ng-model="searchScreens.city.city_name"
+                                           placeholder="search">
+                                </th>
+                                <th><input type="form-control" ng-model="searchScreens.address" placeholder="search">
+                                </th>
+                                <th><input type="form-control" ng-model="searchScreens.groups.group_name"
+                                           placeholder="search"></th>
+                            </tr>
+                            </thead>
+                            <tbody style=" height: 230px;overflow-y: auto;width: 100%;">
+                            <tr class="pointer" ng-class="{selected : screen.selected}"
+                                ng-repeat="screen in (filteredScreens = (filtersetMdlCtrl.screens | filter: searchScreens))"
+                                toggle-selection item="screen">
+                                <td><i class="fa fa-check" ng-show="screen.selected"></i></td>
+                                <td><i class="fa fa-circle" set-screen-status-class="{[screen.status]}"></i></td>
+                                <td class="fix">{[ screen.screen_name ]}</td>
+                                <td class="">{[ screen.city.city_name]}</td>
+                                <td class="fix">{[ screen.address ]}</td>
+                                <td class="fix">
+                                    <div class="tagsinput " style="height: 100%;">
+                                    <span class="tag" ng-repeat="group in screen.groups">
+                                    <span> {[group.group_name]} &nbsp;&nbsp;</span>
+                                        <!--<a class="tagsinput-remove-link"></a>-->
+                                    </span>
+
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Playlists -->
+                    <div ng-show="filtersetMdlCtrl.activeTab == 3"
+                         ng-if="filtersetMdlCtrl.optionalFiltersChoices.playlists">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="properties-header">
+                                    <p>
+                                        Playlists
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table selectable-list">
+                            <thead>
+                            <tr>
+                                <th>Selected</th>
+                                <th>Playlist Name</th>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th><input type="form-control" ng-model="searchPlaylists.playlist_title"
+                                           placeholder="search Name"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr class="pointer" ng-class="{selected : playlist.selected}"
+                                ng-repeat="playlist in (filteredPlaylists = (filtersetMdlCtrl.playlists | filter : searchPlaylists))"
+                                toggle-selection item="playlist">
+                                <td><i class="fa fa-check" ng-show="playlist.selected"></i></td>
+                                <td>{[ playlist.playlist_title ]}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <!--<ul class="list-group selectable-list">-->
+                            <!--<li class="list-group-item" ng-class="{selected : playlist.selected}"-->
+                                <!--ng-repeat="playlist in (filteredPlaylists = (filtersetMdlCtrl.playlists | filter : searchPlaylists))"-->
+                                <!--toggle-selection item="playlist">-->
+                                <!--{[ playlist.playlist_title ]}-->
+                                <!--<i class="fa fa-check pull-right" ng-show="playlist.selected"></i>-->
+                            <!--</li>-->
+                        <!--</ul>-->
+                    </div>
+
+                    <!-- Content files -->
+                    <div ng-show="filtersetMdlCtrl.activeTab == 4"
+                         ng-if="filtersetMdlCtrl.optionalFiltersChoices.content_files">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="properties-header">
+                                    <p>
+                                        Content Library Files
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table selectable-list">
+                            <thead>
+                            <tr>
+                                <th>Selected</th>
+                                <th>File Name</th>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th><input type="form-control" ng-model="searchContentFile.title"
+                                           placeholder="search Name"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr class="pointer" ng-class="{selected : contentFile.selected}"
+                                ng-repeat="contentFile in (filteredContentFiles = (filtersetMdlCtrl.content_files | filter : searchContentFile))"
+                                toggle-selection item="contentFile">
+                                <td><i class="fa fa-check" ng-show="contentFile.selected"></i></td>
+                                <td>{[ contentFile.title ]}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <!--<ul class="list-group selectable-list">-->
+                            <!--<li class="list-group-item" ng-class="{selected : contentFile.selected}"-->
+                                <!--ng-repeat="contentFile in (filteredContentFiles = (filtersetMdlCtrl.content_files | filter : searchContentFile))"-->
+                                <!--toggle-selection item="contentFile">-->
+                                <!--{[ contentFile.title ]}-->
+                                <!--<i class="fa fa-check pull-right" ng-show="contentFile.selected"></i>-->
+                            <!--</li>-->
+                        <!--</ul>-->
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-fixed-width" ng-click="filtersetMdlCtrl.apply()"
+                ng-disabled="">Apply
+            <i class="fa fa-white fa-check icon-right"></i>
+        </button>
+        <button type="button" class="btn btn-default btn-fixed-width" ng-click="filtersetMdlCtrl.cancel()">
+            Cancel <i class="fa fa-times icon-right"></i>
+        </button>
+    </div>
+</div>
