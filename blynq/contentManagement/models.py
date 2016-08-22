@@ -56,7 +56,11 @@ class ContentType(models.Model):
 
 def upload_to_dir(instance, filename):
     filename = os.path.basename(filename)
-    return '%s/user%d/%s' % (USERCONTENT_DIR, instance.uploaded_by.id, filename)
+    if instance.uploaded_by:
+        user_directory = 'user%d' % instance.uploaded_by.id
+    else:
+        user_directory = 'public'
+    return '%s/%s/%s' % (USERCONTENT_DIR, user_directory, filename)
 
 
 class Content(models.Model):
@@ -169,6 +173,28 @@ class Content(models.Model):
 
     # class Meta:
     #     ordering = ['-last_modified_time']
+
+    @property
+    def is_image(self):
+        if not self.document:
+            return False
+        import mimetypes
+        file_type, encoding = mimetypes.guess_type(str(self.document.url))
+        if file_type:
+            return 'image' in file_type
+        else:
+            return False
+
+    @property
+    def is_video(self):
+        if not self.document:
+            return False
+        import mimetypes
+        file_type, encoding = mimetypes.guess_type(str(self.document.url))
+        if file_type:
+            return 'video' in file_type
+        else:
+            return False
 
     @staticmethod
     def get_user_relevant_objects(user_details):

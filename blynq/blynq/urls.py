@@ -6,7 +6,6 @@ from authentication import authentication_urls
 from authentication import views as auth_views
 from layoutManagement import layout_urls
 from playerManagement import player_urls
-from screenManagement import views as screen_views
 from screenManagement import screen_urls
 from playlistManagement import playlist_urls
 from contentManagement import content_urls
