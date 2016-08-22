@@ -27,7 +27,7 @@
     "moment": "^2.13.0",
     "toastr": "^2.1.2",
     "jquery": "2.2.4",
-    "angular-chart.js": "^1.0.1"
+    "angular-chart.js": "^1.0.2"
   },
   "resolutions": {
     "angular": "1.5.7"

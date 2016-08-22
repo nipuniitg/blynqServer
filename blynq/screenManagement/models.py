@@ -216,6 +216,9 @@ def remove_schedule_screens(sender, instance, **kwargs):
 
 
 class ScreenAnalytics(models.Model):
+    """
+    Use this model for Screen Offline/ Online status instead of Analytics
+    """
     screen = models.ForeignKey(Screen, related_name='%(class)s_screen')
     date = models.DateField(default=today_date)
     time_online = models.PositiveIntegerField(default=0)    # in seconds

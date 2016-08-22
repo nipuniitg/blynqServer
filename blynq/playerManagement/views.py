@@ -11,7 +11,8 @@ from contentManagement.models import Content
 from contentManagement.serializers import ContentSerializer
 from customLibrary.views_lib import debugFileLog, string_to_dict, default_string_to_datetime, obj_to_json_response, \
     ajax_response, date_changed
-from playerManagement.models import PlayerUpdate, LocalServer, PlayerLog, MediaAnalytics
+from playerManagement.models import PlayerUpdate, LocalServer, PlayerLog
+from reports.models import MediaAnalytics, ScreenAnalytics
 from playlistManagement.models import PlaylistItems
 from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import ScheduleScreens, SchedulePlaylists, SchedulePane
@@ -276,15 +277,34 @@ def media_stats(request):
     debugFileLog.info('Inside media stats player')
     try:
         posted_data = string_to_dict(request.body)
+        unique_device_key = posted_data.get('device_key')
+        screen = Screen.objects.get(unique_device_key__activation_key=unique_device_key)
         media_stats = posted_data.get('media_item_stats_list')
-        content_id = int(media_stats.get('content_id'))
-        playlist_item_id = int(media_stats.get('playlist_item_id'))
-        count = int(media_stats.get('count'))
-        date = media_stats.get('date')
-        converted_date = default_string_to_datetime(date)
-        media_analytics = MediaAnalytics(content_id=content_id, playlist_item_id=playlist_item_id, count=count,
-                                         date=converted_date)
-        media_analytics.save()
+        for stat in media_stats:
+            try:
+                content_id = int(stat.get('content_id'))
+                playlist_item_id = int(stat.get('playlist_item_id'))
+                count = int(stat.get('count'))
+                date = stat.get('date')
+                converted_date = default_string_to_datetime(date, fmt='%Y-%m-%d')
+                media_analytics = MediaAnalytics(screen=screen, content_id=content_id, playlist_item_id=playlist_item_id,
+                                                 count=count, date=converted_date)
+                media_analytics.save()
+            except Exception as e:
+                debugFileLog.exception('Improper media analytics data')
+                debugFileLog.exception(e)
+        screen_stats = posted_data.get('session_time_list')
+        for stat in screen_stats:
+            try:
+                start_time = stat.get('session_start_time')
+                session_start_time = default_string_to_datetime(start_time)
+                end_time = stat.get('session_end_time')
+                session_end_time = default_string_to_datetime(end_time)
+                screen_analytics = ScreenAnalytics(screen=screen, session_start_time=session_start_time,
+                                                   session_end_time=session_end_time)
+                screen_analytics.save()
+            except Exception as e:
+                debugFileLog.exception(e)
         success = True
     except Exception as e:
         success = False

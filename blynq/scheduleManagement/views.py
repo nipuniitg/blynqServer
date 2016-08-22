@@ -78,12 +78,12 @@ def event_for_allday(schedule, timeline):
     debugFileLog.info("inside event_for_allday")
     start_date = timeline.get('start_date')
     start_time = "00:00"  # datetime.time(0)
-    start = generate_utc_datetime(ist_date=start_date, ist_time=start_time)
+    start = generate_utc_datetime(ist_date=start_date, ist_time=start_time, seconds_str='00')
     end_date = start_date
     end_time = "23:59"  # datetime.time(23, 59, 59, 999)
-    end = generate_utc_datetime(ist_date=end_date, ist_time=end_time)
+    end = generate_utc_datetime(ist_date=end_date, ist_time=end_time, seconds_str='59')
     end_recurring_period_date = timeline.get('end_recurring_period')
-    end_recurring_period = generate_utc_datetime(ist_date=end_recurring_period_date, ist_time=end_time)
+    end_recurring_period = generate_utc_datetime(ist_date=end_recurring_period_date, ist_time=end_time, seconds_str='59')
     rule = generate_rule(timeline=timeline, name=schedule.schedule_title, description=schedule.schedule_title)
     creator = schedule.created_by.user if schedule.created_by else None
     event_dict = {'start': start, 'end': end, 'title': schedule.schedule_title, 'creator': creator,
@@ -125,13 +125,14 @@ def event_dict_from_timeline(timeline, schedule):
     else:
         start_date = timeline.get('start_date')
         start_time = timeline.get('start_time')
-        start = generate_utc_datetime(ist_date=start_date, ist_time=start_time)
+        start = generate_utc_datetime(ist_date=start_date, ist_time=start_time, seconds_str='00')
         end_date = start_date
         end_time = timeline.get('end_time')
-        end = generate_utc_datetime(ist_date=end_date, ist_time=end_time)
+        end = generate_utc_datetime(ist_date=end_date, ist_time=end_time, seconds_str='59')
         end_recurring_period_time = end_time
         end_recurring_period = timeline.get('end_recurring_period')
-        end_recurring_period = generate_utc_datetime(ist_date=end_recurring_period, ist_time=end_recurring_period_time)
+        end_recurring_period = generate_utc_datetime(ist_date=end_recurring_period, ist_time=end_recurring_period_time,
+                                                     seconds_str='59')
         rule = generate_rule(timeline, name=schedule.schedule_title, description=schedule.schedule_title)
         creator = schedule.created_by.user if schedule.created_by else None
         event_dict = {'start': start, 'end': end, 'title': schedule.schedule_title, 'creator': creator,

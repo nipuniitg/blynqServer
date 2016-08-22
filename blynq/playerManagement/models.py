@@ -6,9 +6,6 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from authentication.models import UserDetails, Organization
 from blynq.settings import MEDIA_ROOT, PLAYER_UPDATES_DIR, PLAYER_LOG_DIR
-from customLibrary.views_lib import today_date
-from playlistManagement.models import PlaylistItems
-from screenManagement.models import Screen
 
 
 def upload_to_dir(instance, filename):
@@ -60,15 +57,3 @@ class PlayerLog(models.Model):
     def __unicode__(self):
         player_str = self.file.name if self.file else 'No filename exists'
         return player_str
-
-
-class MediaAnalytics(models.Model):
-    player_analytics_id = models.AutoField(primary_key=True)
-    screen = models.ForeignKey(Screen)
-    playlist_item_id = models.IntegerField(null=True)
-    content_id = models.IntegerField(null=True)
-    date = models.DateField(default=today_date)
-    count = models.IntegerField(default=0)
-
-    def __unicode__(self):
-        return self.screen.screen_name + ' ' + str(self.date) + ' ' + str(self.count)
