@@ -285,10 +285,12 @@ def media_stats(request):
                 content_id = int(stat.get('content_id'))
                 playlist_id = int(stat.get('playlist_id'))
                 count = int(stat.get('count'))
+                total_time = stat.get('total_time')
+                total_time = int(total_time) if total_time else 0
                 date = stat.get('date')
                 converted_date = default_string_to_datetime(date, fmt='%Y-%m-%d')
                 media_analytics = MediaAnalytics(screen=screen, content_id=content_id, playlist_id=playlist_id,
-                                                 count=count, date=converted_date)
+                                                 count=count, date=converted_date, total_time=total_time)
                 media_analytics.save()
             except Exception as e:
                 debugFileLog.exception('Improper media analytics data')
