@@ -14,6 +14,7 @@ class MediaAnalytics(models.Model):
     content_id = models.IntegerField(null=True)
     date = models.DateField(default=today_date)
     count = models.IntegerField(default=0)
+    total_time = models.IntegerField(default=0) # total_time in seconds this content played
 
     def __unicode__(self):
         return self.screen.screen_name + ' ' + str(self.date) + ' ' + str(self.count)
