@@ -10,7 +10,7 @@ from screenManagement.models import Screen
 class MediaAnalytics(models.Model):
     player_analytics_id = models.AutoField(primary_key=True)
     screen = models.ForeignKey(Screen)
-    playlist_item_id = models.IntegerField(null=True)
+    playlist_id = models.IntegerField(null=True)
     content_id = models.IntegerField(null=True)
     date = models.DateField(default=today_date)
     count = models.IntegerField(default=0)

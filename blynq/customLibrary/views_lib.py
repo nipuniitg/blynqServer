@@ -143,6 +143,14 @@ def date_changed(received_datetime):
         return False
 
 
+def date_to_string(date_obj, fmt=date_fmt):
+    return date_obj.strftime(fmt)
+
+
+def string_to_date(date_str, fmt=date_fmt):
+    return datetime.datetime.strptime(date_str, fmt).date()
+
+
 def today_date():
     return timezone.now().date()
 

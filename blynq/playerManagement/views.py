@@ -283,11 +283,11 @@ def media_stats(request):
         for stat in media_stats:
             try:
                 content_id = int(stat.get('content_id'))
-                playlist_item_id = int(stat.get('playlist_item_id'))
+                playlist_id = int(stat.get('playlist_id'))
                 count = int(stat.get('count'))
                 date = stat.get('date')
                 converted_date = default_string_to_datetime(date, fmt='%Y-%m-%d')
-                media_analytics = MediaAnalytics(screen=screen, content_id=content_id, playlist_item_id=playlist_item_id,
+                media_analytics = MediaAnalytics(screen=screen, content_id=content_id, playlist_id=playlist_id,
                                                  count=count, date=converted_date)
                 media_analytics.save()
             except Exception as e:
