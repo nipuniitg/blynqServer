@@ -53,21 +53,25 @@ def intersection_time(event1_start, event1_end, event2_start, event2_end):
 
 def screen_filter(filter_set, user_details):
     all_screens = filter_set.get('all_screens')
+    screen_ids = []
     if all_screens:
         screen_ids = Screen.get_user_relevant_objects(user_details=user_details).values_list('screen_id', flat=True)
     else:
         screen_objects = filter_set.get('screens')
-        screen_ids = (item['screen_id'] for item in screen_objects)
+        if screen_objects:
+            screen_ids = (item['screen_id'] for item in screen_objects)
     return screen_ids
 
 
 def playlist_filter(filter_set, user_details):
+    playlist_ids = []
     all_playlists = filter_set.get('all_playlists')
     if all_playlists:
         playlist_ids = Playlist.get_user_relevant_objects(user_details=user_details).values_list('playlist_id', flat=True)
     else:
         playlist_objects = filter_set.get('playlists')
-        playlist_ids = (item['playlist_id'] for item in playlist_objects)
+        if playlist_objects:
+            playlist_ids = (item['playlist_id'] for item in playlist_objects)
     return playlist_ids
 
 
@@ -92,13 +96,18 @@ def screen_reports(request):
             return obj_to_json_response(json_dict)
         all_screens_dict = {}
         total_time_active = 0
+        screen_objects = Screen.get_user_relevant_objects(user_details).filter(screen_id__in=screen_ids)
+        for obj in screen_objects:
+            all_screens_dict[str(obj.screen_id)] = {'screen_id': obj.screen_id, 'screen_name': obj.screen_name,
+                                                    'time_active': 0, 'total_time_requested': total_time_requested}
         for single_date in date_range(start_date=start_datetime.date(), end_date=end_date):
             start = datetime.combine(single_date, start_datetime.time())
             end = start + time_difference
             date_str = get_ist_date_str(start)
             date_str_list.append(date_str)
             screen_analytics = ScreenAnalytics.objects.exclude(
-                screen_id__in=screen_ids, session_start_time__gte=end, session_end_time__lte=start_datetime).order_by('screen_id')
+                screen_id__in=screen_ids, session_start_time__gte=end,
+                session_end_time__lte=start_datetime).order_by('screen_id')
             date_active_time = 0    # active_time of all_screens in a single date
             for obj in screen_analytics:
                 time_active = intersection_time(start_datetime, end, obj.session_start_time, obj.session_end_time)
@@ -109,7 +118,7 @@ def screen_reports(request):
                     all_screens_dict[str(obj.screen_id)]['time_active'] += time_active
                 else:
                     all_screens_dict[str(obj.screen_id)] = {
-                        'screen_id': obj.screen_id, 'screen_name': obj.screen_name,
+                        'screen_id': obj.screen_id, 'screen_name': obj.screen.screen_name,
                         'time_active': time_active, 'total_time_requested': total_time_requested}
             time_active_list.append(date_active_time)
         if total_time_requested >= total_time_active:
