@@ -124,6 +124,7 @@ def screen_reports(request):
         if total_time_requested >= total_time_active:
             pie_chart_data = [total_time_active, total_time_requested-total_time_active]
         table_data = all_screens_dict.values()
+        line_chart_data = {'date_str': date_str_list, 'time_active': time_active_list}
         json_dict = {'line_chart_data': line_chart_data, 'pie_chart_data': pie_chart_data, 'table_data': table_data }
     except Exception as e:
         debugFileLog.exception(e)
@@ -145,6 +146,7 @@ def playlist_reports(request):
         media_analytics = MediaAnalytics.objects.filter(screen_id__in=screen_ids)
     except Exception as e:
         debugFileLog.exception(e)
+    return obj_to_json_response({})
 
 
 def media_reports(request):
@@ -159,3 +161,4 @@ def media_reports(request):
         # all_content_files :  bool, content_files : array of content objects
     except Exception as e:
         debugFileLog.exception(e)
+    return obj_to_json_response({})
