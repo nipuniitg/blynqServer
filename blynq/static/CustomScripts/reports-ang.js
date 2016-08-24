@@ -180,6 +180,13 @@ rApp.directive('screensReportsTab',[ function(){
 
         //pie chart - data
         $scope.pieLabels = ["online", "offline"];
+        $scope.pieOptions = {
+            title : {
+                display : true
+                ,text : 'Active - Inactive Hours Share'
+            }
+        }
+
         }]
 
     return{
@@ -249,7 +256,7 @@ rApp.directive('playlistsReportsTab',[function(){
         $scope.options = {
         title :{
             display : true
-            ,text : 'Playlist duration(in mins) vs each day'
+            ,text : 'Playlist Playtime'
         },
         scales: {
           yAxes: [
@@ -327,6 +334,10 @@ rApp.directive('contentReportsTab',[function(){
         $scope.series = ['Minutes'];
         $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }];
         $scope.options = {
+        title : {
+            display : true
+            ,text : 'Content Playtime'
+        },
         scales: {
           yAxes: [
             {

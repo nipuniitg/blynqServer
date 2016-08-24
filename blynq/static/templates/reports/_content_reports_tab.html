@@ -35,7 +35,7 @@
                 <tr ng-repeat="fileData in tableData">
                     <td>{[fileData.content_title]}</td>
                     <td>{[fileData.num_of_repetitions]}</td>
-                    <td>{[fileData.time_played]}</td>
+                    <td>{[fileData.time_played | inHoursFormat]}</td>
                     <td>{[fileData.num_of_screens]}</td>
                     <td>{[fileData.num_of_playlists]}</td>
                 </tr>
