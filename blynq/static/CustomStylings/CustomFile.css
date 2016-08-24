@@ -250,6 +250,21 @@ cursor: pointer;
 min-width : 200px;
 }
 
+#div_screens_list tr.active{
+    background-image: -webkit-linear-gradient(top, #337ab7 0%, #2b669a 100%);
+    background-image: -o-linear-gradient(top, #337ab7 0%, #2b669a 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#337ab7), to(#2b669a));
+    background-image: linear-gradient(to bottom, #337ab7 0%, #2b669a 100%);
+    background-repeat: repeat-x;
+    background-color : red;
+    border-color: #2b669a;
+    color : #fff
+}
+
+#div_screens_list tr.active>td{
+    background : inherit;
+}
+
 .pointer{
 cursor:pointer
 }
@@ -565,7 +580,6 @@ input[type=number]::-webkit-outer-spin-button {
 .dropdown-menu i{
     margin-right : 5px
 }
-
 
 .form-group .validation-error{
     color : red;

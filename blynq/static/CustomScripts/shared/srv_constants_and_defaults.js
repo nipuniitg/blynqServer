@@ -45,7 +45,6 @@
                 minWidth : 5        //in percentage
                 ,minHeight : 5      // in percentage
             }
-
             return paneDefaults
         }
 
@@ -55,6 +54,12 @@
             return -1
         }
 
+
+        var getRefreshScreensInterval = function(){
+            var screensRefreshInterval = 20000;
+            return screensRefreshInterval
+        }
+
         return{
             defaultSchedulesLayoutType : defaultSchedulesLayoutType
             ,layouts : layouts
@@ -62,6 +67,7 @@
             ,getFileIcons : getFileIcons
             ,getPaneDefaults : getPaneDefaults
             ,getAllFilesHomeFolder : getAllFilesHomeFolder
+            ,getRefreshScreensInterval : getRefreshScreensInterval
         }
     }]);
 
