@@ -12,8 +12,8 @@
                         </a>
                     </div>
                 </header>
-                <div class="table-responsive fill">
-                    <table class="table  table-hover table-advanced table-striped ">
+                <div class="table-responsive fill" id="div_screens_list">
+                    <table class="table table-advanced ">
                         <thead>
                         <tr>
                             <th>Edit</th>
@@ -68,10 +68,11 @@
                         </tr>
                         </thead>
                         <tbody style=" height: 230px;overflow-y: auto;width: 100%;">
-                        <tr class="pointer" ng-repeat="screen in screens | filter: searchScreens"
+                        <tr class="pointer" ng-class="{'active' : activeScreenIndex == $index}"
+                            ng-repeat="screen in screens | filter: searchScreens"
                             ng-click="clickedOnScreen($index)">
-                            <td><a href="#" ng-click="editScreenDetails($index)"><i class="fa fa-pencil pointer"></i>
-                            </a></td>
+                            <td><span ng-click="editScreenDetails($index)"><i class="fa fa-pencil pointer"></i>
+                            </span></td>
                             <td><i class="fa fa-circle" set-screen-status-class="{[screen.status]}"></i></td>
                             <td class="fix">{[ screen.screen_name ]}</td>
                             <td class="">{[ screen.city.city_name]}</td>
