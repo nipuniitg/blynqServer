@@ -124,9 +124,8 @@ def screen_reports(request):
             end = start + time_difference
             date_str = get_ist_date_str(start)
             date_str_list.append(date_str)
-            screen_analytics = ScreenAnalytics.objects.exclude(
-                screen_id__in=screen_ids, session_start_time__gte=end,
-                session_end_time__lte=start_datetime).order_by('screen_id')
+            screen_analytics = ScreenAnalytics.objects.filter(screen_id__in=screen_ids).exclude(
+                session_start_time__gte=end, session_end_time__lte=start_datetime).order_by('screen_id')
             date_active_time = 0    # active_time of all_screens in a single date
             for obj in screen_analytics:
                 time_active = intersection_time(start_datetime, end, obj.session_start_time, obj.session_end_time)
