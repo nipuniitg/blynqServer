@@ -13,24 +13,20 @@
                 <ul class="list-group filters-nav">
                     <li class="list-group-item" ng-class="{active : (filtersetMdlCtrl.activeTab ==0) }"
                         ng-click="filtersetMdlCtrl.navigateToTab(0)">
-                        Dates
+                        Date
                     </li>
                     <li class="list-group-item" ng-class="{active : (filtersetMdlCtrl.activeTab ==1) }"
-                        ng-click="filtersetMdlCtrl.navigateToTab(1)">
-                        Time
-                    </li>
-                    <li class="list-group-item" ng-class="{active : (filtersetMdlCtrl.activeTab ==2) }"
-                        ng-click="filtersetMdlCtrl.navigateToTab(2)"
+                        ng-click="filtersetMdlCtrl.navigateToTab(1)"
                         ng-if="filtersetMdlCtrl.optionalFiltersChoices.screens">
                         Screens
                     </li>
-                    <li class="list-group-item" ng-class="{active : (filtersetMdlCtrl.activeTab ==3) }"
-                        ng-click="filtersetMdlCtrl.navigateToTab(3)"
+                    <li class="list-group-item" ng-class="{active : (filtersetMdlCtrl.activeTab ==2) }"
+                        ng-click="filtersetMdlCtrl.navigateToTab(2)"
                         ng-if="filtersetMdlCtrl.optionalFiltersChoices.playlists">
                         Playlists
                     </li>
-                    <li class="list-group-item" ng-class="{active : (filtersetMdlCtrl.activeTab ==4) }"
-                        ng-click="filtersetMdlCtrl.navigateToTab(4)"
+                    <li class="list-group-item" ng-class="{active : (filtersetMdlCtrl.activeTab ==3) }"
+                        ng-click="filtersetMdlCtrl.navigateToTab(3)"
                         ng-if="filtersetMdlCtrl.optionalFiltersChoices.content_files">
                         Content Files
                     </li>
@@ -46,11 +42,9 @@
                     <div ng-show="filtersetMdlCtrl.activeTab == 0">
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="properties-header">
-                                    <p>
-                                        Dates
-                                    </p>
-                                </div>
+                                <h3>
+                                    Date
+                                </h3>
                             </div>
                         </div>
 
@@ -109,55 +103,54 @@
                         <p class="text-danger" ng-show="filterDatesForm.endDate.$invalid">
                             End Date must occur after Start Date</p>
 
-                    </div>
-
-                    <!-- Time -->
-                    <div ng-show="filtersetMdlCtrl.activeTab == 1">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="properties-header">
-                                    <p>
+                        <!-- Time -->
+                        <div ng-if="filtersetMdlCtrl.optionalFiltersChoices.time">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3>
                                         Time
-                                    </p>
+                                    </h3>
+                                    <p>(Start-time and end-time in each day)</p>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row ">
-                            <div class="col-md-offset-1 col-md-4">
-                                <div class="form-group">
-                                    <label class="control-label">Start Time</label>
-                                    <uib-timepicker ng-model="filterset.start_time" ng-change="changed()"
-                                                    hour-step="1" minute-step="1" show-meridian="true"
-                                                    name="startTime"></uib-timepicker>
+                            <div class="row ">
+                                <div class="col-md-offset-1 col-md-4">
+                                    <div class="form-group">
+                                        <label class="control-label">Start Time</label>
+                                        <uib-timepicker ng-model="filterset.start_time" ng-change="changed()"
+                                                        hour-step="1" minute-step="1" show-meridian="true"
+                                                        name="startTime"></uib-timepicker>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-offset-2 col-md-4">
-                                <div class="form-group">
-                                    <label class="control-label">End Time</label>
-                                    <div class="time-picker">
-                                        <uib-timepicker ng-model="filterset.end_time" ng-change="changed()"
-                                                        hour-step="1"
-                                                        minute-step="1" show-meridian="true" larger-than-time
-                                                        name="endTime"></uib-timepicker>
+                                <div class="col-md-offset-2 col-md-4">
+                                    <div class="form-group">
+                                        <label class="control-label">End Time</label>
+                                        <div class="time-picker">
+                                            <uib-timepicker ng-model="filterset.end_time" ng-change="changed()"
+                                                            hour-step="1"
+                                                            minute-step="1" show-meridian="true" larger-than-time
+                                                            name="endTime"></uib-timepicker>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                            <p class="text-danger" ng-show="filterDatesForm.endTime.$invalid">
+                                End Time must occur after start time.
+                            </p>
                         </div>
-                        <p class="text-danger" ng-show="filterDatesForm.endTime.$invalid">
-                            End Time must occur after start time.
-                        </p>
+
                     </div>
 
                     <!-- Screens -->
-                    <div ng-show="filtersetMdlCtrl.activeTab == 2"
+                    <div ng-show="filtersetMdlCtrl.activeTab == 1"
                          ng-if="filtersetMdlCtrl.optionalFiltersChoices.screens">
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="properties-header">
-                                    <p>
-                                        Screens
-                                    </p>
-                                </div>
+
+                                <h3>
+                                    Screens
+                                </h3>
+
                             </div>
                         </div>
 
@@ -243,15 +236,13 @@
                     </div>
 
                     <!-- Playlists -->
-                    <div ng-show="filtersetMdlCtrl.activeTab == 3"
+                    <div ng-show="filtersetMdlCtrl.activeTab == 2"
                          ng-if="filtersetMdlCtrl.optionalFiltersChoices.playlists">
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="properties-header">
-                                    <p>
-                                        Playlists
-                                    </p>
-                                </div>
+                                <h3>
+                                    Playlists
+                                </h3>
                             </div>
                         </div>
                         <table class="table selectable-list">
@@ -276,25 +267,23 @@
                             </tbody>
                         </table>
                         <!--<ul class="list-group selectable-list">-->
-                            <!--<li class="list-group-item" ng-class="{selected : playlist.selected}"-->
-                                <!--ng-repeat="playlist in (filteredPlaylists = (filtersetMdlCtrl.playlists | filter : searchPlaylists))"-->
-                                <!--toggle-selection item="playlist">-->
-                                <!--{[ playlist.playlist_title ]}-->
-                                <!--<i class="fa fa-check pull-right" ng-show="playlist.selected"></i>-->
-                            <!--</li>-->
+                        <!--<li class="list-group-item" ng-class="{selected : playlist.selected}"-->
+                        <!--ng-repeat="playlist in (filteredPlaylists = (filtersetMdlCtrl.playlists | filter : searchPlaylists))"-->
+                        <!--toggle-selection item="playlist">-->
+                        <!--{[ playlist.playlist_title ]}-->
+                        <!--<i class="fa fa-check pull-right" ng-show="playlist.selected"></i>-->
+                        <!--</li>-->
                         <!--</ul>-->
                     </div>
 
                     <!-- Content files -->
-                    <div ng-show="filtersetMdlCtrl.activeTab == 4"
+                    <div ng-show="filtersetMdlCtrl.activeTab == 3"
                          ng-if="filtersetMdlCtrl.optionalFiltersChoices.content_files">
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="properties-header">
-                                    <p>
-                                        Content Library Files
-                                    </p>
-                                </div>
+                                <h3>
+                                    Content Library Files
+                                </h3>
                             </div>
                         </div>
                         <table class="table selectable-list">
@@ -319,12 +308,12 @@
                             </tbody>
                         </table>
                         <!--<ul class="list-group selectable-list">-->
-                            <!--<li class="list-group-item" ng-class="{selected : contentFile.selected}"-->
-                                <!--ng-repeat="contentFile in (filteredContentFiles = (filtersetMdlCtrl.content_files | filter : searchContentFile))"-->
-                                <!--toggle-selection item="contentFile">-->
-                                <!--{[ contentFile.title ]}-->
-                                <!--<i class="fa fa-check pull-right" ng-show="contentFile.selected"></i>-->
-                            <!--</li>-->
+                        <!--<li class="list-group-item" ng-class="{selected : contentFile.selected}"-->
+                        <!--ng-repeat="contentFile in (filteredContentFiles = (filtersetMdlCtrl.content_files | filter : searchContentFile))"-->
+                        <!--toggle-selection item="contentFile">-->
+                        <!--{[ contentFile.title ]}-->
+                        <!--<i class="fa fa-check pull-right" ng-show="contentFile.selected"></i>-->
+                        <!--</li>-->
                         <!--</ul>-->
                     </div>
                 </form>

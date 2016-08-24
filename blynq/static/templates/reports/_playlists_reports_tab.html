@@ -7,18 +7,11 @@
 
 <!-- charts View -->
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-12">
         <div class="chart-div">
-            <canvas id="line" class="chart chart-line" chart-data="data"
-                    chart-labels="labels" chart-series="series" chart-options="options"
+            <canvas id="line" class="chart chart-line" chart-data="lineChartData"
+                    chart-labels="lineChartLabels" chart-series="series" chart-options="options"
                     chart-dataset-override="datasetOverride" chart-click="onClick">
-            </canvas>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="chart-div">
-            <canvas id="doughnut" class="chart chart-doughnut"
-                    chart-data="pieData" chart-labels="pieLabels">
             </canvas>
         </div>
     </div>
@@ -33,13 +26,16 @@
                 <tr>
                     <th> Playlist Name</th>
                     <th> Repetitions</th>
-                    <th> Hours played</th>
-                    <th> % time played</th>
+                    <th> Played Time</th>
+                    <th> Screens Played</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td></td>
+                <tr ng-repeat="playlistData in tableData">
+                    <td>{[ playlistData.playlist_title]}</td>
+                    <td>{[ playlistData.num_of_repetitions]}</td>
+                    <td>{[ playlistData.time_played | inHoursFormat ]}</td>
+                    <td>{[ playlistData.num_of_screens]}</td>
                 </tr>
                 </tbody>
             </table>

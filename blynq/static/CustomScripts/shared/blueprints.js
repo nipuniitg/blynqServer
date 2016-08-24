@@ -134,15 +134,6 @@
             this.z_index = numberAvailable ? number : 0;
         }
 
-        //filterset
-        function BaseFilterSet(){
-            //default Filters
-            this.start_date = moment().subtract(1, 'week').toDate();
-            this.end_date = moment().toDate();
-            this.start_time = moment().startOf('day').toDate();
-            this.end_time = moment().endOf('day').toDate();
-        }
-
 
         return{
             Schedule : Schedule
@@ -154,7 +145,6 @@
             ,PlaylistItem : PlaylistItem
             ,Layout : Layout
             ,LayoutPane : LayoutPane
-            ,BaseFilterSet : BaseFilterSet
         }
     }]);
 }());

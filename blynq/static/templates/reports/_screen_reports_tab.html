@@ -32,16 +32,26 @@
                 <thead>
                 <tr>
                     <th> Screen Name</th>
-                    <th> Hours Online</th>
-                    <th> % time Online</th>
-                    <th> Last Online</th>
-                    <!--<th> Playlists</th>-->
-                    <!--<th> unique content shown</th>-->
+                    <th> Hours Active</th>
+                    <th> Total Hours</th>
+                    <th> Active<i class="fa fa-circle" style="color:#5cb85c"></i> -Inactive<i class="fa fa-circle" style="color:#d9534f"></i>- % Share</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng="screenData in screensData">
-                    <td></td>
+                <tr ng-repeat="screenData in tableData">
+                    <td>{[ screenData.screen_name ]}</td>
+                    <td>{[ screenData.time_active | inHoursFormat]}</td>
+                    <td>{[ screenData.total_time_requested | inHoursFormat]}</td>
+                    <td>
+                        <div class="progress progress-md">
+                              <div class="progress-bar progress-bar-success"
+                                   style="width: {[ screenData.active_percentage ]}%">
+                                  <span class="">{[screenData.active_percentage]}% Active</span>
+                              </div>
+                              <div class="progress-bar progress-bar-danger" style="width: {[ screenData.inactive_active_percentage ]}%">
+                                  <span class="">{[screenData.inactive_active_percentage]}% Inactive</span>
+                              </div>
+                          </div>
                 </tr>
                 </tbody>
             </table>

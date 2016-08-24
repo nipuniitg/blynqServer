@@ -42,9 +42,9 @@ function($http, $q, cDT){
         }
         var deferred = $q.defer();
         $http({
-            method : "GET"
+            method : "POST"
             ,url : "/api/reports/screen"
-            ,params : postData
+            ,data : postData
         }).then(function mySucces(response) {
             deferred.resolve(response.data);
         }, function myError(response) {
@@ -56,13 +56,13 @@ function($http, $q, cDT){
 
     var getPlaylistsReportData = function(filterset){
         var postData = {
-            filterset : filterset
+            filterset : cookedFilterset(angular.copy(filterset))
         }
         var deferred = $q.defer();
         $http({
-            method : "GET"
+            method : "POST"
             ,url : "/api/reports/playlist"
-            ,params : postData
+            ,data : postData
         }).then(function mySucces(response) {
             deferred.resolve(response.data);
         }, function myError(response) {
@@ -74,13 +74,13 @@ function($http, $q, cDT){
 
     var geContentReportData = function(filterset){
         var postData = {
-            filterset : filterset
+            filterset : cookedFilterset(angular.copy(filterset))
         }
         var deferred = $q.defer();
         $http({
-            method : "GET"
+            method : "POST"
             ,url : "/api/reports/media"
-            ,params : postData
+            ,data : postData
         }).then(function mySucces(response) {
             deferred.resolve(response.data);
         }, function myError(response) {
@@ -109,48 +109,54 @@ rApp.directive('screensReportsTab',[ function(){
         Directive Type : samescope
         Description : This directive provides reports pertained to screens. Such as, online duration.
     */
-    var controllerFunction = ['$scope','reportsIndexFactory',
-        function($scope, rIF){
+    var controllerFunction = ['$scope','reportsIndexFactory','$filter',
+        function($scope, rIF, $filter){
 
         var scrRprtsCtrl = this;
 
         var onLoad = function(){
-
-            //$scope.refreshScreensData();
+            //select filter fields
+            scrRprtsCtrl.optionalFiltersChoices = {
+                time : true
+                ,screens : true
+                ,playlists : false
+                ,content_files : false
+            }
         }
+
+        onLoad();
 
         $scope.refreshScreensData = function(filterset){
             /*
-                filterset object is only passed when the user selects any filters.
-                Otherwise the filterset is not passed.
+                Initial call is also done from 'filters' directive.
             */
             rIF.getScreensReportData(filterset).then(function(screensData){
                 //This is the data which should be distributed to charts and tables.
-                $scope.data = screensData;
+                //$scope.data = screensData;
+                $scope.tableData = screensData.table_data;
+                $scope.pieData = screensData.pie_chart_data;
+                $scope.labels = screensData.line_chart_data.date_str;
+                $scope.data = screensData.line_chart_data.time_active;
+                prepareDataForCharts();
+
             },function(text){
                 toastr.warning('Oops! some error occured while fetching data.Please refresh the page and try again.')
             });
         }
 
-        //select filter fields
-        scrRprtsCtrl.optionalFiltersChoices = {
-            screens : true
-            ,playlists : false
-            ,content_files : false
+        var prepareDataForCharts =function(data){
+            for(var i=0; i<$scope.tableData.length;i++){
+                var active_percentage = ($scope.tableData[i].time_active/$scope.tableData[i].total_time_requested)*100;
+                $scope.tableData[i].active_percentage = active_percentage;
+                $scope.tableData[i].inactive_active_percentage = (100 - active_percentage);
+            }
         }
 
-        //line - chart data
-        $scope.labels = ["January", "February", "March", "April", "May", "June", "July", "January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June", "July"];
-        $scope.series = ['Series A', 'Series B'];
-        $scope.data = [
-        [65, 59, 80, 81, 56, 55, 40],
-        [28, 48, 40, 19, 86, 27, 90]
-        ];
-        $scope.onClick = function (points, evt) {
-        console.log(points, evt);
-        };
-        $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];
+
+        $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }];
         $scope.options = {
+        showTooltips: true,
+//        tooltipEvents: ["mousemove", "touchstart", "touchmove"],
         title: {
             display: true,
             text: 'Screens Active Hours'
@@ -162,12 +168,6 @@ rApp.directive('screensReportsTab',[ function(){
               type: 'linear',
               display: true,
               position: 'left'
-            },
-            {
-              id: 'y-axis-2',
-              type: 'linear',
-              display: true,
-              position: 'right'
             }
           ]
         }
@@ -175,9 +175,6 @@ rApp.directive('screensReportsTab',[ function(){
 
         //pie chart - data
         $scope.pieLabels = ["online", "offline"];
-        $scope.pieData = [300, 100];
-
-
         }]
 
     return{
@@ -203,41 +200,46 @@ rApp.directive('playlistsReportsTab',[function(){
         var pylRprtsCtrl = this;
 
         var onLoad = function(){
-            //$scope.refreshPlaylistsData();
+            //select filter fields
+            pylRprtsCtrl.optionalFiltersChoices = {
+                time : false
+                ,screens : true
+                ,playlists : true
+                ,content_files : false
+            }
         }
+
+        onLoad();
 
         $scope.refreshPlaylistsData = function(filterset){
             /*
-                filterset object is only passed when the user selects any filters.
-                Otherwise the filterset is not passed.
+                Initial call is also done from 'filters' directive.
             */
             rIF.getPlaylistsReportData(filterset).then(function(playlistsData){
                 //This is the data which should be distributed to charts and tables.
-                $scope.data = playlistsData;
+                $scope.tableData = playlistsData.table_data;
+                $scope.lineChartLabels = playlistsData.line_chart_data.date_str;
+                $scope.lineChartData = playlistsData.line_chart_data.time_played;
+                prepareDataForCharts()
+
             },function(text){
                 toastr.warning('Oops! some error occured while fetching data.Please refresh the page and try again.')
             });
         }
 
-        //select filter fields
-        pylRprtsCtrl.optionalFiltersChoices = {
-            screens : true
-            ,playlists : true
-            ,content_files : false
+        var prepareDataForCharts = function(){
+            for(var i=0; i<$scope.tableData.length;i++){
+                $scope.tableData[i].num_of_screens = $scope.tableData[i].screens_played.length;
+            }
         }
 
         //line - chart data
-        $scope.labels = ["January", "February", "March", "April", "May", "June", "July"];
-        $scope.series = ['Series A', 'Series B'];
-        $scope.data = [
-        [65, 59, 80, 81, 56, 55, 40],
-        [28, 48, 40, 19, 86, 27, 90]
-        ];
-        $scope.onClick = function (points, evt) {
-        console.log(points, evt);
-        };
-        $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];
+        $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }];
         $scope.options = {
+        title :{
+            display : true
+            ,text : 'Playlist duration(in mins) vs each day'
+        },
         scales: {
           yAxes: [
             {
@@ -245,22 +247,10 @@ rApp.directive('playlistsReportsTab',[function(){
               type: 'linear',
               display: true,
               position: 'left'
-            },
-            {
-              id: 'y-axis-2',
-              type: 'linear',
-              display: true,
-              position: 'right'
             }
           ]
         }
         };
-
-        //pie chart - data
-        $scope.pieLabels = ["online", "offline"];
-        $scope.pieData = [300, 100];
-
-
         }]
 
     return{
@@ -284,40 +274,41 @@ rApp.directive('contentReportsTab',[function(){
         var cntRprtsCtrl = this;
 
         var onLoad = function(){
-            //$scope.refreshContentData();
+            //select filter fields
+            cntRprtsCtrl.optionalFiltersChoices = {
+                time : false
+                ,screens : true
+                ,playlists : true
+                ,content_files : true
+            }
         }
+        onLoad();
 
         $scope.refreshContentData = function(filterset){
             /*
-                filterset object is only passed when the user selects any filters.
-                Otherwise the filterset is not passed.
+                Initial call is also done from 'filters' directive.
             */
             rIF.geContentReportData(filterset).then(function(contentData){
                 //This is the data which should be distributed to charts and tables.
-                $scope.data = contentData;
+                $scope.tableData = contentData.table_data;
+                $scope.lineChartLabels = contentData.line_chart_data.date_str;
+                $scope.lineChartData = contentData.line_chart_data.time_played;
+                prepareDataForCharts()
             },function(text){
                 toastr.warning('Oops! some error occured while fetching data.Please refresh the page and try again.')
             });
         }
 
-        //select filter fields
-        cntRprtsCtrl.optionalFiltersChoices = {
-            screens : true
-            ,playlists : true
-            ,content_files : true
+        var prepareDataForCharts = function(){
+            //Set screen count and playlist count for the table data
+            for(var i=0; i<$scope.tableData.length;i++){
+                $scope.tableData[i].num_of_screens = $scope.tableData[i].screens_played.length;
+                $scope.tableData[i].num_of_playlists = $scope.tableData[i].playlists_played.length;
+            }
         }
 
         //line - chart data
-        $scope.labels = ["January", "February", "March", "April", "May", "June", "July"];
-        $scope.series = ['Series A', 'Series B'];
-        $scope.data = [
-        [65, 59, 80, 81, 56, 55, 40],
-        [28, 48, 40, 19, 86, 27, 90]
-        ];
-        $scope.onClick = function (points, evt) {
-        console.log(points, evt);
-        };
-        $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];
+        $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }];
         $scope.options = {
         scales: {
           yAxes: [
@@ -326,22 +317,10 @@ rApp.directive('contentReportsTab',[function(){
               type: 'linear',
               display: true,
               position: 'left'
-            },
-            {
-              id: 'y-axis-2',
-              type: 'linear',
-              display: true,
-              position: 'right'
             }
           ]
         }
         };
-
-        //pie chart - data
-        $scope.pieLabels = ["online", "offline"];
-        $scope.pieData = [300, 100];
-
-
         }]
 
     return{
@@ -355,8 +334,8 @@ rApp.directive('contentReportsTab',[function(){
 
 
 //Filter Set
-rApp.factory('filtersFactory',['blueprints','dataAccessFactory','$q','plDataAccessFactory','constantsAndDefaults',
- function(bp, sDAF,$q, pDF, cAD ){
+rApp.factory('filtersFactory',['dataAccessFactory','$q','plDataAccessFactory','constantsAndDefaults',
+ function( sDAF,$q, pDF, cAD ){
     //Private
     /* List containing all screens with  */
     var selectedBoolSetter = function(allItems, selectedItems, key, isAllSelected){
@@ -402,27 +381,32 @@ rApp.factory('filtersFactory',['blueprints','dataAccessFactory','$q','plDataAcce
     var getFilterSet = function(options){
         //constructor function from base class BaseFilterSet
         //Need to be restructured, as every properties are going into prototype.
-        var FilterSet = function FilterSet(){};
-        FilterSet.prototype = new bp.BaseFilterSet();
+        var filterSet = {}
+
+        filterSet.start_date = moment().subtract(1, 'week').toDate();
+        filterSet.end_date = moment().subtract(1, 'day').toDate();
+
+        if(options.time){
+            filterSet.start_time =moment().startOf('day').toDate();
+            filterSet.end_time = moment().endOf('day').toDate();
+        }
 
         if(options.screens){
-            FilterSet.prototype.screens = [];
-            FilterSet.prototype.all_screens=true;
+            filterSet.screens = [];
+            filterSet.all_screens=true;
         }
 
         if(options.playlists){
-            FilterSet.prototype.playlists=[];
-            FilterSet.prototype.all_playlists = true;
+            filterSet.playlists=[];
+            filterSet.all_playlists = true;
         }
 
         if(options.content_files){
-            FilterSet.prototype.content_files = [];
-            FilterSet.prototype.all_content_files = true;
+            filterSet.content_files = [];
+            filterSet.all_content_files = true;
         }
 
-        var filterset = new FilterSet();
-
-        return filterset
+        return filterSet
     };
 
     var getAllScreenListWithSelectedBool = function(selectedScreens, isAllSelected){
@@ -518,8 +502,6 @@ rApp.directive('filters',[function(){
         //get the default filterset here
         var onLoad = function(){
             filtersCtrl.resetFilterset();
-
-            //Call refresh function as
         }
 
         filtersCtrl.resetFilterset = function(){
@@ -547,17 +529,20 @@ rApp.directive('filters',[function(){
 
             modalInstance.result.then(function filtersUpdated(filterset){
                 $scope.filterset = angular.copy(filterset);
-                $scope.refreshDataFn()($scope.filterset);
             }, function cancelled(){
 
             });
         }
 
+        $scope.$watch('filterset',function(newVal){
+            $scope.refreshDataFn()(newVal);
+        }, true)
+
         filtersCtrl.clearFilters = function(){
             filtersCtrl.resetFilterset();
         }
 
-        $scope.removeScreens = function(index){
+        $scope.removeScreen = function(index){
             $scope.filterset.screens.splice(index,1);
         }
 
@@ -825,3 +810,5 @@ rApp.directive('toggleSelection', function(){
         }
     }
 })
+
+

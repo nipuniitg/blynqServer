@@ -9,16 +9,9 @@
 <div class="row">
     <div class="col-md-8">
         <div class="chart-div">
-            <canvas id="line" class="chart chart-line" chart-data="data"
-                    chart-labels="labels" chart-series="series" chart-options="options"
+            <canvas id="line" class="chart chart-line" chart-data="lineChartData"
+                    chart-labels="lineChartLabels" chart-series="series" chart-options="options"
                     chart-dataset-override="datasetOverride" chart-click="onClick">
-            </canvas>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="chart-div">
-            <canvas id="doughnut" class="chart chart-doughnut"
-                    chart-data="pieData" chart-labels="pieLabels">
             </canvas>
         </div>
     </div>
@@ -32,14 +25,19 @@
                 <thead>
                 <tr>
                     <th> Content Name</th>
-                    <th> Hours Played</th>
-                    <th> % time Online</th>
                     <th> Repetitions</th>
+                    <th> Time Played</th>
+                    <th> Screens Played</th>
+                    <th> Playlists Played</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td></td>
+                <tr ng-repeat="fileData in tableData">
+                    <td>{[fileData.content_title]}</td>
+                    <td>{[fileData.num_of_repetitions]}</td>
+                    <td>{[fileData.time_played]}</td>
+                    <td>{[fileData.num_of_screens]}</td>
+                    <td>{[fileData.num_of_playlists]}</td>
                 </tr>
                 </tbody>
             </table>
