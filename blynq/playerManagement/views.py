@@ -279,8 +279,8 @@ def media_stats(request):
         posted_data = string_to_dict(request.body)
         unique_device_key = posted_data.get('device_key')
         screen = Screen.objects.get(unique_device_key__activation_key=unique_device_key)
-        media_stats = posted_data.get('media_item_stats_list')
-        for stat in media_stats:
+        media_stats_list = posted_data.get('media_item_stats_list')
+        for stat in media_stats_list:
             try:
                 content_id = int(stat.get('content_id'))
                 playlist_id = int(stat.get('playlist_id'))
