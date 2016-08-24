@@ -158,7 +158,7 @@ sdApp.directive('schedulesCalendar',['$log','scheduleIndexFactory','$uibModal',
         restrict    :   'E'
         ,scope : true
         ,bindToController : {
-            events : '=events'
+            rawEvents : '=events'
             ,refreshEvents : '&refreshEventsFn'
         }
         ,templateUrl: '/static/templates/scheduleManagement/_schedules_calendar.html'
@@ -167,9 +167,26 @@ sdApp.directive('schedulesCalendar',['$log','scheduleIndexFactory','$uibModal',
                         var onLoad = function(){
                             clndrCtrl.calendarViewTypes = cF.calendarViewTypes;
                             clndrCtrl.calendarView = clndrCtrl.calendarViewTypes.month;
-                            clndrCtrl.viewDate = moment();
+                            clndrCtrl.viewDate = moment().toDate();
                         };
                         onLoad();
+
+                        $scope.$watch(function(){
+                            return clndrCtrl.rawEvents
+                        }, function(newVal){
+                            clndrCtrl.events = [];
+                            //This will cook the rawEvents and push the sets the variable given to calendar directive
+                            if(newVal){
+                                for(i=0;i<clndrCtrl.rawEvents.length;i++){
+                                    var event = angular.copy(clndrCtrl.rawEvents[i]);
+                                    event.startsAt = moment(event.startsAt).toDate();
+                                    event.endsAt = moment(event.endsAt).toDate();
+                                    clndrCtrl.events.push(event);
+                                }
+                            }
+
+
+                        })
 
                         clndrCtrl.editSchedule= function(schedule){
                             var modalInstance = $uibModal.open({
