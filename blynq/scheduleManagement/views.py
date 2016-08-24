@@ -49,11 +49,17 @@ def append_params(params, new_keyvalue):
         return params
 
 
+BYWEEKDAY_DICT = {'Mon': 0, 'Tue': 1, 'Wed': 2, 'Thu': 3, 'Fri': 4, 'Sat': 5, 'Sun': 6}
+
+
 # byweekday should be a list [0,2,3] meaning 0-Monday, 1-Tuesday, 2-Wednesday, 3-Thursday, 4-Friday, 5-Saturday,6-Sunday
 def generate_rule_params(interval=1, bymonthday=None, byweekday=None, byweekno=None):
     debugFileLog.info("inside generate_rule_params")
     params = interval_param(interval)
-    params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekday', bylistday=byweekday))
+    new_byweekday = []
+    for ele in byweekday:
+        new_byweekday.append(BYWEEKDAY_DICT[ele])
+    params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekday', bylistday=new_byweekday))
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='bymonthday', bylistday=bymonthday))
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekno', bylistday=byweekno))
     return params
