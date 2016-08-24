@@ -1,0 +1,60 @@
+<!--directive : screensReportsTab; controller : scrRprtsCtrl -->
+
+<!-- charts View -->
+<filters optional-filters-choices="scrRprtsCtrl.optionalFiltersChoices"
+         refresh-data-fn ='refreshScreensData'>
+</filters>
+
+<!-- charts View -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="chart-div">
+            <canvas id="line" class="chart chart-line" chart-data="data"
+                    chart-labels="labels" chart-series="series" chart-options="options"
+                    chart-dataset-override="datasetOverride" chart-click="onClick">
+            </canvas>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="chart-div">
+            <canvas id="doughnut" class="chart chart-doughnut"
+                    chart-data="pieData" chart-labels="pieLabels">
+            </canvas>
+        </div>
+    </div>
+</div>
+
+<!-- tables View -->
+<div class="row">
+    <div class="col-md-12">
+        <div>
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th> Screen Name</th>
+                    <th> Hours Active</th>
+                    <th> Total Hours</th>
+                    <th> Active<i class="fa fa-circle" style="color:#5cb85c"></i> -Inactive<i class="fa fa-circle" style="color:#d9534f"></i>- % Share</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="screenData in tableData">
+                    <td>{[ screenData.screen_name ]}</td>
+                    <td>{[ screenData.time_active | inHoursFormat]}</td>
+                    <td>{[ screenData.total_time_requested | inHoursFormat]}</td>
+                    <td>
+                        <div class="progress progress-md">
+                              <div class="progress-bar progress-bar-success"
+                                   style="width: {[ screenData.active_percentage ]}%">
+                                  <span class="">{[screenData.active_percentage]}% Active</span>
+                              </div>
+                              <div class="progress-bar progress-bar-danger" style="width: {[ screenData.inactive_active_percentage ]}%">
+                                  <span class="">{[screenData.inactive_active_percentage]}% Inactive</span>
+                              </div>
+                          </div>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

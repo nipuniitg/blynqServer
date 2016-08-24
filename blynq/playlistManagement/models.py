@@ -1,5 +1,6 @@
 from django.db import models
-from django.db.models.signals import post_save, pre_delete
+from django.db.models import Sum
+from django.db.models.signals import post_save, pre_delete, post_delete
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -7,7 +8,6 @@ from django.conf import settings
 from authentication.models import UserDetails, Organization
 from contentManagement.models import Content
 from customLibrary.views_lib import debugFileLog
-from screenManagement.models import Screen
 
 
 class PlaylistItems(models.Model):
@@ -63,6 +63,22 @@ class Playlist(models.Model):
     @staticmethod
     def get_all_playlists(user_details):
         return Playlist.objects.filter(organization=user_details.organization)
+
+
+@receiver(post_save, sender=PlaylistItems)
+@receiver(post_delete, sender=PlaylistItems)
+def playlist_items_changed(sender, instance, **kwargs):
+    try:
+        playlist_total_time = 0
+        total_time = PlaylistItems.objects.filter(playlist_id=instance.playlist_id).aggregate(Sum('display_time'))
+        if total_time['display_time__sum']:
+            playlist_total_time = total_time['display_time__sum']
+        playlist = Playlist.objects.get(playlist_id=instance.playlist_id)
+        playlist.playlist_total_time = playlist_total_time
+        playlist.save()
+    except Exception as e:
+        debugFileLog.exception('Failed to update the playlist total time for playlist_id %d' % instance.playlist_id)
+        debugFileLog.exception(e)
 
 
 @receiver(post_save, sender=Playlist)

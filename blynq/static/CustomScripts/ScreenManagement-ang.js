@@ -445,7 +445,7 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
         if($state.is('screens')){
             $scope.refreshScreens();
         }
-    }, 20000);
+    }, cAD.getRefreshScreensInterval());
 
     //public functions
      $scope.refreshScreens = function(){

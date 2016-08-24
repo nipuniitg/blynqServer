@@ -1,0 +1,46 @@
+<!--directive : contentReportsTab; controller : cntRprtsCtrl -->
+
+<!-- charts View -->
+<filters optional-filters-choices="cntRprtsCtrl.optionalFiltersChoices"
+         refresh-data-fn ='refreshContentData'>
+</filters>
+
+<!-- charts View -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="chart-div">
+            <canvas id="line" class="chart chart-line" chart-data="lineChartData"
+                    chart-labels="lineChartLabels" chart-series="series" chart-options="options"
+                    chart-dataset-override="datasetOverride" chart-click="onClick">
+            </canvas>
+        </div>
+    </div>
+</div>
+
+<!-- tables View -->
+<div class="row">
+    <div class="col-md-12">
+        <div>
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th> Content Name</th>
+                    <th> Repetitions</th>
+                    <th> Time Played</th>
+                    <th> Screens Played</th>
+                    <th> Playlists Played</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="fileData in tableData">
+                    <td>{[fileData.content_title]}</td>
+                    <td>{[fileData.num_of_repetitions]}</td>
+                    <td>{[fileData.time_played | inHoursFormat]}</td>
+                    <td>{[fileData.num_of_screens]}</td>
+                    <td>{[fileData.num_of_playlists]}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

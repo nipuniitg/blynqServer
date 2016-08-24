@@ -1,0 +1,44 @@
+<!--directive : playlistsReportsTab; controller : pylRprtsCtrl -->
+
+<!-- charts View -->
+<filters optional-filters-choices="pylRprtsCtrl.optionalFiltersChoices"
+         refresh-data-fn ='refreshPlaylistsData'>
+</filters>
+
+<!-- charts View -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="chart-div">
+            <canvas id="line" class="chart chart-line" chart-data="lineChartData"
+                    chart-labels="lineChartLabels" chart-series="series" chart-options="options"
+                    chart-dataset-override="datasetOverride" chart-click="onClick">
+            </canvas>
+        </div>
+    </div>
+</div>
+
+<!-- tables View -->
+<div class="row">
+    <div class="col-md-12">
+        <div>
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th> Playlist Name</th>
+                    <th> Repetitions</th>
+                    <th> Played Time</th>
+                    <th> Screens Played</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="playlistData in tableData">
+                    <td>{[ playlistData.playlist_title]}</td>
+                    <td>{[ playlistData.num_of_repetitions]}</td>
+                    <td>{[ playlistData.time_played | inHoursFormat ]}</td>
+                    <td>{[ playlistData.num_of_screens]}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

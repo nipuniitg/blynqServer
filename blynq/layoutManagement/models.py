@@ -35,10 +35,13 @@ class Layout(models.Model):
 
     @staticmethod
     def get_user_relevant_objects(user_details):
-        return Layout.objects.filter(Q(organization=user_details.organization) | Q(organization__isnull=True))
+        return Layout.objects.filter(organization=user_details.organization)
 
     def __unicode__(self):
         return self.title
+
+    class Meta:
+        ordering = ['layout_id']
 
 
 @receiver(post_save, sender=Layout)

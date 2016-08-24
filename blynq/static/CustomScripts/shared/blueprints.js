@@ -116,7 +116,7 @@
             }
         }
 
-
+        //layouts
         function Layout(){
             this.layout_id = -1;
             this.title = "New layout";

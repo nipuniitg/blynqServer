@@ -45,13 +45,11 @@ def upsert_playlist(request):
                 playlist.save()
 
             # upsert playlist items
-            playlist_total_time = 0
             playlist_item_id_list = []
             for pos_index, item in enumerate(playlist_items):
                 playlist_item_id = int(item.get('playlist_item_id'))
                 content_id = int(item.get('content_id'))
                 display_time = int(item.get('display_time'))
-                playlist_total_time += display_time
                 content = Content.get_user_relevant_objects(user_details=user_details).get(content_id=content_id)
                 if playlist_item_id == -1:
                     entry = PlaylistItems.objects.create(playlist=playlist, content=content, position_index=pos_index,
@@ -63,9 +61,6 @@ def upsert_playlist(request):
                     entry.display_time = display_time
                     entry.save()
                 playlist_item_id_list.append(playlist_item_id)
-
-            playlist.playlist_total_time = playlist_total_time
-            playlist.save()
 
             # Remove content not in playlist_items
             removed_playlist_content = PlaylistItems.objects.filter(playlist=playlist).exclude(

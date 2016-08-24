@@ -6,7 +6,7 @@ from authentication import authentication_urls
 from authentication import views as auth_views
 from layoutManagement import layout_urls
 from playerManagement import player_urls
-from screenManagement import views as screen_views
+from reports import report_urls
 from screenManagement import screen_urls
 from playlistManagement import playlist_urls
 from contentManagement import content_urls
@@ -24,6 +24,7 @@ urlpatterns = [
     , url(r'^api/layout/', include(layout_urls))
     , url(r'^api/content/', include(content_urls))
     , url(r'^api/playlist/', include(playlist_urls))
+    , url(r'^api/reports/', include(report_urls))
     , url(r'^admin', include(admin.site.urls))
     , url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT, })
     , url(r'^.*', auth_views.divert_to_index_page)

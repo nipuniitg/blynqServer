@@ -25,12 +25,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '1ig8fo2929x)i=c7k$z0qe#@1n())0o2rt7*45^j^td5_duj$m'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 if DEBUG:
     ALLOWED_HOSTS = []
 else:
-    ALLOWED_HOSTS = ['http://www.blynq.in', 'www.blynq.in']
+    ALLOWED_HOSTS = ['www.blynq.in', 'http://www.blynq.in', 'blynq.in']
     PREPEND_WWW = True
 
 
@@ -55,7 +55,7 @@ INSTALLED_APPS = (
     'playerManagement',
     'scheduleManagement',
     'layoutManagement',
-    'analytics',
+    'reports',
     #'django_js_reverse',
 )
 
@@ -208,13 +208,15 @@ if DEBUG:
     USERCONTENT_DIR = 'test_usercontent'
     DELETED_CONTENT_DIR = 'test_deletedcontent'
 else:
-    HOST_URL = ALLOWED_HOSTS[0] if ALLOWED_HOSTS else 'http://blynq.in'
+    HOST_URL = ALLOWED_HOSTS[0] if ALLOWED_HOSTS else 'http://www.blynq.in'
     USERCONTENT_DIR = 'usercontent'
     DELETED_CONTENT_DIR = 'deletedcontent'
 
 MEDIA_HOST = HOST_URL
-PLAYER_LOG_DIRECTORY = os.path.join(BASE_DIR, 'logs/player')
 PLAYER_UPDATES_DIR = 'player_updates'
+
+PLAYER_LOG_DIR = 'player_logs'
+
 PLAYER_POLL_TIME = 60  # Time difference in seconds between successive polls of the player
 PLAYER_INACTIVE_THRESHOLD = PLAYER_POLL_TIME + 1    # Wait this time (in seconds) to change status of screen as inactive
 

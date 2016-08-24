@@ -1,16 +1,18 @@
+import mimetypes
 import os
 import subprocess
 from copy import deepcopy
 
+from PIL import Image
 from django.contrib.auth.decorators import login_required
 from django.core.files import File
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import render
 
-from blynq.settings import MEDIA_ROOT
-from contentManagement.serializers import ContentSerializer, default_content_serializer
-from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, debugFileLog
+from contentManagement.serializers import default_content_serializer
+from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, \
+    debugFileLog, full_file_path
 from contentManagement.models import Content, ContentType
 
 
@@ -62,16 +64,44 @@ def upsert_url(request):
     return ajax_response(success=success, errors=errors)
 
 
-def convert_video(content):
-    if not content or not content.content_type:
+def process_media(file_path, parent_folder=None, user_details=None, organization=None):
+    debugFileLog.info('Inside process_media')
+    if not file_path or not os.path.exists(file_path):
+        debugFileLog.info('File path does not exist')
         return True
-    # Only do conversion for video types, may be add a helper function instead of this check
-    if 'video' not in content.content_type.file_type or not content.document:
+    file_type, encoding = mimetypes.guess_type(str(file_path))
+    if 'image' in file_type:
+        return compress_image(file_path, parent_folder, user_details, organization)
+    elif 'video' in file_type:
+        return compress_video(file_path, parent_folder, user_details, organization)
+    else:
         return True
-    file_path = os.path.join(MEDIA_ROOT, content.document.name)
+
+
+def compress_image(file_path, parent_folder=None, user_details=None, organization=None):
+    img = Image.open(file_path)
+    img = img.resize(img.size, Image.ANTIALIAS)
     filename = os.path.basename(file_path)
     title, ext = os.path.splitext(filename)
-    temp_file_path = os.path.join(MEDIA_ROOT, 'temp/converted_' + title + '.mp4')
+    dest_filepath = filename
+    img.save(dest_filepath, optimize=True, quality=95)
+    img_file = open(dest_filepath)
+    django_file = File(img_file)
+    content = Content(title=title, document=django_file, uploaded_by=user_details, last_modified_by=user_details,
+                      organization=user_details.organization, parent_folder=parent_folder, is_folder=False)
+    content.save()
+    try:
+        os.remove(filename)
+    except Exception as e:
+        debugFileLog.exception('Not able to delete compressed temp file')
+        debugFileLog.exception(e)
+    return True
+
+
+def compress_video(file_path, parent_folder=None, user_details=None, organization=None):
+    filename = os.path.basename(file_path)
+    title, ext = os.path.splitext(filename)
+    temp_file_path = full_file_path(relative_path='temp/converted_' + title + '.mp4')
     try:
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
@@ -91,15 +121,13 @@ def convert_video(content):
             return False
         video_file = open(temp_file_path)
         django_file = File(video_file)
-        new_content = deepcopy(content)
-        new_content.pk = None
-        new_content.document = django_file
-        new_content.save()
-        content.delete()
+        content = Content(title=title, document=django_file, uploaded_by=user_details, last_modified_by=user_details,
+                          organization=organization, parent_folder=parent_folder)
+        content.save()
         try:
             os.remove(temp_file_path)
         except Exception as e:
-            debugFileLog.exception('Not able to remove the temp file while video convertion %s' % temp_file_path)
+            debugFileLog.exception('Not able to remove the temp file while video conversion %s' % temp_file_path)
             debugFileLog.exception(e)
         return True
     except Exception as e:
@@ -111,7 +139,7 @@ def convert_video(content):
 def upload_content(request):
     errors = []
     success = True
-    convertion_success = True
+    conversion_success = True
     try:
         user_details = get_userdetails(request)
         posted_data = request.POST
@@ -135,12 +163,15 @@ def upload_content(request):
                                   last_modified_by=user_details, organization=user_details.organization,
                                   parent_folder=parent_folder, is_folder=False)
                 content.save()
-                if not convert_video(content):
-                    error_str = 'Error while conveting the video file %s to correct format' % content.title
-                    errors.append(error_str)
-                    debugFileLog.exception(error_str)
+                if content.is_image or content.is_video:
+                    file_path = full_file_path(relative_path=content.document.name)
+                    if not process_media(file_path, parent_folder=parent_folder, user_details=user_details,
+                                         organization=user_details.organization):
+                        error_str = 'Error while processing media file %s' % document.name
+                        errors.append(error_str)
+                        debugFileLog.exception(error_str)
+                        conversion_success = False
                     content.delete()
-                    convertion_success = False
             except AssertionError:
                 success = False
                 error_str = "Improper parent folder, please refresh the page and try again"
@@ -148,10 +179,10 @@ def upload_content(request):
                 errors.append(error_str)
             except Exception as e:
                 success = False
-                error_str = 'Error while uploading the file %s ' % document.title
+                error_str = 'Error while uploading the file %s ' % document.name
                 debugFileLog.exception(error_str)
                 errors.append(error_str)
-        success = success and convertion_success
+        success = success and conversion_success
     except Exception as e:
         success = False
         error_str = 'Error while uploading the file'
