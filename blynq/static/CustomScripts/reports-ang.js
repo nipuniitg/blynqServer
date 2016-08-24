@@ -122,6 +122,11 @@ rApp.directive('screensReportsTab',[ function(){
                 ,playlists : false
                 ,content_files : false
             }
+
+            //defining variables required for charts
+            $scope.tableData=[];
+            $scope.labels = [];
+            $scope.data =[];
         }
 
         onLoad();
@@ -136,7 +141,7 @@ rApp.directive('screensReportsTab',[ function(){
                 $scope.tableData = screensData.table_data;
                 $scope.pieData = screensData.pie_chart_data;
                 $scope.labels = screensData.line_chart_data.date_str;
-                $scope.data = screensData.line_chart_data.time_active;
+                $scope.data[0]=screensData.line_chart_data.time_active;
                 prepareDataForCharts();
 
             },function(text){
@@ -152,11 +157,10 @@ rApp.directive('screensReportsTab',[ function(){
             }
         }
 
-
+        //line - chart options
+        $scope.series = ['Hours'];
         $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }];
         $scope.options = {
-        showTooltips: true,
-//        tooltipEvents: ["mousemove", "touchstart", "touchmove"],
         title: {
             display: true,
             text: 'Screens Active Hours'
@@ -207,6 +211,11 @@ rApp.directive('playlistsReportsTab',[function(){
                 ,playlists : true
                 ,content_files : false
             }
+
+            //defining variables required for charts
+            $scope.tableData=[];
+            $scope.lineChartLabels = [];
+            $scope.lineChartData =[];
         }
 
         onLoad();
@@ -219,7 +228,7 @@ rApp.directive('playlistsReportsTab',[function(){
                 //This is the data which should be distributed to charts and tables.
                 $scope.tableData = playlistsData.table_data;
                 $scope.lineChartLabels = playlistsData.line_chart_data.date_str;
-                $scope.lineChartData = playlistsData.line_chart_data.time_played;
+                $scope.lineChartData[0]=playlistsData.line_chart_data.time_played;
                 prepareDataForCharts()
 
             },function(text){
@@ -233,7 +242,8 @@ rApp.directive('playlistsReportsTab',[function(){
             }
         }
 
-        //line - chart data
+        //line - chart options
+        $scope.series = ['Minutes'];
         $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }];
         $scope.options = {
         title :{
@@ -281,6 +291,11 @@ rApp.directive('contentReportsTab',[function(){
                 ,playlists : true
                 ,content_files : true
             }
+
+            //defining variables required for charts
+            $scope.tableData=[];
+            $scope.lineChartLabels = [];
+            $scope.lineChartData =[];
         }
         onLoad();
 
@@ -292,7 +307,7 @@ rApp.directive('contentReportsTab',[function(){
                 //This is the data which should be distributed to charts and tables.
                 $scope.tableData = contentData.table_data;
                 $scope.lineChartLabels = contentData.line_chart_data.date_str;
-                $scope.lineChartData = contentData.line_chart_data.time_played;
+                $scope.lineChartData[0]=contentData.line_chart_data.time_played;
                 prepareDataForCharts()
             },function(text){
                 toastr.warning('Oops! some error occured while fetching data.Please refresh the page and try again.')
@@ -308,6 +323,7 @@ rApp.directive('contentReportsTab',[function(){
         }
 
         //line - chart data
+        $scope.series = ['Minutes'];
         $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }];
         $scope.options = {
         scales: {
