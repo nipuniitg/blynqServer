@@ -45,8 +45,12 @@
                 minWidth : 5        //in percentage
                 ,minHeight : 5      // in percentage
             }
-
             return paneDefaults
+        }
+
+        var getRefreshScreensInterval = function(){
+            var screensRefreshInterval = 20000;
+            return screensRefreshInterval
         }
 
         return{
@@ -55,6 +59,7 @@
             ,getPopOverMessages : getPopOverMessages
             ,getFileIcons : getFileIcons
             ,getPaneDefaults : getPaneDefaults
+            ,getRefreshScreensInterval : getRefreshScreensInterval
         }
     }]);
 
