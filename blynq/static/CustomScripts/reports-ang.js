@@ -152,6 +152,7 @@ rApp.directive('screensReportsTab',[ function(){
         var prepareDataForCharts =function(data){
             for(var i=0; i<$scope.tableData.length;i++){
                 var active_percentage = ($scope.tableData[i].time_active/$scope.tableData[i].total_time_requested)*100;
+                active_percentage = $filter('roundOfTo')(active_percentage, 2);
                 $scope.tableData[i].active_percentage = active_percentage;
                 $scope.tableData[i].inactive_active_percentage = (100 - active_percentage);
             }

@@ -70,14 +70,14 @@ shApp.filter('showOnlyDate',['cookDateTime', function(cDT){
         var dateOnly = cDT.getOnlyDate(dateTime)
         return dateOnly
     }
-}])
+}]);
 
 shApp.filter('showOnlyTime',['cookDateTime', function(cDT){
     return function(dateTime){
         var timeOnly = cDT.getOnlyTime(dateTime)
         return timeOnly
     }
-}])
+}]);
 
 shApp.filter('inHoursFormat', [function(){
     return function(totalSec){
@@ -87,4 +87,11 @@ shApp.filter('inHoursFormat', [function(){
         var result = (hours < 10 ? "0" + hours : hours) + "-" + (minutes < 10 ? "0" + minutes : minutes) + "-" + (seconds  < 10 ? "0" + seconds : seconds);
         return result
     }
-}])
+}]);
+
+shApp.filter('roundOfTo', [function(){
+    return function(value, places){
+        var multiplier = Math.pow(10,places)
+        return Math.round(value*multiplier)/multiplier
+    }
+}]);

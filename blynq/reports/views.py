@@ -1,4 +1,6 @@
 from datetime import timedelta, datetime
+
+import pytz
 from django.shortcuts import render
 
 # Create your views here.
@@ -39,14 +41,18 @@ def intersection_time(event1_start, event1_end, event2_start, event2_end):
     Four sets of times should be checked, e1 - s1 ;  e2 - s2 ; e1 - s2 ; e2 - s1
     :return: intersection time in seconds
     """
+    event1_start = event1_start.replace(tzinfo=pytz.utc).astimezone(pytz.utc)
+    event1_end = event1_end.replace(tzinfo=pytz.utc).astimezone(pytz.utc)
+    event2_start = event2_start.replace(tzinfo=pytz.utc).astimezone(pytz.utc)
+    event2_end = event2_end.replace(tzinfo=pytz.utc).astimezone(pytz.utc)
     delta = (event1_end - event1_start).seconds
     new_delta = (event2_end - event2_start).seconds
     if new_delta < delta:
         delta = new_delta
-    new_delta = event1_end - event2_start
+    new_delta = (event1_end - event2_start).seconds
     if new_delta < delta:
         delta = new_delta
-    new_delta = event2_end - event1_start
+    new_delta = (event2_end - event1_start).seconds
     if new_delta < delta:
         delta = new_delta
     return delta
@@ -133,9 +139,12 @@ def screen_reports(request):
                     all_screens_dict[str(obj.screen_id)] = {
                         'screen_id': obj.screen_id, 'screen_name': obj.screen.screen_name,
                         'time_active': time_active, 'total_time_requested': total_time_requested}
-            time_active_list.append(date_active_time/3600.0)    # converting into hours
+            date_active_time = round(date_active_time/3600.0, 2)
+            time_active_list.append(date_active_time)    # converting into hours
         if total_time_requested >= total_time_active:
-            pie_chart_data = [total_time_active, total_time_requested-total_time_active]
+            total_time_inactive = round((total_time_requested-total_time_active)/3600.0, 2)
+            total_time_active = round(total_time_active/3600.0, 2)
+            pie_chart_data = [total_time_active, total_time_inactive]
         table_data = all_screens_dict.values()
         line_chart_data = {'date_str': date_str_list, 'time_active': time_active_list}
         json_dict = {'line_chart_data': line_chart_data, 'pie_chart_data': pie_chart_data, 'table_data': table_data}
