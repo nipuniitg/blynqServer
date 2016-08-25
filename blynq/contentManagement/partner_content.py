@@ -6,7 +6,7 @@ from contentManagement.models import Content
 from contentManagement.views import process_media
 from customLibrary.views_lib import debugFileLog
 
-DOWNLOADED_PARTNER_DIRECTORY = '/Users/nipun/Downloads/partner/'
+DOWNLOADED_PARTNER_DIRECTORY = '/home/django/partner/'
 
 # Don't change the below name if you aren't sure.
 ORGANIZATION_NAME = 'Partner Content'
