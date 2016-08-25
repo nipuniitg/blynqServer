@@ -60,7 +60,7 @@ sdApp.factory('scheduleIndexFactory', ['$http', function($http){
             console.log(response.statusText);
             toastr.warning('Internal Error');
         });
-    }
+    };
 
     return{
         getSchedules : getSchedules
@@ -343,12 +343,28 @@ sdApp.factory('scheduleDetailsFactory', ['$log','$http','$q', function($log, $ht
         });
     };
 
-    var getLayouts = function(){
+    var getCustomLayouts = function(){
+        //This fetches all the layouts that belong to an organization
         var deferred = $q.defer();
         $http({
             method : "GET",
             url : "/api/layout/getLayouts"
-        }).then(function mySucces(response) {
+        }).then(function mySucces(response){
+            deferred.resolve(response.data);
+        }, function myError(response) {
+            console.log(response.statusText);
+            deferred.reject(response.Text)
+        });
+        return deferred.promise
+    }
+
+    var getDefaultLayouts = function(){
+        //This fetches default layouts --FullScreen
+        var deferred = $q.defer();
+        $http({
+            method : "GET",
+            url : "/api/layout/getDefaultLayouts"
+        }).then(function mySucces(response){
             deferred.resolve(response.data);
         }, function myError(response) {
             console.log(response.statusText);
@@ -361,7 +377,8 @@ sdApp.factory('scheduleDetailsFactory', ['$log','$http','$q', function($log, $ht
         selectedBoolSetter : selectedBoolSetter
         ,getSelectedItems : getSelectedItems
         ,upsertScheduleDetails : upsertScheduleDetails
-        ,getLayouts : getLayouts
+        ,getCustomLayouts : getCustomLayouts
+        ,getDefaultLayouts : getDefaultLayouts
     }
 }]);
 
@@ -373,13 +390,11 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
     var onLoad = function(){
         $scope.schedule = schedule;
         isNewSchedule = schedule.schedule_id == -1 ? !0 : !1;
-        sDF.getLayouts().then(function(layouts){
-            //copy full screen layout to use when switching between split and non split
-            $scope.fullScreenLayout = angular.copy(layouts[0]);
-
-            //seperate out other layouts for dropdown.
-            layouts.shift();
+        sDF.getCustomLayouts().then(function(layouts){
             $scope.layouts =angular.copy(layouts);
+        });
+        sDF.getDefaultLayouts().then(function(layouts){
+            $scope.fullScreenLayout = angular.copy(layouts[0]);
         });
         $scope.title = isNewSchedule? 'Add Schedule' : 'Edit Schedule';
         $scope.activeTabIndex=0;
@@ -1249,8 +1264,8 @@ sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal','bluepr
         ,link : function($scope, elem){
                 var openModalPopup = function(index){
                     var newSchedule = new blueprints.Schedule();
-                    sDF.getLayouts().then(function(layouts){
-                        newSchedule.layout = layouts[0];
+                    sDF.getDefaultLayouts().then(function(layouts){
+                        newSchedule.layout = angular.copy(layouts[0]);
                         newSchedule.schedule_panes.push(new blueprints.SchedulePane(layouts[0].layout_panes[0]));
 
                         var modalInstance = $uibModal.open({
