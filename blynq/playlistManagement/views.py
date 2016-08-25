@@ -159,7 +159,8 @@ def get_files_recursively_json(request, parent_folder_id):
     user_details = get_userdetails(request)
     user_content = Content.get_user_relevant_objects(user_details=user_details)
     all_files = user_content.filter(content_id__in=all_files_content_ids)
-    json_data = ContentSerializer().serialize(all_files, fields=('title', 'document', 'content_type', 'content_id'),
+    json_data = ContentSerializer().serialize(all_files, fields=('title', 'document', 'content_type', 'content_id',
+                                                                 'length'),
                                               use_natural_foreign_keys=True)
     return obj_to_json_response(json_data)
 

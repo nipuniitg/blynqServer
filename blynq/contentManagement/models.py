@@ -12,8 +12,8 @@ import os
 import hashlib
 # Create your models here.
 from authentication.models import UserDetails, Organization
-from blynq.settings import BASE_DIR, MEDIA_ROOT, USERCONTENT_DIR, DELETED_CONTENT_DIR
-from customLibrary.views_lib import debugFileLog
+from blynq.settings import BASE_DIR, MEDIA_ROOT, USERCONTENT_DIR, DELETED_CONTENT_DIR, DEFAULT_DISPLAY_TIME
+from customLibrary.views_lib import debugFileLog, get_video_length, full_file_path
 
 
 class ContentType(models.Model):
@@ -74,6 +74,8 @@ class Content(models.Model):
     sha1_hash = models.CharField(_('sha1'), max_length=40, blank=True, default='')
 
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.PROTECT)
+
+    length = models.IntegerField(default=DEFAULT_DISPLAY_TIME)
 
     uploaded_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_uploaded_by',
                                     null=True)
@@ -303,6 +305,11 @@ def save_relevant_playlists(content_id):
 @receiver(post_save, sender=Content)
 def post_save_content(sender, instance, **kwargs):
     debugFileLog.info("inside post_save_content")
+    if instance.document and instance.is_video:
+        seconds = get_video_length(full_file_path(instance.document.name))
+        seconds = round(seconds)
+        instance.length = seconds
+        instance.save()
     save_relevant_playlists(content_id=instance.content_id)
 
 

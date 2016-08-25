@@ -151,7 +151,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGIN_URL = '/authentication/login/'  # The page users are directed to if they are not logged in,
 
 # Content related settings
-DEFAULT_DISPLAY_TIME = 10
+DEFAULT_DISPLAY_TIME = 30
 STORAGE_LIMIT_PER_ORGANIZATION = 5*1024*1024*1024  # 1 gb 1*1024*1024*1024
 
 
@@ -223,6 +223,7 @@ PLAYER_INACTIVE_THRESHOLD = PLAYER_POLL_TIME + 1    # Wait this time (in seconds
 # in MEDIA_ROOT
 # the uploaded content of each user is present in /media/usercontent/userdetails.user.id/
 # the deleted files are moved to /media/deletedcontent/organization.organization_id
+COMPRESS_IMAGE = False
 
 
 EMAIL_USE_TLS = True
