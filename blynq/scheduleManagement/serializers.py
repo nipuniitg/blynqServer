@@ -3,10 +3,8 @@ from django.core.serializers.python import Serializer
 from customLibrary.views_lib import get_ist_date_str, get_ist_time_str, debugFileLog
 from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import SchedulePlaylists, ScheduleScreens, SchedulePane
-from layoutManagement.models import LayoutPane
 from screenManagement.serializers import ScreenSerializer, GroupSerializer
-from layoutManagement.serializers import LayoutPaneSerializer, LayoutSerializer, default_layout_serializer, \
-    default_layout_pane_serializer
+from layoutManagement.serializers import default_layout_serializer, default_layout_pane_serializer
 
 
 class SchedulePlaylistsSerializer(Serializer):
@@ -89,7 +87,8 @@ def get_schedule_timeline(schedule_pane):
         params = rule.get_params() if rule else {}
         event_json['frequency'] = rule.frequency if rule else None
         event_json['interval'] = params.get('interval')
-        event_json['byweekday'] = params.get('byweekday')
+        from scheduleManagement.views import weekday_string_to_index
+        event_json['byweekday'] = weekday_string_to_index(params.get('byweekday'), reverse=True)
         event_json['bymonthday'] = params.get('bymonthday')
         event_json['byweekno'] = params.get('byweekno')
         return event_json

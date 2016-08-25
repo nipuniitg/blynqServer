@@ -50,16 +50,25 @@ def append_params(params, new_keyvalue):
 
 
 BYWEEKDAY_DICT = {'Mon': 0, 'Tue': 1, 'Wed': 2, 'Thu': 3, 'Fri': 4, 'Sat': 5, 'Sun': 6}
+REVERSE_BYWEEKDAY_DICT = {0: 'Mon', 1: 'Tue', 2: 'Wed', 3: 'Thu', 4: 'Fri', 5: 'Sat', 6: 'Sun'}
+
+
+def weekday_string_to_index(byweekday, reverse=False):
+    new_byweekday = []
+    if not byweekday:
+        return new_byweekday
+    mapping_dict = REVERSE_BYWEEKDAY_DICT if reverse else BYWEEKDAY_DICT
+    for ele in byweekday:
+        new_byweekday.append(mapping_dict[ele])
+    return new_byweekday
 
 
 # byweekday should be a list [0,2,3] meaning 0-Monday, 1-Tuesday, 2-Wednesday, 3-Thursday, 4-Friday, 5-Saturday,6-Sunday
 def generate_rule_params(interval=1, bymonthday=None, byweekday=None, byweekno=None):
     debugFileLog.info("inside generate_rule_params")
     params = interval_param(interval)
-    new_byweekday = []
-    for ele in byweekday:
-        new_byweekday.append(BYWEEKDAY_DICT[ele])
-    params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekday', bylistday=new_byweekday))
+    byweekday = weekday_string_to_index(byweekday)
+    params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekday', bylistday=byweekday))
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='bymonthday', bylistday=bymonthday))
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekno', bylistday=byweekno))
     return params
