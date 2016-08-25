@@ -191,6 +191,7 @@ def event_json_from_occurrences(existing_occurrences):
         campaign_dict = {'schedule_id': schedule.schedule_id,
                          'playlists': playlists_json,
                          'pane': layout_pane_dict,
+                         'mute_audio': schedule_pane.mute_audio,
                          'last_updated_time': schedule.last_updated_time,
                          'start_time': occur.start,
                          'end_time': occur.end}
