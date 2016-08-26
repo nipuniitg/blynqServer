@@ -2,11 +2,19 @@
     <div class="col-sm-12">
         <div id="inpPlaylists" class="tagsinput " style="height: 100%;" data-as-sortable=""
                                      data-ng-model="selectedPlaylists">
-        <span class="tag" ng-repeat="playlist in selectedPlaylists" data-as-sortable-item>
-            <span data-as-sortable-item-handle> {[playlist.playlist_title]} &nbsp;&nbsp;</span>
-            <a class="tagsinput-remove-link"
-               ng-click="removePlaylist($index)"></a>
-        </span>
+            <span class="tag" ng-repeat="playlist in selectedPlaylists" data-as-sortable-item>
+                <span data-as-sortable-item-handle> {[playlist.playlist_title]} &nbsp;&nbsp;</span>
+                <a class="tagsinput-remove-link"
+                   ng-click="removePlaylist($index)"></a>
+            </span>
+
+            <!-- BlynQ content tag -->
+            <span class="tag" data-as-sortable-item ng-if="selectedCategories.length > 0">
+                <span data-as-sortable-item-handle> Blynq-Content &nbsp;&nbsp;</span>
+                <a class="tagsinput-remove-link"
+                   ng-click="removeBlynqContent()"></a>
+            </span>
+
             <div class="tagsinput-add-container">
                 <div class="tagsinput-add"
                      ng-click="openPlaylistSelectorModal()"></div>

@@ -70,7 +70,8 @@
                                     <div class="control-label col-md-2">Playlists*</div>
                                     <div class="col-md-10">
                                         <playlist-textbox
-                                                selected-playlists="schedule.schedule_panes[0].schedule_playlists">
+                                                selected-playlists="schedule.schedule_panes[0].schedule_playlists"
+                                                selected-blynq-playlists="schedule.schedule_panes[0].schedule_blynq_playlists">
                                         </playlist-textbox>
                                     </div>
                                 </div>
@@ -91,6 +92,15 @@
                                             recurrence-days-of-week="schedule.schedule_panes[0].timeline.byweekday">
                                     </timeline-textbox>
                                 </div>
+                                <div class="form-group">
+                                    <div class="control-label col-md-2">
+                                        Mute Pane
+                                    </div>
+                                    <div class="col-md-10">
+                                        <input type="checkbox" name="muteAudio"
+                                               ng-model="schedule.schedule_pane[0].mute_audio">
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="row" ng-if="schedule.is_split">
@@ -105,6 +115,7 @@
                                                             <div class="control-label col-md-2">Playlists*</div>
                                                             <div class="col-md-10">
                                                                 <playlist-textbox
+                                                                        selected-blynq-playlists="schedule.schedule_panes[$index].schedule_blynq_playlists"
                                                                         selected-playlists="schedule.schedule_panes[$index].schedule_playlists">
                                                                 </playlist-textbox>
                                                             </div>
@@ -126,6 +137,15 @@
                                                                     recurrence-days-of-week="schedule.schedule_panes[$index].timeline.byweekday">
                                                             </timeline-textbox>
                                                         </div>
+                                                        <div class="form-group">
+                                                            <div class="control-label col-md-2">
+                                                                Mute Audio
+                                                            </div>
+                                                            <div class="col-md-10">
+                                                                <input type="checkbox" name="muteAudio"
+                                                                       ng-model="schedule.schedule_pane[$index].mute_audio">
+                                                            </div>
+                                                        </div>
                                                     </form>
                                                 </div>
                                             </div>
@@ -144,9 +164,7 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
-
                 </div>
             </div>
         </div>

@@ -32,6 +32,8 @@
             this.schedule_pane_id = -1;
             this.layout_pane = angular.copy(layout_pane);
             this.schedule_playlists = [];
+            this.schedule_blynq_playlists=[];
+            this.mute_audio = false;
             this.timeline ={
                 is_always   : !0
                 ,start_date  : null
