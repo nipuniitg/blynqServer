@@ -11,7 +11,7 @@
                     <uib-tab index="0" heading="Screens">
                         <div class="panel">
                             <div class="panel-body" style="max-height:400px;overflow:scroll">
-                                <table class="table bootstrap-datatable">
+                                <table class="table bootstrap-datatable selectable-list">
                                     <thead>
                                     <tr>
                                         <th>Select</th>
@@ -30,9 +30,11 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr ng-repeat="screen in allScreens| filter:searchScreens">
-                                        <td><input type="checkbox" ng-model="screen.selected"
-                                                   ng-click="alert('selected')"></td>
+                                    <tr class="pointer" ng-repeat="screen in allScreens| filter:searchScreens"
+                                        ng-class="{selected : screen.selected}" toggle-selection item="screen">
+                                        <td><i class="fa fa-check" ng-show="screen.selected"></i></td>
+                                        <!--<td><input type="checkbox" ng-model="screen.selected"-->
+                                                   <!--ng-click="alert('selected')"></td>-->
                                         <td>{[screen.screen_name]}</td>
                                         <td>{[screen.address]}</td>
                                         <td>
@@ -51,7 +53,7 @@
                     <uib-tab index="1" heading="Groups" active="tab.active">
                         <div class="panel">
                             <div class="panel-body" style="max-height:400px;overflow:scroll">
-                                <table class="table bootstrap-datatable countries">
+                                <table class="table bootstrap-datatable selectable-list">
                                     <thead>
                                     <tr>
                                         <th>Select</th>
@@ -70,8 +72,10 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr ng-repeat="group in allGroups">
-                                        <td><input type="checkbox" ng-model="group.selected"></td>
+                                    <tr  class="pointer" ng-repeat="group in allGroups | filter :  searchGroups"
+                                         ng-class="{selected : group.selected}" toggle-selection item="group">
+                                        <td><i class="fa fa-check" ng-show="group.selected"></i></td>
+                                        <!--<td><input type="checkbox" ng-model="group.selected"></td>-->
                                         <td>{[ group.group_name ]}</td>
                                         <td>{[ group.description]}</td>
                                         <td>
