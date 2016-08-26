@@ -85,7 +85,8 @@ datetime_fmt_with_seconds = "%Y/%m/%d %H:%M:%S"
 
 def get_video_length(file_path):
     try:
-        result = subprocess.Popen('ffprobe -i input_video -show_entries format=duration -v quiet -of csv="p=0"', stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+        result = subprocess.Popen('ffprobe -i %s -show_entries format=duration -v quiet -of csv="p=0"' % file_path,
+                                  stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         output = result.communicate()
         return output[0]
     except Exception as e:
