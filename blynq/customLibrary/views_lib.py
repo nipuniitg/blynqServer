@@ -92,8 +92,7 @@ def get_video_length(file_path):
                                   stdout=subprocess.PIPE,stderr=subprocess.STDOUT, shell=True)
         output = result.communicate()
         durations = re.findall("\d+", output[0])
-        # Increment duration by one second to round off
-        duration = int(durations[0])+1 if durations else default_video_duration
+        duration = int(durations[0]) if durations else default_video_duration
         return duration
     except Exception as e:
         debugFileLog.exception(e)

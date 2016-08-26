@@ -185,6 +185,8 @@ def upload_content(request):
                                   last_modified_by=user_details, organization=user_details.organization,
                                   parent_folder=parent_folder, is_folder=False)
                 content.save()
+                # Saving the content twice so that the duration can be found out using content.document
+                content.save()
                 if content.is_image or content.is_video:
                     file_path = full_file_path(relative_path=content.document.name)
                     media_compressed, delete_old = process_media(

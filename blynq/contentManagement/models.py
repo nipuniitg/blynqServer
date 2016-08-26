@@ -134,10 +134,11 @@ class Content(models.Model):
             raise NotSupportedError('%s is not supported at the moment' % full_file_type)
         self.content_type = content_type
         # Now increment the used_file_size of the organization if the file is being saved for the first time
-        if self.document and self.pk is None:
+        if self.document:
             if self.is_video or self.is_audio:
                 seconds = get_video_length(full_file_path(self.document.name))
                 self.duration = seconds
+        if self.document and self.pk is None:
             if self.organization.used_file_size + self.document.size <= self.organization.total_file_size_limit:
                 self.organization.used_file_size = self.organization.used_file_size + self.document.size
                 try:
