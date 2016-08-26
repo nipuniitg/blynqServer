@@ -332,7 +332,7 @@ def get_content_helper(request, parent_folder_id=-1, is_folder=False):
         user_content = user_content.filter(is_folder=is_folder)
         json_data = ContentSerializer().serialize(user_content,
                                                   fields=('title', 'document', 'content_type', 'content_id',
-                                                          'is_folder', 'length'), use_natural_foreign_keys=True)
+                                                          'is_folder', 'duration'), use_natural_foreign_keys=True)
     except Exception as e:
         debugFileLog.exception(e)
         json_data = []

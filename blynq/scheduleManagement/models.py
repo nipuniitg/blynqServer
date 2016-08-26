@@ -83,7 +83,7 @@ class SchedulePane(models.Model):
     schedule = models.ForeignKey('Schedule', on_delete=models.CASCADE, related_name='%(class)s_schedule')
     layout_pane = models.ForeignKey(LayoutPane, on_delete=models.CASCADE, null=True, blank=True)
     playlists = models.ManyToManyField(Playlist, through=SchedulePlaylists)
-    mute_audio = models.BooleanField(default=False, null=True)
+    mute_audio = models.BooleanField(default=False)
     is_always = models.BooleanField(default=True)
     all_day = models.BooleanField(default=True)
     recurrence_absolute = models.BooleanField(default=False)

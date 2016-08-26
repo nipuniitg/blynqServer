@@ -75,7 +75,7 @@ class Content(models.Model):
 
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.PROTECT)
 
-    length = models.IntegerField(default=DEFAULT_DISPLAY_TIME)
+    duration = models.IntegerField(default=DEFAULT_DISPLAY_TIME)
 
     uploaded_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_uploaded_by',
                                     null=True)
@@ -308,7 +308,7 @@ def post_save_content(sender, instance, **kwargs):
     if instance.document and instance.is_video:
         seconds = get_video_length(full_file_path(instance.document.name))
         seconds = round(seconds)
-        instance.length = seconds
+        instance.duration = seconds
         instance.save()
     save_relevant_playlists(content_id=instance.content_id)
 
