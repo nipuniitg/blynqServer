@@ -128,6 +128,7 @@ class ScheduleSerializer(Serializer):
             schedule_panes = SchedulePane.objects.filter(schedule=obj)
             json_data = SchedulePaneSerializer().serialize(schedule_panes,
                                                            fields=('schedule_pane_id', 'schedule_playlists',
+                                                                   'schedule_blynq_playlists',
                                                                    'layout_pane', 'timeline', 'mute_audio'))
             self._current['schedule_panes'] = json_data
         self.objects.append(self._current)
