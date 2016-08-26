@@ -140,6 +140,14 @@ def get_playlists(request):
     return obj_to_json_response(json_data)
 
 
+def get_blynq_playlists(request):
+    user_details = get_userdetails(request)
+    blynq_playlists = Playlist.get_blynq_content_playlists()
+    json_data = PlaylistSerializer().serialize(blynq_playlists,
+                                               fields=('playlist_id', 'playlist_title','playlist_items'))
+    return obj_to_json_response(json_data)
+
+
 def get_files_recursively_json(request, parent_folder_id):
     """
     :param request:

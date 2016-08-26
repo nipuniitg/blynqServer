@@ -8,5 +8,6 @@ urlpatterns = [
     url(r'^getFilesRecursively/(?P<parent_folder_id>-?\d+)', views.get_files_recursively_json,
         name='get_files_recursively'),
     url(r'^upsertPlaylist', views.upsert_playlist, name='upsert_playlist'),
-    url(r'^deletePlaylist', views.delete_playlist, name='delete_playlist')
+    url(r'^deletePlaylist', views.delete_playlist, name='delete_playlist'),
+    url(r'^getBlynqPlaylists', views.get_blynq_playlists, name='get_blynq_playlists'),
 ]

@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from schedule.models import Event, Rule
 # Create your views here.
 # from schedule.views import calendar
+from blynq.settings import CONTENT_ORGANIZATION_NAME
 from customLibrary.views_lib import get_userdetails, ajax_response, obj_to_json_response, string_to_dict, \
     list_to_comma_string, generate_utc_datetime, get_ist_datetime, get_utc_datetime, debugFileLog
 from playlistManagement.models import Playlist
@@ -226,14 +227,17 @@ def upsert_schedule_groups(user_details, schedule, schedule_groups):
 
 
 # upsert schedule playlists
-def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists):
+def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists, blynq_playlists=False):
     debugFileLog.info("inside upsert_schedule_playlists")
     error = ''
     schedule_playlist_id_list = []
     for pos_index, item in enumerate(schedule_playlists):
         schedule_playlist_id = int(item.get('schedule_playlist_id'))
         playlist_id = int(item.get('playlist_id'))
-        playlist = Playlist.get_user_relevant_objects(user_details).get(playlist_id=playlist_id)
+        if blynq_playlists:
+            playlist = Playlist.get_blynq_content_playlists().get(playlist_id=playlist_id)
+        else:
+            playlist = Playlist.get_user_relevant_objects(user_details).get(playlist_id=playlist_id)
         if schedule_playlist_id == -1:
             entry = SchedulePlaylists(schedule_pane_id=schedule_pane_id, playlist=playlist, position_index=pos_index)
             entry.save()
@@ -259,6 +263,7 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
     for item in schedule_panes:
         schedule_pane_id = int(item.get('schedule_pane_id'))
         schedule_playlists = item.get('schedule_playlists')
+        schedule_blynq_playlists = item.get('schedule_blynq_playlists')
         layout_pane = item.get('layout_pane')
         layout_pane_id = int(layout_pane.get('layout_pane_id'))
         mute_audio = item.get('mute_audio')
@@ -268,7 +273,7 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
         recurrence_absolute = timeline.get('recurrence_absolute')
         if not recurrence_absolute:
             recurrence_absolute = False
-        if schedule_playlists:
+        if schedule_playlists or schedule_blynq_playlists:
             event_dict = event_dict_from_timeline(timeline=timeline, schedule=schedule)
             event = Event(**event_dict)
             event.save()
@@ -291,8 +296,12 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
             # Not deleting the event, to have the history of events
             schedule_pane.event = event
             schedule_pane.save()
-        upsert_schedule_playlists(user_details=user_details, schedule_pane_id=schedule_pane_id,
-                                  schedule_playlists=schedule_playlists)
+        if schedule_playlists:
+            upsert_schedule_playlists(user_details=user_details, schedule_pane_id=schedule_pane_id,
+                                      schedule_playlists=schedule_playlists)
+        if schedule_blynq_playlists:
+            upsert_schedule_playlists(user_details=user_details, schedule_pane_id=schedule_pane_id,
+                                      schedule_playlists=schedule_blynq_playlists, blynq_playlists=True)
         schedule_pane_id_list.append(schedule_pane_id)
 
     # Remove Schedule Panes which are not in the post request

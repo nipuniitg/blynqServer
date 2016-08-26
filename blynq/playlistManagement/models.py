@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 # Create your models here.
 from authentication.models import UserDetails, Organization
+from blynq.settings import CONTENT_ORGANIZATION_NAME
 from contentManagement.models import Content
 from customLibrary.views_lib import debugFileLog
 
@@ -54,6 +55,10 @@ class Playlist(models.Model):
     @staticmethod
     def get_user_relevant_objects(user_details):
         return Playlist.objects.filter(organization=user_details.organization)
+
+    @staticmethod
+    def get_blynq_content_playlists():
+        return Playlist.objects.filter(organization__name=CONTENT_ORGANIZATION_NAME)
 
 
 @receiver(post_save, sender=PlaylistItems)

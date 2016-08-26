@@ -1,15 +1,14 @@
+import os
 from os import listdir
 from os.path import isfile, join, exists, isdir
-import os
+
 from authentication.models import Organization, UserDetails
+from blynq.settings import CONTENT_ORGANIZATION_NAME
 from contentManagement.models import Content
 from contentManagement.views import process_media
 from customLibrary.views_lib import debugFileLog
 
 DOWNLOADED_PARTNER_DIRECTORY = '/home/django/partner/'
-
-# Don't change the below name if you aren't sure.
-ORGANIZATION_NAME = 'Partner Content'
 
 
 def process_file(file_path, parent_folder, user_details, organization):
@@ -58,7 +57,7 @@ def process_directory(path, organization, user_details, parent_folder):
 
 def push_content():
     try:
-        organization, created = Organization.objects.get_or_create(organization_name=ORGANIZATION_NAME)
+        organization, created = Organization.objects.get_or_create(organization__name=CONTENT_ORGANIZATION_NAME)
         user_details = UserDetails.objects.get(organization=organization)
         parent_folder = None
         if not exists(DOWNLOADED_PARTNER_DIRECTORY):
