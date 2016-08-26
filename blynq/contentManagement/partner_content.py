@@ -21,9 +21,9 @@ def process_file(file_path, parent_folder, user_details, organization):
             print 'File %s already exists in the portal' % file_path
         except Exception as e:
             print 'File %s does not already exist' % title
-            output = process_media(file_path=file_path, parent_folder=parent_folder, user_details=user_details,
-                                   organization=organization)
-            if output:
+            conversion_success, delete_old = process_media(file_path=file_path, parent_folder=parent_folder,
+                                                           user_details=user_details, organization=organization)
+            if conversion_success:
                 print 'Successfully uploaded %s' % file_path
             else:
                 print 'Uploading file unsuccessful %s ' % file_path

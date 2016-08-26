@@ -75,7 +75,7 @@ def process_media(file_path, parent_folder=None, user_details=None, organization
     elif 'video' in file_type:
         return compress_video(file_path, parent_folder, user_details, organization, content_already_saved)
     else:
-        return True
+        return True, False
 
 
 def compress_image(file_path, parent_folder=None, user_details=None, organization=None, content_already_saved=False):
@@ -95,6 +95,8 @@ def compress_image(file_path, parent_folder=None, user_details=None, organizatio
             content = Content(title=title, document=django_file, uploaded_by=user_details, last_modified_by=user_details,
                               organization=user_details.organization, parent_folder=parent_folder, is_folder=False)
             content.save()
+        else:
+            return False, False
     else:
         content = Content(title=title, document=django_file, uploaded_by=user_details, last_modified_by=user_details,
                           organization=user_details.organization, parent_folder=parent_folder, is_folder=False)
@@ -185,13 +187,19 @@ def upload_content(request):
                 content.save()
                 if content.is_image or content.is_video:
                     file_path = full_file_path(relative_path=content.document.name)
-                    if not process_media(file_path, parent_folder=parent_folder, user_details=user_details,
-                                         organization=user_details.organization, content_already_saved=True):
+                    media_compressed, delete_old = process_media(
+                        file_path, parent_folder=parent_folder, user_details=user_details,
+                        organization=user_details.organization, content_already_saved=True)
+                    if not media_compressed:
                         error_str = 'Error while processing media file %s' % document.name
                         errors.append(error_str)
                         debugFileLog.exception(error_str)
-                        conversion_success = False
-                    content.delete()
+                        if delete_old:
+                            conversion_success = False
+                        else:
+                            conversion_success = True
+                    if delete_old:
+                        content.delete()
             except AssertionError:
                 success = False
                 error_str = "Improper parent folder, please refresh the page and try again"
