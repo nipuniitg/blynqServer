@@ -135,6 +135,9 @@ class Content(models.Model):
         self.content_type = content_type
         # Now increment the used_file_size of the organization if the file is being saved for the first time
         if self.document and self.pk is None:
+            if self.is_video:
+                seconds = get_video_length(full_file_path(self.document.name))
+                self.duration = seconds
             if self.organization.used_file_size + self.document.size <= self.organization.total_file_size_limit:
                 self.organization.used_file_size = self.organization.used_file_size + self.document.size
                 try:
@@ -305,11 +308,6 @@ def save_relevant_playlists(content_id):
 @receiver(post_save, sender=Content)
 def post_save_content(sender, instance, **kwargs):
     debugFileLog.info("inside post_save_content")
-    if instance.document and instance.is_video:
-        seconds = get_video_length(full_file_path(instance.document.name))
-        seconds = round(seconds)
-        instance.duration = seconds
-        instance.save()
     save_relevant_playlists(content_id=instance.content_id)
 
 
