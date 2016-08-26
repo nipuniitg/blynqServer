@@ -1268,7 +1268,7 @@ sdApp.controller('playlistSelectorController', ['$scope', '$log','$uibModalInsta
     $scope.apply = function(){
         var returnObj ={};
         returnObj.selectedPlaylists = angular.copy(pSF.getSelectedItems($scope.allPlaylists));
-        returnObj.selectedCategories = angular.copy(pSF.getSelectedItems($scope.allBlynqPlaylists));
+        returnObj.selectedBlynqPlaylists = angular.copy(pSF.getSelectedItems($scope.allBlynqPlaylists));
         $uibModalInstance.close(returnObj);
     };
     $scope.cancel = function(){
