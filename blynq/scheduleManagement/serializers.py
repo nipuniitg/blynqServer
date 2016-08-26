@@ -35,7 +35,7 @@ class SchedulePaneSerializer(Serializer):
             self._current['schedule_playlists'] = json_data
         if 'schedule_blynq_playlists' in self.selected_fields:
             schedule_blynq_playlists = SchedulePlaylists.objects.filter(
-                schedule_pane=obj, playlist__organization__name=CONTENT_ORGANIZATION_NAME)
+                schedule_pane=obj, playlist__organization__organization_name=CONTENT_ORGANIZATION_NAME)
             json_data = SchedulePlaylistsSerializer().serialize(
                 schedule_blynq_playlists, fields=('schedule_playlist_id','playlist'))
             self._current['schedule_blynq_playlists'] = json_data

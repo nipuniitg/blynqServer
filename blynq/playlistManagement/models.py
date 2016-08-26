@@ -58,7 +58,7 @@ class Playlist(models.Model):
 
     @staticmethod
     def get_blynq_content_playlists():
-        return Playlist.objects.filter(organization__name=CONTENT_ORGANIZATION_NAME)
+        return Playlist.objects.filter(organization__organization_name=CONTENT_ORGANIZATION_NAME)
 
 
 @receiver(post_save, sender=PlaylistItems)
