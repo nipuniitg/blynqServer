@@ -135,7 +135,7 @@ class Content(models.Model):
         self.content_type = content_type
         # Now increment the used_file_size of the organization if the file is being saved for the first time
         if self.document and self.pk is None:
-            if self.is_video:
+            if self.is_video or self.is_audio:
                 seconds = get_video_length(full_file_path(self.document.name))
                 self.duration = seconds
             if self.organization.used_file_size + self.document.size <= self.organization.total_file_size_limit:
@@ -198,6 +198,17 @@ class Content(models.Model):
         file_type, encoding = mimetypes.guess_type(str(self.document.url))
         if file_type:
             return 'video' in file_type
+        else:
+            return False
+
+    @property
+    def is_audio(self):
+        if not self.document:
+            return False
+        import mimetypes
+        file_type, encoding = mimetypes.guess_type(str(self.document.url))
+        if file_type:
+            return 'audio' in file_type
         else:
             return False
 
