@@ -57,8 +57,10 @@ def process_directory(path, organization, user_details, parent_folder):
 
 def push_content():
     try:
-        organization, created = Organization.objects.get_or_create(
-            organization__organization_name=CONTENT_ORGANIZATION_NAME)
+        organization, created = Organization.objects.get_or_create(organization_name=CONTENT_ORGANIZATION_NAME)
+        if created:
+            print 'Organization did not exist previously, just created the %s organization, now create a new user' % \
+                  CONTENT_ORGANIZATION_NAME
         user_details = UserDetails.objects.get(organization=organization)
         parent_folder = None
         if not exists(DOWNLOADED_PARTNER_DIRECTORY):
