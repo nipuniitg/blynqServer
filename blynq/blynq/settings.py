@@ -30,7 +30,7 @@ DEBUG = False
 if DEBUG:
     ALLOWED_HOSTS = []
 else:
-    ALLOWED_HOSTS = ['www.blynq.in', 'blynq.in']
+    ALLOWED_HOSTS = ['http://www.blynq.in', 'http://blynq.in', 'www.blynq.in', 'blynq.in']
     PREPEND_WWW = True
 
 
@@ -152,7 +152,7 @@ LOGIN_URL = '/authentication/login/'  # The page users are directed to if they a
 
 # Content related settings
 DEFAULT_DISPLAY_TIME = 30
-STORAGE_LIMIT_PER_ORGANIZATION = 5*1024*1024*1024  # 1 gb 1*1024*1024*1024
+STORAGE_LIMIT_PER_ORGANIZATION = 1*1024*1024*1024  # 1 gb 1*1024*1024*1024
 
 
 today = timezone.now().strftime("%Y%m%d")

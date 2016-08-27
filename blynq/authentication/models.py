@@ -51,7 +51,7 @@ One organization should be Blynq
 class Organization(models.Model):
     organization_id = models.AutoField(primary_key=True)
     organization_name = models.CharField(max_length=100, unique=True)
-    website = models.CharField(max_length=100, null=True)
+    website = models.CharField(max_length=100, null=True, blank=True)
     # address = models.ForeignKey(Address, on_delete=models.PROTECT, blank=True, null=True)
     address = models.CharField(max_length=100, blank=True, null=True)
     contact = models.CharField(max_length=12, blank=True, null=True)
