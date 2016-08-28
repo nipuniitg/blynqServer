@@ -47,7 +47,7 @@ def upsert_url(request):
         url = posted_content.get('url')
         if url:
             content_dict = dict(title=title, url=url, uploaded_by=user_details, parent_folder=parent_folder,
-                                last_modified_by=user_details, organization=user_details.organization)
+                                last_updated_by=user_details, organization=user_details.organization)
             instance, created = Content.get_user_relevant_objects(user_details=user_details).get_or_create(
                 content_id=content_id, defaults=content_dict)
             if not created:
@@ -92,13 +92,13 @@ def compress_image(file_path, parent_folder=None, user_details=None, organizatio
     django_file = File(img_file)
     if content_already_saved:
         if COMPRESS_IMAGE:
-            content = Content(title=title, document=django_file, uploaded_by=user_details, last_modified_by=user_details,
+            content = Content(title=title, document=django_file, uploaded_by=user_details, last_updated_by=user_details,
                               organization=user_details.organization, parent_folder=parent_folder, is_folder=False)
             content.save()
         else:
             return False, False
     else:
-        content = Content(title=title, document=django_file, uploaded_by=user_details, last_modified_by=user_details,
+        content = Content(title=title, document=django_file, uploaded_by=user_details, last_updated_by=user_details,
                           organization=user_details.organization, parent_folder=parent_folder, is_folder=False)
         content.save()
 
@@ -143,7 +143,7 @@ def compress_video(file_path, parent_folder=None, user_details=None, organizatio
             return False
         video_file = open(temp_file_path)
         django_file = File(video_file)
-        content = Content(title=title, document=django_file, uploaded_by=user_details, last_modified_by=user_details,
+        content = Content(title=title, document=django_file, uploaded_by=user_details, last_updated_by=user_details,
                           organization=organization, parent_folder=parent_folder)
         content.save()
         try:
@@ -182,7 +182,7 @@ def upload_content(request):
                     parent_folder = Content.get_user_relevant_objects(user_details).get(content_id=parent_folder_id)
                     assert parent_folder.is_folder
                 content = Content(title=title, document=document, uploaded_by=user_details,
-                                  last_modified_by=user_details, organization=user_details.organization,
+                                  last_updated_by=user_details, organization=user_details.organization,
                                   parent_folder=parent_folder, is_folder=False)
                 content.save()
                 # Saving the content twice so that the duration can be found out using content.document
@@ -267,7 +267,7 @@ def create_folder(request):
         Content.objects.create(title=title,
                                document=None,
                                uploaded_by=user_details,
-                               last_modified_by=user_details,
+                               last_updated_by=user_details,
                                organization=user_details.organization,
                                parent_folder=parent_folder,
                                is_folder=True)

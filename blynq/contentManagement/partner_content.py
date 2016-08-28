@@ -35,7 +35,7 @@ def process_file(file_path, parent_folder, user_details, organization):
 def get_or_create_directory(title, parent_folder, user_details, organization):
     dir_obj, created = Content.objects.get_or_create(title=title, organization=organization, is_folder=True,
                                                      parent_folder=parent_folder, uploaded_by=user_details,
-                                                     last_modified_by=user_details)
+                                                     last_updated_by=user_details)
     return dir_obj
 
 

@@ -247,7 +247,7 @@ def get_screen_data(request, nof_days=7):
             schedule_screens = ScheduleScreens.objects.filter(
                 screen=screen)
             schedule_screens_updated = schedule_screens.filter(
-                schedule__last_updated_time__gte=last_received_datetime)
+                schedule__last_updated_time__gte=last_received_datetime, )
             if schedule_screens_updated:
                 schedule_ids_list = schedule_screens.filter(schedule__deleted=False).values_list(
                     'schedule_id', flat=True).distinct()

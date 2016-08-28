@@ -43,13 +43,15 @@ def upsert_layout(request):
             aspect_ratio_id = aspect_ratio.get('aspect_ratio_id')
             layout_panes = posted_data.get('layout_panes')
             if layout_id == -1:
-                layout = Layout(title=title, aspect_ratio_id=aspect_ratio_id, organization=user_details.organization)
+                layout = Layout(title=title, aspect_ratio_id=aspect_ratio_id, created_by=user_details,
+                                last_updated_by=user_details, organization=user_details.organization)
                 layout_created = True
             else:
                 layout = Layout.get_user_relevant_objects(user_details).get(layout_id=layout_id)
                 layout.title = title
                 layout.aspect_ratio_id = aspect_ratio_id
                 layout_created = False
+                layout.last_updated_by = user_details
                 from scheduleManagement.models import Schedule
                 layout_schedules = Schedule.get_user_relevant_objects(user_details).filter(layout=layout)
             layout.save()

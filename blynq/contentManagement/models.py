@@ -5,6 +5,7 @@ from django.db import models, NotSupportedError
 from django.conf import settings
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
+from django.utils import timezone
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 from django.core.files.base import ContentFile
@@ -81,9 +82,9 @@ class Content(models.Model):
                                     null=True)
     uploaded_time = models.DateTimeField(_('uploaded time'), auto_now_add=True)
 
-    last_modified_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_modified_by',
-                                         null=True)
-    last_modified_time = models.DateTimeField(_('modified at'), auto_now=True)
+    last_updated_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_modified_by',
+                                        null=True)
+    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True)
 
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
 

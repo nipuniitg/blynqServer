@@ -19,6 +19,9 @@ class ScheduleScreens(models.Model):
     schedule = models.ForeignKey('Schedule', on_delete=models.CASCADE, related_name='%(class)s_schedule')
     group = models.ForeignKey(Group, on_delete=models.CASCADE, blank=True, null=True)
 
+    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
+
+
     def __unicode__(self):
         description = self.schedule.schedule_title if self.schedule and self.schedule.schedule_title else ''
         if self.screen:
@@ -69,6 +72,9 @@ class SchedulePlaylists(models.Model):
     schedule_pane = models.ForeignKey('SchedulePane', on_delete=models.CASCADE, blank=True, null=True)
     position_index = models.IntegerField()
 
+    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
+
+
     def __unicode__(self):
         if self.schedule_pane and self.schedule_pane.schedule:
             schedule_title = self.schedule_pane.schedule.schedule_title
@@ -89,6 +95,9 @@ class SchedulePane(models.Model):
     recurrence_absolute = models.BooleanField(default=False)
     event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, blank=True, related_name='%(class)s_event')
 
+    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
+
+
     def __unicode__(self):
         schedule_title = self.schedule.schedule_title if self.schedule.schedule_title else ''
         pane_title = self.layout_pane.title if self.layout_pane.title else ''
@@ -105,10 +114,10 @@ class Schedule(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
 
     created_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True, related_name='%(class)s_created_by')
-    created_time = models.DateTimeField(_('created time'), auto_now_add=True)
+    created_time = models.DateTimeField(_('created time'), auto_now_add=True, blank=True, null=True)
     last_updated_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True,
                                         related_name='%(class)s_last_updated_by')
-    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True)
+    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
     deleted = models.BooleanField(blank=True, default=False)
 
     def __unicode__(self):

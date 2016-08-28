@@ -23,7 +23,7 @@ class PlayerUpdate(models.Model):
                                     null=True)
     comments = models.TextField(blank=True, null=True)
     uploaded_time = models.DateTimeField(_('uploaded time'), auto_now_add=True)
-    last_modified_time = models.DateTimeField(_('modified at'), auto_now=True)
+    last_updated_time = models.DateTimeField(_('updated at'), auto_now=True, blank=True, null=True)
 
     class Meta:
         ordering = ['-uploaded_time']

@@ -39,10 +39,10 @@ class Playlist(models.Model):
 
     created_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_created_by',
                                    null=True)
-    created_time = models.DateTimeField(_('created time'), auto_now_add=True)
+    created_time = models.DateTimeField(_('created time'), auto_now_add=True, blank=True, null=True)
     last_updated_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL,
                                         related_name='%(class)s_last_updated_by', null=True)
-    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True)
+    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
 
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
 
@@ -78,6 +78,7 @@ def playlist_items_changed(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Playlist)
+@receiver(pre_delete, sender=Playlist)
 def post_save_playlist(sender, instance, **kwargs):
     debugFileLog.info("Inside post_save_playlist")
     # Set the last_updated_time for all the schedules having this playlist
