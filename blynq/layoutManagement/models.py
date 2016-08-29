@@ -41,20 +41,18 @@ class Layout(models.Model):
         return self.title
 
 
+@receiver(pre_delete, sender=Layout)
 @receiver(post_save, sender=Layout)
 def post_save_layout(sender, instance, **kwargs):
-    debugFileLog.info("inside post_save_layout")
-    from scheduleManagement.models import Schedule
-    layout_schedules = Schedule.objects.filter(deleted=False, layout_id=instance.layout_id)
-    for each_schedule in layout_schedules:
-        each_schedule.save()
-
-
-@receiver(pre_delete, sender=Layout)
-def remove_layout(sender, instance, **kwargs):
-    if instance.is_default:
-        raise Exception('Cannot delete the default Full Screen layout')
-    from scheduleManagement.models import Schedule
-    schedules = Schedule.objects.filter(layout=instance, deleted=False)
-    if schedules:
-        raise Exception('Cannot delete layout as it is already in use')
+    debugFileLog.info("Inside post_save_layout")
+    from scheduleManagement.models import Schedule, ScheduleScreens
+    try:
+        schedule_ids = Schedule.objects.filter(deleted=False, layout_id=instance.layout_id).values_list(
+            'schedule_id', flat=True)
+        screen_ids = ScheduleScreens.objects.filter(schedule_id__in=schedule_ids).values_list('screen_id', flat=True)
+        from playerManagement.views import notify_player
+        notify_player(screen_ids=screen_ids)
+    except Exception as e:
+        debugFileLog.exception("Error while notifying the relevant players related to the layout %s" %
+                               instance.title)
+        debugFileLog.exception(e)

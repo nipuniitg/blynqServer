@@ -1,3 +1,7 @@
+"""
+Delete this file if not being used.
+"""
+
 import requests
 
 from blynq.settings import FCM_SERVER_KEY

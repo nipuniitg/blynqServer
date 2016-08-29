@@ -171,9 +171,9 @@ def upsert_schedule_screens(user_details, schedule, schedule_screens):
     removed_schedule_screens = ScheduleScreens.objects.filter(schedule=schedule, group__isnull=True).exclude(
         schedule_screen_id__in=schedule_screen_id_list)
     # Send a push message to all the screens which are removed from the schedule
-    for deleted_screen in removed_schedule_screens:
-        from playerManagement.views import notify_player
-        notify_player(deleted_screen.screen)
+    screen_ids = removed_schedule_screens.values_list('screen_id', flat=True)
+    from playerManagement.views import notify_player
+    notify_player(screen_ids)
     if removed_schedule_screens:
         removed_schedule_screens.delete()
     success = True
@@ -208,9 +208,9 @@ def upsert_schedule_groups(user_details, schedule, schedule_groups):
     removed_schedule_groups = ScheduleScreens.objects.filter(schedule=schedule, group__isnull=False).exclude(
         schedule_screen_id__in=schedule_screen_id_list)
     # Send a push message to all the screens which are removed from the schedule
-    for deleted_screen in removed_schedule_groups:
-        from playerManagement.views import notify_player
-        notify_player(deleted_screen.screen)
+    screen_ids = removed_schedule_groups.values_list('screen_id', flat=True)
+    from playerManagement.views import notify_player
+    notify_player(screen_ids=screen_ids)
     if removed_schedule_groups:
         removed_schedule_groups.delete()
     success = True

@@ -277,8 +277,8 @@ def fcm_register(request):
         posted_data = string_to_dict(request.body)
         reg_id = posted_data.get('reg_id')  # registration token
         dev_id = posted_data.get('dev_id')
-        fcm_device, created = FcmDevice.objects.get_or_create(reg_id=reg_id,
-                                                              defaults={'dev_id': dev_id, 'is_active': True})
+        fcm_device, created = FcmDevice.objects.update_or_create(dev_id=dev_id,
+                                                                 defaults={'reg_id': reg_id, 'is_active': True})
         screen = Screen.objects.get(unique_device_key__activation_key=dev_id)
         screen.fcm_device = fcm_device
         screen.save()
@@ -289,12 +289,31 @@ def fcm_register(request):
     return ajax_response(success=success)
 
 
-def notify_player(screen):
+def notify_player(screen_ids):
+    debugFileLog.info("inside notify player")
+    data_dict = {'schedules_updated': True, 'is_registered': True}
+    """
+        Keys to notify player
+        1.is_registered (one-time) -
+        2.schedules_updated -
+        3.player_updated (based on version no) -
+        4.clear_player_cache
+        5.restart_player
+        6.send_logs { start_time, end_time}
+        7.send_stats { start_time, end_time}
+    """
+    if not screen_ids:
+        return
     try:
-        if screen.fcm_device:
-            screen.fcm_device.send_message(data='{modified : True}')
-        else:
-            raise Exception('FCM details does not exist for the screen %s' % screen.screen_name)
+        screens = Screen.objects.filter(screen_id__in=screen_ids)
+        for screen in screens:
+            try:
+                if screen.fcm_device:
+                    screen.fcm_device.send_message(data=data_dict)
+                else:
+                    raise Exception('FCM details does not exist for the screen %s' % screen.screen_name)
+            except Exception as e:
+                debugFileLog.exception(e)
     except Exception as e:
         debugFileLog.exception(e)
 

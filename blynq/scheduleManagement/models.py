@@ -1,7 +1,7 @@
 from django.db import models
 
 # Create your models here.
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 
@@ -131,9 +131,10 @@ class Schedule(models.Model):
         return self.schedulescreens_schedule
 
 
+@receiver(pre_delete, sender=Schedule)
 @receiver(post_save, sender=Schedule)
 def notify_modified_schedules(sender, instance, **kwargs):
     debugFileLog.info("Inside notify_modified_schedules post_save")
-    for screen in instance.screens.all():
-        from playerManagement.views import notify_player
-        notify_player(screen)
+    screen_ids = instance.screens.all().values_list('screen_id', flat=True)
+    from playerManagement.views import notify_player
+    notify_player(screen_ids=screen_ids)

@@ -56,19 +56,18 @@ class Playlist(models.Model):
         return Playlist.objects.filter(organization=user_details.organization)
 
 
+@receiver(pre_delete, sender=Playlist)
 @receiver(post_save, sender=Playlist)
 def post_save_playlist(sender, instance, **kwargs):
     debugFileLog.info("Inside post_save_playlist")
-    # Set the last_updated_time for all the schedules having this playlist
-    from scheduleManagement.models import SchedulePlaylists
+    from scheduleManagement.models import SchedulePane, ScheduleScreens
     try:
-        schedule_playlists = SchedulePlaylists.objects.filter(playlist_id=instance.playlist_id)
-        for each_schedule_playlist in schedule_playlists:
-            if each_schedule_playlist.schedule_pane:
-                schedule = each_schedule_playlist.schedule_pane.schedule
-                if not schedule.deleted:
-                    schedule.save()
+        schedule_ids = SchedulePane.objects.filter(playlists__playlist_id=instance.playlist_id,
+                                                   schedule__deleted=False).values_list('schedule_id', flat=True)
+        screen_ids = ScheduleScreens.objects.filter(schedule_id__in=schedule_ids).values_list('screen_id', flat=True)
+        from playerManagement.views import notify_player
+        notify_player(screen_ids=screen_ids)
     except Exception as e:
-        debugFileLog.exception("Error while updating the last_updated_time of the schedules "
-                               "corresponding to playlist %s" % instance.playlist.playlist_title)
+        debugFileLog.exception("Error while notifying the relevant players related to the playlist %s" %
+                               instance.playlist_title)
         debugFileLog.exception(e)
