@@ -11,6 +11,8 @@ from django.db.models import Q
 from django.shortcuts import render
 
 from contentManagement.serializers import default_content_serializer
+from blynq.settings import COMPRESS_IMAGE
+from contentManagement.serializers import ContentSerializer
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, \
     debugFileLog, full_file_path
 from contentManagement.models import Content, ContentType
@@ -47,7 +49,7 @@ def upsert_url(request):
         url = posted_content.get('url')
         if url:
             content_dict = dict(title=title, url=url, uploaded_by=user_details, parent_folder=parent_folder,
-                                last_modified_by=user_details, organization=user_details.organization)
+                                last_updated_by=user_details, organization=user_details.organization)
             instance, created = Content.get_user_filesystem(user_details=user_details).get_or_create(
                 content_id=content_id, defaults=content_dict)
             if not created:
@@ -64,41 +66,63 @@ def upsert_url(request):
     return ajax_response(success=success, errors=errors)
 
 
-def process_media(file_path, parent_folder=None, user_details=None, organization=None):
+def process_media(file_path, parent_folder=None, user_details=None, organization=None, content_already_saved=False):
     debugFileLog.info('Inside process_media')
     if not file_path or not os.path.exists(file_path):
         debugFileLog.info('File path does not exist')
         return True
     file_type, encoding = mimetypes.guess_type(str(file_path))
     if 'image' in file_type:
-        return compress_image(file_path, parent_folder, user_details, organization)
+        return compress_image(file_path, parent_folder, user_details, organization, content_already_saved)
     elif 'video' in file_type:
-        return compress_video(file_path, parent_folder, user_details, organization)
+        return compress_video(file_path, parent_folder, user_details, organization, content_already_saved)
     else:
-        return True
+        return True, False
 
 
-def compress_image(file_path, parent_folder=None, user_details=None, organization=None):
-    img = Image.open(file_path)
-    img = img.resize(img.size, Image.ANTIALIAS)
+def compress_image(file_path, parent_folder=None, user_details=None, organization=None, content_already_saved=False):
     filename = os.path.basename(file_path)
     title, ext = os.path.splitext(filename)
-    dest_filepath = filename
-    img.save(dest_filepath, optimize=True, quality=95)
-    img_file = open(dest_filepath)
+    if COMPRESS_IMAGE:
+        img = Image.open(file_path)
+        img = img.resize(img.size, Image.ANTIALIAS)
+        dest_filepath = filename
+        img.save(dest_filepath, optimize=True, quality=95)
+        img_file = open(dest_filepath)
+    else:
+        img_file = open(file_path)
     django_file = File(img_file)
-    content = Content(title=title, document=django_file, uploaded_by=user_details, last_modified_by=user_details,
-                      organization=user_details.organization, parent_folder=parent_folder, is_folder=False)
-    content.save()
-    try:
-        os.remove(filename)
-    except Exception as e:
-        debugFileLog.exception('Not able to delete compressed temp file')
-        debugFileLog.exception(e)
+    if content_already_saved:
+        if COMPRESS_IMAGE:
+            content = Content(title=title, document=django_file, uploaded_by=user_details, last_updated_by=user_details,
+                              organization=user_details.organization, parent_folder=parent_folder, is_folder=False)
+            content.save()
+        else:
+            return False, False
+    else:
+        content = Content(title=title, document=django_file, uploaded_by=user_details, last_updated_by=user_details,
+                          organization=user_details.organization, parent_folder=parent_folder, is_folder=False)
+        content.save()
+
+    # if COMPRESS_IMAGE:
+    #     try:
+    #         os.remove(filename)
+    #     except Exception as e:
+    #         debugFileLog.exception('Not able to delete compressed temp file')
+    #         debugFileLog.exception(e)
+    conversion_successful = True
+    delete_old = True
+    return conversion_successful, delete_old
+
+
+def video_conversion_required(file_path):
     return True
+    # try:
+    #     cmd = "ffprobe -show_format -show_streams -loglevel quiet -print_format json '%s'" % file_path
+    #     subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
 
 
-def compress_video(file_path, parent_folder=None, user_details=None, organization=None):
+def compress_video(file_path, parent_folder=None, user_details=None, organization=None, content_already_saved=False):
     filename = os.path.basename(file_path)
     title, ext = os.path.splitext(filename)
     temp_file_path = full_file_path(relative_path='temp/converted_' + title + '.mp4')
@@ -113,7 +137,7 @@ def compress_video(file_path, parent_folder=None, user_details=None, organizatio
         #     if re.match('[0-9]+$', line):
         #         resolution_width = int(line)
         convert_cmd = 'ffmpeg -i "%s" -vcodec libx264 -vprofile high -preset medium -vf ' \
-                      '"scale=2*trunc(iw/2):-2" -threads  0 -acodec copy -b:a 128k "%s"' % (file_path, temp_file_path)
+                      '"scale=2*trunc(iw/2):-2" -threads  0 -acodec copy -strict -2 -b:a 128k "%s"' % (file_path, temp_file_path)
         p = subprocess.Popen(convert_cmd, shell=True, stdout=subprocess.PIPE)
         output, error = p.communicate()
         if p.returncode != 0:
@@ -121,7 +145,7 @@ def compress_video(file_path, parent_folder=None, user_details=None, organizatio
             return False
         video_file = open(temp_file_path)
         django_file = File(video_file)
-        content = Content(title=title, document=django_file, uploaded_by=user_details, last_modified_by=user_details,
+        content = Content(title=title, document=django_file, uploaded_by=user_details, last_updated_by=user_details,
                           organization=organization, parent_folder=parent_folder)
         content.save()
         try:
@@ -160,18 +184,26 @@ def upload_content(request):
                     parent_folder = Content.get_user_filesystem(user_details).get(content_id=parent_folder_id)
                     assert parent_folder.is_folder
                 content = Content(title=title, document=document, uploaded_by=user_details,
-                                  last_modified_by=user_details, organization=user_details.organization,
+                                  last_updated_by=user_details, organization=user_details.organization,
                                   parent_folder=parent_folder, is_folder=False)
+                content.save()
+                # Saving the content twice so that the duration can be found out using content.document
                 content.save()
                 if content.is_image or content.is_video:
                     file_path = full_file_path(relative_path=content.document.name)
-                    if not process_media(file_path, parent_folder=parent_folder, user_details=user_details,
-                                         organization=user_details.organization):
+                    media_compressed, delete_old = process_media(
+                        file_path, parent_folder=parent_folder, user_details=user_details,
+                        organization=user_details.organization, content_already_saved=True)
+                    if not media_compressed:
                         error_str = 'Error while processing media file %s' % document.name
                         errors.append(error_str)
                         debugFileLog.exception(error_str)
-                        conversion_success = False
-                    content.delete()
+                        if delete_old:
+                            conversion_success = False
+                        else:
+                            conversion_success = True
+                    if delete_old:
+                        content.delete()
             except AssertionError:
                 success = False
                 error_str = "Improper parent folder, please refresh the page and try again"
@@ -237,7 +269,7 @@ def create_folder(request):
         Content.objects.create(title=title,
                                document=None,
                                uploaded_by=user_details,
-                               last_modified_by=user_details,
+                               last_updated_by=user_details,
                                organization=user_details.organization,
                                parent_folder=parent_folder,
                                is_folder=True)

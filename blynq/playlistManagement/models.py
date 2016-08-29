@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 # Create your models here.
 from authentication.models import UserDetails, Organization
+from blynq.settings import CONTENT_ORGANIZATION_NAME
 from contentManagement.models import Content
 from customLibrary.views_lib import debugFileLog
 
@@ -39,10 +40,10 @@ class Playlist(models.Model):
     user_visible = models.BooleanField(default=True)
     created_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_created_by',
                                    null=True)
-    created_time = models.DateTimeField(_('created time'), auto_now_add=True)
+    created_time = models.DateTimeField(_('created time'), auto_now_add=True, blank=True, null=True)
     last_updated_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL,
                                         related_name='%(class)s_last_updated_by', null=True)
-    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True)
+    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
 
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
 
@@ -64,6 +65,10 @@ class Playlist(models.Model):
     def get_all_playlists(user_details):
         return Playlist.objects.filter(organization=user_details.organization)
 
+    @staticmethod
+    def get_blynq_content_playlists():
+        return Playlist.objects.filter(organization__organization_name=CONTENT_ORGANIZATION_NAME)
+
 
 @receiver(post_save, sender=PlaylistItems)
 @receiver(post_delete, sender=PlaylistItems)
@@ -82,6 +87,7 @@ def playlist_items_changed(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Playlist)
+@receiver(pre_delete, sender=Playlist)
 def post_save_playlist(sender, instance, **kwargs):
     debugFileLog.info("Inside post_save_playlist")
     # Set the last_updated_time for all the schedules having this playlist

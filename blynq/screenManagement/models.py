@@ -7,6 +7,7 @@ from schedule.models import Calendar
 from authentication.models import Organization, UserDetails, City
 from blynq.settings import PLAYER_INACTIVE_THRESHOLD, PLAYER_POLL_TIME
 from customLibrary.views_lib import debugFileLog, today_date
+from django.utils.translation import ugettext_lazy as _
 
 
 # Create your models here.
@@ -81,6 +82,8 @@ class ScreenActivationKey(models.Model):
     in_use = models.BooleanField(default=False)
     verified = models.BooleanField(default=False)
 
+    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
+
     def __unicode__(self):
         return 'serial number {0} key {1}'.format(str(self.device_serial_num), str(self.activation_key))
 
@@ -120,6 +123,9 @@ class GroupScreens(models.Model):
 
     created_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True,
                                    related_name='%(class)s_created_by')
+
+    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
+
 
     def __unicode__(self):
         return self.screen.screen_name + '-' + self.group.group_name
@@ -222,3 +228,5 @@ class ScreenAnalytics(models.Model):
     screen = models.ForeignKey(Screen, related_name='%(class)s_screen')
     date = models.DateField(default=today_date)
     time_online = models.PositiveIntegerField(default=0)    # in seconds
+
+    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)

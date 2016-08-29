@@ -191,6 +191,7 @@ def event_json_from_occurrences(existing_occurrences):
         campaign_dict = {'schedule_id': schedule.schedule_id,
                          'playlists': playlists_json,
                          'pane': layout_pane_dict,
+                         'mute_audio': schedule_pane.mute_audio,
                          'last_updated_time': schedule.last_updated_time,
                          'start_time': occur.start,
                          'end_time': occur.end}
@@ -246,7 +247,7 @@ def get_screen_data(request, nof_days=7):
             schedule_screens = ScheduleScreens.objects.filter(
                 screen=screen)
             schedule_screens_updated = schedule_screens.filter(
-                schedule__last_updated_time__gte=last_received_datetime)
+                schedule__last_updated_time__gte=last_received_datetime, )
             if schedule_screens_updated:
                 schedule_ids_list = schedule_screens.filter(schedule__deleted=False).values_list(
                     'schedule_id', flat=True).distinct()

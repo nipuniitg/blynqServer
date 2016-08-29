@@ -8,7 +8,7 @@ from contentManagement.views import get_files_recursively
 from customLibrary.views_lib import get_userdetails, string_to_dict, ajax_response, obj_to_json_response
 from playlistManagement.models import Playlist, PlaylistItems
 # Create your views here.
-from playlistManagement.serializers import default_playlist_serializer
+from playlistManagement.serializers import default_playlist_serializer, PlaylistSerializer
 
 
 @login_required
@@ -142,6 +142,14 @@ def get_widget_playlists(request):
     return obj_to_json_response(json_data)
 
 
+def get_blynq_playlists(request):
+    user_details = get_userdetails(request)
+    blynq_playlists = Playlist.get_blynq_content_playlists()
+    json_data = PlaylistSerializer().serialize(blynq_playlists,
+                                               fields=('playlist_id', 'playlist_title','playlist_items'))
+    return obj_to_json_response(json_data)
+
+
 def get_files_recursively_json(request, parent_folder_id):
     """
     :param request:
@@ -163,9 +171,3 @@ def get_files_recursively_json(request, parent_folder_id):
     all_files = user_content.filter(content_id__in=all_files_content_ids)
     json_data = default_content_serializer(all_files, fields=('title', 'document', 'content_type', 'content_id'))
     return obj_to_json_response(json_data)
-
-
-
-
-
-

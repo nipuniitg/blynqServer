@@ -10,8 +10,8 @@ import os
 import hashlib
 # Create your models here.
 from authentication.models import UserDetails, Organization
-from blynq.settings import BASE_DIR, MEDIA_ROOT, USERCONTENT_DIR, DELETED_CONTENT_DIR
-from customLibrary.views_lib import debugFileLog
+from blynq.settings import BASE_DIR, MEDIA_ROOT, USERCONTENT_DIR, DELETED_CONTENT_DIR, DEFAULT_DISPLAY_TIME
+from customLibrary.views_lib import debugFileLog, get_video_length, full_file_path
 
 
 class ContentType(models.Model):
@@ -51,13 +51,15 @@ class Content(models.Model):
 
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.PROTECT)
 
+    duration = models.IntegerField(default=DEFAULT_DISPLAY_TIME)
+
     uploaded_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_uploaded_by',
                                     null=True)
     uploaded_time = models.DateTimeField(_('uploaded time'), auto_now_add=True)
 
-    last_modified_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_modified_by',
-                                         null=True)
-    last_modified_time = models.DateTimeField(_('modified at'), auto_now=True)
+    last_updated_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_modified_by',
+                                        null=True)
+    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True)
 
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
 
@@ -126,6 +128,11 @@ class Content(models.Model):
             raise NotSupportedError('%s is not supported at the moment' % full_file_type)
         self.content_type = content_type
         self.increment_size()
+        # Now increment the used_file_size of the organization if the file is being saved for the first time
+        if self.document:
+            if self.is_video or self.is_audio:
+                seconds = get_video_length(full_file_path(self.document.name))
+                self.duration = seconds
         super(Content, self).save(*args, **kwargs)
 
     @property
@@ -183,6 +190,17 @@ class Content(models.Model):
         file_type, encoding = mimetypes.guess_type(str(self.document.url))
         if file_type:
             return 'video' in file_type
+        else:
+            return False
+
+    @property
+    def is_audio(self):
+        if not self.document:
+            return False
+        import mimetypes
+        file_type, encoding = mimetypes.guess_type(str(self.document.url))
+        if file_type:
+            return 'audio' in file_type
         else:
             return False
 

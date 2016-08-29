@@ -9,5 +9,6 @@ urlpatterns = [
         name='get_files_recursively'),
     url(r'^upsertPlaylist', views.upsert_playlist, name='upsert_playlist'),
     url(r'^deletePlaylist', views.delete_playlist, name='delete_playlist'),
-    url(r'^getWidgetPlaylists', views.get_widget_playlists, name='get_widget_playlists')
+    url(r'^getWidgetPlaylists', views.get_widget_playlists, name='get_widget_playlists'),
+    url(r'^getBlynqPlaylists', views.get_blynq_playlists, name='get_blynq_playlists'),
 ]

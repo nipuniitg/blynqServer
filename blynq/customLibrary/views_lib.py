@@ -2,6 +2,9 @@
 import datetime
 import logging
 
+import subprocess
+
+import re
 from django.core.mail import send_mail
 from django.http import JsonResponse, Http404
 from django.utils import timezone
@@ -80,6 +83,20 @@ time_fmt = "%H:%M"
 date_fmt = "%Y/%m/%d"
 datetime_fmt = "%Y/%m/%d %H:%M"
 datetime_fmt_with_seconds = "%Y/%m/%d %H:%M:%S"
+
+
+def get_video_length(file_path):
+    default_video_duration = 120
+    try:
+        result = subprocess.Popen('ffprobe -i "%s" -show_entries format=duration -v quiet -of csv="p=0"' % file_path,
+                                  stdout=subprocess.PIPE,stderr=subprocess.STDOUT, shell=True)
+        output = result.communicate()
+        durations = re.findall("\d+", output[0])
+        duration = int(durations[0]) if durations else default_video_duration
+        return duration
+    except Exception as e:
+        debugFileLog.exception(e)
+        return default_video_duration
 
 
 def get_ist_datetime(utc_datetime):
