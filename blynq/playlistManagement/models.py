@@ -1,13 +1,14 @@
 from django.db import models
-from django.db.models.signals import post_save, pre_delete
+from django.db.models import Sum
+from django.db.models.signals import post_save, pre_delete, post_delete
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 # Create your models here.
 from authentication.models import UserDetails, Organization
+from blynq.settings import CONTENT_ORGANIZATION_NAME
 from contentManagement.models import Content
 from customLibrary.views_lib import debugFileLog
-from screenManagement.models import Screen
 
 
 class PlaylistItems(models.Model):
@@ -38,10 +39,10 @@ class Playlist(models.Model):
 
     created_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_created_by',
                                    null=True)
-    created_time = models.DateTimeField(_('created time'), auto_now_add=True)
+    created_time = models.DateTimeField(_('created time'), auto_now_add=True, blank=True, null=True)
     last_updated_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL,
                                         related_name='%(class)s_last_updated_by', null=True)
-    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True)
+    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
 
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
 
@@ -55,9 +56,30 @@ class Playlist(models.Model):
     def get_user_relevant_objects(user_details):
         return Playlist.objects.filter(organization=user_details.organization)
 
+    @staticmethod
+    def get_blynq_content_playlists():
+        return Playlist.objects.filter(organization__organization_name=CONTENT_ORGANIZATION_NAME)
+
+
+@receiver(post_save, sender=PlaylistItems)
+@receiver(post_delete, sender=PlaylistItems)
+def playlist_items_changed(sender, instance, **kwargs):
+    try:
+        playlist_total_time = 0
+        total_time = PlaylistItems.objects.filter(playlist_id=instance.playlist_id).aggregate(Sum('display_time'))
+        if total_time['display_time__sum']:
+            playlist_total_time = total_time['display_time__sum']
+        playlist = Playlist.objects.get(playlist_id=instance.playlist_id)
+        playlist.playlist_total_time = playlist_total_time
+        playlist.save()
+    except Exception as e:
+        debugFileLog.exception('Failed to update the playlist total time for playlist_id %d' % instance.playlist_id)
+        debugFileLog.exception(e)
+
 
 @receiver(pre_delete, sender=Playlist)
 @receiver(post_save, sender=Playlist)
+@receiver(pre_delete, sender=Playlist)
 def post_save_playlist(sender, instance, **kwargs):
     debugFileLog.info("Inside post_save_playlist")
     from scheduleManagement.models import SchedulePane, ScheduleScreens

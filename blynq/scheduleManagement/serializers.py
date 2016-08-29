@@ -1,12 +1,11 @@
 from django.core.serializers.python import Serializer
 
+from blynq.settings import CONTENT_ORGANIZATION_NAME
 from customLibrary.views_lib import get_ist_date_str, get_ist_time_str, debugFileLog
 from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import SchedulePlaylists, ScheduleScreens, SchedulePane
-from layoutManagement.models import LayoutPane
 from screenManagement.serializers import ScreenSerializer, GroupSerializer
-from layoutManagement.serializers import LayoutPaneSerializer, LayoutSerializer, default_layout_serializer, \
-    default_layout_pane_serializer
+from layoutManagement.serializers import default_layout_serializer, default_layout_pane_serializer
 
 
 class SchedulePlaylistsSerializer(Serializer):
@@ -27,11 +26,19 @@ class SchedulePlaylistsSerializer(Serializer):
 class SchedulePaneSerializer(Serializer):
     def end_object(self, obj):
         self._current['schedule_pane_id'] = obj._get_pk_val()
+        schedule_organization = obj.schedule.organization
         if 'schedule_playlists' in self.selected_fields:
-            schedule_playlists = SchedulePlaylists.objects.filter(schedule_pane=obj)
+            schedule_playlists = SchedulePlaylists.objects.filter(schedule_pane=obj,
+                                                                  playlist__organization=schedule_organization)
             json_data = SchedulePlaylistsSerializer().serialize(
                 schedule_playlists, fields=('schedule_playlist_id','playlist'))
             self._current['schedule_playlists'] = json_data
+        if 'schedule_blynq_playlists' in self.selected_fields:
+            schedule_blynq_playlists = SchedulePlaylists.objects.filter(
+                schedule_pane=obj, playlist__organization__organization_name=CONTENT_ORGANIZATION_NAME)
+            json_data = SchedulePlaylistsSerializer().serialize(
+                schedule_blynq_playlists, fields=('schedule_playlist_id','playlist'))
+            self._current['schedule_blynq_playlists'] = json_data
         if 'layout_pane' in self.selected_fields:
             if obj.layout_pane:
                 json_data = default_layout_pane_serializer([obj.layout_pane])
@@ -89,7 +96,8 @@ def get_schedule_timeline(schedule_pane):
         params = rule.get_params() if rule else {}
         event_json['frequency'] = rule.frequency if rule else None
         event_json['interval'] = params.get('interval')
-        event_json['byweekday'] = params.get('byweekday')
+        from scheduleManagement.views import weekday_string_to_index
+        event_json['byweekday'] = weekday_string_to_index(params.get('byweekday'), reverse=True)
         event_json['bymonthday'] = params.get('bymonthday')
         event_json['byweekno'] = params.get('byweekno')
         return event_json
@@ -120,7 +128,8 @@ class ScheduleSerializer(Serializer):
             schedule_panes = SchedulePane.objects.filter(schedule=obj)
             json_data = SchedulePaneSerializer().serialize(schedule_panes,
                                                            fields=('schedule_pane_id', 'schedule_playlists',
-                                                                   'layout_pane', 'timeline'))
+                                                                   'schedule_blynq_playlists',
+                                                                   'layout_pane', 'timeline', 'mute_audio'))
             self._current['schedule_panes'] = json_data
         self.objects.append(self._current)
 

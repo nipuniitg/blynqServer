@@ -1,7 +1,7 @@
 (function(){
     'use strict';
     var mainApp =  angular.module('mainApp', ['ui.router','sdApp', 'plApp','sagApp','hApp','lApp','uDApp',
-     'mwl.calendar','ui.bootstrap'])
+    'rApp','shApp','mwl.calendar','ui.bootstrap'])
     .config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('{[');
     $interpolateProvider.endSymbol(']}');
@@ -85,6 +85,12 @@ mainApp.config(function($locationProvider,$stateProvider, $urlRouterProvider) {
         ,templateUrl : '/static/templates/layoutManagement/layout_design_index.html'
         ,controller : 'layoutDesignIndexCtrl'
         ,controllerAs : 'lDIC'
+    })
+    .state('reports', {
+      url: "/reports"
+      ,templateUrl: "/static/templates/reports/reports_index.html"
+      ,controller: 'reportsIndexCtrl'
+      ,controllerAs : 'reportsIndexCtrl'
     })
     .state('logout',{
         template : ' '

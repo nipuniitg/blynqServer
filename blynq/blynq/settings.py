@@ -30,7 +30,8 @@ DEBUG = False
 if DEBUG:
     ALLOWED_HOSTS = []
 else:
-    ALLOWED_HOSTS = ['http://blynq.in', 'http://www.blynq.in', 'www.blynq.in']
+    ALLOWED_HOSTS = ['http://www.blynq.in', 'http://blynq.in', 'www.blynq.in', 'blynq.in']
+    PREPEND_WWW = True
 
 
 # Application definition
@@ -55,7 +56,7 @@ INSTALLED_APPS = (
     'playerManagement',
     'scheduleManagement',
     'layoutManagement',
-    'analytics',
+    'reports',
     #'django_js_reverse',
 )
 
@@ -151,8 +152,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGIN_URL = '/authentication/login/'  # The page users are directed to if they are not logged in,
 
 # Content related settings
-DEFAULT_DISPLAY_TIME = 10
-STORAGE_LIMIT_PER_ORGANIZATION = 5*1024*1024*1024  # 1 gb 1*1024*1024*1024
+DEFAULT_DISPLAY_TIME = 30
+STORAGE_LIMIT_PER_ORGANIZATION = 1*1024*1024*1024  # 1 gb 1*1024*1024*1024
 
 
 today = timezone.now().strftime("%Y%m%d")
@@ -210,22 +211,22 @@ if DEBUG:
     USERCONTENT_DIR = 'test_usercontent'
     DELETED_CONTENT_DIR = 'test_deletedcontent'
 else:
-    HOST_URL = ALLOWED_HOSTS[0] if ALLOWED_HOSTS else 'http://blynq.in'
+    HOST_URL = ALLOWED_HOSTS[0] if ALLOWED_HOSTS else 'http://www.blynq.in'
     USERCONTENT_DIR = 'usercontent'
     DELETED_CONTENT_DIR = 'deletedcontent'
 
 MEDIA_HOST = HOST_URL
-PLAYER_LOG_DIRECTORY = os.path.join(BASE_DIR, 'logs/player')
-if not os.path.exists(PLAYER_LOG_DIRECTORY):
-    os.makedirs(PLAYER_LOG_DIRECTORY)
-
 PLAYER_UPDATES_DIR = 'player_updates'
+
+PLAYER_LOG_DIR = 'player_logs'
+
 PLAYER_POLL_TIME = 60  # Time difference in seconds between successive polls of the player
 PLAYER_INACTIVE_THRESHOLD = PLAYER_POLL_TIME + 1    # Wait this time (in seconds) to change status of screen as inactive
 
 # in MEDIA_ROOT
 # the uploaded content of each user is present in /media/usercontent/userdetails.user.id/
 # the deleted files are moved to /media/deletedcontent/organization.organization_id
+COMPRESS_IMAGE = False
 
 # Some functionalities like push technology are restricted when server is not connected to internet
 INTERNET_ENABLED = True
@@ -240,3 +241,6 @@ EMAIL_HOST = 'smtp.zoho.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'django@blynq.in'
 EMAIL_HOST_PASSWORD = 'Asdf;lkj'
+
+# Don't change the below name if you aren't sure.
+CONTENT_ORGANIZATION_NAME = 'Partner Content'

@@ -9,4 +9,6 @@ urlpatterns = [
     url(r'^updateAvailable', views.player_update_available, name='player_update_available'),
     url(r'fcmRegister', views.fcm_register, name='fcm_register'),
     url(r'^config', views.player_config, name='player_config'),
+    url(r'^mediaStats', views.media_stats, name='media_stats'),
+    url(r'^logs', views.insert_logs, name='insert_logs'),
 ]

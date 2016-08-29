@@ -48,13 +48,11 @@ def upsert_playlist(request):
                 playlist.save()
 
             # upsert playlist items
-            playlist_total_time = 0
             playlist_item_id_list = []
             for pos_index, item in enumerate(playlist_items):
                 playlist_item_id = int(item.get('playlist_item_id'))
                 content_id = int(item.get('content_id'))
                 display_time = int(item.get('display_time'))
-                playlist_total_time += display_time
                 content = Content.get_user_relevant_objects(user_details=user_details).get(content_id=content_id)
                 if playlist_item_id == -1:
                     entry = PlaylistItems.objects.create(playlist=playlist, content=content, position_index=pos_index,
@@ -66,9 +64,6 @@ def upsert_playlist(request):
                     entry.display_time = display_time
                     entry.save()
                 playlist_item_id_list.append(playlist_item_id)
-
-            playlist.playlist_total_time = playlist_total_time
-            playlist.save()
 
             # Remove content not in playlist_items
             removed_playlist_content = PlaylistItems.objects.filter(playlist=playlist).exclude(
@@ -145,6 +140,14 @@ def get_playlists(request):
     return obj_to_json_response(json_data)
 
 
+def get_blynq_playlists(request):
+    user_details = get_userdetails(request)
+    blynq_playlists = Playlist.get_blynq_content_playlists()
+    json_data = PlaylistSerializer().serialize(blynq_playlists,
+                                               fields=('playlist_id', 'playlist_title','playlist_items'))
+    return obj_to_json_response(json_data)
+
+
 def get_files_recursively_json(request, parent_folder_id):
     """
     :param request:
@@ -164,7 +167,8 @@ def get_files_recursively_json(request, parent_folder_id):
     user_details = get_userdetails(request)
     user_content = Content.get_user_relevant_objects(user_details=user_details)
     all_files = user_content.filter(content_id__in=all_files_content_ids)
-    json_data = ContentSerializer().serialize(all_files, fields=('title', 'document', 'content_type', 'content_id'),
+    json_data = ContentSerializer().serialize(all_files, fields=('title', 'document', 'content_type', 'content_id',
+                                                                 'duration'),
                                               use_natural_foreign_keys=True)
     return obj_to_json_response(json_data)
 

@@ -49,10 +49,25 @@ def append_params(params, new_keyvalue):
         return params
 
 
+BYWEEKDAY_DICT = {'Mon': 0, 'Tue': 1, 'Wed': 2, 'Thu': 3, 'Fri': 4, 'Sat': 5, 'Sun': 6}
+REVERSE_BYWEEKDAY_DICT = {0: 'Mon', 1: 'Tue', 2: 'Wed', 3: 'Thu', 4: 'Fri', 5: 'Sat', 6: 'Sun'}
+
+
+def weekday_string_to_index(byweekday, reverse=False):
+    new_byweekday = []
+    if not byweekday:
+        return new_byweekday
+    mapping_dict = REVERSE_BYWEEKDAY_DICT if reverse else BYWEEKDAY_DICT
+    for ele in byweekday:
+        new_byweekday.append(mapping_dict[ele])
+    return new_byweekday
+
+
 # byweekday should be a list [0,2,3] meaning 0-Monday, 1-Tuesday, 2-Wednesday, 3-Thursday, 4-Friday, 5-Saturday,6-Sunday
 def generate_rule_params(interval=1, bymonthday=None, byweekday=None, byweekno=None):
     debugFileLog.info("inside generate_rule_params")
     params = interval_param(interval)
+    byweekday = weekday_string_to_index(byweekday)
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekday', bylistday=byweekday))
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='bymonthday', bylistday=bymonthday))
     params = append_params(params=params, new_keyvalue=list_to_param(key_str='byweekno', bylistday=byweekno))
@@ -78,12 +93,12 @@ def event_for_allday(schedule, timeline):
     debugFileLog.info("inside event_for_allday")
     start_date = timeline.get('start_date')
     start_time = "00:00"  # datetime.time(0)
-    start = generate_utc_datetime(ist_date=start_date, ist_time=start_time)
+    start = generate_utc_datetime(ist_date=start_date, ist_time=start_time, seconds_str='00')
     end_date = start_date
     end_time = "23:59"  # datetime.time(23, 59, 59, 999)
-    end = generate_utc_datetime(ist_date=end_date, ist_time=end_time)
+    end = generate_utc_datetime(ist_date=end_date, ist_time=end_time, seconds_str='59')
     end_recurring_period_date = timeline.get('end_recurring_period')
-    end_recurring_period = generate_utc_datetime(ist_date=end_recurring_period_date, ist_time=end_time)
+    end_recurring_period = generate_utc_datetime(ist_date=end_recurring_period_date, ist_time=end_time, seconds_str='59')
     rule = generate_rule(timeline=timeline, name=schedule.schedule_title, description=schedule.schedule_title)
     creator = schedule.created_by.user if schedule.created_by else None
     event_dict = {'start': start, 'end': end, 'title': schedule.schedule_title, 'creator': creator,
@@ -125,13 +140,14 @@ def event_dict_from_timeline(timeline, schedule):
     else:
         start_date = timeline.get('start_date')
         start_time = timeline.get('start_time')
-        start = generate_utc_datetime(ist_date=start_date, ist_time=start_time)
+        start = generate_utc_datetime(ist_date=start_date, ist_time=start_time, seconds_str='00')
         end_date = start_date
         end_time = timeline.get('end_time')
-        end = generate_utc_datetime(ist_date=end_date, ist_time=end_time)
+        end = generate_utc_datetime(ist_date=end_date, ist_time=end_time, seconds_str='59')
         end_recurring_period_time = end_time
         end_recurring_period = timeline.get('end_recurring_period')
-        end_recurring_period = generate_utc_datetime(ist_date=end_recurring_period, ist_time=end_recurring_period_time)
+        end_recurring_period = generate_utc_datetime(ist_date=end_recurring_period, ist_time=end_recurring_period_time,
+                                                     seconds_str='59')
         rule = generate_rule(timeline, name=schedule.schedule_title, description=schedule.schedule_title)
         creator = schedule.created_by.user if schedule.created_by else None
         event_dict = {'start': start, 'end': end, 'title': schedule.schedule_title, 'creator': creator,
@@ -218,14 +234,17 @@ def upsert_schedule_groups(user_details, schedule, schedule_groups):
 
 
 # upsert schedule playlists
-def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists):
+def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists, blynq_playlists=False):
     debugFileLog.info("inside upsert_schedule_playlists")
     error = ''
     schedule_playlist_id_list = []
     for pos_index, item in enumerate(schedule_playlists):
         schedule_playlist_id = int(item.get('schedule_playlist_id'))
         playlist_id = int(item.get('playlist_id'))
-        playlist = Playlist.get_user_relevant_objects(user_details).get(playlist_id=playlist_id)
+        if blynq_playlists:
+            playlist = Playlist.get_blynq_content_playlists().get(playlist_id=playlist_id)
+        else:
+            playlist = Playlist.get_user_relevant_objects(user_details).get(playlist_id=playlist_id)
         if schedule_playlist_id == -1:
             entry = SchedulePlaylists(schedule_pane_id=schedule_pane_id, playlist=playlist, position_index=pos_index)
             entry.save()
@@ -251,22 +270,24 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
     for item in schedule_panes:
         schedule_pane_id = int(item.get('schedule_pane_id'))
         schedule_playlists = item.get('schedule_playlists')
+        schedule_blynq_playlists = item.get('schedule_blynq_playlists')
         layout_pane = item.get('layout_pane')
         layout_pane_id = int(layout_pane.get('layout_pane_id'))
+        mute_audio = item.get('mute_audio')
         timeline = item.get('timeline')
         is_always = timeline.get('is_always')
         all_day = timeline.get('all_day')
         recurrence_absolute = timeline.get('recurrence_absolute')
         if not recurrence_absolute:
             recurrence_absolute = False
-        if schedule_playlists:
+        if schedule_playlists or schedule_blynq_playlists:
             event_dict = event_dict_from_timeline(timeline=timeline, schedule=schedule)
             event = Event(**event_dict)
             event.save()
         else:
             event = None
         if schedule_pane_id == -1:
-            schedule_pane = SchedulePane(schedule=schedule, layout_pane_id=layout_pane_id,
+            schedule_pane = SchedulePane(schedule=schedule, layout_pane_id=layout_pane_id, mute_audio=mute_audio,
                                          is_always=is_always, all_day=all_day, recurrence_absolute=recurrence_absolute,
                                          event=event)
             schedule_pane.save()
@@ -277,12 +298,17 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
             schedule_pane.layout_pane_id = layout_pane_id
             schedule_pane.is_always = is_always
             schedule_pane.all_day = all_day
+            schedule_pane.mute_audio = mute_audio
             schedule_pane.recurrence_absolute = recurrence_absolute
             # Not deleting the event, to have the history of events
             schedule_pane.event = event
             schedule_pane.save()
-        upsert_schedule_playlists(user_details=user_details, schedule_pane_id=schedule_pane_id,
-                                  schedule_playlists=schedule_playlists)
+        if schedule_playlists:
+            upsert_schedule_playlists(user_details=user_details, schedule_pane_id=schedule_pane_id,
+                                      schedule_playlists=schedule_playlists)
+        if schedule_blynq_playlists:
+            upsert_schedule_playlists(user_details=user_details, schedule_pane_id=schedule_pane_id,
+                                      schedule_playlists=schedule_blynq_playlists, blynq_playlists=True)
         schedule_pane_id_list.append(schedule_pane_id)
 
     # Remove Schedule Panes which are not in the post request

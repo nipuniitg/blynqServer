@@ -1,0 +1,20 @@
+<!-- directive: filters; controller : filtersCtrl -->
+
+<div class="well" style="margin:20px 0;">
+    <div class="row">
+        <div class="col-md-1">
+            <a class="pointer" ng-click="filtersCtrl.filterIconClicked()">
+                <i class="fa fa-filter"></i>Filters
+            </a>
+        </div>
+        <div class="col-md-1">
+            <a class="pointer" ng-click="filtersCtrl.resetFilterset()">
+                <i class="fa fa-undo"></i>Reset
+            </a>
+        </div>
+        <div class="col-md-10">
+            <filterset-textbox>
+            </filterset-textbox>
+        </div>
+    </div>
+</div>

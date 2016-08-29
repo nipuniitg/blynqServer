@@ -5,7 +5,7 @@ from django.db import models
 # Create your models here.
 from django.utils.translation import ugettext_lazy as _
 from authentication.models import UserDetails, Organization
-from blynq.settings import MEDIA_ROOT, PLAYER_UPDATES_DIR
+from blynq.settings import MEDIA_ROOT, PLAYER_UPDATES_DIR, PLAYER_LOG_DIR
 
 
 def upload_to_dir(instance, filename):
@@ -23,7 +23,7 @@ class PlayerUpdate(models.Model):
                                     null=True)
     comments = models.TextField(blank=True, null=True)
     uploaded_time = models.DateTimeField(_('uploaded time'), auto_now_add=True)
-    last_modified_time = models.DateTimeField(_('modified at'), auto_now=True)
+    last_updated_time = models.DateTimeField(_('updated at'), auto_now=True, blank=True, null=True)
 
     class Meta:
         ordering = ['-uploaded_time']
@@ -42,3 +42,18 @@ class LocalServer(models.Model):
 
     def __unicode__(self):
         return self.local_url + ' ' + self.organization.name
+
+
+def upload_to_player_dir(instance, filename):
+    filename = os.path.basename(filename)
+    return '%s/%s' % (PLAYER_LOG_DIR, filename)
+
+
+class PlayerLog(models.Model):
+    player_log_id = models.AutoField(primary_key=True)
+    file = models.FileField(upload_to=upload_to_player_dir, null=True)
+    uploaded_time = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        player_str = self.file.name if self.file else 'No filename exists'
+        return player_str

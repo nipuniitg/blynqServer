@@ -2,15 +2,19 @@ import shutil
 
 from django.core.exceptions import ValidationError
 from django.db import models, NotSupportedError
+from django.conf import settings
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
+from django.utils import timezone
+from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
+from django.core.files.base import ContentFile
 import os
-
+import hashlib
 # Create your models here.
 from authentication.models import UserDetails, Organization
-from blynq.settings import MEDIA_ROOT, USERCONTENT_DIR, DELETED_CONTENT_DIR
-from customLibrary.views_lib import debugFileLog
+from blynq.settings import BASE_DIR, MEDIA_ROOT, USERCONTENT_DIR, DELETED_CONTENT_DIR, DEFAULT_DISPLAY_TIME
+from customLibrary.views_lib import debugFileLog, get_video_length, full_file_path
 
 
 class ContentType(models.Model):
@@ -53,7 +57,11 @@ class ContentType(models.Model):
 
 def upload_to_dir(instance, filename):
     filename = os.path.basename(filename)
-    return '%s/user%d/%s' % (USERCONTENT_DIR, instance.uploaded_by.id, filename)
+    if instance.uploaded_by:
+        user_directory = 'user%d' % instance.uploaded_by.id
+    else:
+        user_directory = 'public'
+    return '%s/%s/%s' % (USERCONTENT_DIR, user_directory, filename)
 
 
 class Content(models.Model):
@@ -68,13 +76,15 @@ class Content(models.Model):
 
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.PROTECT)
 
+    duration = models.IntegerField(default=DEFAULT_DISPLAY_TIME)
+
     uploaded_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_uploaded_by',
                                     null=True)
     uploaded_time = models.DateTimeField(_('uploaded time'), auto_now_add=True)
 
-    last_modified_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_modified_by',
-                                         null=True)
-    last_modified_time = models.DateTimeField(_('modified at'), auto_now=True)
+    last_updated_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_modified_by',
+                                        null=True)
+    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True)
 
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
 
@@ -125,6 +135,10 @@ class Content(models.Model):
             raise NotSupportedError('%s is not supported at the moment' % full_file_type)
         self.content_type = content_type
         # Now increment the used_file_size of the organization if the file is being saved for the first time
+        if self.document:
+            if self.is_video or self.is_audio:
+                seconds = get_video_length(full_file_path(self.document.name))
+                self.duration = seconds
         if self.document and self.pk is None:
             if self.organization.used_file_size + self.document.size <= self.organization.total_file_size_limit:
                 self.organization.used_file_size = self.organization.used_file_size + self.document.size
@@ -166,6 +180,39 @@ class Content(models.Model):
 
     # class Meta:
     #     ordering = ['-last_modified_time']
+
+    @property
+    def is_image(self):
+        if not self.document:
+            return False
+        import mimetypes
+        file_type, encoding = mimetypes.guess_type(str(self.document.url))
+        if file_type:
+            return 'image' in file_type
+        else:
+            return False
+
+    @property
+    def is_video(self):
+        if not self.document:
+            return False
+        import mimetypes
+        file_type, encoding = mimetypes.guess_type(str(self.document.url))
+        if file_type:
+            return 'video' in file_type
+        else:
+            return False
+
+    @property
+    def is_audio(self):
+        if not self.document:
+            return False
+        import mimetypes
+        file_type, encoding = mimetypes.guess_type(str(self.document.url))
+        if file_type:
+            return 'audio' in file_type
+        else:
+            return False
 
     @staticmethod
     def get_user_relevant_objects(user_details):

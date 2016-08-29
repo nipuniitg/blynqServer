@@ -188,52 +188,52 @@
                                     Monthly Recurrence Frequency must be a number between 1 and 999
                                 </p>
                             </div>
-                            <div class="form-group">
-                                <div class="">
-                                    <label class="control-label">
-                                        <input ng-model="recurrence.monthly.recurrenceAbsolute" ng-value=""
-                                               type="radio"
-                                               name="247" value="false">
-                                        The
-                                    </label>
-                                    <fieldset ng-disabled="recurrence.monthly.recurrenceAbsolute" class="input-short"
-                                              disabled="disabled">
-                                        <!--<week-dropdown week="recurrence.monthly.relative.recurrenceWeekOfMonth">-->
-                                        <select class="form-control input-group-addon input-short"
-                                                ng-model="recurrence.monthly.relative.recurrenceWeekOfMonth"
-                                                integer-parser="">
-                                            <option value="0">First</option>
-                                            <option value="1">Second</option>
-                                            <option value="2">Third</option>
-                                            <option value="3">Fourth</option>
-                                            <option value="4">Last</option>
-                                        </select>
-                                        <!--</week-dropdown>-->
-                                        <select class="form-control input-short"
-                                                ng-model="recurrence.monthly.relative.recurrenceDayOfWeek"
-                                                integer-parser="">
-                                            <option value="0">Sunday</option>
-                                            <option value="1">Monday</option>
-                                            <option value="2">Tuesday</option>
-                                            <option value="3">Wednesday</option>
-                                            <option value="4">Thursday</option>
-                                            <option value="5">Friday</option>
-                                            <option value="6">Saturday</option>
-                                        </select>
-                                        <label class="control-label ">of Every</label>
-                                        <input type="number" class="form-control input-short"
-                                               name="monthlyRelativeRecurrenceFrequency"
-                                               ng-model="recurrence.monthly.relative.recurrenceFrequency"
-                                               min="1" max="999"
-                                               ng-required="timeline.recurrenceType === 'Monthly' &amp;&amp; !recurrence.monthly.recurrenceAbsolute">
-                                        <label class="">Month(s)</label>
-                                    </fieldset>
-                                </div>
-                                <p class="text-danger ng-hide"
-                                   ng-show="timelineDetails.monthlyRelativeRecurrenceFrequency.$invalid">
-                                    Monthly Relative Recurrence Frequency must be a number between 1 and 999
-                                </p>
-                            </div>
+                            <!--<div class="form-group">-->
+                                <!--<div class="">-->
+                                    <!--<label class="control-label">-->
+                                        <!--<input ng-model="recurrence.monthly.recurrenceAbsolute" ng-value=""-->
+                                               <!--type="radio"-->
+                                               <!--name="247" value="false">-->
+                                        <!--The-->
+                                    <!--</label>-->
+                                    <!--<fieldset ng-disabled="recurrence.monthly.recurrenceAbsolute" class="input-short"-->
+                                              <!--disabled="disabled">-->
+                                        <!--&lt;!&ndash;<week-dropdown week="recurrence.monthly.relative.recurrenceWeekOfMonth">&ndash;&gt;-->
+                                        <!--<select class="form-control input-group-addon input-short"-->
+                                                <!--ng-model="recurrence.monthly.relative.recurrenceWeekOfMonth"-->
+                                                <!--integer-parser="">-->
+                                            <!--<option value="0">First</option>-->
+                                            <!--<option value="1">Second</option>-->
+                                            <!--<option value="2">Third</option>-->
+                                            <!--<option value="3">Fourth</option>-->
+                                            <!--<option value="4">Last</option>-->
+                                        <!--</select>-->
+                                        <!--&lt;!&ndash;</week-dropdown>&ndash;&gt;-->
+                                        <!--<select class="form-control input-short"-->
+                                                <!--ng-model="recurrence.monthly.relative.recurrenceDayOfWeek"-->
+                                                <!--integer-parser="">-->
+                                            <!--<option value="0">Sunday</option>-->
+                                            <!--<option value="1">Monday</option>-->
+                                            <!--<option value="2">Tuesday</option>-->
+                                            <!--<option value="3">Wednesday</option>-->
+                                            <!--<option value="4">Thursday</option>-->
+                                            <!--<option value="5">Friday</option>-->
+                                            <!--<option value="6">Saturday</option>-->
+                                        <!--</select>-->
+                                        <!--<label class="control-label ">of Every</label>-->
+                                        <!--<input type="number" class="form-control input-short"-->
+                                               <!--name="monthlyRelativeRecurrenceFrequency"-->
+                                               <!--ng-model="recurrence.monthly.relative.recurrenceFrequency"-->
+                                               <!--min="1" max="999"-->
+                                               <!--ng-required="timeline.recurrenceType === 'Monthly' &amp;&amp; !recurrence.monthly.recurrenceAbsolute">-->
+                                        <!--<label class="">Month(s)</label>-->
+                                    <!--</fieldset>-->
+                                <!--</div>-->
+                                <!--<p class="text-danger ng-hide"-->
+                                   <!--ng-show="timelineDetails.monthlyRelativeRecurrenceFrequency.$invalid">-->
+                                    <!--Monthly Relative Recurrence Frequency must be a number between 1 and 999-->
+                                <!--</p>-->
+                            <!--</div>-->
                         </div>
                     </div>
                 </section>

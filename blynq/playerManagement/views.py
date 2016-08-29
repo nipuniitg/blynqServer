@@ -11,7 +11,8 @@ from contentManagement.models import Content
 from contentManagement.serializers import ContentSerializer
 from customLibrary.views_lib import debugFileLog, string_to_dict, default_string_to_datetime, obj_to_json_response, \
     ajax_response, date_changed
-from playerManagement.models import PlayerUpdate, LocalServer
+from playerManagement.models import PlayerUpdate, LocalServer, PlayerLog
+from reports.models import MediaAnalytics, ScreenAnalytics
 from playlistManagement.models import PlaylistItems
 from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import ScheduleScreens, SchedulePlaylists, SchedulePane
@@ -190,6 +191,7 @@ def event_json_from_occurrences(existing_occurrences):
         campaign_dict = {'schedule_id': schedule.schedule_id,
                          'playlists': playlists_json,
                          'pane': layout_pane_dict,
+                         'mute_audio': schedule_pane.mute_audio,
                          'last_updated_time': schedule.last_updated_time,
                          'start_time': occur.start,
                          'end_time': occur.end}
@@ -245,7 +247,7 @@ def get_screen_data(request, nof_days=7):
             schedule_screens = ScheduleScreens.objects.filter(
                 screen=screen)
             schedule_screens_updated = schedule_screens.filter(
-                schedule__last_updated_time__gte=last_received_datetime)
+                schedule__last_updated_time__gte=last_received_datetime, )
             if schedule_screens_updated:
                 schedule_ids_list = schedule_screens.filter(schedule__deleted=False).values_list(
                     'schedule_id', flat=True).distinct()
@@ -316,6 +318,62 @@ def notify_player(screen_ids):
                 debugFileLog.exception(e)
     except Exception as e:
         debugFileLog.exception(e)
+
+
+def media_stats(request):
+    debugFileLog.info('Inside media stats player')
+    try:
+        posted_data = string_to_dict(request.body)
+        unique_device_key = posted_data.get('device_key')
+        screen = Screen.objects.get(unique_device_key__activation_key=unique_device_key)
+        media_stats_list = posted_data.get('media_item_stats_list')
+        for stat in media_stats_list:
+            try:
+                content_id = int(stat.get('content_id'))
+                playlist_id = int(stat.get('playlist_id'))
+                count = int(stat.get('count'))
+                time_played = stat.get('time_played')
+                time_played = int(time_played) if time_played else 0
+                date = stat.get('date')
+                converted_date = default_string_to_datetime(date, fmt='%Y-%m-%d')
+                media_analytics = MediaAnalytics(screen=screen, content_id=content_id, playlist_id=playlist_id,
+                                                 count=count, date=converted_date, time_played=time_played)
+                media_analytics.save()
+            except Exception as e:
+                debugFileLog.exception('Improper media analytics data')
+                debugFileLog.exception(e)
+        screen_stats = posted_data.get('session_time_list')
+        for stat in screen_stats:
+            try:
+                start_time = stat.get('session_start_time')
+                session_start_time = default_string_to_datetime(start_time)
+                end_time = stat.get('session_end_time')
+                session_end_time = default_string_to_datetime(end_time)
+                screen_analytics = ScreenAnalytics(screen=screen, session_start_time=session_start_time,
+                                                   session_end_time=session_end_time)
+                screen_analytics.save()
+            except Exception as e:
+                debugFileLog.exception(e)
+        success = True
+    except Exception as e:
+        success = False
+        debugFileLog.exception(e)
+    return ajax_response(success=success)
+
+
+@csrf_exempt
+def insert_logs(request):
+    debugFileLog.info('Inside insert player logs')
+    try:
+        for key in request.FILES.keys():
+            file = request.FILES[key]
+            player_log = PlayerLog(file=file)
+            player_log.save()
+        success = True
+    except Exception as e:
+        debugFileLog.exception(e)
+        success = False
+    return ajax_response(success=success)
 
 
 @csrf_exempt

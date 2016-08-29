@@ -133,7 +133,7 @@ def create_content(default_content=True, is_folder=False, userdetails=None, pare
     try:
         content = Content.objects.get(title=title)
     except Content.DoesNotExist:
-        content = Content(title=title, document=document, uploaded_by=userdetails, last_modified_by=userdetails,
+        content = Content(title=title, document=document, uploaded_by=userdetails, last_updated_by=userdetails,
                           organization=userdetails.organization, is_folder=is_folder, parent_folder=parent_folder)
         content.save()
     return content

@@ -3,7 +3,11 @@ import os
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
+
 # See https://docs.djangoproject.com/en/1.8/ref/contrib/auth/ for User model details
+from django.utils import timezone
+
 from blynq.settings import STORAGE_LIMIT_PER_ORGANIZATION, MEDIA_ROOT, PLAYER_UPDATES_DIR
 
 
@@ -11,6 +15,8 @@ class City(models.Model):
     city_id = models.AutoField(primary_key=True)
     city_name = models.CharField(max_length=50, unique=True)
     state = models.CharField(max_length=50)
+
+    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
 
     def __unicode__(self):
         return self.city_name + ', ' + self.state
@@ -49,12 +55,15 @@ One organization should be Blynq
 class Organization(models.Model):
     organization_id = models.AutoField(primary_key=True)
     organization_name = models.CharField(max_length=100, unique=True)
-    website = models.CharField(max_length=100, null=True)
+    website = models.CharField(max_length=100, null=True, blank=True)
     # address = models.ForeignKey(Address, on_delete=models.PROTECT, blank=True, null=True)
     address = models.CharField(max_length=100, blank=True, null=True)
     contact = models.CharField(max_length=12, blank=True, null=True)
     total_file_size_limit = models.BigIntegerField(default=STORAGE_LIMIT_PER_ORGANIZATION)
     used_file_size = models.BigIntegerField(default=0)
+
+    created_time = models.DateTimeField(auto_now_add=True, null=True)
+    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
 
     def __unicode__(self):
         return self.organization_name
@@ -75,6 +84,8 @@ class Role(models.Model):
     role_id = models.AutoField(primary_key=True)
     role_name = models.CharField(max_length=50, unique=True)
     description = models.CharField(max_length=100, null=True)
+
+    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
 
     def __unicode__(self):
         return self.role_name
@@ -105,6 +116,8 @@ class UserDetails(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     mobile_number = models.CharField(max_length=14, validators=[mobile_number_regex], null=True, blank=True)
     role = models.ForeignKey(Role)
+    created_time = models.DateTimeField(auto_now_add=True, null=True)
+    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
 
     def __unicode__(self):
         return self.user.username

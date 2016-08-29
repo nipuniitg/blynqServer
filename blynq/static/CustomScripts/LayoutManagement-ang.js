@@ -24,7 +24,7 @@ lApp.controller('layoutsIndexCtrl',['$scope', 'layoutsIndexFactory','blueprints'
     }
 
     var refreshLayouts = function(){
-        lIF.getLayouts().then(function getLayoutsSuccess(layouts){
+        lIF.getCustomLayouts().then(function getLayoutsSuccess(layouts){
             lIC.layouts = layouts;
         },function getLayoutsReject(){
             toastr.warning('Oops! some error occurred while fetching screen layouts. Please refresh page and try again')
@@ -60,7 +60,7 @@ lApp.controller('layoutsIndexCtrl',['$scope', 'layoutsIndexFactory','blueprints'
 //Factories
 lApp.factory('layoutsIndexFactory',['$http','$q', function($http, $q){
 
-    var getLayouts = function(){
+    var getCustomLayouts = function(){
         var deferred = $q.defer();
         $http({
             method : "GET",
@@ -94,7 +94,7 @@ lApp.factory('layoutsIndexFactory',['$http','$q', function($http, $q){
     }
 
     return{
-        getLayouts : getLayouts
+        getCustomLayouts : getCustomLayouts
         ,deleteLayout : deleteLayout
     }
 
@@ -174,6 +174,9 @@ lApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints','
             lDIC.selected_aspect_ratio = angular.copy($scope.layout.aspect_ratio);
             lDIC.resetLayoutBackup = angular.copy($scope.layout);
             $scope.activePaneIndex = 0;
+
+            //setActiveTabIndex
+            setActiveTabIndex(0);
         },function reject(){
 
         })
@@ -197,6 +200,10 @@ lApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints','
         });
     }
 
+    var setActiveTabIndex = function(index){
+        $scope.activeTabIndex = index;
+    }
+
     lDIC.aspectRatioChanged = function(){
         //set layout
         var newLayout = new blueprints.Layout();
@@ -216,6 +223,8 @@ lApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints','
         $scope.layout.layout_panes.push(new blueprints.LayoutPane($scope.layout.layout_panes.length));
         $scope.activePaneIndex = $scope.layout.layout_panes.length-1;
         toastr.success('Pane added')
+
+        setActiveTabIndex(1);
     }
 
     lDIC.deletePane = function(){
@@ -251,10 +260,10 @@ lApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints','
     $scope.updateActivePane = function(index){
         $scope.$apply(function(){
             $scope.activePaneIndex = angular.copy(index);
+            setActiveTabIndex(1);
         });
         //paneToDirectiveSrv.setActivePaneIndex();
     }
-
 
     onLoad();
 

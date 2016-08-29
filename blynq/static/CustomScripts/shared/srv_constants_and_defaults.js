@@ -45,8 +45,19 @@
                 minWidth : 5        //in percentage
                 ,minHeight : 5      // in percentage
             }
-
             return paneDefaults
+        }
+
+        //content - all files recursive home folder : -1
+
+        var getAllFilesHomeFolder = function(){
+            return -1
+        }
+
+
+        var getRefreshScreensInterval = function(){
+            var screensRefreshInterval = 20000;
+            return screensRefreshInterval
         }
 
         return{
@@ -55,6 +66,8 @@
             ,getPopOverMessages : getPopOverMessages
             ,getFileIcons : getFileIcons
             ,getPaneDefaults : getPaneDefaults
+            ,getAllFilesHomeFolder : getAllFilesHomeFolder
+            ,getRefreshScreensInterval : getRefreshScreensInterval
         }
     }]);
 
