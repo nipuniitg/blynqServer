@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from schedule.models import Event, Rule
 # Create your views here.
 # from schedule.views import calendar
+from blynq.settings import CONTENT_ORGANIZATION_NAME
 from customLibrary.views_lib import get_userdetails, ajax_response, obj_to_json_response, string_to_dict, \
     list_to_comma_string, generate_utc_datetime, get_ist_datetime, get_utc_datetime, debugFileLog
 from playlistManagement.models import Playlist
@@ -250,6 +251,12 @@ def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists
     # Remove playlists not in playlist_schedules
     removed_playlist_schedules = SchedulePlaylists.objects.filter(schedule_pane_id=schedule_pane_id).exclude(
         schedule_playlist_id__in=schedule_playlist_id_list)
+    if blynq_playlists:
+        removed_playlist_schedules = removed_playlist_schedules.filter(
+            playlist__organization__organization_name=CONTENT_ORGANIZATION_NAME)
+    else:
+        removed_playlist_schedules = removed_playlist_schedules.exclude(
+            playlist__organization__organization_name=CONTENT_ORGANIZATION_NAME)
     if removed_playlist_schedules:
         removed_playlist_schedules.delete()
     return True, error
