@@ -183,8 +183,8 @@ def event_json_from_occurrences(existing_occurrences):
         schedule_pane = schedule_pane_from_occurrence(occur)
         schedule = schedule_pane.schedule
         # User added playlists in a pane should be appear after each playlist in Content Partner
-        content_partner_playlists = schedule_pane.playlists.filter(organization=CONTENT_ORGANIZATION_NAME)
-        user_added_playlists = schedule_pane.playlists.exclude(organization=CONTENT_ORGANIZATION_NAME)
+        content_partner_playlists = schedule_pane.playlists.filter(organization__organization_name=CONTENT_ORGANIZATION_NAME)
+        user_added_playlists = schedule_pane.playlists.exclude(organization__organization_name=CONTENT_ORGANIZATION_NAME)
         all_playlists = list(chain(user_added_playlists))
         for each_partner_playlist in content_partner_playlists:
             all_playlists = list(chain(all_playlists, [each_partner_playlist], user_added_playlists))
