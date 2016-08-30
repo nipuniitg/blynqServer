@@ -295,12 +295,10 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
             # Not deleting the event, to have the history of events
             schedule_pane.event = event
             schedule_pane.save()
-        if schedule_playlists:
-            upsert_schedule_playlists(user_details=user_details, schedule_pane_id=schedule_pane_id,
-                                      schedule_playlists=schedule_playlists)
-        if schedule_blynq_playlists:
-            upsert_schedule_playlists(user_details=user_details, schedule_pane_id=schedule_pane_id,
-                                      schedule_playlists=schedule_blynq_playlists, blynq_playlists=True)
+        upsert_schedule_playlists(user_details=user_details, schedule_pane_id=schedule_pane_id,
+                                  schedule_playlists=schedule_playlists)
+        upsert_schedule_playlists(user_details=user_details, schedule_pane_id=schedule_pane_id,
+                                  schedule_playlists=schedule_blynq_playlists, blynq_playlists=True)
         schedule_pane_id_list.append(schedule_pane_id)
 
     # Remove Schedule Panes which are not in the post request
