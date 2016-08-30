@@ -371,3 +371,14 @@ def get_content_urls_local(request, nof_days=1):
         success = False
         errors = str(e)
         return ajax_response(success=success, errors=errors)
+
+
+@csrf_exempt
+def update_status(request):
+    try:
+        posted_data = string_to_dict(request.body)
+        unique_device_key = posted_data.get('device_key')
+        screen = Screen.objects.get(unique_device_key__activation_key=unique_device_key)
+        screen.update_status()
+    except Exception as e:
+        debugFileLog.exception(e)

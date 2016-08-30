@@ -125,17 +125,17 @@ def screen_reports(request):
             date_str = get_ist_date_str(start)
             date_str_list.append(date_str)
             screen_analytics = ScreenAnalytics.objects.filter(screen_id__in=screen_ids).exclude(
-                session_start_time__gte=end, session_end_time__lte=start_datetime).order_by('screen_id')
+                session_start_time__gte=end).exclude(session_end_time__lte=start).order_by('screen_id')
             date_active_time = 0    # active_time of all_screens in a single date
             for obj in screen_analytics:
-                time_active = intersection_time(start_datetime, end, obj.session_start_time, obj.session_end_time)
+                time_active = intersection_time(start, end, obj.session_start_time, obj.session_end_time)
                 date_active_time += time_active
                 total_time_active += time_active
                 screen_id_key = str(obj.screen_id)
                 if all_screens_dict.get(screen_id_key) and all_screens_dict[screen_id_key]['time_active']:
-                    all_screens_dict[str(obj.screen_id)]['time_active'] += time_active
+                    all_screens_dict[screen_id_key]['time_active'] += time_active
                 else:
-                    all_screens_dict[str(obj.screen_id)] = {
+                    all_screens_dict[screen_id_key] = {
                         'screen_id': obj.screen_id, 'screen_name': obj.screen.screen_name,
                         'time_active': time_active, 'total_time_requested': total_time_requested}
             date_active_time = round(date_active_time/3600.0, 2)
