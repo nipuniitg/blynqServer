@@ -33,6 +33,8 @@
             this.layout_pane = angular.copy(layout_pane);
             this.schedule_playlists = [];
             this.schedule_widgets=[];
+            this.schedule_blynq_playlists=[];
+            this.mute_audio = false;
             this.timeline ={
                 is_always   : !0
                 ,start_date  : null
@@ -79,41 +81,40 @@
             ,title: ''
         }
 
-        function PlaylistItem(contentFile, getDurationFn){
+        function PlaylistItem(contentFile){
             this.is_folder = false;
             this.title = contentFile.title;
             this.url = contentFile.url;
             this.content_type = contentFile.content_type;
             this.content_id = contentFile.content_id;
-
             this.playlist_item_id = -1;
-
-            this.setDuration = function(contentFile){
-                var deferred = $q.defer();
-                switch (this.content_type.split("/")[1]){
-                    case 'video':
-                        getDurationFn(contentFile, function(duration){
-                            deferred.resolve(duration)
-                        });
-                        return deferred.promise
-                        break;
-                    case 'audio':
-                        getDurationFn(contentFile, function(duration){
-                            deferred.resolve(duration)
-                        });
-                        return deferred.promise
-                        break;
-                    case 'web' :
-                        var duration = 150;
-                        deferred.resolve(duration);
-                        return deferred.promise
-                        break;
-                    default :
-                        var duration = 15;
-                        deferred.resolve(duration);
-                        return deferred.promise
-                }
-            }
+            this.display_time = contentFile.duration;
+//            this.setDuration = function(contentFile){
+//                var deferred = $q.defer();
+//                switch (this.content_type.split("/")[1]){
+//                    case 'video':
+//                        getDurationFn(contentFile, function(duration){
+//                            deferred.resolve(duration)
+//                        });
+//                        return deferred.promise
+//                        break;
+//                    case 'audio':
+//                        getDurationFn(contentFile, function(duration){
+//                            deferred.resolve(duration)
+//                        });
+//                        return deferred.promise
+//                        break;
+//                    case 'web' :
+//                        var duration = 150;
+//                        deferred.resolve(duration);
+//                        return deferred.promise
+//                        break;
+//                    default :
+//                        var duration = 15;
+//                        deferred.resolve(duration);
+//                        return deferred.promise
+//                }
+//            }
         }
 
         //layouts

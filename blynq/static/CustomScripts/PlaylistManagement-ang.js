@@ -103,7 +103,7 @@ plApp.factory('plDataAccessFactory',['$http','$window', function($http,$window){
 
 }]);
 
-plApp.factory('plFactory',['plDataAccessFactory', function(dataAccessFactory)
+plApp.factory('plFactory',['plDataAccessFactory','blueprints', function(dataAccessFactory,blueprints)
 {
     //TODO: Refactor the below code. Get the templates from the backend.
     var playlistBluePrint = {
@@ -128,15 +128,16 @@ plApp.factory('plFactory',['plDataAccessFactory', function(dataAccessFactory)
     var getFolderContentsAsPlaylistItems = function(folderId, callback){
         dataAccessFactory.getFolderContentsRecursively(folderId, function(contentItems){
             var noOfContents = contentItems.length;
+            var folderFiles = [];
             if(noOfContents>0)
             {
                 for(var i=0;i<noOfContents; i++)
                 {
-                    contentItems[i].playlist_item_id =-1
-                    contentItems[i].display_time= 15
+                    var playlistItem = new blueprints.PlaylistItem(contentItems[i]);
+                    folderFiles.push(playlistItem);
                 }
             }
-            callback(contentItems);
+            callback(folderFiles);
         })
 
     }
@@ -306,7 +307,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
     $scope.editPlaylistItems = function(){
         //need selector here
         $scope.playlistQueueEditMode= true;
-        enableSortable()
+        enableSortable();
         console.log($scope.activePlaylistObj);
     };
 
@@ -336,47 +337,32 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
     //----Add Contents To activePlaylistObj
         //Below functions are being called from the droppable directive
     $scope.addContentToPlaylistItems = function(index){
-        if($scope.playlistQueueEditMode)
+        if(!$scope.playlistQueueEditMode)
         {
-            toastr.success('Dropped. Adding in progress..')
-            var contentDropped = ctFactory.getFilesObj()[index];
-            var newPlaylistItem = new blueprints.PlaylistItem(contentDropped, getContentDuration);
-            newPlaylistItem.setDuration(contentDropped).then(function(duration){
-                if(duration == NaN)
-                {
-                    newPlaylistItem.display_time = 500;
-                }else
-                {
-                    newPlaylistItem.display_time = duration;
-                }
-
-                    $scope.activePlaylistObj.playlist_items.push(newPlaylistItem);
-                    toastr.success('File added to playlist');
-            });
+            $scope.editPlaylistItems();
+            toastr.success('Playlist in edit mode.Dont forget to save after updating.');
         }
-        else
-        {
-            toastr.warning('Please set the playlist items in edit mode.');
-        }
-
-
+        var contentDropped = ctFactory.getFilesObj()[index];
+        var newPlaylistItem = new blueprints.PlaylistItem(contentDropped);
+        $scope.$apply(function(){
+            $scope.activePlaylistObj.playlist_items.push(newPlaylistItem);
+        });
+        toastr.success('File added to playlist');
     }
 
     $scope.addFolderContentToPlaylistItems= function(index)
     {
-        if($scope.playlistQueueEditMode)
+        if(!$scope.playlistQueueEditMode)
         {
-            toastr.success('Folder Dragged. Loading the content in the folder.');
-            var folderDropped = ctFactory.getFoldersObj()[index];
-            plFactory.getFolderContentsAsPlaylistItems(folderDropped.content_id, function(data){
-                $scope.activePlaylistObj.playlist_items= $scope.activePlaylistObj.playlist_items.concat(data);
-                toastr.success('Playlist Items updated')
-            });
+            $scope.editPlaylistItems();
+            toastr.success('Playlist in edit mode.Dont forget to save after updating.');
         }
-        else{
-            toastr.warning('Please set the playlist items in edit mode.');
-        }
-
+        toastr.success('Folder Dragged. Loading the content in the folder.');
+        var folderDropped = ctFactory.getFoldersObj()[index];
+        plFactory.getFolderContentsAsPlaylistItems(folderDropped.content_id, function(data){
+            $scope.activePlaylistObj.playlist_items= $scope.activePlaylistObj.playlist_items.concat(data);
+            toastr.success('Playlist Items updated')
+        });
     }
 
 
@@ -411,31 +397,6 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
 
     };
 
-    //video drag drop duration
-    var getContentDuration = function(contentFile, callback){
-        var duration;
-        var contentElement;
-        if(contentFile.content_type.indexOf('audio')>-1){
-            contentElement = document.getElementById("audio_for_duration");
-        }
-        if(contentFile.content_type.indexOf('video')>-1){
-            contentElement = document.getElementById("video_for_duration");
-        }
-        //if same item dropped, then take duration from the existing
-        if(contentElement.src == contentFile.url){
-            duration =  Math.ceil(contentElement.duration);
-            callback(duration);
-        }
-        else{
-            $scope.$apply(function(){
-                $scope.durationFile = contentFile;
-            });
-            contentElement.onloadedmetadata = function(){
-                duration = Math.ceil(contentElement.duration);
-                callback(duration);
-            };
-        }
-    }
 
 
     onLoad();

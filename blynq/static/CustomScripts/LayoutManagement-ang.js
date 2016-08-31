@@ -24,7 +24,7 @@ lApp.controller('layoutsIndexCtrl',['$scope', 'layoutsIndexFactory','blueprints'
     }
 
     var refreshLayouts = function(){
-        lIF.getLayouts().then(function getLayoutsSuccess(layouts){
+        lIF.getCustomLayouts().then(function getLayoutsSuccess(layouts){
             lIC.layouts = layouts;
         },function getLayoutsReject(){
             toastr.warning('Oops! some error occurred while fetching screen layouts. Please refresh page and try again')
@@ -60,7 +60,7 @@ lApp.controller('layoutsIndexCtrl',['$scope', 'layoutsIndexFactory','blueprints'
 //Factories
 lApp.factory('layoutsIndexFactory',['$http','$q', function($http, $q){
 
-    var getLayouts = function(){
+    var getCustomLayouts = function(){
         var deferred = $q.defer();
         $http({
             method : "GET",
@@ -94,7 +94,7 @@ lApp.factory('layoutsIndexFactory',['$http','$q', function($http, $q){
     }
 
     return{
-        getLayouts : getLayouts
+        getCustomLayouts : getCustomLayouts
         ,deleteLayout : deleteLayout
     }
 
