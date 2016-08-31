@@ -388,5 +388,8 @@ def update_status(request):
         unique_device_key = posted_data.get('device_key')
         screen = Screen.objects.get(unique_device_key__activation_key=unique_device_key)
         screen.update_status()
+        success = True
     except Exception as e:
         debugFileLog.exception(e)
+        success = False
+    return ajax_response(success=True)
