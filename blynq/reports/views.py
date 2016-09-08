@@ -194,7 +194,7 @@ def playlist_reports(request):
                 playlist_dict['time_played'] += obj.time_played
                 if all_screens_dict[str(obj.screen_id)] not in playlist_dict['screens_played']:
                     playlist_dict['screens_played'].append(all_screens_dict[str(obj.screen_id)])
-            time_played_list.append(time_played_each_day/60.0) # converting into minutes
+            time_played_list.append(round(time_played_each_day/60.0, 2)) # converting into minutes
         table_data = all_playlists_dict.values()
         line_chart_data = {'date_str': date_str_list, 'time_played': time_played_list}
         json_dict = {'line_chart_data': line_chart_data, 'table_data': table_data}
@@ -253,7 +253,7 @@ def media_reports(request):
                     content_dict['screens_played'].append(all_screens_dict[str(obj.screen_id)])
                 if all_playlists_dict[str(obj.playlist_id)] not in content_dict['playlists_played']:
                     content_dict['playlists_played'].append(all_playlists_dict[str(obj.playlist_id)])
-            time_played_list.append(time_played_each_day/60.0) # converting into minutes
+            time_played_list.append(round(time_played_each_day/60.0, 2)) # converting into minutes
         table_data = all_content_dict.values()
         line_chart_data = {'date_str': date_str_list, 'time_played': time_played_list}
         json_dict = {'line_chart_data': line_chart_data, 'table_data': table_data}
