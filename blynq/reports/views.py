@@ -125,17 +125,17 @@ def screen_reports(request):
             date_str = get_ist_date_str(start)
             date_str_list.append(date_str)
             screen_analytics = ScreenAnalytics.objects.filter(screen_id__in=screen_ids).exclude(
-                session_start_time__gte=end, session_end_time__lte=start_datetime).order_by('screen_id')
+                session_start_time__gte=end).exclude(session_end_time__lte=start).order_by('screen_id')
             date_active_time = 0    # active_time of all_screens in a single date
             for obj in screen_analytics:
-                time_active = intersection_time(start_datetime, end, obj.session_start_time, obj.session_end_time)
+                time_active = intersection_time(start, end, obj.session_start_time, obj.session_end_time)
                 date_active_time += time_active
                 total_time_active += time_active
                 screen_id_key = str(obj.screen_id)
                 if all_screens_dict.get(screen_id_key) and all_screens_dict[screen_id_key]['time_active']:
-                    all_screens_dict[str(obj.screen_id)]['time_active'] += time_active
+                    all_screens_dict[screen_id_key]['time_active'] += time_active
                 else:
-                    all_screens_dict[str(obj.screen_id)] = {
+                    all_screens_dict[screen_id_key] = {
                         'screen_id': obj.screen_id, 'screen_name': obj.screen.screen_name,
                         'time_active': time_active, 'total_time_requested': total_time_requested}
             date_active_time = round(date_active_time/3600.0, 2)
@@ -194,7 +194,7 @@ def playlist_reports(request):
                 playlist_dict['time_played'] += obj.time_played
                 if all_screens_dict[str(obj.screen_id)] not in playlist_dict['screens_played']:
                     playlist_dict['screens_played'].append(all_screens_dict[str(obj.screen_id)])
-            time_played_list.append(time_played_each_day/60.0) # converting into minutes
+            time_played_list.append(round(time_played_each_day/60.0, 2)) # converting into minutes
         table_data = all_playlists_dict.values()
         line_chart_data = {'date_str': date_str_list, 'time_played': time_played_list}
         json_dict = {'line_chart_data': line_chart_data, 'table_data': table_data}
@@ -253,7 +253,7 @@ def media_reports(request):
                     content_dict['screens_played'].append(all_screens_dict[str(obj.screen_id)])
                 if all_playlists_dict[str(obj.playlist_id)] not in content_dict['playlists_played']:
                     content_dict['playlists_played'].append(all_playlists_dict[str(obj.playlist_id)])
-            time_played_list.append(time_played_each_day/60.0) # converting into minutes
+            time_played_list.append(round(time_played_each_day/60.0, 2)) # converting into minutes
         table_data = all_content_dict.values()
         line_chart_data = {'date_str': date_str_list, 'time_played': time_played_list}
         json_dict = {'line_chart_data': line_chart_data, 'table_data': table_data}

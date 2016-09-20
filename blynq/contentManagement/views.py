@@ -87,7 +87,7 @@ def compress_image(file_path, parent_folder=None, user_details=None, organizatio
         img = Image.open(file_path)
         img = img.resize(img.size, Image.ANTIALIAS)
         dest_filepath = filename
-        img.save(dest_filepath, optimize=True, quality=95)
+        img.save(dest_filepath, optimize=True, quality=75)
         img_file = open(dest_filepath)
     else:
         img_file = open(file_path)

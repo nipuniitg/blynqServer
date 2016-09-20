@@ -48,6 +48,7 @@ INSTALLED_APPS = (
     'schedule', # https://github.com/llazzaro/django-scheduler
     'reversion',    # http://django-reversion.readthedocs.io/en/latest/
     'coverage',
+    'easy_thumbnails',
     'authentication',
     'screenManagement',
     'contentManagement',
@@ -234,3 +235,10 @@ EMAIL_HOST_PASSWORD = 'Asdf;lkj'
 
 # Don't change the below name if you aren't sure.
 CONTENT_ORGANIZATION_NAME = 'Partner Content'
+
+
+THUMBNAIL_ALIASES = {
+    '': {
+        'avatar': {'size': (128, 128), 'crop': True},
+    },
+}

@@ -215,14 +215,3 @@ def remove_schedule_screens(sender, instance, **kwargs):
     from scheduleManagement.models import ScheduleScreens
     schedule_screens = ScheduleScreens.objects.filter(group=instance.group, screen=instance.screen)
     schedule_screens.delete()
-
-
-class ScreenAnalytics(models.Model):
-    """
-    Use this model for Screen Offline/ Online status instead of Analytics
-    """
-    screen = models.ForeignKey(Screen, related_name='%(class)s_screen')
-    date = models.DateField(default=today_date)
-    time_online = models.PositiveIntegerField(default=0)    # in seconds
-
-    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
