@@ -191,10 +191,6 @@ class Screen(models.Model):
 
     def update_status(self):
         self.last_active_time = timezone.now()
-        screen_analytics, created = self.screenanalytics_screen.get_or_create(date=timezone.now().date())
-        if not created:
-            screen_analytics.time_online += PLAYER_POLL_TIME
-            screen_analytics.save()
         self.save()
 
 

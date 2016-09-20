@@ -1258,6 +1258,7 @@ sdApp.factory('playlistSelectorFactory', ['scheduleDetailsFactory','$http','plDa
             , 'schedule_playlist_id');
             callback(allWidgetsWithSelectedBool);
         })
+        }
 
     var getBlynqContentWithSelectedBool = function(selectedBlynqPlaylists){
         var deferred = $q.defer();
