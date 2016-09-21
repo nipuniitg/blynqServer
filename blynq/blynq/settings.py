@@ -48,6 +48,7 @@ INSTALLED_APPS = (
     'schedule', # https://github.com/llazzaro/django-scheduler
     'reversion',    # http://django-reversion.readthedocs.io/en/latest/
     'coverage',
+    'corsheaders',
     'easy_thumbnails',
     'authentication',
     'screenManagement',
@@ -61,6 +62,8 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'reversion.middleware.RevisionMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -142,7 +145,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static_root")
 # Media files directory takes care of the uploaded pictures
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
+TEMP_DIR = os.path.join(MEDIA_ROOT, 'temp')
 
 # The below variables are for registration app
 # REGISTRATION_OPEN = True        # If True, users can register
@@ -224,7 +227,7 @@ PLAYER_INACTIVE_THRESHOLD = PLAYER_POLL_TIME + 1    # Wait this time (in seconds
 # in MEDIA_ROOT
 # the uploaded content of each user is present in /media/usercontent/userdetails.user.id/
 # the deleted files are moved to /media/deletedcontent/organization.organization_id
-COMPRESS_IMAGE = False
+COMPRESS_IMAGE = True
 
 
 EMAIL_USE_TLS = True

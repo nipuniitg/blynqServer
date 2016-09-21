@@ -11,8 +11,7 @@ from django.db.models import Q
 from django.shortcuts import render
 
 from contentManagement.serializers import default_content_serializer
-from blynq.settings import COMPRESS_IMAGE
-from contentManagement.serializers import ContentSerializer
+from blynq.settings import COMPRESS_IMAGE, TEMP_DIR
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, \
     debugFileLog, full_file_path
 from contentManagement.models import Content, ContentType
@@ -86,7 +85,7 @@ def compress_image(file_path, parent_folder=None, user_details=None, organizatio
     if COMPRESS_IMAGE:
         img = Image.open(file_path)
         img = img.resize(img.size, Image.ANTIALIAS)
-        dest_filepath = filename
+        dest_filepath = os.path.join(TEMP_DIR, filename)
         img.save(dest_filepath, optimize=True, quality=75)
         img_file = open(dest_filepath)
     else:
