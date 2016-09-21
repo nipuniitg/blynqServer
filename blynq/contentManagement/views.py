@@ -467,7 +467,7 @@ def delete_widget(request):
 def create_playlist_from_content(content):
     from playlistManagement.models import Playlist, PlaylistItems
     playlist = Playlist(playlist_title=content.title, user_visible=False, created_by=content.uploaded_by,
-                        last_updated_by=content.last_modified_by, organization=content.organization)
+                        last_updated_by=content.last_updated_by, organization=content.organization)
     playlist.save()
     playlist_item = PlaylistItems(playlist=playlist, content=content)
     playlist_item.save()
@@ -492,7 +492,7 @@ def upsert_widget(request):
                                              'widget_text': posted_data.get('widget_text'),
                                              'content_type_id': content_type.content_type_id,
                                              'organization_id': user_details.organization.organization_id,
-                                             'last_modified_by': user_details})
+                                             'last_updated_by': user_details})
         if new_widget:
             widget.uploaded_by = user_details
             widget.save()
