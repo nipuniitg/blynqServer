@@ -347,14 +347,14 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
 
     //public or Scope releated functions
     $scope.deleteWidget = function(widget_id){
-        ctDataAccessFactory.deleteWidget(content_id,  function(data){
+        ctDataAccessFactory.deleteWidget(widget_id,  function(data){
             if(data.success)
             {
                 $scope.refreshWidget();
                 toastr.success('Widget deleted successfully.');
             }
             else{
-                toastr.warning("Oops!!There was some error. Please try again later.");
+                toastr.warning(data.errors.join('. '));
             }
         });
     }
