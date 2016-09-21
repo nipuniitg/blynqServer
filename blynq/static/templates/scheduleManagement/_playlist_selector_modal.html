@@ -64,23 +64,24 @@
                                 </table>
                             </uib-tab>
                             <uib-tab index="2" heading="Widgets">
-                                <table class="table bootstrap-datatable">
+                                <table class="table bootstrap-datatable selectable-list">
                                     <thead>
                                     <tr>
                                         <th>Select</th>
                                         <th>Widgets Name</th>
-                                        <!--<th>Description</th>-->
                                     </tr>
                                     <tr>
                                         <th></th>
                                         <th><input type="form-control" ng-model="searchWidget.playlist_title"
                                                    placeholder="search Name"></th>
-                                        <!--<th><input type="form-control" ng-model="searchPlaylist.description"-->
-                                        <!--placeholder="search Description"></th>-->
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr ng-repeat="widget in allWidgets | filter : searchWidget">
+                                    <tr class="pointer"
+                                        ng-repeat="widget in allWidgets | filter : searchWidget"
+                                        ng-class="{selected : widget.selected}" toggle-selection
+                                        item="widget">
+                                        <td><i class="fa fa-check" ng-show="widget.selected"></i></td>
                                         <td><input type="checkbox" ng-model="widget.selected"></td>
                                         <td>{[widget.playlist_title]}</td>
                                     </tr>

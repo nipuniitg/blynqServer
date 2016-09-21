@@ -1215,13 +1215,13 @@ sdApp.directive('playlistTextbox',['$uibModal', function($uibModal){
                 modalInstance.result.then(function apply(appliedObjs){
                     $scope.selectedPlaylists= appliedObjs.selectedPlaylists;
                     $scope.selectedBlynqPlaylists = appliedObjs.selectedBlynqPlaylists;
-                    $scope.selectedWidgets = appliedObjs.selectedList.widgets;
+                    $scope.selectedWidgets = appliedObjs.selectedWidgets;
                 }, function cancel(){
                     toastr.warning('cancelled');
                 });
             };
         }
-    }
+    };
 }]);
 
 sdApp.factory('playlistSelectorFactory', ['scheduleDetailsFactory','$http','plDataAccessFactory','$q',
