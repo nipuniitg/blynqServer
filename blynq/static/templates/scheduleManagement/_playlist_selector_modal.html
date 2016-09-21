@@ -27,8 +27,10 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr class="pointer" ng-repeat="playlist in allPlaylists | filter : searchPlaylist"
-                                        ng-class="{selected : playlist.selected}" toggle-selection item="playlist">
+                                    <tr class="pointer"
+                                        ng-repeat="playlist in allPlaylists | filter : searchPlaylist"
+                                        ng-class="{selected : playlist.selected}" toggle-selection
+                                        item="playlist">
                                         <td><i class="fa fa-check" ng-show="playlist.selected"></i></td>
                                         <!--<td><input type="checkbox" ng-model="playlist.selected"></td>-->
                                         <td>{[playlist.playlist_title]}</td>
@@ -51,16 +53,41 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                        <tr class="pointer" ng-repeat="blynqPlaylist in allBlynqPlaylists | filter : searchCategory"
-                                            ng-class="{selected : blynqPlaylist.selected}" toggle-selection item="blynqPlaylist">
-                                            <td><i class="fa fa-check" ng-show="blynqPlaylist.selected"></i></td>
-                                            <td>{[blynqPlaylist.playlist_title]}</td>
-                                        </tr>
+                                    <tr class="pointer"
+                                        ng-repeat="blynqPlaylist in allBlynqPlaylists | filter : searchCategory"
+                                        ng-class="{selected : blynqPlaylist.selected}" toggle-selection
+                                        item="blynqPlaylist">
+                                        <td><i class="fa fa-check" ng-show="blynqPlaylist.selected"></i></td>
+                                        <td>{[blynqPlaylist.playlist_title]}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </uib-tab>
+                            <uib-tab index="2" heading="Widgets">
+                                <table class="table bootstrap-datatable selectable-list">
+                                    <thead>
+                                    <tr>
+                                        <th>Select</th>
+                                        <th>Widgets Name</th>
+                                    </tr>
+                                    <tr>
+                                        <th></th>
+                                        <th><input type="form-control" ng-model="searchWidget.playlist_title"
+                                                   placeholder="search Name"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr class="pointer"
+                                        ng-repeat="widget in allWidgets | filter : searchWidget"
+                                        ng-class="{selected : widget.selected}" toggle-selection
+                                        item="widget">
+                                        <td><i class="fa fa-check" ng-show="widget.selected"></i></td>
+                                        <td>{[widget.playlist_title]}</td>
+                                    </tr>
                                     </tbody>
                                 </table>
                             </uib-tab>
                         </uib-tabset>
-
                     </div>
                 </div>
             </div>

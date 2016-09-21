@@ -28,11 +28,17 @@ class SchedulePaneSerializer(Serializer):
         self._current['schedule_pane_id'] = obj._get_pk_val()
         schedule_organization = obj.schedule.organization
         if 'schedule_playlists' in self.selected_fields:
-            schedule_playlists = SchedulePlaylists.objects.filter(schedule_pane=obj,
+            schedule_playlists = SchedulePlaylists.objects.filter(schedule_pane=obj, playlist__user_visible=True,
                                                                   playlist__organization=schedule_organization)
             json_data = SchedulePlaylistsSerializer().serialize(
                 schedule_playlists, fields=('schedule_playlist_id','playlist'))
             self._current['schedule_playlists'] = json_data
+        if 'schedule_widgets' in self.selected_fields:
+            # TODO: Change this logic of checking user_visible=False for widgets
+            schedule_playlists = SchedulePlaylists.objects.filter(schedule_pane=obj, playlist__user_visible=False)
+            json_data = SchedulePlaylistsSerializer().serialize(
+                schedule_playlists, fields=('schedule_playlist_id','playlist'))
+            self._current['schedule_widgets'] = json_data
         if 'schedule_blynq_playlists' in self.selected_fields:
             schedule_blynq_playlists = SchedulePlaylists.objects.filter(
                 schedule_pane=obj, playlist__organization__organization_name=CONTENT_ORGANIZATION_NAME)
@@ -128,6 +134,7 @@ class ScheduleSerializer(Serializer):
             schedule_panes = SchedulePane.objects.filter(schedule=obj)
             json_data = SchedulePaneSerializer().serialize(schedule_panes,
                                                            fields=('schedule_pane_id', 'schedule_playlists',
+                                                                   'schedule_widgets',
                                                                    'schedule_blynq_playlists',
                                                                    'layout_pane', 'timeline', 'mute_audio'))
             self._current['schedule_panes'] = json_data

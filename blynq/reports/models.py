@@ -32,3 +32,6 @@ class ScreenAnalytics(models.Model):
     session_end_time = models.DateTimeField()
 
     last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
+
+    def __unicode__(self):
+        return self.screen.screen_name + 'start ' + self.session_start_time + ' end ' + self.session_end_time

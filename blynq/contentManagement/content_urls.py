@@ -13,5 +13,8 @@ urlpatterns = [
      url(r'^folderPath/(?P<current_folder_id>-?\d+)', views.folder_path, name='folder_path'),
      url(r'^moveContent', views.move_content, name='move_content'),
      url(r'^upsertUrl', views.upsert_url, name='upsert_url'),
-     url(r'^validContentTypes', views.get_valid_content_types, name='valid_content_types')
+     url(r'^validContentTypes', views.get_valid_content_types, name='valid_content_types'),
+     url(r'^getWidgets', views.get_widgets, name='get_widgets'),
+     url(r'^upsertWidget', views.upsert_widget, name='upsert_widget'),
+     url(r'^deleteWidget', views.delete_widget, name='delete_widget')
 ]

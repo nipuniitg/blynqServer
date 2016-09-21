@@ -57,13 +57,17 @@
                         </legend>
                         <div class="col collapse in" id="playlist_{[schedule.schedule_id]}_{[$index]}">
                             <div class="tagsinput">
-                            <span class="tag"
-                                  ng-repeat="playlist in pane.schedule_playlists">
-                                <span> {[playlist.playlist_title]} &nbsp;&nbsp;</span>
-                            </span>
-                            <span class="tag" ng-if="pane.schedule_blynq_playlists.length>0">
-                                <span> Blynq-Content &nbsp;&nbsp;</span>
-                            </span>
+                                <span class="tag"
+                                      ng-repeat="playlist in pane.schedule_playlists">
+                                    <span> {[playlist.playlist_title]} &nbsp;&nbsp;</span>
+                                </span>
+                                <span class="tag"
+                                  ng-repeat="widget in pane.schedule_widgets">
+                                    <span> {[widget.playlist_title]} &nbsp;&nbsp;</span>
+                                </span>
+                                <span class="tag" ng-if="pane.schedule_blynq_playlists.length>0">
+                                    <span> Blynq-Content &nbsp;&nbsp;</span>
+                                </span>
                             </div>
                         </div>
                     </fieldset>

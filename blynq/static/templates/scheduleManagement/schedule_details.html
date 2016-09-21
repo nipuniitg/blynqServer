@@ -71,6 +71,7 @@
                                     <div class="col-md-10">
                                         <playlist-textbox
                                                 selected-playlists="schedule.schedule_panes[0].schedule_playlists"
+                                                selected-widgets="schedule.schedule_panes[0].schedule_widgets"
                                                 selected-blynq-playlists="schedule.schedule_panes[0].schedule_blynq_playlists">
                                         </playlist-textbox>
                                     </div>
@@ -115,6 +116,7 @@
                                                             <div class="control-label col-md-2">Playlists*</div>
                                                             <div class="col-md-10">
                                                                 <playlist-textbox
+                                                                        selected-widgets="schedule.schedule_panes[$index].schedule_widgets"
                                                                         selected-blynq-playlists="schedule.schedule_panes[$index].schedule_blynq_playlists"
                                                                         selected-playlists="schedule.schedule_panes[$index].schedule_playlists">
                                                                 </playlist-textbox>

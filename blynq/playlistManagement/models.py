@@ -16,7 +16,7 @@ class PlaylistItems(models.Model):
     playlist = models.ForeignKey('Playlist', on_delete=models.CASCADE)
     content = models.ForeignKey(Content, on_delete=models.CASCADE)
     # index signifies the position of content in the playlist
-    position_index = models.IntegerField()
+    position_index = models.IntegerField(default=0)
     # display_time is the time for which the content should be displayed
     display_time = models.IntegerField(default=settings.DEFAULT_DISPLAY_TIME)
 
@@ -37,6 +37,7 @@ class Playlist(models.Model):
     playlist_items = models.ManyToManyField(Content, through=PlaylistItems)
     playlist_total_time = models.IntegerField(default=0, blank=True, null=True)
 
+    user_visible = models.BooleanField(default=True)
     created_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, related_name='%(class)s_created_by',
                                    null=True)
     created_time = models.DateTimeField(_('created time'), auto_now_add=True, blank=True, null=True)
@@ -53,7 +54,15 @@ class Playlist(models.Model):
         ordering = ['-last_updated_time']
 
     @staticmethod
-    def get_user_relevant_objects(user_details):
+    def get_user_visible_objects(user_details):
+        return Playlist.objects.filter(organization=user_details.organization, user_visible=True)
+
+    @staticmethod
+    def get_user_invisible_playlists(user_details):
+        return Playlist.objects.filter(organization=user_details.organization, user_visible=False)
+
+    @staticmethod
+    def get_all_playlists(user_details):
         return Playlist.objects.filter(organization=user_details.organization)
 
     @staticmethod
@@ -72,6 +81,8 @@ def playlist_items_changed(sender, instance, **kwargs):
         playlist = Playlist.objects.get(playlist_id=instance.playlist_id)
         playlist.playlist_total_time = playlist_total_time
         playlist.save()
+        if not playlist.user_visible and playlist.playlist_total_time == 0:
+            playlist.delete()
     except Exception as e:
         debugFileLog.exception('Failed to update the playlist total time for playlist_id %d' % instance.playlist_id)
         debugFileLog.exception(e)

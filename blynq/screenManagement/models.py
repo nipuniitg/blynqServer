@@ -198,10 +198,6 @@ class Screen(models.Model):
 
     def update_status(self):
         self.last_active_time = timezone.now()
-        screen_analytics, created = self.screenanalytics_screen.get_or_create(date=timezone.now().date())
-        if not created:
-            screen_analytics.time_online += PLAYER_POLL_TIME
-            screen_analytics.save()
         self.save()
 
 
@@ -226,14 +222,3 @@ def remove_schedule_screens(sender, instance, **kwargs):
     from scheduleManagement.models import ScheduleScreens
     schedule_screens = ScheduleScreens.objects.filter(group=instance.group, screen=instance.screen)
     schedule_screens.delete()
-
-
-class ScreenAnalytics(models.Model):
-    """
-    Use this model for Screen Offline/ Online status instead of Analytics
-    """
-    screen = models.ForeignKey(Screen, related_name='%(class)s_screen')
-    date = models.DateField(default=today_date)
-    time_online = models.PositiveIntegerField(default=0)    # in seconds
-
-    last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)

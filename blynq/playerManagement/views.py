@@ -3,12 +3,14 @@ import os
 from copy import deepcopy
 from operator import itemgetter
 from django.shortcuts import render
+from itertools import chain
+
 # Create your views here.
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-from blynq.settings import MEDIA_HOST, HOST_URL, PLAYER_POLL_TIME
+from blynq.settings import MEDIA_HOST, HOST_URL, PLAYER_POLL_TIME, CONTENT_ORGANIZATION_NAME
 from contentManagement.models import Content
-from contentManagement.serializers import ContentSerializer
+from contentManagement.serializers import default_content_serializer
 from customLibrary.views_lib import debugFileLog, string_to_dict, default_string_to_datetime, obj_to_json_response, \
     ajax_response, date_changed
 from playerManagement.models import PlayerUpdate, LocalServer, PlayerLog
@@ -180,9 +182,15 @@ def event_json_from_occurrences(existing_occurrences):
     for occur in existing_occurrences:
         schedule_pane = schedule_pane_from_occurrence(occur)
         schedule = schedule_pane.schedule
-        playlists = schedule_pane.playlists.all()
-        playlists_json = PlaylistSerializer().serialize(playlists, fields=('playlist_id', 'playlist_title',
-                                                                           'playlist_items'))
+        # User added playlists in a pane should be appear after each playlist in Content Partner
+        content_partner_playlists = schedule_pane.playlists.filter(organization__organization_name=CONTENT_ORGANIZATION_NAME)
+        user_added_playlists = schedule_pane.playlists.exclude(organization__organization_name=CONTENT_ORGANIZATION_NAME)
+        all_playlists = list(chain(user_added_playlists))
+        for each_partner_playlist in content_partner_playlists:
+            all_playlists = list(chain(all_playlists, [each_partner_playlist], user_added_playlists))
+        # all_playlists = schedule_pane.playlists.all()
+        playlists_json = PlaylistSerializer().serialize(all_playlists, fields=('playlist_id', 'playlist_title',
+                                                                               'playlist_items'))
         aspect_ratio_list = [schedule.layout.aspect_ratio] if schedule.layout and schedule.layout.aspect_ratio else []
         aspect_ratio = AspectRatioSerializer().serialize(aspect_ratio_list)
         orientation = aspect_ratio[0]['orientation'] if aspect_ratio else ORIENTATION_CHOICES[0][0]
@@ -226,13 +234,13 @@ def get_screen_data(request, nof_days=7):
     :param nof_days: optional argument mentioning the time interval for the events
     :return:
     """
-    posted_data = string_to_dict(request.body)
-    # the datetime format of last_received should be "%2d%2m%4Y%2H%2M%2S"
-    last_received = posted_data.get('last_received')
-    unique_device_key = posted_data.get('device_key')
-    debugFileLog.info("get_screen_data device_key is %s last_received is %s " % (unique_device_key, last_received))
-    last_received_datetime = default_string_to_datetime(last_received)
     try:
+        posted_data = string_to_dict(request.body)
+        # the datetime format of last_received should be "%2d%2m%4Y%2H%2M%2S"
+        last_received = posted_data.get('last_received')
+        unique_device_key = posted_data.get('device_key')
+        debugFileLog.info("get_screen_data device_key is %s last_received is %s " % (unique_device_key, last_received))
+        last_received_datetime = default_string_to_datetime(last_received)
         start_time = timezone.now()
         end_time = start_time + datetime.timedelta(days=nof_days)
         screen = Screen.objects.get(unique_device_key__activation_key=unique_device_key)
@@ -406,7 +414,7 @@ def get_content_urls_local(request, nof_days=1):
             'playlist_id', flat=True)
         content_ids = PlaylistItems.objects.filter(playlist_id__in=playlist_ids).values_list('content_id', flat=True)
         contents = Content.objects.filter(content_id__in=content_ids).exclude(content_type__file_type__contains='web')
-        json_data = ContentSerializer().serialize(contents, fields='document')
+        json_data = default_content_serializer(contents, fields=('document'))
         url_list = [str(element['url']) for element in json_data]
         json_obj = dict()
         json_obj['urls'] = url_list
@@ -417,3 +425,17 @@ def get_content_urls_local(request, nof_days=1):
         success = False
         errors = str(e)
         return ajax_response(success=success, errors=errors)
+
+
+@csrf_exempt
+def update_status(request):
+    try:
+        posted_data = string_to_dict(request.body)
+        unique_device_key = posted_data.get('device_key')
+        screen = Screen.objects.get(unique_device_key__activation_key=unique_device_key)
+        screen.update_status()
+        success = True
+    except Exception as e:
+        debugFileLog.exception(e)
+        success = False
+    return ajax_response(success=True)

@@ -1178,6 +1178,7 @@ sdApp.directive('playlistTextbox',['$uibModal', function($uibModal){
         restrict:'E'
         ,scope : {
             selectedPlaylists : '='
+            ,selectedWidgets : '='
             ,selectedBlynqPlaylists : '='
         }
         ,templateUrl : '/static/templates/scheduleManagement/_playlist_textbox.html'
@@ -1185,11 +1186,12 @@ sdApp.directive('playlistTextbox',['$uibModal', function($uibModal){
             $scope.removePlaylist = function(index){
                 $scope.selectedPlaylists.splice(index,1);
             };
-
+            $scope.removeWidget = function(index){
+                $scope.selectedWidgets.splice(index,1);
+            }
             $scope.removeBlynqContent = function(index){
                 $scope.selectedBlynqPlaylists = [];
             };
-
             $scope.openPlaylistSelectorModal = function(){
                 var modalInstance = $uibModal.open({
                   animation: true,
@@ -1202,24 +1204,43 @@ sdApp.directive('playlistTextbox',['$uibModal', function($uibModal){
                         var resolvedObj = {};
                         resolvedObj.selectedPlaylists = angular.copy($scope.selectedPlaylists);
                         resolvedObj.selectedBlynqPlaylists = angular.copy($scope.selectedBlynqPlaylists);
+                        resolvedObj.selectedWidgets = angular.copy($scope.selectedWidgets);
                         return resolvedObj
+                    }
+                    ,selectedWidgets: function(){
+                        return angular.copy($scope.selectedWidgets);
                     }
                   }
                 });
                 modalInstance.result.then(function apply(appliedObjs){
                     $scope.selectedPlaylists= appliedObjs.selectedPlaylists;
                     $scope.selectedBlynqPlaylists = appliedObjs.selectedBlynqPlaylists;
+                    $scope.selectedWidgets = appliedObjs.selectedWidgets;
                 }, function cancel(){
                     toastr.warning('cancelled');
                 });
             };
         }
-    }
+    };
 }]);
 
 sdApp.factory('playlistSelectorFactory', ['scheduleDetailsFactory','$http','plDataAccessFactory','$q',
  function(sDF, $http, pDF, $q){
     //private functions
+
+    var getWidgetsJson = function(callback){
+        $http({
+             method : "GET",
+             url : '/api/playlist/getWidgetPlaylists'
+         }).then(function mySucces(response){
+                if(callback)
+                {
+                    callback(response.data);
+                }
+            }, function myError(response) {
+                console.log(response.statusText);
+            });
+    };
 
     //public functions
     var getPlaylistsListWithSelectedBool = function(selectedPlaylists, callback){
@@ -1229,6 +1250,15 @@ sdApp.factory('playlistSelectorFactory', ['scheduleDetailsFactory','$http','plDa
             callback(allPlaylistsWithSelectedBool);
         })
     };
+
+
+    var getWidgetsListWithSelectedBool = function(selectedWidgets, callback){
+        getWidgetsJson(function(allWidgets){
+            var allWidgetsWithSelectedBool = sDF.selectedBoolSetter(allWidgets, selectedWidgets, 'playlist_id'
+            , 'schedule_playlist_id');
+            callback(allWidgetsWithSelectedBool);
+        })
+        }
 
     var getBlynqContentWithSelectedBool = function(selectedBlynqPlaylists){
         var deferred = $q.defer();
@@ -1248,16 +1278,21 @@ sdApp.factory('playlistSelectorFactory', ['scheduleDetailsFactory','$http','plDa
 
     return{
         getPlaylistsListWithSelectedBool : getPlaylistsListWithSelectedBool
+        ,getWidgetsListWithSelectedBool : getWidgetsListWithSelectedBool
         ,getSelectedItems : getSelectedItems
         ,getBlynqContentWithSelectedBool : getBlynqContentWithSelectedBool
     }
 }]);
+
 
 sdApp.controller('playlistSelectorController', ['$scope', '$log','$uibModalInstance','resolvedObj',
 'playlistSelectorFactory', function($scope, $log, $uibModalInstance, resolvedObj, pSF){
     var onLoad = function(){
         pSF.getPlaylistsListWithSelectedBool(resolvedObj.selectedPlaylists,function(data) {
             $scope.allPlaylists = data;
+        });
+        pSF.getWidgetsListWithSelectedBool(resolvedObj.selectedWidgets, function(data) {
+            $scope.allWidgets = data;
         });
 
         pSF.getBlynqContentWithSelectedBool(resolvedObj.selectedBlynqPlaylists).then(function(data){
@@ -1269,6 +1304,7 @@ sdApp.controller('playlistSelectorController', ['$scope', '$log','$uibModalInsta
         var returnObj ={};
         returnObj.selectedPlaylists = angular.copy(pSF.getSelectedItems($scope.allPlaylists));
         returnObj.selectedBlynqPlaylists = angular.copy(pSF.getSelectedItems($scope.allBlynqPlaylists));
+        returnObj.selectedWidgets=angular.copy(pSF.getSelectedItems($scope.allWidgets));
         $uibModalInstance.close(returnObj);
     };
     $scope.cancel = function(){

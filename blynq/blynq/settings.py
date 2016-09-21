@@ -49,6 +49,8 @@ INSTALLED_APPS = (
     'reversion',    # http://django-reversion.readthedocs.io/en/latest/
     'coverage',
     'fcm',
+    'corsheaders',
+    'easy_thumbnails',
     'authentication',
     'screenManagement',
     'contentManagement',
@@ -61,6 +63,8 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'reversion.middleware.RevisionMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -142,7 +146,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static_root")
 # Media files directory takes care of the uploaded pictures
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
+TEMP_DIR = os.path.join(MEDIA_ROOT, 'temp')
 
 # The below variables are for registration app
 # REGISTRATION_OPEN = True        # If True, users can register
@@ -152,12 +156,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGIN_URL = '/authentication/login/'  # The page users are directed to if they are not logged in,
 
 # Content related settings
-DEFAULT_DISPLAY_TIME = 30
+DEFAULT_DISPLAY_TIME = 15
 STORAGE_LIMIT_PER_ORGANIZATION = 1*1024*1024*1024  # 1 gb 1*1024*1024*1024
 
 
 today = timezone.now().strftime("%Y%m%d")
 SERVER_LOG_DIRECTORY = os.path.join(BASE_DIR, 'logs/server')
+
 if not os.path.exists(SERVER_LOG_DIRECTORY):
     os.makedirs(SERVER_LOG_DIRECTORY)
 
@@ -226,7 +231,7 @@ PLAYER_INACTIVE_THRESHOLD = PLAYER_POLL_TIME + 1    # Wait this time (in seconds
 # in MEDIA_ROOT
 # the uploaded content of each user is present in /media/usercontent/userdetails.user.id/
 # the deleted files are moved to /media/deletedcontent/organization.organization_id
-COMPRESS_IMAGE = False
+COMPRESS_IMAGE = True
 
 # Some functionalities like push technology are restricted when server is not connected to internet
 INTERNET_ENABLED = True
@@ -244,3 +249,10 @@ EMAIL_HOST_PASSWORD = 'Asdf;lkj'
 
 # Don't change the below name if you aren't sure.
 CONTENT_ORGANIZATION_NAME = 'Partner Content'
+
+
+THUMBNAIL_ALIASES = {
+    '': {
+        'avatar': {'size': (128, 128), 'crop': True},
+    },
+}
