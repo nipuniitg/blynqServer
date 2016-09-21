@@ -59,6 +59,13 @@ def list_to_comma_string(list):
     return ','.join(map(str, list))
 
 
+def empty_list_for_none(obj):
+    if obj:
+        return obj
+    else:
+        return []
+
+
 def send_mail_blynq(to=['hello@blynq.in'], subject='', message=''):
     try:
         send_mail(subject=subject, message=message, from_email='django@blynq.in', recipient_list=to,

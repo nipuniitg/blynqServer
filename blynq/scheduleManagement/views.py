@@ -11,7 +11,7 @@ from schedule.models import Event, Rule
 # from schedule.views import calendar
 from blynq.settings import CONTENT_ORGANIZATION_NAME
 from customLibrary.views_lib import get_userdetails, ajax_response, obj_to_json_response, string_to_dict, \
-    list_to_comma_string, generate_utc_datetime, get_ist_datetime, get_utc_datetime, debugFileLog
+    list_to_comma_string, generate_utc_datetime, get_ist_datetime, get_utc_datetime, debugFileLog, empty_list_for_none
 from playlistManagement.models import Playlist
 from scheduleManagement.models import Schedule, SchedulePlaylists, ScheduleScreens, SchedulePane
 from scheduleManagement.serializers import default_schedule_serializer
@@ -227,18 +227,10 @@ def upsert_schedule_groups(user_details, schedule, schedule_groups):
 
 
 # upsert schedule playlists
-def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists, schedule_widgets,
-                              blynq_playlists=False):
+def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists, blynq_playlists=False):
     debugFileLog.info("inside upsert_schedule_playlists")
     error = ''
     schedule_playlist_id_list = []
-    if schedule_playlists and schedule_widgets:
-        schedule_playlists.extend(schedule_widgets)
-    elif schedule_widgets:
-        schedule_playlists = schedule_widgets
-    elif not schedule_playlists:
-        # Both schedule_palylists and schedule_widgets doesn't exist
-        return
     for pos_index, item in enumerate(schedule_playlists):
         schedule_playlist_id = int(item.get('schedule_playlist_id'))
         playlist_id = int(item.get('playlist_id'))
@@ -276,9 +268,10 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
     schedule_pane_id_list = []
     for item in schedule_panes:
         schedule_pane_id = int(item.get('schedule_pane_id'))
-        schedule_playlists = item.get('schedule_playlists')
-        schedule_widgets = item.get('schedule_widgets')
-        schedule_blynq_playlists = item.get('schedule_blynq_playlists')
+        schedule_playlists = empty_list_for_none(item.get('schedule_playlists'))
+        schedule_widgets = empty_list_for_none(item.get('schedule_widgets'))
+        schedule_playlists.extend(schedule_widgets)
+        schedule_blynq_playlists = empty_list_for_none(item.get('schedule_blynq_playlists'))
         layout_pane = item.get('layout_pane')
         layout_pane_id = int(layout_pane.get('layout_pane_id'))
         mute_audio = item.get('mute_audio')
@@ -288,7 +281,7 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
         recurrence_absolute = timeline.get('recurrence_absolute')
         if not recurrence_absolute:
             recurrence_absolute = False
-        if schedule_playlists or schedule_widgets or schedule_blynq_playlists:
+        if schedule_playlists or schedule_blynq_playlists:
             event_dict = event_dict_from_timeline(timeline=timeline, schedule=schedule)
             event = Event(**event_dict)
             event.save()
