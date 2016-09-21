@@ -81,6 +81,8 @@ def playlist_items_changed(sender, instance, **kwargs):
         playlist = Playlist.objects.get(playlist_id=instance.playlist_id)
         playlist.playlist_total_time = playlist_total_time
         playlist.save()
+        if not playlist.user_visible and playlist.playlist_total_time == 0:
+            playlist.delete()
     except Exception as e:
         debugFileLog.exception('Failed to update the playlist total time for playlist_id %d' % instance.playlist_id)
         debugFileLog.exception(e)

@@ -449,6 +449,7 @@ def get_widgets(request):
 
 
 def delete_widget(request):
+    debugFileLog.info('Inside delete widget')
     success = False
     errors = []
     try:
