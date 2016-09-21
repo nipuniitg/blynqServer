@@ -203,6 +203,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
 
     return{
         deleteContent : deleteContent
+        ,deleteWidget : deleteWidget
         ,getFiles : getFilesJson
         ,getFolders : getFoldersJson
         ,getWidgets : getWidgets
