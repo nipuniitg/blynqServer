@@ -2,11 +2,16 @@ import os
 from os import listdir
 from os.path import isfile, join, exists, isdir
 
+import datetime
+
+import requests
+from django.utils import timezone
+
 from authentication.models import Organization, UserDetails
 from blynq.settings import CONTENT_ORGANIZATION_NAME
 from contentManagement.models import Content
 from contentManagement.views import process_media
-from customLibrary.views_lib import debugFileLog
+from customLibrary.views_lib import debugFileLog, get_ist_datetime, date_to_string, ajax_response
 
 DOWNLOADED_PARTNER_DIRECTORY = '/home/django/partner/'
 
@@ -55,12 +60,17 @@ def process_directory(path, organization, user_details, parent_folder):
             print 'This is not a file or directory. Ignore.'
 
 
+def content_partner_organization():
+    organization, created = Organization.objects.get_or_create(organization_name=CONTENT_ORGANIZATION_NAME)
+    if created:
+        debugFileLog.error('Organization did not exist previously, just created the %s organization, '
+                           'now create a new user' % CONTENT_ORGANIZATION_NAME)
+    return organization
+
+
 def push_content():
     try:
-        organization, created = Organization.objects.get_or_create(organization_name=CONTENT_ORGANIZATION_NAME)
-        if created:
-            print 'Organization did not exist previously, just created the %s organization, now create a new user' % \
-                  CONTENT_ORGANIZATION_NAME
+        organization = content_partner_organization()
         user_details = UserDetails.objects.get(organization=organization)
         parent_folder = None
         if not exists(DOWNLOADED_PARTNER_DIRECTORY):
@@ -69,6 +79,90 @@ def push_content():
         path = DOWNLOADED_PARTNER_DIRECTORY
         process_directory(path=path, organization=organization, user_details=user_details, parent_folder=parent_folder)
     except Exception as e:
-        debugFileLog.exception('Exception while calling fetch_content')
+        debugFileLog.exception('Exception while calling push_content')
         debugFileLog.exception(e)
     print 'All the downloaded partner content has been uploaded successfully'
+
+
+def generate_way2_url(category):
+    base_way2_url = 'http://www.way2news.co/postsway2?lang=eng'
+    way2_date_fmt = "%Y-%m-%d %H:%M:%S"
+    ttime = timezone.now()
+    ftime = ttime - datetime.timedelta(days=1)
+    ttime = get_ist_datetime(ttime)
+    ftime = get_ist_datetime(ftime)
+    ttime_url_part = '&ttime=' + date_to_string(ttime, fmt=way2_date_fmt)
+    ftime_url_part = '&ftime=' + date_to_string(ftime, fmt=way2_date_fmt)
+    way2_categories = {'latest': 0, 'news': 81, 'business': 6, 'sports': 15, 'cinema': 8, 'special': 82}
+    try:
+        category_url_part = '&catid=' + str(way2_categories[category])
+    except Exception as e:
+        debugFileLog.exception(e)
+        category_url_part = '&catid=0'
+    return base_way2_url + category_url_part + ftime_url_part + ttime_url_part
+
+
+WAY2_CONSTANTS = {'playlist_title': 'News', 'folder_title': 'Way2News', 'category': 'latest'}
+
+
+def process_way2_urls(way2_dict, way2_items_required, time_for_each_url):
+    organization = content_partner_organization()
+    from playlistManagement.models import Playlist, PlaylistItems
+    news_playlist, created = Playlist.objects.get_or_create(playlist_title=WAY2_CONSTANTS['playlist_title'],
+                                                            organization=organization)
+    parent_folder, created = Content.objects.filter(organization=organization, is_folder=True).get_or_create(
+        title=WAY2_CONSTANTS['folder_title'], defaults=dict(organization=organization, is_folder=True))
+    count = 0
+    content_objs = []
+    content_ids = []
+    for obj in way2_dict:
+        url = obj.get('url')
+        title = obj.get('title')
+        if url and title:
+            count += 1
+            if count > way2_items_required:
+                break
+
+            content_dict = dict(title=title, parent_folder=parent_folder, duration=time_for_each_url,
+                                organization=organization)
+            instance, created = Content.objects.filter(organization=organization).get_or_create(url=url,
+                                                                                                defaults=content_dict)
+            content_ids.append(instance.content_id)
+            content_objs.append(instance)
+    obsolete_playlist_items = PlaylistItems.objects.filter(playlist=news_playlist).exclude(content_id__in=content_ids)
+    if count > way2_items_required:
+        obsolete_content_ids = obsolete_playlist_items.values_list('content_id', flat=True)
+        obsolete_contents = Content.objects.filter(organization=organization, content_id__in=obsolete_content_ids)
+        obsolete_contents.delete()
+    else:
+        obsolete_playlist_items.delete()
+    for obj in content_objs:
+        item, created = PlaylistItems.objects.get_or_create(
+            content=obj, defaults=dict(playlist=news_playlist, display_time=time_for_each_url))
+
+
+def fetch_way2news():
+    try:
+        final_url = generate_way2_url(category=WAY2_CONSTANTS['category'])
+        time_for_each_url = 30
+        total_time_for_way2 = 600  # 10 minutes
+        way2_items_required = total_time_for_way2/time_for_each_url
+        result = requests.get(final_url)
+        if result.status_code == 200:
+            success = True
+            way2_dict = result.json()
+            if type(way2_dict) is list:
+                process_way2_urls(way2_dict, way2_items_required, time_for_each_url)
+            elif type(way2_dict) is tuple:
+                debugFileLog.exception('Received a tuple from way2 url, %s' % str(way2_dict))
+            else:
+                debugFileLog.exception('Received unknown response from way2 url')
+        else:
+            debugFileLog.exception(result.reason)
+            debugFileLog.exception('Error while fetching way2 content status code %d , reason %s' %
+                                   (result.status_code, result.reason))
+            success = False
+    except Exception as e:
+        debugFileLog.exception(e)
+        success = False
+    return ajax_response(success=success)
