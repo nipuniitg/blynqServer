@@ -8,7 +8,8 @@ from itertools import chain
 # Create your views here.
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-from blynq.settings import MEDIA_HOST, HOST_URL, PLAYER_POLL_TIME, CONTENT_ORGANIZATION_NAME
+from blynq.settings import MEDIA_HOST, HOST_URL
+from customLibrary.custom_settings import CONTENT_ORGANIZATION_NAME, PLAYER_POLL_TIME
 from contentManagement.models import Content
 from contentManagement.serializers import default_content_serializer
 from customLibrary.views_lib import debugFileLog, string_to_dict, default_string_to_datetime, obj_to_json_response, \

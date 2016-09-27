@@ -1,6 +1,5 @@
 from django.core.serializers.python import Serializer
-
-from blynq.settings import CONTENT_ORGANIZATION_NAME
+from customLibrary.custom_settings import CONTENT_ORGANIZATION_NAME
 from customLibrary.views_lib import get_ist_date_str, get_ist_time_str, debugFileLog
 from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import SchedulePlaylists, ScheduleScreens, SchedulePane

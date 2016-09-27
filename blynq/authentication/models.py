@@ -8,7 +8,8 @@ from django.utils.translation import ugettext_lazy as _
 # See https://docs.djangoproject.com/en/1.8/ref/contrib/auth/ for User model details
 from django.utils import timezone
 
-from blynq.settings import STORAGE_LIMIT_PER_ORGANIZATION, MEDIA_ROOT, PLAYER_UPDATES_DIR
+from blynq.settings import STORAGE_LIMIT_PER_ORGANIZATION, MEDIA_ROOT
+from customLibrary.custom_settings import PLAYER_UPDATES_DIR
 
 
 class City(models.Model):

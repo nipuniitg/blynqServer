@@ -5,8 +5,8 @@ from django.utils import timezone
 from schedule.models import Calendar
 
 from authentication.models import Organization, UserDetails, City
-from blynq.settings import PLAYER_INACTIVE_THRESHOLD, PLAYER_POLL_TIME
-from customLibrary.views_lib import debugFileLog, today_date
+from customLibrary.custom_settings import PLAYER_INACTIVE_THRESHOLD
+from customLibrary.views_lib import debugFileLog
 from django.utils.translation import ugettext_lazy as _
 
 

@@ -11,7 +11,8 @@ from django.db.models import Q
 from django.shortcuts import render
 
 from contentManagement.serializers import default_content_serializer
-from blynq.settings import COMPRESS_IMAGE, TEMP_DIR
+from blynq.settings import TEMP_DIR
+from customLibrary.custom_settings import COMPRESS_IMAGE
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, \
     debugFileLog, full_file_path
 from contentManagement.models import Content, ContentType

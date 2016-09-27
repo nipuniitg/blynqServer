@@ -31,7 +31,7 @@
             var fileIcons = {
                 pdf : '/static/images/pdf_logo.png'
                 ,video : '/static/images/video_icon.png'
-                ,folder : '/static/images/folder-icon.png'
+                ,folder : '/static/images/folder_icon.png'
                 ,url : '/static/images/url_icon.png'
                 ,audio : '/static/images/audio_icon.png'
             };

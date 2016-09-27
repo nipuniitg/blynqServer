@@ -5,7 +5,8 @@ from django.db import models
 # Create your models here.
 from django.utils.translation import ugettext_lazy as _
 from authentication.models import UserDetails, Organization
-from blynq.settings import MEDIA_ROOT, PLAYER_UPDATES_DIR, PLAYER_LOG_DIR
+from blynq.settings import MEDIA_ROOT
+from customLibrary.custom_settings import PLAYER_UPDATES_DIR, PLAYER_LOG_DIR
 
 
 def upload_to_dir(instance, filename):

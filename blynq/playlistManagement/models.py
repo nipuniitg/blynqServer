@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 # Create your models here.
 from authentication.models import UserDetails, Organization
-from blynq.settings import CONTENT_ORGANIZATION_NAME
+from customLibrary.custom_settings import CONTENT_ORGANIZATION_NAME
 from contentManagement.models import Content
 from customLibrary.views_lib import debugFileLog
 

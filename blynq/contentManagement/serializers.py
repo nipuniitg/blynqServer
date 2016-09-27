@@ -11,25 +11,10 @@ def default_content_serializer(query_set, fields=('title', 'document', 'content_
 class ContentSerializer(Serializer):
     def end_object(self, obj):
         self._current['content_id'] = obj._get_pk_val()
+        self._current['thumbnail'] = obj.thumbnail
         if 'document' in self.selected_fields:
-            if obj.document:
-                self._current['url'] = settings.MEDIA_HOST + obj.document.url
-            else:
-                self._current['url'] = obj.url
+            self._current['url'] = obj.get_url()
             del self._current['document']
         if obj.is_widget:
             self._current['widget_text'] = obj.widget_text
         self.objects.append(self._current)
-
-
-# def default_widget_serializer(querySet):
-#     return WidgetSerializer().serialize(querySet, fields=('title', 'text', 'type', 'widget_id'),
-#                                         use_natural_foreign_keys=True)
-#
-#
-# class WidgetSerializer(Serializer):
-#     def end_object(self, obj):
-#         self._current['widget_id'] = obj._get_pk_val()
-#         if 'text' in self.selected_fields:
-#             self._current['url'] = obj.text
-#         self.objects.append(self._current)

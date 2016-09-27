@@ -1,4 +1,6 @@
+import mimetypes
 import shutil
+import urllib
 
 from django.core.exceptions import ValidationError
 from django.db import models, NotSupportedError
@@ -9,8 +11,11 @@ from django.utils.translation import ugettext_lazy as _
 import os
 import hashlib
 # Create your models here.
+from easy_thumbnails.files import get_thumbnailer
+
 from authentication.models import UserDetails, Organization
-from blynq.settings import BASE_DIR, MEDIA_ROOT, USERCONTENT_DIR, DELETED_CONTENT_DIR, DEFAULT_DISPLAY_TIME
+from blynq.settings import BASE_DIR, MEDIA_ROOT, USERCONTENT_DIR, DELETED_CONTENT_DIR, DEFAULT_DISPLAY_TIME, MEDIA_HOST
+from customLibrary.custom_settings import CONTENT_THUMBNAILS, PERMANENTLY_DELETE_FILES
 from customLibrary.views_lib import debugFileLog, get_video_length, full_file_path
 
 
@@ -98,7 +103,6 @@ class Content(models.Model):
         else:
             url = ''
             full_file_type = ''
-        import mimetypes
         file_type, encoding = mimetypes.guess_type(str(url))
         if file_type:
             full_file_type = full_file_type + file_type
@@ -135,13 +139,6 @@ class Content(models.Model):
                 self.duration = seconds
         super(Content, self).save(*args, **kwargs)
 
-    @property
-    def is_widget(self):
-        widget = False
-        if self.content_type and self.content_type.file_type:
-            widget = 'widget' in self.content_type.file_type
-        return widget
-
     def __unicode__(self):
         return self.title
 
@@ -171,38 +168,69 @@ class Content(models.Model):
     # class Meta:
     #     ordering = ['-last_modified_time']
 
-    @property
-    def is_image(self):
+    def check_type(self, type_str='image'):
         if not self.document:
             return False
-        import mimetypes
         file_type, encoding = mimetypes.guess_type(str(self.document.url))
         if file_type:
-            return 'image' in file_type
+            return type_str in file_type
         else:
             return False
+
+    @property
+    def file_path(self):
+        if self.document:
+            return os.path.join(MEDIA_ROOT, self.document.name)
+        return ''
+
+    @property
+    def is_image(self):
+        return self.check_type(type_str='image')
 
     @property
     def is_video(self):
-        if not self.document:
-            return False
-        import mimetypes
-        file_type, encoding = mimetypes.guess_type(str(self.document.url))
-        if file_type:
-            return 'video' in file_type
-        else:
-            return False
+        return self.check_type(type_str='video')
 
     @property
     def is_audio(self):
-        if not self.document:
-            return False
-        import mimetypes
-        file_type, encoding = mimetypes.guess_type(str(self.document.url))
-        if file_type:
-            return 'audio' in file_type
+        return self.check_type(type_str='audio')
+
+    @property
+    def is_pdf(self):
+        return self.check_type(type_str='application/pdf')
+
+    @property
+    def is_widget(self):
+        widget = False
+        if self.content_type and self.content_type.file_type:
+            widget = 'widget' in self.content_type.file_type
+        return widget
+
+    @property
+    def thumbnail(self):
+        if self.is_folder:
+            relative_url = CONTENT_THUMBNAILS['folder']
+        elif self.is_audio:
+            relative_url = CONTENT_THUMBNAILS['audio']
+        elif self.is_video:
+            relative_url = CONTENT_THUMBNAILS['video']
+        elif self.is_pdf:
+            relative_url = CONTENT_THUMBNAILS['pdf']
+        elif self.is_image:
+            local_file_path = get_thumbnailer(self.file_path, str(self.content_id))['avatar'].url
+            relative_file_path = local_file_path.replace(BASE_DIR, '')
+            relative_url = urllib.quote(relative_file_path)
         else:
-            return False
+            relative_url = CONTENT_THUMBNAILS['url']
+        return MEDIA_HOST + relative_url
+
+    def get_url(self):
+        if self.document:
+            return MEDIA_HOST + self.document.url
+        elif self.is_folder:
+            return ''
+        else:
+            return self.url
 
     @staticmethod
     def get_user_relevant_objects(user_details):
@@ -267,18 +295,25 @@ def pre_delete_content(sender, instance, **kwargs):
             debugFileLog.exception("Exception while subtracting the deleted file size")
         try:
             src = instance.document.name
-            file_src = os.path.join(MEDIA_ROOT, src)
+            file_src = instance.file_path
             if os.path.exists(file_src):
-                dst = '%s/organization%d/' % (DELETED_CONTENT_DIR, instance.organization.organization_id)
-                file_dst = os.path.join(MEDIA_ROOT, dst)
-                try:
-                    if not os.path.exists(file_dst):
-                        os.makedirs(file_dst)
-                    full_file_dst = file_dst + os.path.basename(src)
-                    shutil.move(file_src, full_file_dst)
-                except Exception as e:
-                    debugFileLog.error("Error while moving deleted content to media/deletedcontent/organization_id")
-                    debugFileLog.exception(e)
+                if PERMANENTLY_DELETE_FILES:
+                    dst = '%s/organization%d/' % (DELETED_CONTENT_DIR, instance.organization.organization_id)
+                    file_dst = os.path.join(MEDIA_ROOT, dst)
+                    try:
+                        if not os.path.exists(file_dst):
+                            os.makedirs(file_dst)
+                        full_file_dst = file_dst + os.path.basename(src)
+                        shutil.move(file_src, full_file_dst)
+                    except Exception as e:
+                        debugFileLog.error("Error while moving deleted content to media/deletedcontent/organization_id")
+                        debugFileLog.exception(e)
+                else:
+                    try:
+                        os.remove(file_src)
+                    except Exception as e:
+                        debugFileLog.exception('Permanent deletion of file failed with exception')
+                        debugFileLog.exception(e)
             else:
                 debugFileLog.error("To be deleted content %s does not exist" % file_src)
         except Exception as e:

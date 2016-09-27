@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from blynq import settings
-from blynq.settings import PLAYER_INACTIVE_THRESHOLD
+from customLibrary.custom_settings import PLAYER_INACTIVE_THRESHOLD
 from customLibrary.views_lib import string_to_dict, ajax_response, get_userdetails, send_mail_blynq, obj_to_json_response, \
     debugFileLog
 from scheduleManagement.models import Schedule

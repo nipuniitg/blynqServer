@@ -5,13 +5,16 @@ from os.path import isfile, join, exists, isdir
 import datetime
 
 import requests
+# from celery import shared_task
+# from celery.task import periodic_task
 from django.utils import timezone
 
 from authentication.models import Organization, UserDetails
-from blynq.settings import CONTENT_ORGANIZATION_NAME
+from customLibrary.custom_settings import CONTENT_ORGANIZATION_NAME
 from contentManagement.models import Content
 from contentManagement.views import process_media
 from customLibrary.views_lib import debugFileLog, get_ist_datetime, date_to_string, ajax_response
+
 
 DOWNLOADED_PARTNER_DIRECTORY = '/home/django/partner/'
 
@@ -145,6 +148,7 @@ def process_way2_urls(way2_dict, way2_items_required, time_for_each_url):
 
 
 def fetch_way2news():
+    debugFileLog.info('Inside fetch_way2news')
     try:
         final_url = generate_way2_url(category=WAY2_CONSTANTS['category'])
         time_for_each_url = 30
