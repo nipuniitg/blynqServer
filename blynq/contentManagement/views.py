@@ -65,7 +65,7 @@ def upsert_url(request):
     return ajax_response(success=success, errors=errors)
 
 
-def process_media(file_path, parent_folder=None, user_details=None, organization=None, content_already_saved=False):
+def process_media(file_path, parent_folder=None, user_details=None, organization=None, content_already_saved=True):
     debugFileLog.info('Inside process_media')
     if not file_path or not os.path.exists(file_path):
         debugFileLog.info('File path does not exist')
@@ -122,6 +122,8 @@ def video_conversion_required(file_path):
 
 
 def compress_video(file_path, parent_folder=None, user_details=None, organization=None, content_already_saved=False):
+    delete_old = True
+    conversion_successful = False
     filename = os.path.basename(file_path)
     title, ext = os.path.splitext(filename)
     temp_file_path = full_file_path(relative_path='temp/converted_' + title + '.mp4')
@@ -141,21 +143,22 @@ def compress_video(file_path, parent_folder=None, user_details=None, organizatio
         output, error = p.communicate()
         if p.returncode != 0:
             debugFileLog.exception("Video conversion failed with error %d %s %s" % (p.returncode, output, error))
-            return False
+            return conversion_successful, delete_old
         video_file = open(temp_file_path)
         django_file = File(video_file)
         content = Content(title=title, document=django_file, uploaded_by=user_details, last_updated_by=user_details,
                           organization=organization, parent_folder=parent_folder)
         content.save()
+        conversion_successful = True
         try:
             os.remove(temp_file_path)
         except Exception as e:
             debugFileLog.exception('Not able to remove the temp file while video conversion %s' % temp_file_path)
             debugFileLog.exception(e)
-        return True
+        return conversion_successful, delete_old
     except Exception as e:
         debugFileLog.exception(e)
-        return False
+        return conversion_successful, delete_old
 
 
 @login_required
@@ -182,10 +185,9 @@ def upload_content(request):
                 else:
                     parent_folder = Content.get_user_filesystem(user_details).get(content_id=parent_folder_id)
                     assert parent_folder.is_folder
-                content = Content(title=title, document=document, uploaded_by=user_details,
-                                  last_updated_by=user_details, organization=user_details.organization,
-                                  parent_folder=parent_folder, is_folder=False)
-                content.save()
+                content = Content.objects.create(title=title, document=document, uploaded_by=user_details,
+                                                 last_updated_by=user_details, organization=user_details.organization,
+                                                 parent_folder=parent_folder, is_folder=False)
                 # Saving the content twice so that the duration can be found out using content.document
                 content.save()
                 if content.is_image or content.is_video:

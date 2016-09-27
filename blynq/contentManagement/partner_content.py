@@ -27,11 +27,14 @@ def process_file(file_path, parent_folder, user_details, organization):
         except Exception as e:
             print 'File %s does not already exist' % title
             conversion_success, delete_old = process_media(file_path=file_path, parent_folder=parent_folder,
-                                                           user_details=user_details, organization=organization)
+                                                           user_details=user_details, organization=organization,
+                                                           content_already_saved=False)
             if conversion_success:
                 print 'Successfully uploaded %s' % file_path
             else:
                 print 'Uploading file unsuccessful %s ' % file_path
+            if delete_old:
+                os.remove(file_path)
     except Exception as e:
         debugFileLog.exception(e)
         debugFileLog.exception('Exception while processing %s ' % file_path)
