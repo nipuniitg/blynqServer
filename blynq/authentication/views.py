@@ -1,12 +1,13 @@
 import datetime
+
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.utils import timezone
-
-from authentication.forms import RequestQuoteForm
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+
+from authentication.forms import RequestQuoteForm
 from blynq import settings
 from customLibrary.custom_settings import PLAYER_INACTIVE_THRESHOLD
 from customLibrary.views_lib import string_to_dict, ajax_response, get_userdetails, send_mail_blynq, obj_to_json_response, \

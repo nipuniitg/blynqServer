@@ -4,11 +4,13 @@ from django.db.models.signals import post_save, pre_delete, post_delete
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-# Create your models here.
+
 from authentication.models import UserDetails, Organization
 from customLibrary.custom_settings import CONTENT_ORGANIZATION_NAME
 from contentManagement.models import Content
 from customLibrary.views_lib import debugFileLog
+
+# Create your models here.
 
 
 class PlaylistItems(models.Model):

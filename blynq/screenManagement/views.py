@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
-from django.core import serializers
 from django.db import transaction
 from django.shortcuts import render
+
 from schedule.models import Calendar
 
 from authentication.models import City
@@ -9,12 +9,8 @@ from authentication.serializers import CitySerializer
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, debugFileLog
 from screenManagement.forms import AddScreenForm, AddGroup
 from screenManagement.models import Screen, ScreenStatus, Group, GroupScreens, ScreenActivationKey, AspectRatio
-# import the logging library
-
-# Get an instance of a logger
 from screenManagement.serializers import ScreenSerializer, GroupSerializer, AspectRatioSerializer, \
     default_screen_serializer
-
 
 # Create your views here.
 

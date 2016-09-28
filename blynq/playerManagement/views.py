@@ -2,11 +2,10 @@ import datetime
 import os
 from copy import deepcopy
 from operator import itemgetter
-from django.shortcuts import render
 from itertools import chain
 
-# Create your views here.
 from django.utils import timezone
+
 from django.views.decorators.csrf import csrf_exempt
 from blynq.settings import MEDIA_HOST, HOST_URL
 from customLibrary.custom_settings import CONTENT_ORGANIZATION_NAME, PLAYER_POLL_TIME
@@ -22,6 +21,8 @@ from scheduleManagement.models import ScheduleScreens, SchedulePlaylists, Schedu
 from screenManagement.models import ScreenActivationKey, Screen, ORIENTATION_CHOICES
 from layoutManagement.serializers import default_layout_pane_serializer
 from screenManagement.serializers import AspectRatioSerializer
+
+# Create your views here.
 
 
 @csrf_exempt

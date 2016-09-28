@@ -1,14 +1,14 @@
 # import django.utils.timezone.datetime as datetime
 import datetime
 import logging
-
 import subprocess
-
 import re
+import json, pytz, os
+
 from django.core.mail import send_mail
 from django.http import JsonResponse, Http404
 from django.utils import timezone
-import json, pytz, os
+
 from authentication.models import UserDetails
 from blynq.settings import MEDIA_ROOT
 

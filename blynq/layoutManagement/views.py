@@ -1,10 +1,10 @@
 from django.db import transaction
-from django.shortcuts import render
 
-# Create your views here.
 from customLibrary.views_lib import obj_to_json_response, get_userdetails, string_to_dict, debugFileLog, ajax_response
 from layoutManagement.models import Layout, LayoutPane
 from layoutManagement.serializers import default_layout_serializer
+
+# Create your views here.
 
 
 def get_layouts(request):

@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils import timezone
+
 from schedule.models import Calendar
 
 from authentication.models import Organization, UserDetails, City

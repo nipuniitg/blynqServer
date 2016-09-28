@@ -1,6 +1,4 @@
 from django.db import models
-
-# Create your models here.
 from django.utils.translation import ugettext_lazy as _
 
 from authentication.models import UserDetails, Organization
@@ -8,6 +6,8 @@ from playlistManagement.models import Playlist
 from screenManagement.models import Screen, Group
 from layoutManagement.models import LayoutPane, Layout
 from schedule.models import Event
+
+# Create your models here.
 
 
 class ScheduleScreens(models.Model):
