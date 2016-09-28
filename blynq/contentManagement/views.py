@@ -445,7 +445,7 @@ def move_content(request):
 def get_widgets(request):
     user_details = get_userdetails(request)
     widgets = Content.get_user_widgets(user_details=user_details)
-    json_data = default_content_serializer(widgets, fields=('title', 'content_id', 'widget_text'))
+    json_data = default_content_serializer(widgets)
     return obj_to_json_response(json_data)
 
 

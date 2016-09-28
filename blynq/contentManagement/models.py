@@ -241,6 +241,8 @@ class Content(models.Model):
             return MEDIA_HOST + self.document.url
         elif self.is_folder:
             return ''
+        elif self.is_widget:
+            return ''
         else:
             return self.url
 
