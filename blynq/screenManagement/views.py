@@ -12,7 +12,8 @@ from screenManagement.models import Screen, ScreenStatus, Group, GroupScreens, S
 # import the logging library
 
 # Get an instance of a logger
-from screenManagement.serializers import ScreenSerializer, GroupSerializer, AspectRatioSerializer
+from screenManagement.serializers import ScreenSerializer, GroupSerializer, AspectRatioSerializer, \
+    default_screen_serializer
 
 
 # Create your views here.
@@ -194,10 +195,7 @@ def get_groups_json(request):
 def get_screens_json(request):
     user_details = get_userdetails(request)
     screen_data = Screen.get_user_relevant_objects(user_details)
-    json_data = ScreenSerializer().serialize(screen_data,
-                                             fields=('screen_id', 'screen_name', 'address', 'city',
-                                                     'status', 'groups', 'screen_size', 'resolution'),
-                                             use_natural_foreign_keys=True)
+    json_data = default_screen_serializer(screen_data)
     return obj_to_json_response(json_data)
 
 

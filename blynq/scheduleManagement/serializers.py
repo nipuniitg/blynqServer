@@ -3,7 +3,7 @@ from customLibrary.custom_settings import CONTENT_ORGANIZATION_NAME
 from customLibrary.views_lib import get_ist_date_str, get_ist_time_str, debugFileLog
 from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import SchedulePlaylists, ScheduleScreens, SchedulePane
-from screenManagement.serializers import ScreenSerializer, GroupSerializer
+from screenManagement.serializers import ScreenSerializer, GroupSerializer, default_screen_serializer
 from layoutManagement.serializers import default_layout_serializer, default_layout_pane_serializer
 
 
@@ -63,10 +63,7 @@ class ScheduleScreensSerializer(Serializer):
     def end_object(self, obj):
         self._current['schedule_screen_id'] = obj._get_pk_val()
         if 'screen' in self.selected_fields:
-            json_data = ScreenSerializer().serialize([obj.screen],
-                                                     fields=('screen_id', 'status', 'groups', 'address', 'city',
-                                                             'screen_size', 'resolution', 'screen_name'),
-                                                     use_natural_foreign_keys=True)
+            json_data = default_screen_serializer([obj.screen])
             self.add_dict_to_current(json_data)
             del self._current['screen']
         if 'group' in self.selected_fields:
