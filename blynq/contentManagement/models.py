@@ -206,23 +206,32 @@ class Content(models.Model):
             widget = 'widget' in self.content_type.file_type
         return widget
 
-    @property
-    def thumbnail(self):
+    def thumbnail_relative_path(self):
         if self.is_folder:
-            relative_url = CONTENT_THUMBNAILS['folder']
+            relative_path = CONTENT_THUMBNAILS['folder']
         elif self.is_audio:
-            relative_url = CONTENT_THUMBNAILS['audio']
+            relative_path = CONTENT_THUMBNAILS['audio']
         elif self.is_video:
-            relative_url = CONTENT_THUMBNAILS['video']
+            relative_path = CONTENT_THUMBNAILS['video']
         elif self.is_pdf:
-            relative_url = CONTENT_THUMBNAILS['pdf']
+            relative_path = CONTENT_THUMBNAILS['pdf']
         elif self.is_image:
-            local_file_path = get_thumbnailer(self.file_path, str(self.content_id))['avatar'].url
-            relative_file_path = local_file_path.replace(BASE_DIR, '')
-            relative_url = urllib.quote(relative_file_path)
+            relative_path = get_thumbnailer(self.file_path, str(self.content_id))['avatar'].url
         else:
-            relative_url = CONTENT_THUMBNAILS['url']
-        return MEDIA_HOST + relative_url
+            relative_path = CONTENT_THUMBNAILS['url']
+        return relative_path
+
+    @property
+    def thumbnail_url(self):
+        relative_path = self.thumbnail_relative_path()
+        if self.is_image:
+            relative_file_path = relative_path.replace(BASE_DIR, '')
+            relative_path = urllib.quote(relative_file_path)
+        return MEDIA_HOST + relative_path
+
+    @property
+    def thumbnail_path(self):
+        return os.path.join(BASE_DIR, self.thumbnail_relative_path())
 
     def get_url(self):
         if self.document:
@@ -246,21 +255,6 @@ class Content(models.Model):
     def get_user_filesystem(user_details):
         return Content.get_user_relevant_objects(user_details=user_details).exclude(
             content_type__file_type__icontains='widget')
-
-        # class Meta:
-        #     unique_together = (('title', 'parent_folder', 'uploaded_by'))
-        # def generate_sha1(self):
-        #     sha = hashlib.sha1()
-        #     self.document.seek(0)
-        #     while True:
-        #         buf = self.document.read(104857600)
-        #         if not buf:
-        #             break
-        #         sha.update(buf)
-        #     self.sha1 = sha.hexdigest()
-        #     # to make sure later operations can read the whole file
-        #     self.document.seek(0)
-        #
 
 
 def save_relevant_playlists(content_id):
@@ -296,8 +290,15 @@ def pre_delete_content(sender, instance, **kwargs):
         try:
             src = instance.document.name
             file_src = instance.file_path
+            # Delete thumbnail
+            if instance.is_image and os.path.exists(instance.thumbnail_path):
+                try:
+                    os.remove(instance.thumbnail_path)
+                except Exception as e:
+                    debugFileLog.exception('Deletion of thumbnail %s failed with exception %s' %
+                                           (instance.thumbnail_path, str(e)))
             if os.path.exists(file_src):
-                if PERMANENTLY_DELETE_FILES:
+                if not PERMANENTLY_DELETE_FILES:
                     dst = '%s/organization%d/' % (DELETED_CONTENT_DIR, instance.organization.organization_id)
                     file_dst = os.path.join(MEDIA_ROOT, dst)
                     try:
