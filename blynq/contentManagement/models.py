@@ -1,6 +1,7 @@
 import mimetypes
 import shutil
 import urllib
+import os
 
 from django.core.exceptions import ValidationError
 from django.db import models, NotSupportedError
@@ -8,8 +9,7 @@ from django.db.models import Q
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
-import os
-import hashlib
+
 # Create your models here.
 from easy_thumbnails.files import get_thumbnailer
 

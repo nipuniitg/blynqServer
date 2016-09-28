@@ -7,8 +7,9 @@ from contentManagement.serializers import default_content_serializer
 from contentManagement.views import get_files_recursively
 from customLibrary.views_lib import get_userdetails, string_to_dict, ajax_response, obj_to_json_response
 from playlistManagement.models import Playlist, PlaylistItems
-# Create your views here.
 from playlistManagement.serializers import default_playlist_serializer, PlaylistSerializer
+
+# Create your views here.
 
 
 @login_required

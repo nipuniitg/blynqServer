@@ -5,10 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import render
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
+
 from schedule.models import Event, Rule
-# Create your views here.
-# from schedule.views import calendar
+
 from customLibrary.custom_settings import CONTENT_ORGANIZATION_NAME
 from customLibrary.views_lib import get_userdetails, ajax_response, obj_to_json_response, string_to_dict, \
     list_to_comma_string, generate_utc_datetime, get_ist_datetime, get_utc_datetime, debugFileLog, empty_list_for_none
@@ -17,6 +16,8 @@ from scheduleManagement.models import Schedule, SchedulePlaylists, ScheduleScree
 from scheduleManagement.serializers import default_schedule_serializer
 from screenManagement.models import Screen, Group
 from layoutManagement.models import Layout
+
+# Create your views here.
 
 
 @login_required

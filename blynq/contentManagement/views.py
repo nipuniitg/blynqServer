@@ -1,14 +1,13 @@
 import mimetypes
 import os
 import subprocess
-from copy import deepcopy
 
-from PIL import Image
 from django.contrib.auth.decorators import login_required
 from django.core.files import File
 from django.db import transaction
-from django.db.models import Q
 from django.shortcuts import render
+
+from PIL import Image
 
 from contentManagement.serializers import default_content_serializer
 from blynq.settings import TEMP_DIR

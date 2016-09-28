@@ -1,17 +1,14 @@
 from django.core.validators import MaxValueValidator
 from django.db import models
-
 from django.utils.translation import ugettext_lazy as _
-
-
-# Create your models here.
-from django.db.models import Q
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
 from authentication.models import Organization, UserDetails
 from customLibrary.views_lib import debugFileLog
 from screenManagement.models import AspectRatio
+
+# Create your models here.
 
 
 class LayoutPane(models.Model):
