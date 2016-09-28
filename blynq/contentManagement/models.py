@@ -217,6 +217,9 @@ class Content(models.Model):
             relative_path = CONTENT_THUMBNAILS['pdf']
         elif self.is_image:
             relative_path = get_thumbnailer(self.file_path, str(self.content_id))['avatar'].url
+        elif self.is_widget:
+            # Right now only rss is supported in widgets. Change this as per type of widgets in the future
+            relative_path = CONTENT_THUMBNAILS['rss']
         else:
             relative_path = CONTENT_THUMBNAILS['url']
         return relative_path
