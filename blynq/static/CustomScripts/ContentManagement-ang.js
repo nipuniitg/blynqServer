@@ -285,7 +285,6 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
         $scope.currentFolderId = -1  //-1 represents root folder. And hence fetches the data in root folder.
         $scope.refreshContent($scope.currentFolderId);
 
-        $scope.fileIcons = cAD.getFileIcons();
         $scope.popOverMessages = cAD.getPopOverMessages();
     };
 
@@ -860,6 +859,7 @@ plApp.controller('mdlContentInDetailCtrl',['$scope','file','$uibModalInstance',
 plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentScopeObj','$cookies','ctDataAccessFactory',
  function($scope,$uibModalInstance, parentScopeObj, $cookies, ctDAF){
     var validateFiles = [];
+    var objXhr;
     var onLoad = function(){
         $scope.currentFolderId = parentScopeObj.currentFolderId;
         $scope.files=[];
@@ -907,7 +907,7 @@ plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentS
                 var formData = new FormData();
                 var filesArr = [];
 
-                for(var i in $scope.files){
+                for(var i=0; i<$scope.files.length;i++){
                     formData.append('file'+i, $scope.files[i]);
                 }
                 formData.append('currentFolderId', $scope.currentFolderId);
@@ -915,7 +915,7 @@ plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentS
 
 
                 // ADD LISTENERS.
-                var objXhr = new XMLHttpRequest();
+                objXhr = new XMLHttpRequest();
                 var csrftoken = $cookies.get('csrftoken');
                 //using upload is necessary. It triggers the progress bar.
                 objXhr.upload.onprogress = updateProgress;
@@ -953,14 +953,18 @@ plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentS
         }
         else{
             $scope.uploadInProgress = false;
-            toastr.warning('upload aborted');
+            //toastr.warning('upload aborted');
             toastr.warning(response.errors.join());
+            $uibModalInstance.dismiss('cancel');
         }
     };
 
     $scope.cancel = function(){
+        if(objXhr){
+            objXhr.abort();
+            toastr.warning('upload aborted');
+        }
         $uibModalInstance.dismiss('cancel');
-        toastr.warning('upload aborted');
     }
 
     onLoad();
@@ -1000,12 +1004,13 @@ return{
 
                    var dragIndex = angular.element(ui.draggable).data('index');
                    var isFolder = angular.element(ui.draggable).data('isfolder');
+                   var fileType = angular.element(ui.draggable).data('type');
                    if(isFolder){
                         scope.addFolderFunction()(dragIndex);
                    }
                    else
                    {
-                        scope.addContentFunction()(dragIndex);
+                        scope.addContentFunction()(dragIndex, fileType);
                    }
 
                 }

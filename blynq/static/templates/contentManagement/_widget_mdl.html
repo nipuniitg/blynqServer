@@ -22,9 +22,9 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">Widget Text/ URL*</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control"
-                           placeholder="" ng-model="widgetObj.widget_text"
-                           name="text" required>
+                    <textarea type="text" placeholder="write rss text here" name="text"
+                           ng-model="widgetObj.widget_text" class="form-control" required>
+                        </textarea>
                 </div>
                 <div class="col-md-offset-2 col-md-9"
                      ng-show="widgetUpsertForm.text.$touched && widgetUpsertForm.text.$invalid">

@@ -171,6 +171,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
         $scope.showQueueItemDetails = false;
 
         $scope.is_sortable_disabled = !0;
+        $scope.contentDetailsForm={};
 
         refreshPlaylists();
     };
@@ -336,13 +337,18 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
 
     //----Add Contents To activePlaylistObj
         //Below functions are being called from the droppable directive
-    $scope.addContentToPlaylistItems = function(index){
+    $scope.addContentToPlaylistItems = function(index, fileType){
         if(!$scope.playlistQueueEditMode)
         {
             $scope.editPlaylistItems();
             toastr.success('Playlist in edit mode.Dont forget to save after updating.');
         }
-        var contentDropped = ctFactory.getFilesObj()[index];
+        if(fileType == 'file'){
+            var contentDropped = ctFactory.getFilesObj()[index];
+        }else{
+            var contentDropped = ctFactory.getWidgetsObj()[index];
+        }
+
         var newPlaylistItem = new blueprints.PlaylistItem(contentDropped);
         $scope.$apply(function(){
             $scope.activePlaylistObj.playlist_items.push(newPlaylistItem);
@@ -387,12 +393,12 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
     };
 
     $scope.saveItemDurationUpdate = function(){
-        if($scope.contentDetailsForm.$valid)
+        if($scope.contentDetailsForm.form.$valid)
         {
            $scope.activePlaylistObj.playlist_items[$scope.activePlaylistItemIndex] = angular.copy($scope.activePlaylistItem);
             toastr.success('duration updated!! Dont forget to save playlist after edit.')
         }else{
-            toastr.warning('Some errors are there in the input fields. Resolve then and try again');
+            toastr.warning('Some errors are there in the input fields. Resolve them and try again');
         }
 
     };
@@ -419,5 +425,131 @@ plApp.filter('playlistTotalTime', [function(){
         return result
     }
 
+}]);
+
+plApp.filter('youtube', ['youtubeFactory', function(yF){
+    /*
+        This filter extracts the required video Id and playlist Id
+        and builds a custom Url which is upported to play
+     */
+    return function(url){
+        var controls = '?controls=1';
+        var autoplay = '&autoplay=1';
+        var loop = '&loop=1';
+        var playlistUrlStr = '?listType=playlist&list=';
+        var addAdditionalParamsToUrl = function(){
+            customUrl = customUrl + controls + autoplay + loop;
+        };
+
+        var customUrl = 'https://www.youtube.com/embed/';
+
+        //if video Id exists, then construct url with video Id, otherwise with playlistId
+        if(yF.getVideoId(url)){
+            customUrl = customUrl + yF.getVideoId(url);
+            addAdditionalParamsToUrl();
+            return customUrl
+        }else{
+            customUrl = customUrl +  playlistUrlStr + yf.getPlaylistId(url);
+            return customUrl
+        }
+    }
+}]);
+
+plApp.factory('youtubeFactory', [function(){
+
+    //returns the video Id of an Url
+    var getVideoId = function(url){
+        var regex = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+        return url.match(regex)[7]
+    };
+
+    var getPlaylistId = function(url){
+        var regExp = /^.*(youtu.be\/|list=)([^#\&\?]*).*/;
+        var match = url.match(regExp);
+        if (match && match[2]){
+        return match[2];
+        }
+    };
+
+    return{
+        getVideoId : getVideoId
+        ,getPlaylistId : getPlaylistId
+    };
+}]);
+
+plApp.directive('mediaPlayer', [function(){
+    return{
+        restrict:'E'
+        ,templateUrl : '/static/templates/shared/_media_player_drtv.html'
+        ,scope:{
+            mediaFile : '='
+        }
+        ,link : function($scope, elem){
+
+            $scope.$watch('mediaFile', function(){
+                setMediaType();
+            });
+
+            $scope.isMediaType = {
+                image : false
+                ,video : false
+                ,audio : false
+                ,pdf : false
+                ,youtube : false
+                ,rssText : false
+                ,iframe : false
+                ,default : false
+            };
+
+            var setMediaType = function(){
+                /*
+                    sets what mime type the current playing item is. If it can't find any, it defaults to
+                    default image.
+                */
+                angular.forEach($scope.isMediaType, function(value, key){
+                    $scope.isMediaType[key] = false;
+                });
+                switch(true){
+                    case $scope.mediaFile.content_type.indexOf('image')>-1:
+                        $scope.isMediaType.image = true;
+                        break;
+                    case $scope.mediaFile.content_type.indexOf('pdf')>-1:
+                        $scope.isMediaType.pdf = true;
+                        break;
+                    case $scope.mediaFile.content_type.indexOf('video')>-1:
+                        $scope.isMediaType.video = true;
+                        break;
+                    case $scope.mediaFile.content_type.indexOf('audio')>-1:
+                        $scope.isMediaType.audio = true;
+                        break;
+                    case $scope.mediaFile.content_type.indexOf('youtube')>-1:
+                        $scope.isMediaType.youtube = true;
+                        break;
+                    case $scope.mediaFile.content_type.indexOf('widget/rss/text')>-1:
+                        $scope.isMediaType.rssText = true;
+                        setUpRssTextMedia();
+                        break;
+                    case $scope.mediaFile.content_type.indexOf('url/web')>-1:
+                        $scope.isMediaType.iframe = true;
+                        break;
+                    default:
+                        $scope.isMediaType.default = true;
+                }
+            };
+
+            var setUpRssTextMedia = function(){
+                //set font-size according to the div height
+			    	var $div = $('.media-player'+ ' .rss-text')
+			    	var divHeight = $div.height();
+			    	$div.css({
+						'font-size': (divHeight/2) + 'px',
+						'line-height': divHeight + 'px'
+					});
+            }
+
+
+
+        }
+    }
 }]);
 
