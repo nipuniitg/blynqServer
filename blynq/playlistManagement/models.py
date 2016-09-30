@@ -93,7 +93,7 @@ def playlist_items_changed(sender, instance, **kwargs):
 @receiver(post_save, sender=Playlist)
 @receiver(pre_delete, sender=Playlist)
 def post_save_playlist(sender, instance, **kwargs):
-    debugFileLog.info("Inside post_save_playlist")
+    debugFileLog.info("Inside post_save_playlist of %s" % instance.playlist_title)
     # Set the last_updated_time for all the schedules having this playlist
     from scheduleManagement.models import SchedulePlaylists
     try:
@@ -101,8 +101,8 @@ def post_save_playlist(sender, instance, **kwargs):
         for each_schedule_playlist in schedule_playlists:
             if each_schedule_playlist.schedule_pane:
                 schedule = each_schedule_playlist.schedule_pane.schedule
-                if not schedule.deleted:
-                    schedule.save()
+                if schedule:
+                    schedule.update_screens_data()
     except Exception as e:
         debugFileLog.exception("Error while updating the last_updated_time of the schedules "
                                "corresponding to playlist %s" % instance.playlist.playlist_title)

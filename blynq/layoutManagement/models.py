@@ -57,7 +57,7 @@ def post_save_layout(sender, instance, **kwargs):
     from scheduleManagement.models import Schedule
     layout_schedules = Schedule.objects.filter(deleted=False, layout_id=instance.layout_id)
     for each_schedule in layout_schedules:
-        each_schedule.save()
+        each_schedule.update_screens_data()
 
 
 @receiver(pre_delete, sender=Layout)

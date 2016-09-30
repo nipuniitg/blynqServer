@@ -194,6 +194,36 @@ class Screen(models.Model):
         self.last_active_time = timezone.now()
         self.save()
 
+    def data_modified(self):
+        try:
+            screen_data_modified = self.screen_data_modified
+            screen_data_modified.save()
+        except ScreenDataModified.DoesNotExist:
+            screen_data_modified = ScreenDataModified(screen_id=self.screen_id)
+            screen_data_modified.save()
+        except Exception as e:
+            debugFileLog.error('Received exception while updating screen data_modified %s' % self.screen_name)
+            debugFileLog.error(e)
+
+    def is_data_modified(self, last_received_datetime):
+        try:
+            if self.screen_data_modified.last_updated_time >= last_received_datetime:
+                return True
+            else:
+                return False
+        except Exception as e:
+            debugFileLog.exception('Screen %s is_data_modified failed with exception %s ' % (self.screen_name, str(e)))
+            return True
+
+# Update the last_updated_time of a screen whenever any schedule or playlist or group or layout related to screen is
+# modified. This model instance will be used in the get_screen_data function in playerManagement/views.py
+class ScreenDataModified(models.Model):
+    screen = models.OneToOneField(Screen, related_name='screen_data_modified', on_delete=models.CASCADE)
+    last_updated_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    def __unicode__(self):
+        return self.screen.screen_name + ' last modified at ' + str(self.last_updated_time)
+
 
 @receiver(post_save, sender=GroupScreens)
 def create_schedule_screens(sender, instance, **kwargs):
@@ -202,9 +232,15 @@ def create_schedule_screens(sender, instance, **kwargs):
     group = instance.group
     from scheduleManagement.models import ScheduleScreens
     group_schedules = ScheduleScreens.objects.filter(schedule__deleted=False, screen__isnull=True, group=group)
+    if group_schedules:
+        screen.data_modified()
     for each_group_schedule in group_schedules:
-        schedule_screen = ScheduleScreens(screen=screen, schedule=each_group_schedule.schedule, group=group)
-        schedule_screen.save()
+        try:
+            schedule_screen = ScheduleScreens(screen=screen, schedule=each_group_schedule.schedule, group=group)
+            schedule_screen.save()
+        except Exception as e:
+            debugFileLog.exception("Exception while saving the Schedule Screens for screen %s group %s schedule %s" %
+                                   (screen.screen_name, group.group_name, each_group_schedule.schedule.schedule_title))
     debugFileLog.info("Schedules for the group has been successfully copied to the screen")
 
 
@@ -215,4 +251,6 @@ def remove_schedule_screens(sender, instance, **kwargs):
     debugFileLog.info("Inside remove_schedule_screens pre_delete")
     from scheduleManagement.models import ScheduleScreens
     schedule_screens = ScheduleScreens.objects.filter(group=instance.group, screen=instance.screen)
+    if schedule_screens:
+        instance.screen.data_modified()
     schedule_screens.delete()

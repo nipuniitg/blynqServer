@@ -113,8 +113,8 @@ def event_for_always(schedule):
     ist_now = get_ist_datetime(timezone.now())
     ist_start = ist_now.replace(hour=0, minute=0, second=0)
     ist_end = ist_now.replace(hour=23, minute=59, second=59)
-    start = get_utc_datetime(ist_start)
-    end = get_utc_datetime(ist_end)
+    start = get_utc_datetime(ist_start, include_seconds=True)
+    end = get_utc_datetime(ist_end, include_seconds=True)
     rule = Rule(name=schedule.schedule_title, description=schedule.schedule_title, frequency='DAILY')
     rule.save()
     creator = schedule.created_by.user if schedule.created_by else None
