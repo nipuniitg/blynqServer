@@ -389,8 +389,7 @@ def get_group_schedules(request, group_id):
     debugFileLog.info("inside get_group_schedules")
     group_id = int(group_id)
     user_details = get_userdetails(request)
-    group_schedule_id_list = ScheduleScreens.objects.filter(schedule__deleted=False, screen__isnull=True,
-                                                            group_id=group_id).values_list(
+    group_schedule_id_list = ScheduleScreens.objects.filter(screen__isnull=True, group_id=group_id).values_list(
         'schedule_id', flat=True).distinct()
     group_schedules = Schedule.get_user_relevant_objects(user_details).filter(schedule_id__in=group_schedule_id_list)
     json_data = default_schedule_serializer(querySet=group_schedules)
@@ -511,13 +510,11 @@ def delete_schedule(request):
             schedule_id = int(posted_data.get('schedule_id'))
             schedule = Schedule.get_user_relevant_objects(user_details=user_details).get(schedule_id=schedule_id)
             # Cascading delete would delete all the schedule screens
-            # schedule.delete()
-            schedule.deleted = True
-            schedule.save()
+            schedule.delete()
             success = True
     except Exception as e:
         success = False
-        errors = ['Sorry, you do not have access to this schedule']
+        errors = ['Sorry, you do not have access to this schedule or something wrong has happened']
         debugFileLog.exception(errors[0])
         debugFileLog.exception(e)
     return ajax_response(success=success, errors=errors)
@@ -525,16 +522,14 @@ def delete_schedule(request):
 
 def calendar_schedules(start_datetime, end_datetime, screen_id=None, group_id=None):
     if screen_id and group_id:
-        schedule_id_list = ScheduleScreens.objects.filter(schedule__deleted=False, screen_id=screen_id,
-                                                          group_id=group_id).values_list(
+        schedule_id_list = ScheduleScreens.objects.filter(screen_id=screen_id, group_id=group_id).values_list(
             'schedule_id', flat=True).distinct()
     elif screen_id:
         # Show the schedules of the screen as well as the schedule of the group in which screen lies.
-        schedule_id_list = ScheduleScreens.objects.filter(schedule__deleted=False, screen_id=screen_id).values_list(
-            'schedule_id', flat=True).distinct()
+        schedule_id_list = ScheduleScreens.objects.filter(screen_id=screen_id).values_list('schedule_id',
+                                                                                           flat=True).distinct()
     elif group_id:
-        schedule_id_list = ScheduleScreens.objects.filter(schedule__deleted=False, screen__isnull=True,
-                                                          group_id=group_id).values_list(
+        schedule_id_list = ScheduleScreens.objects.filter(screen__isnull=True, group_id=group_id).values_list(
             'schedule_id', flat=True).distinct()
     else:
         return []

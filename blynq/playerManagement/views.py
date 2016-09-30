@@ -18,7 +18,7 @@ from reports.models import MediaAnalytics, ScreenAnalytics
 from playlistManagement.models import PlaylistItems
 from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import ScheduleScreens, SchedulePlaylists, SchedulePane
-from screenManagement.models import ScreenActivationKey, Screen, ORIENTATION_CHOICES
+from screenManagement.models import ScreenActivationKey, Screen, ORIENTATION_CHOICES, ScreenDataModified
 from layoutManagement.serializers import default_layout_pane_serializer
 from screenManagement.serializers import AspectRatioSerializer
 
@@ -246,28 +246,28 @@ def get_screen_data(request, nof_days=7):
         start_time = timezone.now()
         end_time = start_time + datetime.timedelta(days=nof_days)
         screen = Screen.objects.get(unique_device_key__activation_key=unique_device_key)
+        is_modified = True
         # Update the screen status saying that it is active
         screen.update_status()
         if date_changed(last_received_datetime):
-            schedule_ids_list = ScheduleScreens.objects.filter(
-                screen=screen, schedule__deleted=False).values_list('schedule_id', flat=True)
             is_modified = True
         else:
-            # Include deleted schedules as well by not checking the deleted flag
-            schedule_screens = ScheduleScreens.objects.filter(
-                screen=screen)
-            schedule_screens_updated = schedule_screens.filter(
-                schedule__last_updated_time__gte=last_received_datetime, )
-            if schedule_screens_updated:
-                schedule_ids_list = schedule_screens.filter(schedule__deleted=False).values_list(
-                    'schedule_id', flat=True).distinct()
+            try:
+                screen_data_modified = ScreenDataModified.objects.get(screen=screen)
+                if screen_data_modified.last_updated_time >= last_received_datetime:
+                    is_modified = True
+                else:
+                    is_modified = False
+            except ScreenDataModified.DoesNotExist:
+                debugFileLog.exception('ScreenDataModified does not exist for the screen %s' % screen.screen_name)
                 is_modified = True
+        if is_modified:
+            schedule_ids_list = ScheduleScreens.objects.filter(screen=screen).values_list('schedule_id', flat=True)
+            if schedule_ids_list:
+                schedule_panes = SchedulePane.objects.filter(schedule_id__in=schedule_ids_list). \
+                    order_by('-schedule__last_updated_time')
             else:
-                schedule_ids_list = []
-                is_modified = False
-        if schedule_ids_list:
-            schedule_panes = SchedulePane.objects.filter(schedule_id__in=schedule_ids_list). \
-                order_by('-schedule__last_updated_time')
+                schedule_panes = []
         else:
             schedule_panes = []
         if schedule_panes:
@@ -354,7 +354,7 @@ def get_content_urls_local(request, nof_days=1):
         local_server = LocalServer.objects.get(unique_key=unique_key)
         organization = local_server.organization
         screens = Screen.objects.filter(owned_by=organization)
-        schedule_screens = ScheduleScreens.objects.filter(screen__in=screens, schedule__deleted=False)
+        schedule_screens = ScheduleScreens.objects.filter(screen__in=screens)
         current_datetime = timezone.now()
         next_day = current_datetime + datetime.timedelta(days=1)
         start_time = next_day.replace(hour=0, minute=0, second=0)

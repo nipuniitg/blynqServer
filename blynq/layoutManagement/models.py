@@ -55,7 +55,7 @@ class Layout(models.Model):
 def post_save_layout(sender, instance, **kwargs):
     debugFileLog.info("inside post_save_layout")
     from scheduleManagement.models import Schedule
-    layout_schedules = Schedule.objects.filter(deleted=False, layout_id=instance.layout_id)
+    layout_schedules = Schedule.objects.filter(layout_id=instance.layout_id)
     for each_schedule in layout_schedules:
         each_schedule.update_screens_data()
 
@@ -65,6 +65,6 @@ def remove_layout(sender, instance, **kwargs):
     if instance.is_default:
         raise Exception('Cannot delete the default Full Screen layout')
     from scheduleManagement.models import Schedule
-    schedules = Schedule.objects.filter(layout=instance, deleted=False)
+    schedules = Schedule.objects.filter(layout=instance)
     if schedules:
         raise Exception('Cannot delete layout as it is already in use')

@@ -215,6 +215,7 @@ class Screen(models.Model):
             debugFileLog.exception('Screen %s is_data_modified failed with exception %s ' % (self.screen_name, str(e)))
             return True
 
+
 # Update the last_updated_time of a screen whenever any schedule or playlist or group or layout related to screen is
 # modified. This model instance will be used in the get_screen_data function in playerManagement/views.py
 class ScreenDataModified(models.Model):
@@ -231,7 +232,7 @@ def create_schedule_screens(sender, instance, **kwargs):
     screen = instance.screen
     group = instance.group
     from scheduleManagement.models import ScheduleScreens
-    group_schedules = ScheduleScreens.objects.filter(schedule__deleted=False, screen__isnull=True, group=group)
+    group_schedules = ScheduleScreens.objects.filter(screen__isnull=True, group=group)
     if group_schedules:
         screen.data_modified()
     for each_group_schedule in group_schedules:

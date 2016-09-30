@@ -121,7 +121,6 @@ class Schedule(models.Model):
     last_updated_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True,
                                         related_name='%(class)s_last_updated_by')
     last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
-    deleted = models.BooleanField(blank=True, default=False)
 
     def __unicode__(self):
         return self.schedule_title
@@ -131,7 +130,7 @@ class Schedule(models.Model):
 
     @staticmethod
     def get_user_relevant_objects(user_details):
-        return Schedule.objects.filter(organization=user_details.organization, deleted=False)
+        return Schedule.objects.filter(organization=user_details.organization)
 
     def get_schedule_screens_manager(self):
         """
