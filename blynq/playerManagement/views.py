@@ -252,15 +252,7 @@ def get_screen_data(request, nof_days=7):
         if date_changed(last_received_datetime):
             is_modified = True
         else:
-            try:
-                screen_data_modified = ScreenDataModified.objects.get(screen=screen)
-                if screen_data_modified.last_updated_time >= last_received_datetime:
-                    is_modified = True
-                else:
-                    is_modified = False
-            except ScreenDataModified.DoesNotExist:
-                debugFileLog.exception('ScreenDataModified does not exist for the screen %s' % screen.screen_name)
-                is_modified = True
+            is_modified = screen.is_data_modified(last_received_datetime=last_received_datetime)
         if is_modified:
             schedule_ids_list = ScheduleScreens.objects.filter(screen=screen).values_list('schedule_id', flat=True)
             if schedule_ids_list:
