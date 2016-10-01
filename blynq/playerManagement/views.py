@@ -400,8 +400,9 @@ def screen_info(request):
         screen = Screen.objects.filter(unique_device_key__activation_key=unique_device_key)
         json_data = default_screen_serializer(screen, fields=('screen_name', 'address', 'screen_size',
                                                               'aspect_ratio', 'resolution', 'last_active_time'))
-        return obj_to_json_response(json_data)
+        if json_data and type(json_data) == list:
+            return obj_to_json_response(json_data[0])
     except Exception as e:
         debugFileLog.exception('Exception while fetching screen info for device key %s' % unique_device_key)
         debugFileLog.exception(e)
-        return obj_to_json_response({})
+    return obj_to_json_response({})
