@@ -31,7 +31,8 @@ class GroupScreensSerializer(Serializer):
 
 class ScreenSerializer(Serializer):
     def end_object( self, obj ):
-        self._current['screen_id'] = obj._get_pk_val()
+        if 'screen_id' in self.selected_fields:
+            self._current['screen_id'] = obj._get_pk_val()
         if 'groups' in self.selected_fields:
             group_screens = GroupScreens.objects.filter(screen=obj)
             self._current['groups'] = GroupScreensSerializer().serialize(

@@ -20,7 +20,8 @@ from playlistManagement.serializers import PlaylistSerializer
 from scheduleManagement.models import ScheduleScreens, SchedulePlaylists, SchedulePane
 from screenManagement.models import ScreenActivationKey, Screen, ORIENTATION_CHOICES, ScreenDataModified
 from layoutManagement.serializers import default_layout_pane_serializer
-from screenManagement.serializers import AspectRatioSerializer
+from screenManagement.serializers import AspectRatioSerializer, default_screen_serializer
+
 
 # Create your views here.
 
@@ -387,3 +388,20 @@ def update_status(request):
         debugFileLog.exception(e)
         success = False
     return ajax_response(success=True)
+
+
+@csrf_exempt
+def screen_info(request):
+    debugFileLog.info('Inside screen info')
+    unique_device_key = ''
+    try:
+        posted_data = string_to_dict(request.body)
+        unique_device_key = posted_data.get('device_key')
+        screen = Screen.objects.filter(unique_device_key__activation_key=unique_device_key)
+        json_data = default_screen_serializer(screen, fields=('screen_name', 'address', 'screen_size',
+                                                              'aspect_ratio', 'resolution', 'last_active_time'))
+        return obj_to_json_response(json_data)
+    except Exception as e:
+        debugFileLog.exception('Exception while fetching screen info for device key %s' % unique_device_key)
+        debugFileLog.exception(e)
+        return obj_to_json_response({})
