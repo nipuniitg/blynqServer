@@ -1,14 +1,13 @@
 from django.db import models
-from django.db.models.signals import pre_save, post_save, pre_delete
-from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
+from schedule.models import Event
 
 from authentication.models import UserDetails, Organization
 from customLibrary.views_lib import debugFileLog
+from layoutManagement.models import LayoutPane, Layout
 from playlistManagement.models import Playlist
 from screenManagement.models import Screen, Group
-from layoutManagement.models import LayoutPane, Layout
-from schedule.models import Event
+
 
 # Create your models here.
 
@@ -146,17 +145,3 @@ class Schedule(models.Model):
                 screen.data_modified()
             else:
                 debugFileLog.error('Got null for screen attribute in schedule %s' % self.schedule_title)
-
-
-@receiver(pre_save, sender=Schedule)
-@receiver(post_save, sender=Schedule)
-def schedule_data_modified(sender, instance, **kwargs):
-    debugFileLog.info("Inside schedule_data_modified")
-    instance.update_screens_data()
-
-
-@receiver(pre_delete, sender=ScheduleScreens)
-def schedule_screen_data_modifed(sender, instance, **kwargs):
-    debugFileLog.info("Inside schedule_screen_data_modified")
-    if instance.screen:
-        instance.screen.data_modified()
