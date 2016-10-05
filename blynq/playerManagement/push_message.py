@@ -3,8 +3,7 @@ Delete this file if not being used.
 """
 
 import requests
-
-from blynq.settings import FCM_SERVER_KEY
+from customLibrary.custom_settings import FCM_SERVER_KEY
 from customLibrary.views_lib import obj_to_json_str
 
 

@@ -1,14 +1,13 @@
-from django.db import models
-from django.db.models import Sum
-from django.db.models.signals import post_save, pre_delete, post_delete
-from django.dispatch import receiver
-from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-# Create your models here.
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
+
 from authentication.models import UserDetails, Organization
-from blynq.settings import CONTENT_ORGANIZATION_NAME
 from contentManagement.models import Content
-from customLibrary.views_lib import debugFileLog
+from customLibrary.custom_settings import CONTENT_ORGANIZATION_NAME
+
+
+# Create your models here.
 
 
 class PlaylistItems(models.Model):
@@ -68,39 +67,3 @@ class Playlist(models.Model):
     @staticmethod
     def get_blynq_content_playlists():
         return Playlist.objects.filter(organization__organization_name=CONTENT_ORGANIZATION_NAME)
-
-
-@receiver(post_save, sender=PlaylistItems)
-@receiver(post_delete, sender=PlaylistItems)
-def playlist_items_changed(sender, instance, **kwargs):
-    try:
-        playlist_total_time = 0
-        total_time = PlaylistItems.objects.filter(playlist_id=instance.playlist_id).aggregate(Sum('display_time'))
-        if total_time['display_time__sum']:
-            playlist_total_time = total_time['display_time__sum']
-        playlist = Playlist.objects.get(playlist_id=instance.playlist_id)
-        playlist.playlist_total_time = playlist_total_time
-        playlist.save()
-        if not playlist.user_visible and playlist.playlist_total_time == 0:
-            playlist.delete()
-    except Exception as e:
-        debugFileLog.exception('Failed to update the playlist total time for playlist_id %d' % instance.playlist_id)
-        debugFileLog.exception(e)
-
-
-@receiver(pre_delete, sender=Playlist)
-@receiver(post_save, sender=Playlist)
-@receiver(pre_delete, sender=Playlist)
-def post_save_playlist(sender, instance, **kwargs):
-    debugFileLog.info("Inside post_save_playlist")
-    from scheduleManagement.models import SchedulePane, ScheduleScreens
-    try:
-        schedule_ids = SchedulePane.objects.filter(playlists__playlist_id=instance.playlist_id,
-                                                   schedule__deleted=False).values_list('schedule_id', flat=True)
-        screen_ids = ScheduleScreens.objects.filter(schedule_id__in=schedule_ids).values_list('screen_id', flat=True)
-        from playerManagement.views import notify_player
-        notify_player(screen_ids=screen_ids)
-    except Exception as e:
-        debugFileLog.exception("Error while notifying the relevant players related to the playlist %s" %
-                               instance.playlist_title)
-        debugFileLog.exception(e)

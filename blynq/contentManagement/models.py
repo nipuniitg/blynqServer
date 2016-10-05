@@ -1,16 +1,16 @@
-import shutil
+import mimetypes
+import os
 
 from django.core.exceptions import ValidationError
 from django.db import models, NotSupportedError
 from django.db.models import Q
-from django.db.models.signals import pre_delete, post_save
-from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
-import os
-import hashlib
 # Create your models here.
+from easy_thumbnails.files import get_thumbnailer
+
 from authentication.models import UserDetails, Organization
-from blynq.settings import BASE_DIR, MEDIA_ROOT, USERCONTENT_DIR, DELETED_CONTENT_DIR, DEFAULT_DISPLAY_TIME
+from blynq.settings import BASE_DIR, MEDIA_ROOT, USERCONTENT_DIR, DEFAULT_DISPLAY_TIME, MEDIA_HOST
+from customLibrary.custom_settings import CONTENT_THUMBNAILS
 from customLibrary.views_lib import debugFileLog, get_video_length, full_file_path
 
 
@@ -98,7 +98,6 @@ class Content(models.Model):
         else:
             url = ''
             full_file_type = ''
-        import mimetypes
         file_type, encoding = mimetypes.guess_type(str(url))
         if file_type:
             full_file_type = full_file_type + file_type
@@ -135,13 +134,6 @@ class Content(models.Model):
                 self.duration = seconds
         super(Content, self).save(*args, **kwargs)
 
-    @property
-    def is_widget(self):
-        widget = False
-        if self.content_type and self.content_type.file_type:
-            widget = 'widget' in self.content_type.file_type
-        return widget
-
     def __unicode__(self):
         return self.title
 
@@ -171,38 +163,81 @@ class Content(models.Model):
     # class Meta:
     #     ordering = ['-last_modified_time']
 
-    @property
-    def is_image(self):
+    def check_type(self, type_str='image'):
         if not self.document:
             return False
-        import mimetypes
         file_type, encoding = mimetypes.guess_type(str(self.document.url))
         if file_type:
-            return 'image' in file_type
+            return type_str in file_type
         else:
             return False
+
+    @property
+    def file_path(self):
+        if self.document:
+            return os.path.join(MEDIA_ROOT, self.document.name)
+        return ''
+
+    @property
+    def is_image(self):
+        return self.check_type(type_str='image')
 
     @property
     def is_video(self):
-        if not self.document:
-            return False
-        import mimetypes
-        file_type, encoding = mimetypes.guess_type(str(self.document.url))
-        if file_type:
-            return 'video' in file_type
-        else:
-            return False
+        return self.check_type(type_str='video')
 
     @property
     def is_audio(self):
-        if not self.document:
-            return False
-        import mimetypes
-        file_type, encoding = mimetypes.guess_type(str(self.document.url))
-        if file_type:
-            return 'audio' in file_type
+        return self.check_type(type_str='audio')
+
+    @property
+    def is_pdf(self):
+        return self.check_type(type_str='application/pdf')
+
+    @property
+    def is_widget(self):
+        widget = False
+        if self.content_type and self.content_type.file_type:
+            widget = 'widget' in self.content_type.file_type
+        return widget
+
+    def thumbnail_relative_path(self):
+        if self.is_folder:
+            relative_path = CONTENT_THUMBNAILS['folder']
+        elif self.is_audio:
+            relative_path = CONTENT_THUMBNAILS['audio']
+        elif self.is_video:
+            relative_path = CONTENT_THUMBNAILS['video']
+        elif self.is_pdf:
+            relative_path = CONTENT_THUMBNAILS['pdf']
+        elif self.is_image:
+            full_path = get_thumbnailer(self.file_path, str(self.content_id))['avatar'].url
+            relative_path = full_path.replace(BASE_DIR, '')
+        elif self.is_widget:
+            # Right now only rss is supported in widgets. Change this as per type of widgets in the future
+            relative_path = CONTENT_THUMBNAILS['rss']
         else:
-            return False
+            relative_path = CONTENT_THUMBNAILS['url']
+        return relative_path
+
+    @property
+    def thumbnail_url(self):
+        relative_path = self.thumbnail_relative_path()
+        return MEDIA_HOST + relative_path
+
+    @property
+    def thumbnail_path(self):
+        return os.path.join(BASE_DIR, self.thumbnail_relative_path())
+
+    def get_url(self):
+        if self.document:
+            return MEDIA_HOST + self.document.url
+        elif self.is_folder:
+            return ''
+        elif self.is_widget:
+            return ''
+        else:
+            return self.url
 
     @staticmethod
     def get_user_relevant_objects(user_details):
@@ -218,74 +253,6 @@ class Content(models.Model):
     def get_user_filesystem(user_details):
         return Content.get_user_relevant_objects(user_details=user_details).exclude(
             content_type__file_type__icontains='widget')
-
-        # class Meta:
-        #     unique_together = (('title', 'parent_folder', 'uploaded_by'))
-        # def generate_sha1(self):
-        #     sha = hashlib.sha1()
-        #     self.document.seek(0)
-        #     while True:
-        #         buf = self.document.read(104857600)
-        #         if not buf:
-        #             break
-        #         sha.update(buf)
-        #     self.sha1 = sha.hexdigest()
-        #     # to make sure later operations can read the whole file
-        #     self.document.seek(0)
-        #
-
-
-def save_relevant_playlists(content_id):
-    debugFileLog.info('save_relevant_playlists')
-    try:
-        from playlistManagement.models import PlaylistItems
-        playlist_items = PlaylistItems.objects.filter(content_id=content_id)
-        for item in playlist_items:
-            item.playlist.save()
-    except Exception as e:
-        debugFileLog.exception("Exception while saving the playlist to update last_updated_time")
-        debugFileLog.exception(e)
-
-
-@receiver(post_save, sender=Content)
-def post_save_content(sender, instance, **kwargs):
-    debugFileLog.info("inside post_save_content")
-    save_relevant_playlists(content_id=instance.content_id)
-
-
-@receiver(pre_delete, sender=Content)
-def pre_delete_content(sender, instance, **kwargs):
-    debugFileLog.info("inside pre_delete_content")
-    if instance.document:
-        try:
-            organization = instance.organization
-            organization.used_file_size = organization.used_file_size - instance.document.size
-            if organization.used_file_size < 0:
-                organization.used_file_size = 0
-            organization.save()
-        except Exception as e:
-            debugFileLog.exception("Exception while subtracting the deleted file size")
-        try:
-            src = instance.document.name
-            file_src = os.path.join(MEDIA_ROOT, src)
-            if os.path.exists(file_src):
-                dst = '%s/organization%d/' % (DELETED_CONTENT_DIR, instance.organization.organization_id)
-                file_dst = os.path.join(MEDIA_ROOT, dst)
-                try:
-                    if not os.path.exists(file_dst):
-                        os.makedirs(file_dst)
-                    full_file_dst = file_dst + os.path.basename(src)
-                    shutil.move(file_src, full_file_dst)
-                except Exception as e:
-                    debugFileLog.error("Error while moving deleted content to media/deletedcontent/organization_id")
-                    debugFileLog.exception(e)
-            else:
-                debugFileLog.error("To be deleted content %s does not exist" % file_src)
-        except Exception as e:
-            debugFileLog.exception("Unknown exception while deleting content")
-            debugFileLog.exception(e)
-    save_relevant_playlists(content_id=instance.content_id)
-
 
 # class Widget(models.Model):
 #     widget_id = models.AutoField(primary_key=True)

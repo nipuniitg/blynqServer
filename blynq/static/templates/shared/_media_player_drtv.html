@@ -1,0 +1,70 @@
+<!-- mediaPlayer -->
+
+<div class="stretch media-player">
+
+    <!-- image-->
+    <div ng-if="isMediaType.image" class="media-wrapper">
+        <img ng-src="{[ mediaFile.url | trusted]}"
+             class="media-content" >
+    </div>
+
+    <!-- pdf -->
+    <div ng-if="isMediaType.pdf" class="media-wrapper">
+        <pdf-section class="media-content" >
+            <button ng-click="prevPage()">&lt;</button>
+            <button ng-click="nextPage()">&gt;</button>
+            <span>{[currentPage]}/{[totalPages]}</span>
+            <br>
+            <br>
+            <pdfviewer src="{[ mediaFile.url | trusted ]}"
+                       on-page-load='pageLoaded(page,total)' id="viewer"></pdfviewer>
+        </pdf-section>
+    </div>
+
+    <!-- video -->
+    <div ng-if="isMediaType.video" class="media-wrapper">
+        <video controls autoplay class="media-content"
+               ng-src="{[mediaFile.url | trusted]}"
+                >
+            <!--<source ng-src="{[file.url | trusted]}">-->
+            Your browser does not support HTML5 video.
+        </video>
+    </div>
+
+    <!-- audio -->
+    <div ng-if="isMediaType.audio" class="media-wrapper">
+        <audio controls autoplay class="media-content"
+               ng-src="{[mediaFile.url | trusted]}">
+        <!--<source ng-src="{[file.url | trusted]}">-->
+            Your browser does not support HTML5 video.
+        </audio>
+        <!-- audio gif-->
+        <!--<img class="media-content"-->
+             <!--ng-src="static/img/audio_gif.gif">-->
+    </div>
+
+    <!-- youtube -->
+    <div ng-if="isMediaType.youtube" class="media-wrapper">
+        <iframe class="stretch" ng-src="{[ mediaFile.url | youtube | trusted ]}">
+        </iframe>
+    </div>
+
+    <!-- widget/rss -->
+    <div ng-if="isMediaType.rssText" class="media-wrapper rss-text">
+        <marquee>
+            {[ mediaFile.widget_text ]}
+        </marquee>
+    </div>
+
+    <!-- url, that is not image, pdf, video. Hence, shown in iframe-->
+    <div ng-if="isMediaType.iframe" class="media-wrapper">
+        <iframe id="{[ 'iframe_'+ schedulePane.pane.layout_pane_id ]}" class="stretch"
+                ng-src="{[ mediaFile.url | trusted]}"></iframe>
+    </div>
+
+    <!-- Default -->
+    <div ng-if="isMediaType.default" class="media-wrapper">
+        <img ng-src="{[defaultImageUrl]}" class="media-content">
+    </div>
+
+</div>

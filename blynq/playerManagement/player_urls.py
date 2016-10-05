@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^mediaStats', views.media_stats, name='media_stats'),
     url(r'^status', views.update_status, name='update_status'),
     url(r'^logs', views.insert_logs, name='insert_logs'),
+    url(r'^screenInfo', views.screen_info, name='screen_info'),
 ]

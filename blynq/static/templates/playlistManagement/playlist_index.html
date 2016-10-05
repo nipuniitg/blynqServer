@@ -89,51 +89,17 @@
         </div>
 
         <!-- Item Details form -->
-        <div class="col-md-4 col-fluid fill" ng-show="showQueueItemDetails">
+        <div class="col-md-4 col-fluid fill" ng-if="showQueueItemDetails">
             <div class="panel panel-default">
                 <div class="panel-heading ">
                     <div class="pull-left">Item Details</div>
                 </div>
                 <div class="panel-body fill overflow-y">
-                    <div style="margin:0 auto;text-align : center;">
-                        <!--<img ng-src="{[ activePlaylistItem.url ]}">-->
-                        <!-- image-->
-                        <div ng-if="activePlaylistItem.content_type.indexOf('image')>-1" class="">
-                            <img ng-src="{[ activePlaylistItem.url]}" class="max-fit">
-                        </div>
-                        <!-- pdf -->
-                        <div ng-if="activePlaylistItem.content_type.indexOf('pdf')>-1" class="">
-                            <pdf-section class="max-fit">
-                                <button ng-click="prevPage()">&lt;</button>
-                                <button ng-click="nextPage()">&gt;</button>
-                                <br>
-                                <span>{[currentPage]}/{[totalPages]}</span>
-                                <br>
-                                <pdfviewer src="{[ activePlaylistItem.url | trusted ]}"
-                                           on-page-load='pageLoaded(page,total)'
-                                           id="viewer"></pdfviewer>
-                            </pdf-section>
-                        </div>
-                        <!-- video -->
-                        <div ng-if="activePlaylistItem.content_type.indexOf('video')>-1" class="">
-                            <video controls class="max-fit" ng-src="{[activePlaylistItem.url | trusted]}">
-                                <!--<source ng-src="{[file.url | trusted]}">-->
-                                Your browser does not support HTML5 video.
-                            </video>
-                        </div>
-                        <!-- audio -->
-                        <div ng-if="activePlaylistItem.content_type.indexOf('audio')>-1" class="">
-                            <audio controls class="max-fit" ng-src="{[activePlaylistItem.url | trusted]}">
-                                Your browser does not support HTML5 video.
-                            </audio>
-                        </div>
-
-                        <!-- url, that is not image, pdf, video. Hence, shown in iframe-->
-                        <div ng-if="activePlaylistItem.content_type.indexOf('url/web')>-1" class="">
-                            <iframe class="max-fit" ng-src="{[ activePlaylistItem.url | trusted]}"></iframe>
-                        </div>
+                    <div style="margin:0 auto;text-align : center; width:100%; height:40%;">
+                        <media-player media-file="activePlaylistItem">
+                        </media-player>
                     </div>
-                    <form class="form-horizontal" role="form" name="contentDetailsForm" novalidate>
+                    <form class="form-horizontal" role="form" name="contentDetailsForm.form" novalidate>
                         <div class="form-group">
                             <label class="col-md-3 control-label">Item Name</label>
                             <div class="col-md-9">
@@ -168,8 +134,8 @@
                                 </div>
                             </div>
                             <div class="col-md-offset-3 col-md-9"
-                                 ng-show="contentDetailsForm.$submitted || contentDetailsForm.display_time.$touched">
-                                <span ng-show="contentDetailsForm.display_time.$error.required" style="color:red">
+                                 ng-show="contentDetailsForm.form.$submitted || contentDetailsForm.form.display_time.$touched">
+                                <span ng-show="contentDetailsForm.form.display_time.$error.required" style="color:red">
                                     Duration is required</span>
                             </div>
                         </div>

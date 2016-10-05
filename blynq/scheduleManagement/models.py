@@ -1,16 +1,15 @@
 from django.db import models
-
-# Create your models here.
-from django.db.models.signals import post_save, pre_delete
-from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
+from schedule.models import Event
 
 from authentication.models import UserDetails, Organization
 from customLibrary.views_lib import debugFileLog
+from layoutManagement.models import LayoutPane, Layout
 from playlistManagement.models import Playlist
 from screenManagement.models import Screen, Group
-from layoutManagement.models import LayoutPane, Layout
-from schedule.models import Event
+
+
+# Create your models here.
 
 
 class ScheduleScreens(models.Model):
@@ -121,7 +120,6 @@ class Schedule(models.Model):
     last_updated_by = models.ForeignKey(UserDetails, on_delete=models.SET_NULL, null=True,
                                         related_name='%(class)s_last_updated_by')
     last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
-    deleted = models.BooleanField(blank=True, default=False)
 
     def __unicode__(self):
         return self.schedule_title
@@ -131,7 +129,7 @@ class Schedule(models.Model):
 
     @staticmethod
     def get_user_relevant_objects(user_details):
-        return Schedule.objects.filter(organization=user_details.organization, deleted=False)
+        return Schedule.objects.filter(organization=user_details.organization)
 
     def get_schedule_screens_manager(self):
         """
@@ -140,11 +138,10 @@ class Schedule(models.Model):
         """
         return self.schedulescreens_schedule
 
-
-@receiver(pre_delete, sender=Schedule)
-@receiver(post_save, sender=Schedule)
-def notify_modified_schedules(sender, instance, **kwargs):
-    debugFileLog.info("Inside notify_modified_schedules post_save")
-    screen_ids = instance.screens.all().values_list('screen_id', flat=True)
-    from playerManagement.views import notify_player
-    notify_player(screen_ids=screen_ids)
+    def update_screens_data(self):
+        debugFileLog.info("Inside update_screens_data of schedule %s " % self.schedule_title)
+        for screen in self.screens.all():
+            if screen:
+                screen.data_modified()
+            else:
+                debugFileLog.error('Got null for screen attribute in schedule %s' % self.schedule_title)

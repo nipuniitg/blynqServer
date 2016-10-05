@@ -451,9 +451,13 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
                 $scope.schedule.schedule_panes.push(new blueprints.SchedulePane(newLayout.layout_panes[i]));
             }
             //For one of the panes, select blynq Content by default
-            sDF.getDefaultBlynqPlaylists().then(function(allPlaylists){
-                $scope.schedule.schedule_panes[0].schedule_blynq_playlists = angular.copy(allPlaylists);
-            })
+            //not allowing blynq content for now.
+            if(false){
+                sDF.getDefaultBlynqPlaylists().then(function(allPlaylists){
+                    $scope.schedule.schedule_panes[0].schedule_blynq_playlists = angular.copy(allPlaylists);
+                })
+            }
+
             $scope.activeTabIndex = 0;
         }
     });
@@ -1350,15 +1354,17 @@ sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal','bluepr
                     var newSchedule = new blueprints.Schedule();
 
                     var layoutsProm = sDF.getDefaultLayouts();
-                    var defaultBlynqPlaylistsProm =  sDF.getDefaultBlynqPlaylists();
+                    if(false){
+                        var defaultBlynqPlaylistsProm =  sDF.getDefaultBlynqPlaylists();
+                    }
 
                     $q.all([
                         layoutsProm.then(function(layouts){
                             newSchedule.layout = angular.copy(layouts[0]);
-                            newSchedule.schedule_panes.push(new blueprints.SchedulePane(layouts[0].layout_panes[0]));}),
-                        defaultBlynqPlaylistsProm.then(function(allPlaylists){
-                            newSchedule.schedule_panes[0].schedule_blynq_playlists = angular.copy(allPlaylists);
-                        })
+                            newSchedule.schedule_panes.push(new blueprints.SchedulePane(layouts[0].layout_panes[0]));})
+//                      ,defaultBlynqPlaylistsProm.then(function(allPlaylists){
+//                          newSchedule.schedule_panes[0].schedule_blynq_playlists = angular.copy(allPlaylists);
+//                       });
                     ])
                     .then(function(){
                         var modalInstance = $uibModal.open({

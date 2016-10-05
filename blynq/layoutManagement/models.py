@@ -1,17 +1,15 @@
 from django.core.validators import MaxValueValidator
 from django.db import models
-
-from django.utils.translation import ugettext_lazy as _
-
-
-# Create your models here.
-from django.db.models import Q
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
+from django.utils.translation import ugettext_lazy as _
 
 from authentication.models import Organization, UserDetails
 from customLibrary.views_lib import debugFileLog
 from screenManagement.models import AspectRatio
+
+
+# Create your models here.
 
 
 class LayoutPane(models.Model):
@@ -52,20 +50,3 @@ class Layout(models.Model):
 
     class Meta:
         ordering = ['layout_id']
-
-
-@receiver(pre_delete, sender=Layout)
-@receiver(post_save, sender=Layout)
-def post_save_layout(sender, instance, **kwargs):
-    debugFileLog.info("Inside post_save_layout")
-    from scheduleManagement.models import Schedule, ScheduleScreens
-    try:
-        schedule_ids = Schedule.objects.filter(deleted=False, layout_id=instance.layout_id).values_list(
-            'schedule_id', flat=True)
-        screen_ids = ScheduleScreens.objects.filter(schedule_id__in=schedule_ids).values_list('screen_id', flat=True)
-        from playerManagement.views import notify_player
-        notify_player(screen_ids=screen_ids)
-    except Exception as e:
-        debugFileLog.exception("Error while notifying the relevant players related to the layout %s" %
-                               instance.title)
-        debugFileLog.exception(e)

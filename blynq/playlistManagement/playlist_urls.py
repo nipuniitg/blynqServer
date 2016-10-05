@@ -1,5 +1,5 @@
-__author__ = 'PRASANTH'
 from django.conf.urls import url
+
 from playlistManagement import views
 
 urlpatterns = [

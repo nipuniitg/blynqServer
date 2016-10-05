@@ -1,14 +1,14 @@
 # import django.utils.timezone.datetime as datetime
 import datetime
 import logging
-
 import subprocess
-
 import re
+import json, pytz, os
+
 from django.core.mail import send_mail
 from django.http import JsonResponse, Http404
 from django.utils import timezone
-import json, pytz, os
+
 from authentication.models import UserDetails
 from blynq.settings import MEDIA_ROOT
 
@@ -87,6 +87,7 @@ def default_string_to_datetime(str, fmt='%d%m%Y%H%M%S'):
 
 ist_timezone = pytz.timezone('Asia/Kolkata')
 time_fmt = "%H:%M"
+time_fmt_with_seconds = "%H:%M:%S"
 date_fmt = "%Y/%m/%d"
 datetime_fmt = "%Y/%m/%d %H:%M"
 datetime_fmt_with_seconds = "%Y/%m/%d %H:%M:%S"
@@ -134,13 +135,17 @@ def generate_utc_datetime(ist_date, ist_time, seconds_str=''):
     return utc_dt
 
 
-def get_utc_datetime(ist_datetime):
+def get_utc_datetime(ist_datetime, include_seconds=False):
     """
+    :param include_seconds: Player do need seconds but the portal doesn't need seconds
     :param ist_datetime: python datetime object in IST timezone
     :return: utc_datetime : python datetime object in UTC timezone
     """
     ist_date = ist_datetime.strftime(date_fmt)
-    ist_time = ist_datetime.strftime(time_fmt)
+    if include_seconds:
+        ist_time = ist_datetime.strftime(time_fmt_with_seconds)
+    else:
+        ist_time = ist_datetime.strftime(time_fmt)
     return generate_utc_datetime(ist_date=ist_date, ist_time=ist_time)
 
 

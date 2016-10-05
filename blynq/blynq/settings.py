@@ -211,6 +211,9 @@ LOGGING = {
 }
 
 
+# in MEDIA_ROOT
+# the uploaded content of each user is present in /media/usercontent/userdetails.user.id/
+# the deleted files are moved to /media/deletedcontent/organization.organization_id
 if DEBUG:
     HOST_URL = 'http://127.0.0.1:8000'
     USERCONTENT_DIR = 'test_usercontent'
@@ -221,38 +224,10 @@ else:
     DELETED_CONTENT_DIR = 'deletedcontent'
 
 MEDIA_HOST = HOST_URL
-PLAYER_UPDATES_DIR = 'player_updates'
 
-PLAYER_LOG_DIR = 'player_logs'
-
-PLAYER_POLL_TIME = 60  # Time difference in seconds between successive polls of the player
-PLAYER_INACTIVE_THRESHOLD = PLAYER_POLL_TIME + 1    # Wait this time (in seconds) to change status of screen as inactive
-
-# in MEDIA_ROOT
-# the uploaded content of each user is present in /media/usercontent/userdetails.user.id/
-# the deleted files are moved to /media/deletedcontent/organization.organization_id
-COMPRESS_IMAGE = True
-
-# Some functionalities like push technology are restricted when server is not connected to internet
-INTERNET_ENABLED = True
-
-FCM_APIKEY = 'AIzaSyD0ecm7y8DC0tQ2ut62S4WgLL0GnrsQ_wc'
-FCM_SERVER_KEY = 'AIzaSyD0ecm7y8DC0tQ2ut62S4WgLL0GnrsQ_wc'
-FCM_DEVICE_MODEL = 'screenManagement.models.FcmDevice'
-FCM_MAX_RECIPIENTS = 100000
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.zoho.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'django@blynq.in'
 EMAIL_HOST_PASSWORD = 'Asdf;lkj'
-
-# Don't change the below name if you aren't sure.
-CONTENT_ORGANIZATION_NAME = 'Partner Content'
-
-
-THUMBNAIL_ALIASES = {
-    '': {
-        'avatar': {'size': (128, 128), 'crop': True},
-    },
-}

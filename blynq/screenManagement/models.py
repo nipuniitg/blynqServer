@@ -1,15 +1,12 @@
 from django.db import models
-from django.db.models.signals import post_save, pre_delete
-from django.dispatch import receiver
 from django.utils import timezone
-from fcm.models import Device, AbstractDevice
-from schedule.models import Calendar
-
-from authentication.models import Organization, UserDetails, City
-from blynq.settings import PLAYER_INACTIVE_THRESHOLD, PLAYER_POLL_TIME
-from customLibrary.views_lib import debugFileLog, today_date
 from django.utils.translation import ugettext_lazy as _
 
+from schedule.models import Calendar
+from fcm.models import AbstractDevice
+from authentication.models import Organization, UserDetails, City
+from customLibrary.custom_settings import PLAYER_INACTIVE_THRESHOLD
+from customLibrary.views_lib import debugFileLog
 
 # Create your models here.
 ORIENTATION_CHOICES = (
@@ -200,25 +197,56 @@ class Screen(models.Model):
         self.last_active_time = timezone.now()
         self.save()
 
+    def data_modified(self):
+        try:
+            screen_data_modified = self.screen_data_modified
+            screen_data_modified.save()
+        except ScreenDataModified.DoesNotExist:
+            screen_data_modified = ScreenDataModified(screen_id=self.screen_id)
+            screen_data_modified.save()
+        except Exception as e:
+            debugFileLog.error('Received exception while updating screen data_modified %s' % self.screen_name)
+            debugFileLog.error(e)
+        # Notify the player when data is modified
+        self.notify_player()
 
-@receiver(post_save, sender=GroupScreens)
-def create_schedule_screens(sender, instance, **kwargs):
-    debugFileLog.info("Inside create_schedule_screens post_save")
-    screen = instance.screen
-    group = instance.group
-    from scheduleManagement.models import ScheduleScreens
-    group_schedules = ScheduleScreens.objects.filter(schedule__deleted=False, screen__isnull=True, group=group)
-    for each_group_schedule in group_schedules:
-        schedule_screen = ScheduleScreens(screen=screen, schedule=each_group_schedule.schedule, group=group)
-        schedule_screen.save()
-    debugFileLog.info("Schedules for the group has been successfully copied to the screen")
+    def is_data_modified(self, last_received_datetime):
+        try:
+            if self.screen_data_modified.last_updated_time >= last_received_datetime:
+                return True
+            else:
+                return False
+        except Exception as e:
+            debugFileLog.exception('Screen %s is_data_modified failed with exception %s ' % (self.screen_name, str(e)))
+            return True
+
+    def notify_player(self):
+        debugFileLog.info("inside notify player")
+        data_dict = {'schedules_updated': True, 'is_registered': True}
+        """
+            Keys to notify player
+            1.is_registered (one-time) -
+            2.schedules_updated -
+            3.player_updated (based on version no) -
+            4.clear_player_cache
+            5.restart_player
+            6.send_logs { start_time, end_time}
+            7.send_stats { start_time, end_time}
+        """
+        try:
+            if self.fcm_device:
+                self.fcm_device.send_message(data=data_dict)
+            else:
+                raise Exception('FCM details does not exist for the screen %s' % self.screen_name)
+        except Exception as e:
+            debugFileLog.exception(e)
 
 
-# This function is to either remove groups from screens or screens from groups and remove relevant entries from the
-# ScheduleScreens table
-@receiver(pre_delete, sender=GroupScreens)
-def remove_schedule_screens(sender, instance, **kwargs):
-    debugFileLog.info("Inside remove_schedule_screens pre_delete")
-    from scheduleManagement.models import ScheduleScreens
-    schedule_screens = ScheduleScreens.objects.filter(group=instance.group, screen=instance.screen)
-    schedule_screens.delete()
+# Update the last_updated_time of a screen whenever any schedule or playlist or group or layout related to screen is
+# modified. This model instance will be used in the get_screen_data function in playerManagement/views.py
+class ScreenDataModified(models.Model):
+    screen = models.OneToOneField(Screen, related_name='screen_data_modified', on_delete=models.CASCADE)
+    last_updated_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    def __unicode__(self):
+        return self.screen.screen_name + ' last modified at ' + str(self.last_updated_time)
