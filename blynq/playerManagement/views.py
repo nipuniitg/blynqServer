@@ -9,7 +9,7 @@ from contentManagement.models import Content
 from contentManagement.serializers import default_content_serializer
 from customLibrary.custom_settings import PLAYER_POLL_TIME
 from customLibrary.views_lib import debugFileLog, string_to_dict, default_string_to_datetime, obj_to_json_response, \
-    ajax_response, date_changed
+    ajax_response, date_changed, timeit
 from playerManagement.helpers import screen_schedule_data
 from playerManagement.models import PlayerUpdate, LocalServer, PlayerLog
 from playlistManagement.models import PlaylistItems
@@ -115,6 +115,7 @@ def activation_key_valid(request):
     # return ajax_response(success=success, errors=errors)
 
 
+@timeit
 @csrf_exempt
 def get_screen_data(request, nof_days=7):
     """
@@ -170,16 +171,23 @@ def fcm_register(request):
         dev_id = posted_data.get('dev_id')
         fcm_device, created = FcmDevice.objects.update_or_create(dev_id=dev_id,
                                                                  defaults={'reg_id': reg_id, 'is_active': True})
-        screen = Screen.objects.get(unique_device_key__activation_key=dev_id)
+        try:
+            screen = Screen.objects.get(unique_device_key__activation_key=dev_id)
+        except Exception as e:
+            debugFileLog.exception('Error while extracting screen object from device id')
+            debugFileLog.exception(e)
+            return ajax_response(success=False)
         screen.fcm_device = fcm_device
         screen.save()
         success = True
     except Exception as e:
+        debugFileLog.exception('Error while saving the fcm device to database')
         debugFileLog.exception(e)
         success = False
     return ajax_response(success=success)
 
 
+@csrf_exempt
 def media_stats(request):
     debugFileLog.info('Inside media stats player')
     try:

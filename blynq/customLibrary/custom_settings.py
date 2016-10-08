@@ -19,17 +19,3 @@ CONTENT_THUMBNAILS = {
     'audio': '/static/images/audio_icon.png',
     'rss': '/static/images/rss_icon.png'
 }
-
-# Some functionalities like push technology are restricted when server is not connected to internet
-INTERNET_ENABLED = True
-
-FCM_APIKEY = 'AIzaSyD0ecm7y8DC0tQ2ut62S4WgLL0GnrsQ_wc'
-FCM_SERVER_KEY = 'AIzaSyD0ecm7y8DC0tQ2ut62S4WgLL0GnrsQ_wc'
-FCM_DEVICE_MODEL = 'screenManagement.models.FcmDevice'
-FCM_MAX_RECIPIENTS = 100000
-
-THUMBNAIL_ALIASES = {
-    '': {
-        'avatar': {'size': (128, 128), 'crop': False},
-    },
-}

@@ -140,7 +140,12 @@ class Schedule(models.Model):
 
     def update_screens_data(self):
         debugFileLog.info("Inside update_screens_data of schedule %s " % self.schedule_title)
-        for screen in self.screens.all():
+        try:
+            schedule_screens = self.screens.all()
+        except Exception as e:
+            debugFileLog.exception('Screens does not exist for the schedule, may be due to pre_save')
+            return
+        for screen in schedule_screens:
             if screen:
                 screen.data_modified()
             else:

@@ -231,3 +231,17 @@ EMAIL_HOST = 'smtp.zoho.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'django@blynq.in'
 EMAIL_HOST_PASSWORD = 'Asdf;lkj'
+
+THUMBNAIL_ALIASES = {
+    '': {
+        'avatar': {'size': (128, 128), 'crop': False},
+    },
+}
+
+# Some functionalities like push technology are restricted when server is not connected to internet
+INTERNET_ENABLED = True
+
+FCM_APIKEY = 'AIzaSyD0ecm7y8DC0tQ2ut62S4WgLL0GnrsQ_wc'
+FCM_SERVER_KEY = 'AIzaSyD0ecm7y8DC0tQ2ut62S4WgLL0GnrsQ_wc'
+FCM_DEVICE_MODEL = 'screenManagement.models.FcmDevice'
+FCM_MAX_RECIPIENTS = 100000

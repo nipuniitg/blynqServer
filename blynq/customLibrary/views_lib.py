@@ -1,10 +1,12 @@
 # import django.utils.timezone.datetime as datetime
-import datetime
+from time import time
+import functools
 import logging
 import subprocess
 import re
 import json, pytz, os
 
+import datetime
 from django.core.mail import send_mail
 from django.http import JsonResponse, Http404
 from django.utils import timezone
@@ -142,10 +144,12 @@ def get_utc_datetime(ist_datetime, include_seconds=False):
     :return: utc_datetime : python datetime object in UTC timezone
     """
     ist_date = ist_datetime.strftime(date_fmt)
-    if include_seconds:
-        ist_time = ist_datetime.strftime(time_fmt_with_seconds)
-    else:
-        ist_time = ist_datetime.strftime(time_fmt)
+    ist_time = ist_datetime.strftime(time_fmt)
+    # TODO: Fix this bug
+    # if include_seconds:
+    #     ist_time = ist_datetime.strftime(time_fmt_with_seconds)
+    # else:
+    #     ist_time = ist_datetime.strftime(time_fmt)
     return generate_utc_datetime(ist_date=ist_date, ist_time=ist_time)
 
 
@@ -186,6 +190,17 @@ def today_date():
 
 def full_file_path(relative_path=''):
     return os.path.join(MEDIA_ROOT, relative_path)
+
+
+def timeit(func):
+    @functools.wraps(func)
+    def newfunc(*args, **kwargs):
+        startTime = time()
+        response = func(*args, **kwargs)
+        elapsedTime = time() - startTime
+        debugFileLog.info('function [{}] finished in {} ms'.format(func.__name__, int(elapsedTime * 1000)))
+        return response
+    return newfunc
 
 
 debugFileLog = logging.getLogger('debugFileLog')

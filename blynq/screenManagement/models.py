@@ -198,15 +198,15 @@ class Screen(models.Model):
         self.save()
 
     def data_modified(self):
+        debugFileLog.info('Data modified for screen %s' % self.screen_name)
         try:
             screen_data_modified = self.screen_data_modified
-            screen_data_modified.save()
-        except ScreenDataModified.DoesNotExist:
-            screen_data_modified = ScreenDataModified(screen_id=self.screen_id)
             screen_data_modified.save()
         except Exception as e:
             debugFileLog.error('Received exception while updating screen data_modified %s' % self.screen_name)
             debugFileLog.error(e)
+            screen_data_modified, created = ScreenDataModified.objects.get_or_create(screen_id=self.screen_id)
+            screen_data_modified.save()
         # Notify the player when data is modified
         self.notify_player()
 
@@ -217,8 +217,9 @@ class Screen(models.Model):
             else:
                 return False
         except Exception as e:
+            self.data_modified()
             debugFileLog.exception('Screen %s is_data_modified failed with exception %s ' % (self.screen_name, str(e)))
-            return True
+        return True
 
     def notify_player(self):
         debugFileLog.info("inside notify player")
