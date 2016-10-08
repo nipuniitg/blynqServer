@@ -35,9 +35,9 @@ def get_userdetails(request):
 
 
 def string_to_dict(str):
-    # json_acceptable_string = str.replace("'", "\"")
+    json_acceptable_string = str.replace("'", "\"")
     try:
-        obj = json.loads(str)
+        obj = json.loads(json_acceptable_string)
     except Exception as e:
         obj = {}
         debugFileLog.exception(e)
