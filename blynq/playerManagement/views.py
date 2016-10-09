@@ -292,13 +292,15 @@ def update_status(request):
     try:
         posted_data = string_to_dict(request.body)
         unique_device_key = posted_data.get('device_key')
+        if not unique_device_key:
+            raise Exception('Device key is empty')
         screen = Screen.objects.get(unique_device_key__activation_key=unique_device_key)
         screen.update_status()
         success = True
     except Exception as e:
         debugFileLog.exception(e)
         success = False
-    return ajax_response(success=True)
+    return ajax_response(success=success)
 
 
 @csrf_exempt
