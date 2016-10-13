@@ -73,7 +73,7 @@ def playlist_filter(filter_set, user_details):
     playlist_ids = []
     all_playlists = filter_set.get('all_playlists')
     if all_playlists:
-        playlist_ids = Playlist.get_user_relevant_objects(user_details=user_details).values_list('playlist_id', flat=True)
+        playlist_ids = Playlist.get_user_visible_objects(user_details=user_details).values_list('playlist_id', flat=True)
     else:
         playlist_objects = filter_set.get('playlists')
         if playlist_objects:
@@ -175,7 +175,7 @@ def playlist_reports(request):
         for obj in screen_objects:
             all_screens_dict[str(obj.screen_id)] = {'screen_id': obj.screen_id, 'screen_name': obj.screen_name}
         all_playlists_dict = {}
-        playlist_objects = Playlist.get_user_relevant_objects(user_details).filter(playlist_id__in=playlist_ids)
+        playlist_objects = Playlist.get_user_visible_objects(user_details).filter(playlist_id__in=playlist_ids)
         for obj in playlist_objects:
             all_playlists_dict[str(obj.playlist_id)] = {
                 'playlist_id': obj.playlist_id, 'playlist_title': obj.playlist_title, 'num_of_repetitions': 0,
@@ -227,7 +227,7 @@ def media_reports(request):
         for obj in screen_objects:
             all_screens_dict[str(obj.screen_id)] = {'screen_id': obj.screen_id, 'screen_name': obj.screen_name}
         all_playlists_dict = {}
-        playlist_objects = Playlist.get_user_relevant_objects(user_details).filter(playlist_id__in=playlist_ids)
+        playlist_objects = Playlist.get_user_visible_objects(user_details).filter(playlist_id__in=playlist_ids)
         for obj in playlist_objects:
             all_playlists_dict[str(obj.playlist_id)] = {'playlist_id': obj.playlist_id,
                                                         'playlist_title': obj.playlist_title}
