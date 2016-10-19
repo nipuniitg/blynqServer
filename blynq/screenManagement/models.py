@@ -75,7 +75,7 @@ class ScreenStatus(models.Model):
 
 class ScreenActivationKey(models.Model):
     screen_activation_id = models.AutoField(primary_key=True)
-    activation_key = models.CharField(max_length=16, unique=True)
+    activation_key = models.CharField(max_length=16, unique=True, db_index=True)
     device_serial_num = models.CharField(max_length=20, unique=True, null=True, blank=True)
     in_use = models.BooleanField(default=False)
     verified = models.BooleanField(default=False)
