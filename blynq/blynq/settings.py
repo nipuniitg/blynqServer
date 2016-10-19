@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'fcm',
     'corsheaders',
     'easy_thumbnails',
+    'debug_toolbar',
     'authentication',
     'screenManagement',
     'contentManagement',
@@ -75,6 +76,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django_pdb.middleware.PdbMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'customLibrary.app_exceptions.AppExceptionTrap',
 )
 
@@ -215,6 +217,7 @@ LOGGING = {
 # the uploaded content of each user is present in /media/usercontent/userdetails.user.id/
 # the deleted files are moved to /media/deletedcontent/organization.organization_id
 if DEBUG:
+    INTERNAL_IPS = ('127.0.0.1',)
     HOST_URL = 'http://127.0.0.1:8000'
     USERCONTENT_DIR = 'test_usercontent'
     DELETED_CONTENT_DIR = 'test_deletedcontent'

@@ -54,16 +54,16 @@ class Playlist(models.Model):
 
     @staticmethod
     def get_user_visible_objects(user_details):
-        return Playlist.objects.filter(organization=user_details.organization, user_visible=True)
+        return Playlist.objects.prefetch_related('playlist_items').filter(organization=user_details.organization, user_visible=True)
 
     @staticmethod
     def get_user_invisible_playlists(user_details):
-        return Playlist.objects.filter(organization=user_details.organization, user_visible=False)
+        return Playlist.objects.prefetch_related('playlist_items').filter(organization=user_details.organization, user_visible=False)
 
     @staticmethod
     def get_all_playlists(user_details):
-        return Playlist.objects.filter(organization=user_details.organization)
+        return Playlist.objects.prefetch_related('playlist_items').filter(organization=user_details.organization)
 
     @staticmethod
     def get_blynq_content_playlists():
-        return Playlist.objects.filter(organization__organization_name=CONTENT_ORGANIZATION_NAME)
+        return Playlist.objects.prefetch_related('playlist_items').filter(organization__organization_name=CONTENT_ORGANIZATION_NAME)

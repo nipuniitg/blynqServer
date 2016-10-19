@@ -184,7 +184,8 @@ class Screen(models.Model):
 
     @staticmethod
     def get_user_relevant_objects(user_details):
-        return Screen.objects.filter(owned_by=user_details.organization)
+        return Screen.objects.select_related('city', 'owned_by', 'status', 'fcm_device').filter(
+            owned_by=user_details.organization)
 
     @property
     def current_status(self):

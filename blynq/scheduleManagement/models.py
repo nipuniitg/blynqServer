@@ -105,6 +105,10 @@ class SchedulePane(models.Model):
         pane_title = self.layout_pane.title if self.layout_pane.title else ''
         return schedule_title + ' - ' + pane_title
 
+    @property
+    def get_schedule_playlists_manager(self):
+        return self.scheduleplaylists_set.prefetch_related('playlist')
+
 
 class Schedule(models.Model):
     schedule_id = models.AutoField(primary_key=True)
@@ -129,14 +133,23 @@ class Schedule(models.Model):
 
     @staticmethod
     def get_user_relevant_objects(user_details):
-        return Schedule.objects.filter(organization=user_details.organization)
+        return Schedule.objects.select_related('layout', 'organization').filter(organization=user_details.organization)
 
+    @property
     def get_schedule_screens_manager(self):
         """
         :return: RelatedManager object of ScheduleScreens related to this Schedule, queries can be fired using
-        self.schedulescreens_schedule.filter( schedule_screen_id = 1 )
+        self.get_schedule_screens_manager.filter(schedule_screen_id = 1)
         """
         return self.schedulescreens_schedule
+
+    @property
+    def get_schedule_pane_manager(self):
+        """
+        :return: RelatedManager object of SchedulePane related to this Schedule, queries can be fired using
+        self.get_schedule_pane_manager.filter(schedule_pane_id = 1)
+        """
+        return self.schedulepane_schedule.select_related('layout_pane', 'event').prefetch_related('playlists')
 
     def update_screens_data(self):
         debugFileLog.info("Inside update_screens_data of schedule %s " % self.schedule_title)

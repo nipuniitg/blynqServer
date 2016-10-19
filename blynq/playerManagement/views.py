@@ -1,6 +1,7 @@
 import datetime
 import os
 
+from django.db import connection, reset_queries
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
@@ -115,15 +116,26 @@ def activation_key_valid(request):
     # return ajax_response(success=success, errors=errors)
 
 
+def log_query_times(top_results=10):
+    queries = connection.queries
+    debugFileLog.info('Inside log_query_times, total queries %d' % len(queries))
+    newlist = sorted(queries, key=lambda k: float(k['time']))
+    newlist.reverse()
+    for i in range(top_results):
+        debugFileLog.info('Time ' + newlist[i]['time'] + ' Query: ' + newlist[i]['sql'])
+
+
 @timeit
 @csrf_exempt
-def get_screen_data(request, nof_days=7):
+def get_screen_data(request, nof_days=3):
     """
     :param request: request object should contain device_key ( unique identifier for the screen ) and
                     last_received ( datetime when the screen last polled to the server )
     :param nof_days: optional argument mentioning the time interval for the events
     :return:
     """
+    # Uncomment the below line in DEBUG = True and while using log_query_times
+    # reset_queries()
     try:
         posted_data = string_to_dict(request.body)
         # the datetime format of last_received should be "%2d%2m%4Y%2H%2M%2S"
@@ -133,7 +145,8 @@ def get_screen_data(request, nof_days=7):
         last_received_datetime = default_string_to_datetime(last_received)
         start_time = timezone.now()
         end_time = start_time + datetime.timedelta(days=nof_days)
-        screen = Screen.objects.get(unique_device_key__activation_key=unique_device_key)
+        screen = Screen.objects.select_related('screen_data_modified').get(
+            unique_device_key__activation_key=unique_device_key)
         is_modified = True
         # Update the screen status saying that it is active
         screen.update_status()
@@ -141,20 +154,17 @@ def get_screen_data(request, nof_days=7):
             is_modified = True
         else:
             is_modified = screen.is_data_modified(last_received_datetime=last_received_datetime)
+        campaigns_json = {'campaigns': [], 'is_modified': is_modified}
         if is_modified:
             schedule_ids_list = ScheduleScreens.objects.filter(screen=screen).values_list('schedule_id', flat=True)
             if schedule_ids_list:
-                schedule_panes = SchedulePane.objects.filter(schedule_id__in=schedule_ids_list). \
-                    order_by('-schedule__last_updated_time')
-            else:
-                schedule_panes = []
-        else:
-            schedule_panes = []
-        if schedule_panes:
-            screen_data_json = screen_schedule_data(schedule_panes, start_time, end_time)
-            campaigns_json = {'campaigns': screen_data_json, 'is_modified': True}
-        else:
-            campaigns_json = {'campaigns': [], 'is_modified': is_modified}
+                schedule_panes = SchedulePane.objects.select_related(
+                    'schedule', 'layout_pane', 'event').prefetch_related('playlists').filter(
+                    schedule_id__in=schedule_ids_list).order_by('-schedule__last_updated_time')
+                if schedule_panes.exists():
+                    screen_data_json = screen_schedule_data(schedule_panes, start_time, end_time)
+                    campaigns_json = {'campaigns': screen_data_json, 'is_modified': True}
+                # log_query_times()
     except Exception as e:
         errors = "Error while fetching the occurences or invalid screen identifier"
         debugFileLog.exception(errors)

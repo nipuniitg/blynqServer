@@ -64,7 +64,7 @@ def upsert_playlist(request):
                 playlist_item_id_list.append(playlist_item_id)
 
             # Remove content not in playlist_items
-            removed_playlist_content = PlaylistItems.objects.filter(playlist=playlist).exclude(
+            removed_playlist_content = playlist.playlistitems_set.exclude(
                 playlist_item_id__in=playlist_item_id_list)
             for content in removed_playlist_content:
                 content.delete()

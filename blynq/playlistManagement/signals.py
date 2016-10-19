@@ -14,6 +14,7 @@ def playlist_items_changed(sender, instance, **kwargs):
         total_time = PlaylistItems.objects.filter(playlist_id=instance.playlist_id).aggregate(Sum('display_time'))
         if total_time['display_time__sum']:
             playlist_total_time = total_time['display_time__sum']
+        # TODO: Scope for optimization : Change the below line to : "playlist = instance.playlist"
         playlist = Playlist.objects.get(playlist_id=instance.playlist_id)
         playlist.playlist_total_time = playlist_total_time
         playlist.save()

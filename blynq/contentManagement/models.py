@@ -211,8 +211,13 @@ class Content(models.Model):
         elif self.is_pdf:
             relative_path = CONTENT_THUMBNAILS['pdf']
         elif self.is_image:
-            full_path = get_thumbnailer(self.file_path, str(self.content_id))['avatar'].url
-            relative_path = full_path.replace(BASE_DIR, '')
+            try:
+                full_path = get_thumbnailer(self.file_path, str(self.content_id))['avatar'].url
+                relative_path = full_path.replace(BASE_DIR, '')
+            except Exception as e:
+                debugFileLog.exception(e)
+                # TODO: Add an image icon or Not found icon if the image is missing
+                relative_path = CONTENT_THUMBNAILS['url']
         elif self.is_widget:
             # Right now only rss is supported in widgets. Change this as per type of widgets in the future
             relative_path = CONTENT_THUMBNAILS['rss']
@@ -241,11 +246,12 @@ class Content(models.Model):
 
     @staticmethod
     def get_user_relevant_objects(user_details):
-        return Content.objects.filter(organization=user_details.organization)
+        return Content.objects.select_related('content_type').filter(organization=user_details.organization)
 
     @staticmethod
     def get_user_widgets(user_details):
-        return Content.objects.filter(Q(organization=user_details.organization) | Q(organization__isnull=True)).filter(
+        return Content.objects.select_related('content_type').filter(
+            Q(organization=user_details.organization) | Q(organization__isnull=True)).filter(
             content_type__file_type__icontains='widget')
 
     # This includes both files, folders and URLs

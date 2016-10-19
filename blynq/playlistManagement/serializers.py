@@ -12,7 +12,6 @@ class PlaylistItemsSerializer(Serializer):
     def end_object(self, obj):
         self._current['playlist_item_id'] = obj._get_pk_val()
         if 'content' in self.selected_fields:
-
             json_data =default_content_serializer([obj.content])
             self.add_dict_to_current(json_data)
             del self._current['content']
@@ -28,7 +27,8 @@ class PlaylistSerializer(Serializer):
     def end_object(self, obj):
         self._current['playlist_id'] = obj._get_pk_val()
         if 'playlist_items' in self.selected_fields:
-            playlist_items_data = PlaylistItems.objects.filter(playlist=obj)
+            playlist_items_data = obj.playlistitems_set.select_related(
+                'content', 'content__content_type').all()
             self._current['playlist_items'] = PlaylistItemsSerializer().serialize(
                 playlist_items_data,fields=('playlist_item_id', 'display_time', 'content'))
         self.objects.append(self._current)

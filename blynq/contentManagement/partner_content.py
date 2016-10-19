@@ -135,7 +135,7 @@ def process_way2_urls(way2_dict, way2_items_required, time_for_each_url):
                                                                                                 defaults=content_dict)
             content_ids.append(instance.content_id)
             content_objs.append(instance)
-    obsolete_playlist_items = PlaylistItems.objects.filter(playlist=news_playlist).exclude(content_id__in=content_ids)
+    obsolete_playlist_items = news_playlist.playlistitems_set.exclude(content_id__in=content_ids)
     if count > way2_items_required:
         obsolete_content_ids = obsolete_playlist_items.values_list('content_id', flat=True)
         obsolete_contents = Content.objects.filter(organization=organization, content_id__in=obsolete_content_ids)
