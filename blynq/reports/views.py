@@ -65,7 +65,7 @@ def screen_filter(filter_set, user_details):
     else:
         screen_objects = filter_set.get('screens')
         if screen_objects:
-            screen_ids = (item['screen_id'] for item in screen_objects)
+            screen_ids = [item['screen_id'] for item in screen_objects]
     return screen_ids
 
 
@@ -77,7 +77,7 @@ def playlist_filter(filter_set, user_details):
     else:
         playlist_objects = filter_set.get('playlists')
         if playlist_objects:
-            playlist_ids = (item['playlist_id'] for item in playlist_objects)
+            playlist_ids = [item['playlist_id'] for item in playlist_objects]
     return playlist_ids
 
 
@@ -89,7 +89,7 @@ def content_filter(filter_set, user_details):
     else:
         content_objects = filter_set.get('content_files')
         if content_objects:
-            content_ids = (item['content_id'] for item in content_objects)
+            content_ids = [item['content_id'] for item in content_objects]
     return content_ids
 
 
