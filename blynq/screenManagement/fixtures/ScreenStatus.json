@@ -1,0 +1,1 @@
+[{"fields": {"description": "The screen is on and connected to the internet", "status_name": "Online"}, "model": "screenManagement.screenstatus", "pk": 1}, {"fields": {"description": "The screen is either offline or not connected to the internet", "status_name": "Offline"}, "model": "screenManagement.screenstatus", "pk": 2}]
