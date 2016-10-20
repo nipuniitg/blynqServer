@@ -1,1 +1,1 @@
-[{"fields": {"role_name": "manager", "description": null}, "model": "authentication.role", "pk": 1}]
+[{"fields": {"role_name": "manager", "description": null, "last_updated_time": null}, "model": "authentication.role", "pk": 1}]
