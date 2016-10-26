@@ -115,9 +115,11 @@ DATABASES = {
         'PASSWORD': 'Believe',
         'HOST': '127.0.0.1',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
+        'CONN_MAX_AGE': 600,
     }
 }
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -217,10 +219,12 @@ LOGGING = {
 # the uploaded content of each user is present in /media/usercontent/userdetails.user.id/
 # the deleted files are moved to /media/deletedcontent/organization.organization_id
 if DEBUG:
-    INTERNAL_IPS = ('127.0.0.1',)
     HOST_URL = 'http://127.0.0.1:8000'
     USERCONTENT_DIR = 'test_usercontent'
     DELETED_CONTENT_DIR = 'test_deletedcontent'
+    # Django debug toolbar configuration
+    INTERNAL_IPS = ('127.0.0.1',)
+    ROOT_TAG_EXTRA_ATTRS = 'ng-non-bindable'
 else:
     HOST_URL = ALLOWED_HOSTS[0] if ALLOWED_HOSTS else 'http://www.blynq.in'
     USERCONTENT_DIR = 'usercontent'
