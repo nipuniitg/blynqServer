@@ -16,7 +16,7 @@ class LayoutPaneSerializer(Serializer):
 
 
 def default_layout_serializer(querySet):
-    return LayoutSerializer().serialize(querySet, fields=('layout_id', 'title', 'layout_panes','aspect_ratio'))
+    return LayoutSerializer().serialize(querySet, fields=('layout_id', 'title', 'layout_panes', 'aspect_ratio'))
 
 
 class LayoutSerializer(Serializer):

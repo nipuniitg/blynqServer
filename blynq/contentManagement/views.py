@@ -69,7 +69,7 @@ def process_media(file_path, parent_folder=None, user_details=None, organization
     debugFileLog.info('Inside process_media')
     if not file_path or not os.path.exists(file_path):
         debugFileLog.info('File path does not exist')
-        return True
+        return False, False
     file_type, encoding = mimetypes.guess_type(str(file_path))
     if 'image' in file_type:
         return compress_image(file_path, parent_folder, user_details, organization, content_already_saved)
@@ -80,37 +80,42 @@ def process_media(file_path, parent_folder=None, user_details=None, organization
 
 
 def compress_image(file_path, parent_folder=None, user_details=None, organization=None, content_already_saved=False):
-    filename = os.path.basename(file_path)
-    title, ext = os.path.splitext(filename)
-    if COMPRESS_IMAGE:
-        img = Image.open(file_path)
-        img = img.resize(img.size, Image.ANTIALIAS)
-        dest_filepath = os.path.join(TEMP_DIR, filename)
-        img.save(dest_filepath, optimize=True, quality=75)
-        img_file = open(dest_filepath)
-    else:
-        img_file = open(file_path)
-    django_file = File(img_file)
-    if content_already_saved:
+    try:
+        filename = os.path.basename(file_path)
+        title, ext = os.path.splitext(filename)
         if COMPRESS_IMAGE:
+            img = Image.open(file_path)
+            img = img.resize(img.size, Image.ANTIALIAS)
+            dest_filepath = os.path.join(TEMP_DIR, filename)
+            img.save(dest_filepath, optimize=True, quality=75)
+            img_file = open(dest_filepath)
+        else:
+            img_file = open(file_path)
+        django_file = File(img_file)
+        if content_already_saved:
+            if COMPRESS_IMAGE:
+                content = Content(title=title, document=django_file, uploaded_by=user_details, last_updated_by=user_details,
+                                  organization=user_details.organization, parent_folder=parent_folder, is_folder=False)
+                content.save()
+            else:
+                return False, False
+        else:
             content = Content(title=title, document=django_file, uploaded_by=user_details, last_updated_by=user_details,
                               organization=user_details.organization, parent_folder=parent_folder, is_folder=False)
             content.save()
-        else:
-            return False, False
-    else:
-        content = Content(title=title, document=django_file, uploaded_by=user_details, last_updated_by=user_details,
-                          organization=user_details.organization, parent_folder=parent_folder, is_folder=False)
-        content.save()
 
-    # if COMPRESS_IMAGE:
-    #     try:
-    #         os.remove(filename)
-    #     except Exception as e:
-    #         debugFileLog.exception('Not able to delete compressed temp file')
-    #         debugFileLog.exception(e)
-    conversion_successful = True
-    delete_old = True
+        # if COMPRESS_IMAGE:
+        #     try:
+        #         os.remove(filename)
+        #     except Exception as e:
+        #         debugFileLog.exception('Not able to delete compressed temp file')
+        #         debugFileLog.exception(e)
+        conversion_successful = True
+        delete_old = True
+    except Exception as e:
+        debugFileLog.exception(e)
+        conversion_successful = False
+        delete_old = False
     return conversion_successful, delete_old
 
 

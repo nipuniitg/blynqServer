@@ -13,7 +13,7 @@ from customLibrary.tests_lib import create_content, create_userdetails, create_o
 
 
 class ContentTest(TestCase):
-    fixtures = ['../fixtures/ContentType.json',]
+    fixtures = ['ContentType', 'Role', 'AspectRatio', 'ScreenStatus', 'Layout', 'LayoutPane']
 
     def test_content_methods(self):
         content = create_content(default_content=True, is_folder=False)
@@ -52,7 +52,7 @@ class ContentTest(TestCase):
 
 
 class ContentViewsTest(TestCase):
-    fixtures = ['../fixtures/ContentType.json',]
+    fixtures = ['ContentType', 'Role', 'AspectRatio', 'ScreenStatus', 'Layout', 'LayoutPane']
 
     def setUp(self):
         self.factory = RequestFactory()

@@ -6,11 +6,13 @@ from customLibrary.tests_lib import create_organization, create_userdetails, cre
     create_screen_activation_key, create_group, create_screen, create_group_screens, generate_random_string, create_city, \
     verify_posted_dict, verify_get_result, generate_screen_dict, generate_group_dict
 from screenManagement.models import ScreenStatus, ScreenActivationKey, Group, Screen, GroupScreens
-from screenManagement.views import get_screens_json, get_groups_json, upsert_group, delete_group, activation_key_valid, \
+from screenManagement.views import get_screens_json, get_groups_json, upsert_group, delete_group, \
     upsert_screen, get_city_options
 
 
 class ScreenStatusTest(TestCase):
+    fixtures = ['ContentType', 'Role', 'AspectRatio', 'ScreenStatus', 'Layout', 'LayoutPane']
+
     def test_screen_status_creation(self):
         status = create_screen_status()
         self.assertTrue(isinstance(status, ScreenStatus))
@@ -19,6 +21,8 @@ class ScreenStatusTest(TestCase):
 
 
 class ScreenActivationKeyTest(TestCase):
+    fixtures = ['ContentType', 'Role', 'AspectRatio', 'ScreenStatus', 'Layout', 'LayoutPane']
+
     def test_screen_activation_key(self):
         key = create_screen_activation_key()
         self.assertTrue(isinstance(key,ScreenActivationKey))
@@ -28,6 +32,8 @@ class ScreenActivationKeyTest(TestCase):
 
 
 class GroupTest(TestCase):
+    fixtures = ['ContentType', 'Role', 'AspectRatio', 'ScreenStatus', 'Layout', 'LayoutPane']
+
     def test_group(self):
         organization1 = create_organization()
         user_details = create_userdetails()
@@ -43,6 +49,8 @@ class GroupTest(TestCase):
 
 
 class ScreenTest(TestCase):
+    fixtures = ['ContentType', 'Role', 'AspectRatio', 'ScreenStatus', 'Layout', 'LayoutPane']
+
     def test_screen(self):
         screen = create_screen()
         self.assertTrue(isinstance(screen, Screen))
@@ -55,6 +63,8 @@ class ScreenTest(TestCase):
 
 
 class GroupScreensTest(TestCase):
+    fixtures = ['ContentType', 'Role', 'AspectRatio', 'ScreenStatus', 'Layout', 'LayoutPane']
+
     def test_group_screens(self):
         screen = create_screen()
         group = create_group()
@@ -65,6 +75,8 @@ class GroupScreensTest(TestCase):
 
 
 class ViewsTest(TestCase):
+    fixtures = ['ContentType', 'Role', 'AspectRatio', 'ScreenStatus', 'Layout', 'LayoutPane']
+
     def setUp(self):
         self.factory = RequestFactory()
         user = create_userdetails(default_userdetails=True).user
@@ -121,19 +133,6 @@ class ViewsTest(TestCase):
             self.assertTrue(False, msg='The above query should fail as the group should be deleted')
         except Group.DoesNotExist:
             print 'test_delete_group completed successfully'
-
-    def test_activation_key_valid(self):
-        url = reverse('activation_key_valid')
-        screen_key = create_screen_activation_key()
-        posted_data = {'activation_key': screen_key.activation_key}
-        verify_posted_dict(self, posted_data=posted_data, url=url, view_func=activation_key_valid)
-        random_str = generate_random_string(16)
-        try:
-            screen_key = ScreenActivationKey.objects.get(activation_key=random_str)
-        except ScreenActivationKey.DoesNotExist:
-            posted_data['activation_key'] = random_str
-            verify_posted_dict(self, posted_data=posted_data, url=url, view_func=activation_key_valid, success=False)
-        print 'test_activation_key_valid completed successfully'
 
     def test_upsert_screen(self):
         url = reverse('upsert_screen')

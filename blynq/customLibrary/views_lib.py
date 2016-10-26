@@ -8,11 +8,12 @@ import json, pytz, os
 
 import datetime
 from django.core.mail import send_mail
+from django.db import connection, reset_queries
 from django.http import JsonResponse, Http404
 from django.utils import timezone
 
 from authentication.models import UserDetails
-from blynq.settings import MEDIA_ROOT
+from blynq.settings import MEDIA_ROOT, DEBUG
 
 
 def ajax_response(success=False, errors=[], obj_dict=None):
@@ -176,6 +177,10 @@ def date_changed(received_datetime):
         return False
 
 
+def datetime_to_string(datetime_obj, fmt=datetime_fmt):
+    return datetime_obj.strftime(fmt)
+
+
 def date_to_string(date_obj, fmt=date_fmt):
     return date_obj.strftime(fmt)
 
@@ -199,6 +204,26 @@ def timeit(func):
         response = func(*args, **kwargs)
         elapsedTime = time() - startTime
         debugFileLog.info('function [{}] finished in {} ms'.format(func.__name__, int(elapsedTime * 1000)))
+        return response
+    return newfunc
+
+
+# Decorator function to log query times during debugging
+def log_query_times(func):
+    @functools.wraps(func)
+    def newfunc(*args, **kwargs):
+        if DEBUG:
+            reset_queries()
+        response = func(*args, **kwargs)
+        if DEBUG:
+            top_results = 10
+            queries = connection.queries
+            debugFileLog.info('Inside log_query_times, total queries %d' % len(queries))
+            newlist = sorted(queries, key=lambda k: float(k['time']))
+            top_results = len(queries) if len(queries) < 10 else 10
+            newlist.reverse()
+            for i in range(top_results):
+                debugFileLog.info('Time ' + newlist[i]['time'] + ' Query: ' + newlist[i]['sql'])
         return response
     return newfunc
 

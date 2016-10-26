@@ -10,7 +10,8 @@ from schedule.models import Event, Rule
 
 from customLibrary.custom_settings import CONTENT_ORGANIZATION_NAME
 from customLibrary.views_lib import get_userdetails, ajax_response, obj_to_json_response, string_to_dict, \
-    list_to_comma_string, generate_utc_datetime, get_ist_datetime, get_utc_datetime, debugFileLog, empty_list_for_none
+    list_to_comma_string, generate_utc_datetime, get_ist_datetime, get_utc_datetime, debugFileLog, empty_list_for_none, \
+    timeit, log_query_times
 from playlistManagement.models import Playlist
 from scheduleManagement.models import Schedule, SchedulePlaylists, ScheduleScreens, SchedulePane
 from scheduleManagement.serializers import default_schedule_serializer
@@ -134,11 +135,12 @@ def event_dict_from_timeline(timeline, schedule):
         schedule.all_day = all_day
     if recurrence_absolute is not None:
         schedule.recurrence_absolute = recurrence_absolute
-    schedule.save()
+    # TODO: validate whether commenting the below line is safe
+    # schedule.save()
     if is_always:
-        return event_for_always(schedule)
+        return event_for_always(schedule), schedule
     elif all_day:
-        return event_for_allday(schedule, timeline)
+        return event_for_allday(schedule, timeline), schedule
     else:
         start_date = timeline.get('start_date')
         start_time = timeline.get('start_time')
@@ -154,7 +156,7 @@ def event_dict_from_timeline(timeline, schedule):
         creator = schedule.created_by.user if schedule.created_by else None
         event_dict = {'start': start, 'end': end, 'title': schedule.schedule_title, 'creator': creator,
                       'rule': rule, 'end_recurring_period': end_recurring_period}
-        return event_dict
+        return event_dict, schedule
 
 
 def upsert_schedule_screens(user_details, schedule, schedule_screens):
@@ -166,32 +168,17 @@ def upsert_schedule_screens(user_details, schedule, schedule_screens):
         if schedule_screen_id == -1:
             screen_id = int(item.get('screen_id'))
             screen = Screen.get_user_relevant_objects(user_details).get(screen_id=screen_id)
-            # event = Event(**event_dict)
-            # event.calendar = screen.screen_calendar
-            # event.save()
             entry = ScheduleScreens.objects.create(screen=screen, schedule=schedule)
             schedule_screen_id = entry.schedule_screen_id
-        # else:
-            # entry = ScheduleScreens.objects.get(schedule_screen_id=schedule_screen_id)
-            # events = Event.objects.filter(id=entry.event.id)
-            # # Not deleting the rule as all the events have the same rule
-            # # for event in events:
-            # #     if event.rule:
-            # #         rule = event.rule
-            # #         event.rule = None
-            # #         event.save()
-            # #         rule.delete()
-            # events.update(**event_dict)
-            # entry.save()
         schedule_screen_id_list.append(schedule_screen_id)
 
     # Remove screens not in the schedule
     removed_schedule_screens = ScheduleScreens.objects.filter(schedule=schedule, group__isnull=True).exclude(
         schedule_screen_id__in=schedule_screen_id_list)
-    if removed_schedule_screens:
+    if removed_schedule_screens.exists():
         removed_schedule_screens.delete()
     success = True
-    return success, error
+    return success, error, schedule
 
 
 def upsert_schedule_groups(user_details, schedule, schedule_groups):
@@ -208,11 +195,7 @@ def upsert_schedule_groups(user_details, schedule, schedule_groups):
             entry = ScheduleScreens(schedule=schedule, group=group)
             entry.save()
             schedule_screen_id = entry.schedule_screen_id
-            # schedule_screen_id_list.append(entry.schedule_screen_id)
             for screen in group.screen_set.all():
-                # screen_event = Event(**event_dict)
-                # screen_event.calendar = screen.screen_calendar
-                # screen_event.save()
                 entry = ScheduleScreens(screen=screen, schedule=schedule, group=group)
                 entry.save()
                 schedule_screen_id_list.append(entry.schedule_screen_id)
@@ -221,13 +204,12 @@ def upsert_schedule_groups(user_details, schedule, schedule_groups):
     # Remove groups not in the schedule
     removed_schedule_groups = ScheduleScreens.objects.filter(schedule=schedule, group__isnull=False).exclude(
         schedule_screen_id__in=schedule_screen_id_list)
-    if removed_schedule_groups:
+    if removed_schedule_groups.exists():
         removed_schedule_groups.delete()
     success = True
-    return success, error
+    return success, error, schedule
 
 
-# upsert schedule playlists
 def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists, blynq_playlists=False):
     debugFileLog.info("inside upsert_schedule_playlists")
     error = ''
@@ -258,7 +240,7 @@ def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists
     else:
         removed_playlist_schedules = removed_playlist_schedules.exclude(
             playlist__organization__organization_name=CONTENT_ORGANIZATION_NAME)
-    if removed_playlist_schedules:
+    if removed_playlist_schedules.exists():
         removed_playlist_schedules.delete()
     return True, error
 
@@ -283,7 +265,7 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
         if not recurrence_absolute:
             recurrence_absolute = False
         if schedule_playlists or schedule_blynq_playlists:
-            event_dict = event_dict_from_timeline(timeline=timeline, schedule=schedule)
+            event_dict, schedule = event_dict_from_timeline(timeline=timeline, schedule=schedule)
             event = Event(**event_dict)
             event.save()
         else:
@@ -316,11 +298,12 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
     # Remove Schedule Panes which are not in the post request
     remove_schedule_panes = SchedulePane.objects.filter(schedule=schedule).exclude(
         schedule_pane_id__in=schedule_pane_id_list)
-    if remove_schedule_panes:
+    if remove_schedule_panes.exists():
         remove_schedule_panes.delete()
-    return True, error
+    return True, error, schedule
 
 
+@timeit
 @transaction.atomic
 @login_required
 def upsert_schedule(request):
@@ -347,26 +330,29 @@ def upsert_schedule(request):
                 schedule = Schedule(schedule_title=schedule_title, created_by=user_details, is_split=is_split,
                                     layout=layout, last_updated_by=user_details,
                                     organization=user_details.organization)
+                schedule.save()
             else:
                 schedule = user_schedules.get(schedule_id=schedule_id)
                 schedule.schedule_title = schedule_title
                 schedule.is_split = is_split
                 schedule.layout = layout
                 schedule.last_updated_by = user_details
-            schedule.save()
+            # schedule.save()
 
-            success_screens, error = upsert_schedule_screens(user_details=user_details, schedule=schedule,
-                                                             schedule_screens=schedule_screens)
+            success_screens, error, schedule = upsert_schedule_screens(user_details=user_details, schedule=schedule,
+                                                                       schedule_screens=schedule_screens)
             errors.append(error)
 
-            success_groups, error = upsert_schedule_groups(user_details=user_details, schedule=schedule,
-                                                           schedule_groups=schedule_groups)
+            success_groups, error, schedule = upsert_schedule_groups(user_details=user_details, schedule=schedule,
+                                                                     schedule_groups=schedule_groups)
             errors.append(error)
 
-            success_panes, error = upsert_schedule_panes(user_details=user_details, schedule=schedule,
-                                                         schedule_panes=schedule_panes, layout=layout)
+            success_panes, error, schedule = upsert_schedule_panes(user_details=user_details, schedule=schedule,
+                                                                   schedule_panes=schedule_panes, layout=layout)
             success = success_screens and success_groups and success_panes
             errors.append(error)
+
+            schedule.save()
     except Exception as e:
         success = False
         error = 'Error while upserting content to schedule'
@@ -394,18 +380,6 @@ def get_group_schedules(request, group_id):
     group_schedules = Schedule.get_user_relevant_objects(user_details).filter(schedule_id__in=group_schedule_id_list)
     json_data = default_schedule_serializer(querySet=group_schedules)
     return obj_to_json_response(json_data)
-
-
-# def get_playlist_schedules(request, playlist_id):
-#     debugFileLog.info("inside get_playlist_schedules")
-#     playlist_id = int(playlist_id)
-#     user_details = get_userdetails(request)
-#     playlist_schedule_pane_id_list = SchedulePlaylists.objects.filter(playlist_id=playlist_id).values_list(
-#         'schedule_pane_id', flat=True).distinct()
-#     playlist_schedules = Schedule.get_user_relevant_objects(user_details=user_details).filter(
-#         schedule_pane_id__in=playlist_schedule_pane_id_list)
-#     json_data = default_schedule_serializer(querySet=playlist_schedules)
-#     return obj_to_json_response(json_data)
 
 
 def get_schedules(request):

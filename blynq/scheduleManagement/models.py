@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from schedule.models import Event
 
 from authentication.models import UserDetails, Organization
-from customLibrary.views_lib import debugFileLog
+from customLibrary.views_lib import debugFileLog, timeit
 from layoutManagement.models import LayoutPane, Layout
 from playlistManagement.models import Playlist
 from screenManagement.models import Screen, Group
@@ -23,7 +23,6 @@ class ScheduleScreens(models.Model):
 
     last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
 
-
     def __unicode__(self):
         description = self.schedule.schedule_title if self.schedule and self.schedule.schedule_title else ''
         if self.screen:
@@ -31,41 +30,6 @@ class ScheduleScreens(models.Model):
         if self.group:
             description = description + ' - group ' + self.group.group_name
         return description
-
-    # def delete_event(self):
-    #     if self.event:
-    #         event = self.event
-    #         if event.rule:
-    #             rule = event.rule
-    #             event.rule = None
-    #             event.save()
-    #             rule.delete()
-    #         self.event = None
-    #         self.save()
-    #         event.delete()
-
-    # class Meta:
-    #     unique_together = (('screen', 'schedule', 'group'))
-
-
-# @receiver(pre_delete, sender=ScheduleScreens)
-# def delete_schedule_screen_event(sender, instance, **kwargs):
-#     debugFileLog.info("inside delete_schedule_screen")
-#     try:
-#         if instance.event:
-#             event = instance.event
-#             if event.rule:
-#                 # rule = event.rule
-#                 event.rule = None
-#                 event.save()
-#                 # multiple events are having the same rule, so not deleting the rule
-#                 # rule.delete()
-#             instance.event = None
-#             instance.save()
-#             event.delete()
-#     except Exception as e:
-#         debugFileLog.exception("Received exception")
-#         debugFileLog.exception(e)
 
 
 class SchedulePlaylists(models.Model):
@@ -82,14 +46,14 @@ class SchedulePlaylists(models.Model):
             schedule_title = self.schedule_pane.schedule.schedule_title
         else:
             schedule_title = ''
-        playlist_title =  self.playlist.playlist_title if self.playlist and self.playlist.playlist_title else ''
+        playlist_title = self.playlist.playlist_title if self.playlist and self.playlist.playlist_title else ''
         return schedule_title + '-' + playlist_title
 
 
 class SchedulePane(models.Model):
     schedule_pane_id = models.AutoField(primary_key=True)
     schedule = models.ForeignKey('Schedule', on_delete=models.CASCADE, related_name='%(class)s_schedule')
-    layout_pane = models.ForeignKey(LayoutPane, on_delete=models.CASCADE, null=True, blank=True)
+    layout_pane = models.ForeignKey(LayoutPane, on_delete=models.PROTECT, null=True, blank=True)
     playlists = models.ManyToManyField(Playlist, through=SchedulePlaylists)
     mute_audio = models.BooleanField(default=False)
     is_always = models.BooleanField(default=True)
@@ -115,7 +79,7 @@ class Schedule(models.Model):
     schedule_title = models.CharField(max_length=100)
     screens = models.ManyToManyField(Screen, through=ScheduleScreens)
     is_split = models.BooleanField(default=False)
-    layout = models.ForeignKey(Layout, on_delete=models.SET_NULL, null=True)
+    layout = models.ForeignKey(Layout, on_delete=models.PROTECT, null=True)
     schedule_panes = models.ManyToManyField(LayoutPane, through=SchedulePane)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
 
@@ -133,7 +97,8 @@ class Schedule(models.Model):
 
     @staticmethod
     def get_user_relevant_objects(user_details):
-        return Schedule.objects.select_related('layout', 'organization').filter(organization=user_details.organization)
+        return Schedule.objects.select_related().prefetch_related('screens', 'schedule_panes').filter(
+            organization=user_details.organization)
 
     @property
     def get_schedule_screens_manager(self):
@@ -141,7 +106,7 @@ class Schedule(models.Model):
         :return: RelatedManager object of ScheduleScreens related to this Schedule, queries can be fired using
         self.get_schedule_screens_manager.filter(schedule_screen_id = 1)
         """
-        return self.schedulescreens_schedule
+        return self.schedulescreens_schedule.select_related()
 
     @property
     def get_schedule_pane_manager(self):
@@ -149,16 +114,19 @@ class Schedule(models.Model):
         :return: RelatedManager object of SchedulePane related to this Schedule, queries can be fired using
         self.get_schedule_pane_manager.filter(schedule_pane_id = 1)
         """
-        return self.schedulepane_schedule.select_related('layout_pane', 'event').prefetch_related('playlists')
+        return self.schedulepane_schedule.select_related().prefetch_related('playlists')
 
+    @timeit
     def update_screens_data(self):
         debugFileLog.info("Inside update_screens_data of schedule %s " % self.schedule_title)
         try:
-            schedule_screens = self.screens.all()
+            schedule_screens = ScheduleScreens.objects.select_related('screen', 'screen__screen_data_modified').filter(
+                schedule_id=self.schedule_id)
         except Exception as e:
             debugFileLog.exception('Screens does not exist for the schedule, may be due to pre_save')
             return
-        for screen in schedule_screens:
+        for obj in schedule_screens:
+            screen = obj.screen
             if screen:
                 screen.data_modified()
             else:

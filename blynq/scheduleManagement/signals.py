@@ -5,7 +5,6 @@ from customLibrary.views_lib import debugFileLog
 from scheduleManagement.models import Schedule, ScheduleScreens
 
 
-@receiver(pre_save, sender=Schedule)
 @receiver(post_save, sender=Schedule)
 def schedule_data_modified(sender, instance, **kwargs):
     debugFileLog.info("Inside schedule_data_modified")

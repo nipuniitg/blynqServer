@@ -1,5 +1,6 @@
 from django.core.serializers.python import Serializer
 
+from customLibrary.views_lib import datetime_to_string, get_ist_datetime
 from screenManagement.models import GroupScreens
 
 
@@ -21,9 +22,9 @@ class GroupScreensSerializer(Serializer):
             del self._current['group']
         if 'screen' in self.selected_fields:
             # groups field should not be passed for the default_screen_serializer
-            json_data = default_screen_serializer(query_set=[obj.screen],
-                                                  fields=('screen_id', 'screen_name', 'address', 'city', 'status',
-                                                          'screen_size', 'aspect_ratio', 'resolution'))
+            json_data = default_screen_serializer(query_set=[obj.screen], fields=(
+                'screen_id', 'screen_name', 'address', 'city', 'status', 'screen_size', 'aspect_ratio', 'resolution',
+                'last_active_time'))
             self.add_dict_to_current(json_data)
             del self._current['screen']
         self.objects.append(self._current)
@@ -39,6 +40,8 @@ class ScreenSerializer(Serializer):
                 group_screens, fields=('group_screen_id', 'group'))
         if 'status' in self.selected_fields:
             self._current['status'] = obj.current_status
+        if 'last_active_time' in self.selected_fields:
+            self._current['last_active_time'] = datetime_to_string(get_ist_datetime(obj.last_active_time))
         self.objects.append(self._current)
 
 

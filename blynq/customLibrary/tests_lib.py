@@ -8,18 +8,24 @@ from schedule.models import Event, Rule, Calendar
 from authentication.models import Role, Organization, UserDetails, City
 from blynq.settings import MEDIA_HOST
 from contentManagement.models import Content
-from customLibrary.views_lib import obj_to_json_str, string_to_dict, get_ist_date_str, get_ist_time_str
+from customLibrary.views_lib import obj_to_json_str, string_to_dict, get_ist_date_str, get_ist_time_str, \
+    datetime_to_string, get_ist_datetime
+from layoutManagement.models import Layout, LayoutPane
 from playlistManagement.models import Playlist, PlaylistItems
-from scheduleManagement.models import Schedule, SchedulePlaylists, ScheduleScreens
-from screenManagement.models import ScreenStatus, ScreenActivationKey, Group, Screen, GroupScreens
+from scheduleManagement.models import Schedule, SchedulePlaylists, ScheduleScreens, SchedulePane
+from screenManagement.models import ScreenStatus, ScreenActivationKey, Group, Screen, GroupScreens, AspectRatio
 
 
 def generate_random_string(length=16):
     return ''.join(choice(ascii_uppercase) for i in range(length))
 
 
+def trigger_pdb():
+    import pdb;pdb.set_trace()
+
+
 def create_role(role_name='Manager', description='Manager'):
-    return Role.objects.get_or_create(role_name=role_name, description=description)[0]
+    return Role.objects.get_or_create(role_name=role_name, defaults=dict(description=description))[0]
 
 
 def create_organization(default_organization=True):
@@ -63,7 +69,7 @@ def create_city(default_city=True):
 
 
 def create_screen_status(status_name='Offline', description='The device is not connected to internet'):
-    return ScreenStatus.objects.get_or_create(status_name=status_name, description=description)[0]
+    return ScreenStatus.objects.get_or_create(status_name=status_name, defaults=dict(description=description))[0]
 
 
 def create_screen_activation_key():
@@ -139,6 +145,48 @@ def create_content(default_content=True, is_folder=False, userdetails=None, pare
     return content
 
 
+def default_aspect_ratio():
+    return AspectRatio.objects.get(aspect_ratio_id=1)
+
+
+def full_screen_layout():
+    try:
+        return Layout.objects.get(layout_id=1)
+    except Exception as e:
+        print 'Default Full Screen Layout does not exist'
+        trigger_pdb()
+
+
+def create_layout(default_layout=True, is_split=False, userdetails=None):
+    if not is_split:
+        return full_screen_layout()
+    elif default_layout:
+        layout_title = 'test layout 1'
+    else:
+        layout_title = generate_random_string(6)
+    if not userdetails:
+        userdetails = create_userdetails(default_userdetails=True)
+    try:
+        return Layout.objects.get_or_create(title=layout_title, defaults=dict(
+            aspect_ratio=default_aspect_ratio(), created_by=userdetails, last_updated_by=userdetails,
+            organization=userdetails.organization, is_default=False))[0]    # return layout in layout, created
+    except Exception as e:
+        print 'Error in layout creation'
+        trigger_pdb()
+
+
+def create_layout_pane(default_layout_pane=True, left_margin=0, top_margin=0, z_index=0, width=50, height=50,
+                       layout=None):
+    if default_layout_pane:
+        layout_pane_title = 'test pane 1'
+    else:
+        layout_pane_title = generate_random_string(6)
+    if not layout:
+        layout = create_layout(default_layout=True)
+    return LayoutPane.objects.get_or_create(title=layout_pane_title, defaults=dict(
+        left_margin=left_margin, top_margin=top_margin, z_index=z_index, width=width, height=height, layout=layout))[0]
+
+
 def create_playlist(default_playlist=True, userdetails=None):
     if default_playlist:
         playlist_title = 'test playlist 1'
@@ -160,36 +208,46 @@ def create_playlist_items(default_playlist_item=True, position_index=1, display_
                                                defaults=dict(position_index=position_index, display_time=display_time))[0]
 
 
-def create_schedule(default_schedule=True, userdetails=None):
+def create_schedule(default_schedule=True, is_split=False, userdetails=None):
     if default_schedule:
         schedule_title = 'test schedule 1'
     else:
         schedule_title = generate_random_string(6)
     if not userdetails:
         userdetails = create_userdetails(default_userdetails=True)
-    return Schedule.objects.get_or_create(schedule_title=schedule_title,
+    layout = create_layout(default_layout=default_schedule, is_split=is_split, userdetails=userdetails)
+    return Schedule.objects.get_or_create(schedule_title=schedule_title, is_split=is_split, layout=layout,
                                           defaults=dict(created_by=userdetails, last_updated_by=userdetails,
                                                         organization=userdetails.organization))[0]
 
 
-def create_schedule_playlist(default_schedule_playlist=True, position_index=1):
+def create_schedule_playlist(default_schedule_playlist=True, is_split=False, userdetails=None, position_index=1):
     playlist = create_playlist(default_playlist=default_schedule_playlist)
-    schedule = create_schedule(default_schedule=default_schedule_playlist)
-    return SchedulePlaylists.objects.get_or_create(playlist=playlist, schedule=schedule,
+    schedule_pane = create_schedule_pane(default_schedule_pane=default_schedule_playlist, is_split=is_split,
+                                         userdetails=userdetails)
+    return SchedulePlaylists.objects.get_or_create(playlist=playlist, schedule_pane=schedule_pane,
                                                    defaults=dict(position_index=position_index))[0]
+
+
+def create_schedule_pane(default_schedule_pane=True, is_split=False, userdetails=None):
+    schedule = create_schedule(default_schedule=default_schedule_pane)
+    layout = create_layout(default_layout=default_schedule_pane, is_split=is_split, userdetails=userdetails)
+    layout_pane = create_layout_pane(default_layout_pane=default_schedule_pane, layout=layout)
+    rule = Rule.objects.create(name=schedule.schedule_title, description=schedule.schedule_title, frequency='DAILY')
+    event = Event.objects.create(start=timezone.now(), end=timezone.now(), title=schedule.schedule_title, rule=rule)
+    try:
+        return SchedulePane.objects.get_or_create(schedule=schedule, layout_pane=layout_pane, event=event)[0]
+    except Exception as e:
+        trigger_pdb()
 
 
 def create_schedule_screen(default_schedule_screen=True, group=None):
     schedule = create_schedule(default_schedule=default_schedule_screen)
     screen = create_screen(default_screen=default_schedule_screen)
-    rule = Rule.objects.create(name=schedule.schedule_title, description=schedule.schedule_title, frequency='DAILY')
-    event = Event.objects.create(start=timezone.now(), end=timezone.now(), title=schedule.schedule_title, rule=rule,
-                                 calendar=screen.screen_calendar)
-    # TODO: Add test cases for event
-    return ScheduleScreens.objects.get_or_create(schedule=schedule, screen=screen, group=group, event=event)[0]
+    return ScheduleScreens.objects.get_or_create(schedule=schedule, screen=screen, group=group)[0]
 
 
-def verify_posted_dict(obj, posted_data, url, view_func, success=True, content_type='application/json'):
+def verify_posted_dict(obj, posted_data, url, view_func, success=True, content_type='application/json', redirect=False):
     if content_type == 'application/json':
         json_str = obj_to_json_str(posted_data)
     else:
@@ -197,13 +255,17 @@ def verify_posted_dict(obj, posted_data, url, view_func, success=True, content_t
     request = obj.factory.post(url, data=json_str, content_type=content_type)
     request.user = obj.user
     response = view_func(request)
+    if redirect:
+        obj.assertEqual(response.status_code, 302)
+        return
     obj.assertEqual(response.status_code, 200)
     response_data = string_to_dict(response.content)
     try:
         obj.assertEqual(response_data.get('success'), success, msg='Response of the url %s is not valid' % url)
     except AssertionError:
         print 'Received assertion error in the response of success'
-        import pdb;pdb.set_trace()
+        trigger_pdb()
+        obj.assertTrue(False, msg='Success in response of url %s does not match' % url)
 
 
 def verify_get_result(obj, expected_result, url, view_func, *args, **kwargs):
@@ -221,7 +283,7 @@ def verify_get_result(obj, expected_result, url, view_func, *args, **kwargs):
         print expected_result
         print "Received response:"
         print json_response
-        import pdb;pdb.set_trace()
+        trigger_pdb()
         obj.assertTrue(False, msg='The JSON output of url %s does not match' % url)
     return json_response
 
@@ -236,8 +298,14 @@ def generate_content_dict(content, include_is_folder=True):
             content_dict['is_folder'] = content.is_folder
         if content.document:
             content_dict['url'] = MEDIA_HOST + content.document.url
+        elif content.is_folder or content.is_widget:
+            content_dict['url'] = ''
         else:
             content_dict['url'] = content.url
+        content_dict['thumbnail'] = content.thumbnail_url
+        content_dict['duration'] = content.duration
+        if content.is_widget:
+            content_dict['widget_text'] = content.widget_text
     return content_dict
 
 
@@ -252,6 +320,9 @@ def generate_screen_dict(screen):
     screen_dict['address'] = screen.address
     screen_dict['resolution'] = screen.resolution
     screen_dict['screen_id'] = screen.screen_id
+    screen_dict['status'] = screen.current_status
+    screen_dict['last_active_time'] = datetime_to_string(get_ist_datetime(screen.last_active_time))
+    screen_dict['aspect_ratio'] = screen.aspect_ratio
     group_dicts = []
     for group_screen in screen.groupscreens_set.all():
         group_dicts.append({'group_id': group_screen.group.group_id, 'group_name': group_screen.group.group_name,
@@ -294,7 +365,6 @@ def generate_group_dict(group=None):
         for group_screen in group.groupscreens_set.all():
             screen_dict = generate_screen_dict(group_screen.screen)
             del screen_dict['groups']
-            del screen_dict['status']
             # Fix this difference of not showing aspect_ratio in the screen_dict
             screen_dict['aspect_ratio'] = group_screen.screen.aspect_ratio
             screen_dict['group_screen_id'] = group_screen.group_screen_id
@@ -307,6 +377,36 @@ def generate_group_dict(group=None):
         screen = create_screen(default_screen=True)
         group_dict['screens'] = [{'group_screen_id': -1, 'screen_id': screen.screen_id}]
     return group_dict
+
+
+def generate_aspect_ratio_dict(aspect_ratio):
+    return dict(aspect_ratio_id=aspect_ratio.aspect_ratio_id, title=aspect_ratio.title,
+                orientation=aspect_ratio.orientation, width_component=aspect_ratio.width_component,
+                height_component=aspect_ratio.height_component)
+
+
+def generate_layout_pane_dict(pane=None):
+    if pane:
+        layout_pane_dict = dict(layout_pane_id=pane.layout_pane_id, title=pane.title, left_margin=pane.left_margin,
+                                top_margin=pane.top_margin, z_index=pane.z_index, width=pane.width, height=pane.height)
+    else:
+        layout_pane_dict = dict(layout_pane_id=-1, title=generate_random_string(6), left_margin=0, top_margin=0, z_index=0,
+                                width=50, height=50)
+    return layout_pane_dict
+
+
+def generate_layout_dict(layout=None):
+    if layout:
+        layout_panes = LayoutPane.objects.filter(layout=layout)
+        layout_panes_list = []
+        for pane in layout_panes:
+            layout_panes_list.append(generate_layout_pane_dict(pane))
+        layout_dict = dict(layout_id=layout.layout_id, title=layout.title, layout_panes=layout_panes_list,
+                           aspect_ratio=generate_aspect_ratio_dict(layout.aspect_ratio))
+    else:
+        layout_dict = dict(layout_id=-1, title=generate_random_string(6), layout_panes=[generate_layout_pane_dict()],
+                           aspect_ratio=generate_aspect_ratio_dict(default_aspect_ratio()))
+    return layout_dict
 
 
 def default_timeline(is_always=True, all_day=True, recurrence_absolute=False, start_date=None, end_recurring_period=None,
@@ -346,10 +446,10 @@ def generate_schedule_groups(schedule=None):
     return schedule_groups_list
 
 
-def generate_schedule_playlists(schedule=None):
+def generate_schedule_playlists(schedule_pane=None):
     schedule_playlists_list = []
-    if schedule:
-        schedule_playlists = SchedulePlaylists.objects.filter(schedule=schedule)
+    if schedule_pane:
+        schedule_playlists = SchedulePlaylists.objects.filter(schedule=schedule_pane)
         for schedule_playlist in schedule_playlists:
             playlist_dict = generate_playlist_dict(schedule_playlist.playlist)
             playlist_dict['schedule_playlist_id'] = schedule_playlist.schedule_playlist_id
@@ -358,6 +458,27 @@ def generate_schedule_playlists(schedule=None):
         playlist = create_playlist(default_playlist=True)
         schedule_playlists_list.append(dict(schedule_playlist_id=-1, playlist_id=playlist.playlist_id))
     return schedule_playlists_list
+
+
+def generate_schedule_panes(schedule=None):
+    schedule_panes_list = []
+    if schedule:
+        schedule_panes = SchedulePane.objects.filter(schedule=schedule)
+    else:
+        schedule_panes = full_screen_layout().layoutpane_layout.all()
+    for schedule_pane in schedule_panes:
+        schedule_blynq_playlists = []
+        schedule_widgets = []
+        mute_audio = schedule_pane.mute_audio
+        schedule_playlists = generate_schedule_playlists(schedule_pane)
+        layout_pane = generate_layout_pane_dict(schedule_pane.layout_pane)
+        timeline = generate_schedule_timeline(schedule)
+        schedule_pane_id = schedule_pane.schedule_pane_id
+        schedule_pane_dict = dict(schedule_pane_id=schedule_pane_id, schedule_blynq_playlists=schedule_blynq_playlists,
+                                  schedule_widgets=schedule_widgets, mute_audio=mute_audio,
+                                  schedule_playlists=schedule_playlists, layout_pane=layout_pane, timeline=timeline)
+        schedule_panes_list.append(schedule_pane_dict)
+    return schedule_panes_list
 
 
 def generate_schedule_timeline(schedule=None, is_always=True, all_day=True, recurrence_absolute=False):
@@ -393,22 +514,20 @@ def generate_schedule_timeline(schedule=None, is_always=True, all_day=True, recu
 
 
 def generate_schedule_dict(schedule=None):
-    schedule_dict = dict()
     if schedule:
         schedule_screens = generate_schedule_screens(schedule)
         schedule_groups = generate_schedule_groups(schedule)
-        schedule_playlists = generate_schedule_playlists(schedule)
-        timeline = generate_schedule_timeline(schedule)
+        layout = generate_layout_dict(schedule.layout)
+        schedule_panes = generate_schedule_panes(schedule)
         schedule_id = schedule.schedule_id
         schedule_title = schedule.schedule_title
-        schedule_dict = dict(schedule_id=schedule_id, schedule_title=schedule_title,
-                             schedule_playlists=schedule_playlists, schedule_screens=schedule_screens,
-                             schedule_groups=schedule_groups, timeline=timeline)
+        is_split = schedule.is_split
+        schedule_dict = dict(schedule_id=schedule_id, schedule_title=schedule_title, layout=layout, is_split=is_split,
+                             schedule_screens=schedule_screens, schedule_groups=schedule_groups,
+                             schedule_panes=schedule_panes)
     else:
-        schedule_dict['schedule_id'] = -1
-        schedule_dict['schedule_title'] = 'test upsert schedule'
-        schedule_dict['schedule_playlists'] = generate_schedule_playlists()
-        schedule_dict['schedule_screens'] = generate_schedule_screens()
-        schedule_dict['schedule_groups'] = generate_schedule_groups()
-        schedule_dict['timeline'] = generate_schedule_timeline()
+        layout = generate_layout_dict(full_screen_layout())
+        schedule_dict = dict(schedule_id=-1, schedule_title='test upsert schedule', layout=layout, is_split=False,
+                             schedule_screens=generate_schedule_screens(), schedule_groups=generate_schedule_groups(),
+                             schedule_panes=generate_schedule_panes())
     return schedule_dict

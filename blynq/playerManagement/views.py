@@ -1,7 +1,6 @@
 import datetime
 import os
 
-from django.db import connection, reset_queries
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
@@ -10,7 +9,7 @@ from contentManagement.models import Content
 from contentManagement.serializers import default_content_serializer
 from customLibrary.custom_settings import PLAYER_POLL_TIME
 from customLibrary.views_lib import debugFileLog, string_to_dict, default_string_to_datetime, obj_to_json_response, \
-    ajax_response, date_changed, timeit
+    ajax_response, date_changed, timeit, log_query_times
 from playerManagement.helpers import screen_schedule_data
 from playerManagement.models import PlayerUpdate, LocalServer, PlayerLog
 from playlistManagement.models import PlaylistItems
@@ -116,15 +115,6 @@ def activation_key_valid(request):
     # return ajax_response(success=success, errors=errors)
 
 
-def log_query_times(top_results=10):
-    queries = connection.queries
-    debugFileLog.info('Inside log_query_times, total queries %d' % len(queries))
-    newlist = sorted(queries, key=lambda k: float(k['time']))
-    newlist.reverse()
-    for i in range(top_results):
-        debugFileLog.info('Time ' + newlist[i]['time'] + ' Query: ' + newlist[i]['sql'])
-
-
 @timeit
 @csrf_exempt
 def get_screen_data(request, nof_days=3):
@@ -134,8 +124,6 @@ def get_screen_data(request, nof_days=3):
     :param nof_days: optional argument mentioning the time interval for the events
     :return:
     """
-    # Uncomment the below line in DEBUG = True and while using log_query_times
-    # reset_queries()
     try:
         posted_data = string_to_dict(request.body)
         # the datetime format of last_received should be "%2d%2m%4Y%2H%2M%2S"
@@ -164,7 +152,7 @@ def get_screen_data(request, nof_days=3):
                 if schedule_panes.exists():
                     screen_data_json = screen_schedule_data(schedule_panes, start_time, end_time)
                     campaigns_json = {'campaigns': screen_data_json, 'is_modified': True}
-                # log_query_times()
+                log_query_times()
     except Exception as e:
         errors = "Error while fetching the occurences or invalid screen identifier"
         debugFileLog.exception(errors)

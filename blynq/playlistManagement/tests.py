@@ -12,7 +12,7 @@ from playlistManagement.views import get_user_playlists, get_files_recursively_j
 
 
 class PlaylistTest(TestCase):
-    fixtures = ['../fixtures/ContentType.json',]
+    fixtures = ['ContentType', 'Role', 'AspectRatio', 'ScreenStatus', 'Layout', 'LayoutPane']
 
     def test_playlist(self):
         playlist = create_playlist(default_playlist=True)
@@ -33,7 +33,7 @@ class PlaylistTest(TestCase):
 
 
 class PlaylistViewsTest(TestCase):
-    fixtures = ['../fixtures/ContentType.json',]
+    fixtures = ['ContentType', 'Role', 'AspectRatio', 'ScreenStatus', 'Layout', 'LayoutPane']
 
     def setUp(self):
         self.factory = RequestFactory()
@@ -58,8 +58,8 @@ class PlaylistViewsTest(TestCase):
         content1 = create_content(default_content=True, is_folder=False)
         folder1 = create_content(default_content=True, is_folder=True)
         content2 = create_content(default_content=False, is_folder=False, parent_folder=folder1)
-        expected_result = [generate_content_dict(content1, include_is_folder=False),
-                           generate_content_dict(content2, include_is_folder=False)]
+        expected_result = [generate_content_dict(content1),
+                           generate_content_dict(content2)]
         verify_get_result(self, expected_result=expected_result, url=url, view_func=get_files_recursively_json,
                           parent_folder_id=-1)
         content1.delete()
