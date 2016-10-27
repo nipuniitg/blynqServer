@@ -522,7 +522,9 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
         });
 
         modalInstance.result.then(function saved(){
-            $scope.refreshScreens();
+            $scope.refreshScreens().then(function(){
+                $scope.refreshScreenSchedulesandEvents();
+            });
         }, function cancelled(){
             toastr.warning('Screen Update cancelled')
         })
