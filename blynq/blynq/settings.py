@@ -115,7 +115,7 @@ DATABASES = {
         'PASSWORD': 'Believe',
         'HOST': '127.0.0.1',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
-        'CONN_MAX_AGE': 600,
+        # 'CONN_MAX_AGE': 600,
     }
 }
 
