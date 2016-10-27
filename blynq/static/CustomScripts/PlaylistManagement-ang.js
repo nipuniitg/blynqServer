@@ -211,6 +211,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
             }
             else
             {
+                toastr.warning(data.errors.join());
                 toastr.warning('Oops!! Some error occured. Please try again');
             }
         });
@@ -254,6 +255,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
                                 $uibModalInstance.close(returnData.playlist);
                             }
                             else{
+                                toastr.warning(returnData.errors.join());
                                 toastr.warning('Oops! There was some error while updating the details. Please try again later.')
                             }
                         });
@@ -324,6 +326,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
                 disableSortable();
             }
             else{
+                toastr.warning(data.errors.join());
                 toastr.warning('Oops!! Some error occured. Please try again.');
             }
         });

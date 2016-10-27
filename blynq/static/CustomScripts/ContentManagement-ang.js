@@ -367,6 +367,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
                 toastr.success('Item deleted successfully.');
             }
             else{
+                toastr.warning(data.errors.join());
                 toastr.warning("Oops!!There was some error. Please try later.");
             }
         });
@@ -382,6 +383,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
                     toastr.success('Items deleted successfully.');
                 }
                 else{
+                    toastr.warning(data.errors.join());
                     toastr.warning("Oops!!There was some error. Please try later.");
                 }
             })
@@ -417,6 +419,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
                                 $uibModalInstance.close();
                             }
                             else{
+                                toastr.warning(data.errors.join());
                                 toastr.warning('Oops!!There was some error while creating folder. Please try again.');
                             }
                         });
@@ -473,6 +476,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
                                 $uibModalInstance.close();
                             }
                             else{
+                                toastr.warning(data.errors.join());
                                 toastr.warning('Oops!! Some error occured while updating the template');
                             }
                         });
@@ -549,6 +553,7 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
                         $scope.refreshContent($scope.currentFolderId);
                     }
                     else{
+                        toastr.warning(returnData.errors.join());
                         toastr.warning('Oops! Some error occured while moving. Please try again later.')
                     }
 
@@ -1032,7 +1037,8 @@ plApp.directive('contentDroppable',['ctDataAccessFactory', function(ctDAF){
                     $scope.refreshContent($scope.currentFolderId);
                 }
                 else{
-                    toastr.warning(returnData.error);
+                    toastr.warning(returnData.errors.join());
+                    //toastr.warning(returnData.error);
                 }
             };
 

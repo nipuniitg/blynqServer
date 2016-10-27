@@ -421,18 +421,21 @@ function(groupsFactory, dataAccessFactory, $scope,$uibModal, cAD){
 
 //screen Index Cntrl
 sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','$uibModal','constantsAndDefaults',
-'$interval','$state',
-  function(screensFactory,dataAccessFactory, $scope, $uibModal, cAD, $interval,$state){
+'$interval','$state','$q',
+  function(screensFactory,dataAccessFactory, $scope, $uibModal, cAD, $interval,$state, $q){
 
     //private functions
     var onLoad = function(){
-        $scope.refreshScreens();
         $scope.activeScreenIndex = 0;
         //Intialising default view of schedules as list view
         $scope.schedulesView = cAD.defaultSchedulesLayoutType();
 
         //popOverMessages
         $scope.popOverMessages = cAD.getPopOverMessages();
+
+        $scope.refreshScreens().then(function(){
+            $scope.refreshScreenSchedulesandEvents();
+        });
     };
 
     var setActiveScreenIndex = function(index){
@@ -449,11 +452,14 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
 
     //public functions
      $scope.refreshScreens = function(){
+        var deferred = $q.defer();
         screensFactory.getAllScreens(function(allScreens)
         {
             $scope.screens = allScreens;
-            $scope.refreshScreenSchedulesandEvents();
+            deferred.resolve();
         });
+
+        return deferred.promise;
      }
 
     onLoad();

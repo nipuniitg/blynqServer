@@ -22,6 +22,7 @@
                             <th>City</th>
                             <th class="fix">Address</th>
                             <th class="fix">Groups</th>
+                            <th class="fix">Last Online Time</th>
                         </tr>
                         <tr>
                             <th></th>
@@ -65,6 +66,7 @@
                             <th><input type="form-control" ng-model="searchScreens.address" placeholder="search"></th>
                             <th><input type="form-control" ng-model="searchScreens.groups.group_name"
                                        placeholder="search"></th>
+                            <th></th>
                         </tr>
                         </thead>
                         <tbody style=" height: 230px;overflow-y: auto;width: 100%;">
@@ -86,6 +88,9 @@
 
                                     </span>
                                 </div>
+                            </td>
+                            <td class="fix">
+                                {[ screen.last_active_time ]}
                             </td>
                         </tr>
                         </tbody>

@@ -133,6 +133,7 @@ sdApp.directive('schedulesList',['$log','scheduleIndexFactory','$uibModal',
                             $scope.refreshSchedules();
                         }
                         else{
+                            toastr.warning(returnData.errors.join());
                             toastr.warning('There was some error while deleting scheduling.Please refresh and try again.');
                         }
                     });
@@ -501,6 +502,7 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
             }
             else
             {
+                toastr.warning(data.errors.join());
                 toastr.warning('Oops!.There was some error while updating the schedule.');
             }
         });
