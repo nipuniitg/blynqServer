@@ -11,7 +11,7 @@ from schedule.models import Event, Rule
 from customLibrary.custom_settings import CONTENT_ORGANIZATION_NAME
 from customLibrary.views_lib import get_userdetails, ajax_response, obj_to_json_response, string_to_dict, \
     list_to_comma_string, generate_utc_datetime, get_ist_datetime, get_utc_datetime, debugFileLog, empty_list_for_none, \
-    timeit, log_query_times, mail_exception
+    timeit, mail_exception
 from playlistManagement.models import Playlist
 from scheduleManagement.models import Schedule, SchedulePlaylists, ScheduleScreens, SchedulePane
 from scheduleManagement.serializers import default_schedule_serializer

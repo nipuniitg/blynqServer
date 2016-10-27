@@ -9,7 +9,7 @@ from contentManagement.models import Content
 from contentManagement.serializers import default_content_serializer
 from customLibrary.custom_settings import PLAYER_POLL_TIME
 from customLibrary.views_lib import debugFileLog, string_to_dict, default_string_to_datetime, obj_to_json_response, \
-    ajax_response, date_changed, timeit, log_query_times, mail_exception
+    ajax_response, date_changed, timeit, mail_exception
 from playerManagement.helpers import screen_schedule_data
 from playerManagement.models import PlayerUpdate, LocalServer, PlayerLog
 from playlistManagement.models import PlaylistItems
@@ -152,7 +152,6 @@ def get_screen_data(request, nof_days=3):
                 if schedule_panes.exists():
                     screen_data_json = screen_schedule_data(schedule_panes, start_time, end_time)
                     campaigns_json = {'campaigns': screen_data_json, 'is_modified': True}
-                log_query_times()
     except Exception as e:
         errors = "Error while fetching the occurences or invalid screen identifier"
         debugFileLog.exception(errors)
