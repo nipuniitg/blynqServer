@@ -237,5 +237,14 @@ def log_query_times(func):
     return newfunc
 
 
+def wrap_try_catch(func):
+    @functools.wraps(func)
+    def newfunc(*args, **kwargs):
+        try:
+            response = func(*args, **kwargs)
+            return response
+        except Exception as e:
+            mail_exception(exception=e)
+
 debugFileLog = logging.getLogger('debugFileLog')
 consoleLog = logging.getLogger('consoleLog')

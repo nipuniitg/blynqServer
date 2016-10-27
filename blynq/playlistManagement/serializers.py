@@ -1,6 +1,7 @@
 from django.core.serializers.python import Serializer
 
 from contentManagement.serializers import ContentSerializer, default_content_serializer
+from customLibrary.views_lib import mail_exception
 from playlistManagement.models import PlaylistItems
 
 
@@ -10,12 +11,15 @@ class PlaylistItemsSerializer(Serializer):
             self._current.update(each_dict)
 
     def end_object(self, obj):
-        self._current['playlist_item_id'] = obj._get_pk_val()
-        if 'content' in self.selected_fields:
-            json_data =default_content_serializer([obj.content])
-            self.add_dict_to_current(json_data)
-            del self._current['content']
-        self.objects.append(self._current)
+        try:
+            self._current['playlist_item_id'] = obj._get_pk_val()
+            if 'content' in self.selected_fields:
+                json_data =default_content_serializer([obj.content])
+                self.add_dict_to_current(json_data)
+                del self._current['content']
+            self.objects.append(self._current)
+        except Exception as e:
+            mail_exception(exception=e)
 
 
 def default_playlist_serializer(query_set):
@@ -25,10 +29,13 @@ def default_playlist_serializer(query_set):
 
 class PlaylistSerializer(Serializer):
     def end_object(self, obj):
-        self._current['playlist_id'] = obj._get_pk_val()
-        if 'playlist_items' in self.selected_fields:
-            playlist_items_data = obj.playlistitems_set.select_related(
-                'content', 'content__content_type').all()
-            self._current['playlist_items'] = PlaylistItemsSerializer().serialize(
-                playlist_items_data,fields=('playlist_item_id', 'display_time', 'content'))
-        self.objects.append(self._current)
+        try:
+            self._current['playlist_id'] = obj._get_pk_val()
+            if 'playlist_items' in self.selected_fields:
+                playlist_items_data = obj.playlistitems_set.select_related(
+                    'content', 'content__content_type').all()
+                self._current['playlist_items'] = PlaylistItemsSerializer().serialize(
+                    playlist_items_data,fields=('playlist_item_id', 'display_time', 'content'))
+            self.objects.append(self._current)
+        except Exception as e:
+            mail_exception(exception=e)

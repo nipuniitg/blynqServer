@@ -1,6 +1,6 @@
 from django.core.serializers.python import Serializer
 
-from customLibrary.views_lib import datetime_to_string, get_ist_datetime
+from customLibrary.views_lib import datetime_to_string, get_ist_datetime, wrap_try_catch
 from screenManagement.models import GroupScreens
 
 
@@ -14,6 +14,7 @@ class GroupScreensSerializer(Serializer):
         for each_dict in json_data:
             self._current.update(each_dict)
 
+    @wrap_try_catch
     def end_object(self, obj):
         self._current['group_screen_id'] = obj._get_pk_val()
         if 'group' in self.selected_fields:
@@ -31,6 +32,7 @@ class GroupScreensSerializer(Serializer):
 
 
 class ScreenSerializer(Serializer):
+    @wrap_try_catch
     def end_object( self, obj ):
         if 'screen_id' in self.selected_fields:
             self._current['screen_id'] = obj._get_pk_val()
@@ -46,6 +48,7 @@ class ScreenSerializer(Serializer):
 
 
 class GroupSerializer(Serializer):
+    @wrap_try_catch
     def end_object(self, obj):
         self._current['group_id'] = obj._get_pk_val()
         if 'screens' in self.selected_fields:
@@ -56,6 +59,7 @@ class GroupSerializer(Serializer):
 
 
 class AspectRatioSerializer(Serializer):
+    @wrap_try_catch
     def end_object(self, obj):
         self._current['aspect_ratio_id'] = obj._get_pk_val()
         self.objects.append(self._current)
