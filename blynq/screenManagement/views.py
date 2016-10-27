@@ -6,7 +6,8 @@ from schedule.models import Calendar
 
 from authentication.models import City
 from authentication.serializers import CitySerializer
-from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, debugFileLog
+from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, debugFileLog, \
+    mail_exception
 from screenManagement.forms import AddScreenForm, AddGroup
 from screenManagement.models import Screen, ScreenStatus, Group, GroupScreens, ScreenActivationKey, AspectRatio
 from screenManagement.serializers import ScreenSerializer, GroupSerializer, AspectRatioSerializer, \
@@ -61,12 +62,13 @@ def upsert_group(request):
                     removed_group_screens.delete()
                     success = True
             except Exception as e:
-                debugFileLog.exception(e)
+                mail_exception(exception=e)
                 errors = ['Error while adding the group details']
         else:
             debugFileLog.exception('Add/Edit Group Form is not valid')
-            print add_group_form.errors
+            debugFileLog.error(str(add_group_form.errors))
             errors = add_group_form.errors
+            mail_exception(exception=e)
     return ajax_response(success=success, errors=errors)
 
 
@@ -88,9 +90,9 @@ def delete_group(request):
             user_content.delete()
             success = True
     except Exception as e:
-        print "Exception is ", e
         error = "Error while deleting the group"
-        print error
+        debugFileLog.error(e)
+        mail_exception(exception=e)
         errors.append(error)
     return ajax_response(success=success, errors=errors)
 
@@ -116,8 +118,7 @@ def upsert_screen(request):
                     screen_activation_key.in_use = True
                     screen_activation_key.save()
                 except Exception as e:
-                    print "Not a valid activation key"
-                    print "Exception is ", e
+                    mail_exception(exception=e)
                     return ajax_response(success=False, errors=['Not a valid activation key, contact support@blynq.in'])
             else:
                 screen = Screen.get_user_relevant_objects(user_details).get(screen_id=screen_id)
@@ -172,7 +173,7 @@ def upsert_screen(request):
             # TODO: The above case only handles the PRIVATE businessType, add a check
             success = True
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
         errors = ['Error while adding the screen details to database']
         success = False
     return ajax_response(success=success, errors=errors)
