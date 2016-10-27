@@ -7,6 +7,8 @@ PLAYER_LOG_DIR = 'player_logs'
 PLAYER_POLL_TIME = 120  # Time difference in seconds between successive polls of the player
 PLAYER_INACTIVE_THRESHOLD = PLAYER_POLL_TIME + 1    # Wait this time (in seconds) to change status of screen as inactive
 
+WIDGET_SCROLL_TIME = 180
+
 COMPRESS_IMAGE = True
 
 PERMANENTLY_DELETE_FILES = True

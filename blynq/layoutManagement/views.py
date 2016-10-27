@@ -1,6 +1,7 @@
 from django.db import transaction
 
-from customLibrary.views_lib import obj_to_json_response, get_userdetails, string_to_dict, debugFileLog, ajax_response
+from customLibrary.views_lib import obj_to_json_response, get_userdetails, string_to_dict, debugFileLog, ajax_response, \
+    mail_exception
 from layoutManagement.models import Layout, LayoutPane
 from layoutManagement.serializers import default_layout_serializer
 
@@ -88,7 +89,7 @@ def upsert_layout(request):
             posted_data['layout_id'] = layout_id
             success = True
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
         errors = ['Error while creating the layout']
     return ajax_response(success=success, errors=errors, obj_dict={'saved_layout': posted_data})
 
@@ -106,6 +107,6 @@ def delete_layout(request):
             layout.delete()
             success = True
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
         errors = ['Error while deleting the layout, Layout is already in use']
     return ajax_response(success=success, errors=errors)

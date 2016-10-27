@@ -11,7 +11,7 @@ from schedule.models import Event, Rule
 from customLibrary.custom_settings import CONTENT_ORGANIZATION_NAME
 from customLibrary.views_lib import get_userdetails, ajax_response, obj_to_json_response, string_to_dict, \
     list_to_comma_string, generate_utc_datetime, get_ist_datetime, get_utc_datetime, debugFileLog, empty_list_for_none, \
-    timeit, log_query_times
+    timeit, log_query_times, mail_exception
 from playlistManagement.models import Playlist
 from scheduleManagement.models import Schedule, SchedulePlaylists, ScheduleScreens, SchedulePane
 from scheduleManagement.serializers import default_schedule_serializer
@@ -41,7 +41,7 @@ def list_to_param(key_str, bylistday):
             weekday_string = list_to_comma_string(bylistday)
             return key_str + ':' + weekday_string
         except Exception as e:
-            debugFileLog.exception(e)
+            mail_exception(exception=e)
     return ''
 
 
@@ -357,7 +357,7 @@ def upsert_schedule(request):
         success = False
         error = 'Error while upserting content to schedule'
         debugFileLog.exception(error)
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
         errors.append(error)
     return ajax_response(success=success, errors=errors)
 
@@ -490,7 +490,7 @@ def delete_schedule(request):
         success = False
         errors = ['Sorry, you do not have access to this schedule or something wrong has happened']
         debugFileLog.exception(errors[0])
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
     return ajax_response(success=success, errors=errors)
 
 
@@ -562,7 +562,7 @@ def get_calendar_events(params):
             screen_data.extend(day_schedules)
     except Exception as e:
         screen_data = []
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
     return obj_to_json_response(screen_data)
 
 

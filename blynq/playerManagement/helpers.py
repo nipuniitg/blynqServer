@@ -3,7 +3,7 @@ from itertools import chain
 from operator import itemgetter
 
 from customLibrary.custom_settings import CONTENT_ORGANIZATION_NAME
-from customLibrary.views_lib import debugFileLog
+from customLibrary.views_lib import debugFileLog, mail_exception
 from layoutManagement.serializers import default_layout_pane_serializer
 from playlistManagement.serializers import PlaylistSerializer
 from screenManagement.models import ORIENTATION_CHOICES
@@ -33,7 +33,7 @@ def is_conflicting(cur_occur, new_occur):
         elif (cur_occur.start <= new_occur.start <= cur_occur.end) or (new_occur.start <= cur_occur.start <= new_occur.end):
             return True
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
     return False
 
 

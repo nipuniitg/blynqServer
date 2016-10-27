@@ -11,9 +11,9 @@ from PIL import Image
 
 from contentManagement.serializers import default_content_serializer
 from blynq.settings import TEMP_DIR
-from customLibrary.custom_settings import COMPRESS_IMAGE
+from customLibrary.custom_settings import COMPRESS_IMAGE, WIDGET_SCROLL_TIME
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, \
-    debugFileLog, full_file_path
+    debugFileLog, full_file_path, mail_exception
 from contentManagement.models import Content, ContentType
 
 
@@ -60,7 +60,7 @@ def upsert_url(request):
             errors = ['Please enter a valid URL']
     except Exception as e:
         debugFileLog.exception('Received exception')
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
         errors = str(e)
     return ajax_response(success=success, errors=errors)
 
@@ -109,11 +109,11 @@ def compress_image(file_path, parent_folder=None, user_details=None, organizatio
         #         os.remove(filename)
         #     except Exception as e:
         #         debugFileLog.exception('Not able to delete compressed temp file')
-        #         debugFileLog.exception(e)
+        #         mail_exception(exception=e)
         conversion_successful = True
         delete_old = True
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
         conversion_successful = False
         delete_old = False
     return conversion_successful, delete_old
@@ -159,10 +159,10 @@ def compress_video(file_path, parent_folder=None, user_details=None, organizatio
             os.remove(temp_file_path)
         except Exception as e:
             debugFileLog.exception('Not able to remove the temp file while video conversion %s' % temp_file_path)
-            debugFileLog.exception(e)
+            mail_exception(exception=e)
         return conversion_successful, delete_old
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
         return conversion_successful, delete_old
 
 
@@ -281,7 +281,7 @@ def create_folder(request):
                                is_folder=True)
         success = True
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
         errors = 'Error with the submitted data in create folder'
     return ajax_response(success=success, errors=errors)
 
@@ -350,7 +350,7 @@ def get_content_helper(request, parent_folder_id=-1, is_folder=False):
         user_content = user_content.filter(is_folder=is_folder)
         json_data = default_content_serializer(user_content)
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
         json_data = []
         debugFileLog.exception("Error while fetching the content or invalid parent folder id")
     return obj_to_json_response(json_data)
@@ -409,7 +409,7 @@ def update_content_title(request):
             content.save()
             success = True
         except Exception as e:
-            debugFileLog.exception(e)
+            mail_exception(exception=e)
             error = 'Error while saving the title to the database'
             errors.append(error)
     return ajax_response(success=success, errors=errors)
@@ -467,7 +467,7 @@ def delete_widget(request):
         success = True
     except Exception as e:
         errors = ['Access denied to delete this widget']
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
     return ajax_response(success=success, errors=errors)
 
 
@@ -476,7 +476,7 @@ def create_playlist_from_content(content):
     playlist = Playlist(playlist_title=content.title, user_visible=False, created_by=content.uploaded_by,
                         last_updated_by=content.last_updated_by, organization=content.organization)
     playlist.save()
-    playlist_item = PlaylistItems(playlist=playlist, content=content)
+    playlist_item = PlaylistItems(playlist=playlist, content=content, display_time=content.duration)
     playlist_item.save()
 
 
@@ -493,19 +493,18 @@ def upsert_widget(request):
         new_widget = False
         if content_id == -1:
             content_id = None
-            new_widget = True
         widget, created = Content.get_user_widgets(user_details=user_details).update_or_create(
-            content_id=content_id, defaults={'title': posted_data.get('title'),
-                                             'widget_text': posted_data.get('widget_text'),
-                                             'content_type_id': content_type.content_type_id,
-                                             'organization_id': user_details.organization.organization_id,
-                                             'last_updated_by': user_details})
-        if new_widget:
+            content_id=content_id, defaults=dict(
+                title=posted_data.get('title'), widget_text=posted_data.get('widget_text'), duration=WIDGET_SCROLL_TIME,
+                content_type_id=content_type.content_type_id, organization_id=user_details.organization.organization_id,
+                last_updated_by=user_details))
+        if created:
             widget.uploaded_by = user_details
             widget.save()
             create_playlist_from_content(content=widget)
         success = True
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
+        mail_exception(exception=e)
         errors = ['Invalid widget details']
     return ajax_response(success=success, errors=errors)

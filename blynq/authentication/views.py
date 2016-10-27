@@ -11,7 +11,7 @@ from authentication.forms import RequestQuoteForm
 from blynq import settings
 from customLibrary.custom_settings import PLAYER_INACTIVE_THRESHOLD
 from customLibrary.views_lib import string_to_dict, ajax_response, get_userdetails, send_mail_blynq, obj_to_json_response, \
-    debugFileLog
+    debugFileLog, mail_exception
 from scheduleManagement.models import Schedule
 from screenManagement.models import Screen
 
@@ -76,7 +76,7 @@ def get_profile_details(request):
         context_dic['email'] = user_details.user.email
         context_dic['mobile_number'] = user_details.mobile_number
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
     return obj_to_json_response(context_dic)
 
 
@@ -94,7 +94,7 @@ def update_user_details(request):
         user_details.save()
         success = True
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
         errors = ['Improper User details']
         success = False
     return ajax_response(success=success, errors=errors)
@@ -124,7 +124,7 @@ def change_password(request):
     except Exception as e:
         success = False
         errors = ['Password change unsuccessful']
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
     return ajax_response(success=success, errors=errors)
 
 
@@ -162,7 +162,7 @@ def request_quote(request):
                 send_mail_blynq(subject='[Auto-Generated] Quote Requested', message=message)
                 success = True
             except Exception as e:
-                debugFileLog.exception(e)
+                mail_exception(exception=e)
                 error = "Error while saving the requested Quote"
                 errors.append(error)
         else:
@@ -191,7 +191,7 @@ def organization_homepage_summary(request):
         context_dic['used_storage'] = organization.used_file_size
         context_dic['total_storage'] = organization.total_file_size_limit
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
         context_dic['used_storage'] = 0
         context_dic['total_storage'] = settings.STORAGE_LIMIT_PER_ORGANIZATION
     return obj_to_json_response(context_dic)

@@ -41,7 +41,8 @@ def string_to_dict(str):
         obj = json.loads(json_acceptable_string)
     except Exception as e:
         obj = {}
-        debugFileLog.exception(e)
+        debugFileLog.exception('Exception in string_to_dict for str: %s' % str)
+        mail_exception(exception=e)
     return obj
 
 
@@ -49,7 +50,8 @@ def obj_to_json_str(obj):
     try:
         json_str = json.dumps(obj)
     except Exception as e:
-        debugFileLog.exception(e)
+        debugFileLog.exception(str(obj))
+        mail_exception(exception=e)
         json_str = ''
     return json_str
 
@@ -75,6 +77,12 @@ def send_mail_blynq(to=['hello@blynq.in'], subject='', message=''):
                   fail_silently=False)
     except Exception as e:
         debugFileLog.error('Error while sending mail to ' + ','.join(to))
+
+
+def mail_exception(exception, to=['issue@blynq.in'], subject='Recieved exception'):
+    exception = str(exception)
+    debugFileLog.exception(exception)
+    send_mail_blynq(to=to, subject=subject, message=exception)
 
 
 def default_string_to_datetime(str, fmt='%d%m%Y%H%M%S'):
@@ -106,7 +114,8 @@ def get_video_length(file_path):
         duration = int(durations[0]) if durations else default_video_duration
         return duration
     except Exception as e:
-        debugFileLog.exception(e)
+        debugFileLog.exception('Error received for file_path: %s' % file_path)
+        mail_exception(exception=e)
         return default_video_duration
 
 

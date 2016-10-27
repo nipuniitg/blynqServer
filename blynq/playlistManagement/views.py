@@ -5,7 +5,8 @@ from django.contrib.auth.decorators import login_required
 from contentManagement.models import Content
 from contentManagement.serializers import default_content_serializer
 from contentManagement.views import get_files_recursively
-from customLibrary.views_lib import get_userdetails, string_to_dict, ajax_response, obj_to_json_response
+from customLibrary.views_lib import get_userdetails, string_to_dict, ajax_response, obj_to_json_response, debugFileLog, \
+    mail_exception
 from playlistManagement.models import Playlist, PlaylistItems
 from playlistManagement.serializers import default_playlist_serializer, PlaylistSerializer
 
@@ -75,9 +76,9 @@ def upsert_playlist(request):
             success = True
     except Exception as e:
         success = False
-        print "Exception is ", e
         error = 'Error while upserting content to playlist'
-        print error
+        debugFileLog.exception(error)
+        mail_exception(exception=e)
         errors.append(error)
         obj_dict = None
     return ajax_response(success=success, errors=errors, obj_dict=obj_dict)
@@ -94,9 +95,9 @@ def delete_playlist(request):
         playlist.delete()
         success = True
     except Exception as e:
-        print "Exception is ", e
         error = "Error while deleting playlist"
-        print error
+        debugFileLog.exception(error)
+        mail_exception(exception=e)
         errors.append(error)
     return ajax_response(success=success, errors=errors)
 

@@ -58,21 +58,21 @@ class ScheduleViewsTest(TestCase):
         verify_get_result(self, expected_result=expected_result, url=url, view_func=get_schedules)
         print 'test_get_schedules completed successfully'
 
-    # def test_get_screen_schedules(self):
-    #     schedule_screen = create_schedule_screen(default_schedule_screen=True)
-    #     schedule_screen2 = create_schedule_screen(default_schedule_screen=False)
-    #     screen_id = schedule_screen.screen_id
-    #     url = reverse('get_screen_schedules', kwargs={'screen_id':screen_id})
-    #     expected_result = [generate_schedule_dict(schedule_screen.schedule)]
-    #     verify_get_result(self, expected_result=expected_result, url=url, view_func=get_screen_schedules,
-    #                       screen_id=screen_id)
-    #     screen_id = schedule_screen2.screen_id
-    #     url = reverse('get_screen_schedules', kwargs={'screen_id':screen_id})
-    #     expected_result = [generate_schedule_dict(schedule_screen2.schedule)]
-    #     verify_get_result(self, expected_result=expected_result, url=url, view_func=get_screen_schedules,
-    #                       screen_id=screen_id)
-    #     print 'test_get_screen_schedules completed successfully'
-    #
+    def test_get_screen_schedules(self):
+        schedule_screen = create_schedule_screen(default_schedule_screen=True)
+        schedule_screen2 = create_schedule_screen(default_schedule_screen=False)
+        screen_id = schedule_screen.screen_id
+        url = reverse('get_screen_schedules', kwargs={'screen_id':screen_id})
+        expected_result = [generate_schedule_dict(schedule_screen.schedule)]
+        verify_get_result(self, expected_result=expected_result, url=url, view_func=get_screen_schedules,
+                          screen_id=screen_id)
+        screen_id = schedule_screen2.screen_id
+        url = reverse('get_screen_schedules', kwargs={'screen_id':screen_id})
+        expected_result = [generate_schedule_dict(schedule_screen2.schedule)]
+        verify_get_result(self, expected_result=expected_result, url=url, view_func=get_screen_schedules,
+                          screen_id=screen_id)
+        print 'test_get_screen_schedules completed successfully'
+
     # def test_get_group_schedules(self):
     #     group = create_group(default_group=True)
     #     schedule_group = create_schedule_screen(default_schedule_screen=True, group=group)

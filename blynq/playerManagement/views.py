@@ -9,7 +9,7 @@ from contentManagement.models import Content
 from contentManagement.serializers import default_content_serializer
 from customLibrary.custom_settings import PLAYER_POLL_TIME
 from customLibrary.views_lib import debugFileLog, string_to_dict, default_string_to_datetime, obj_to_json_response, \
-    ajax_response, date_changed, timeit, log_query_times
+    ajax_response, date_changed, timeit, log_query_times, mail_exception
 from playerManagement.helpers import screen_schedule_data
 from playerManagement.models import PlayerUpdate, LocalServer, PlayerLog
 from playlistManagement.models import PlaylistItems
@@ -48,7 +48,7 @@ def player_update_available(request):
     except ScreenActivationKey.DoesNotExist:
         debugFileLog.exception('Screen activation key %s does not exist' % unique_device_key)
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
     return obj_to_json_response(player_json)
 
 
@@ -156,7 +156,7 @@ def get_screen_data(request, nof_days=3):
     except Exception as e:
         errors = "Error while fetching the occurences or invalid screen identifier"
         debugFileLog.exception(errors)
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
         campaigns_json = {'campaigns': [], 'is_modified': False}
     return obj_to_json_response(campaigns_json)
 
@@ -173,14 +173,14 @@ def fcm_register(request):
             screen = Screen.objects.get(unique_device_key__activation_key=dev_id)
         except Exception as e:
             debugFileLog.exception('Error while extracting screen object from device id')
-            debugFileLog.exception(e)
+            mail_exception(exception=e)
             return ajax_response(success=False)
         screen.fcm_device = fcm_device
         screen.save()
         success = True
     except Exception as e:
         debugFileLog.exception('Error while saving the fcm device to database')
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
         success = False
     return ajax_response(success=success)
 
@@ -207,7 +207,7 @@ def media_stats(request):
                 media_analytics.save()
             except Exception as e:
                 debugFileLog.exception('Improper media analytics data')
-                debugFileLog.exception(e)
+                mail_exception(exception=e)
         screen_stats = posted_data.get('session_time_list')
         for stat in screen_stats:
             try:
@@ -219,11 +219,11 @@ def media_stats(request):
                                                    session_end_time=session_end_time)
                 screen_analytics.save()
             except Exception as e:
-                debugFileLog.exception(e)
+                mail_exception(exception=e)
         success = True
     except Exception as e:
         success = False
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
     return ajax_response(success=success)
 
 
@@ -237,7 +237,7 @@ def insert_logs(request):
             player_log.save()
         success = True
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
         success = False
     return ajax_response(success=success)
 
@@ -279,7 +279,7 @@ def get_content_urls_local(request, nof_days=1):
         json_obj['success'] = True
         return obj_to_json_response(json_obj)
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
         success = False
         errors = str(e)
         return ajax_response(success=success, errors=errors)
@@ -296,7 +296,7 @@ def update_status(request):
         screen.update_status()
         success = True
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
         success = False
     return ajax_response(success=success)
 
@@ -315,5 +315,5 @@ def screen_info(request):
             return obj_to_json_response(json_data[0])
     except Exception as e:
         debugFileLog.exception('Exception while fetching screen info for device key %s' % unique_device_key)
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
     return obj_to_json_response({})

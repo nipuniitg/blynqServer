@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from blynq.settings import DELETED_CONTENT_DIR, MEDIA_ROOT
 from contentManagement.models import Content
 from customLibrary.custom_settings import PERMANENTLY_DELETE_FILES
-from customLibrary.views_lib import debugFileLog
+from customLibrary.views_lib import debugFileLog, mail_exception
 
 
 def save_relevant_playlists(content_id):
@@ -19,7 +19,7 @@ def save_relevant_playlists(content_id):
             item.playlist.save()
     except Exception as e:
         debugFileLog.exception("Exception while saving the playlist to update last_updated_time")
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
 
 
 @receiver(post_save, sender=Content)
@@ -46,7 +46,7 @@ def delete_actual_file(instance):
                     os.remove(file_src)
                 except Exception as e:
                     debugFileLog.exception('Permanent deletion of file failed with exception')
-                    debugFileLog.exception(e)
+                    mail_exception(exception=e)
             else:
                 dst = '%s/organization%d/' % (DELETED_CONTENT_DIR, instance.organization.organization_id)
                 file_dst = os.path.join(MEDIA_ROOT, dst)
@@ -57,12 +57,12 @@ def delete_actual_file(instance):
                     shutil.move(file_src, full_file_dst)
                 except Exception as e:
                     debugFileLog.error("Error while moving deleted content to media/deletedcontent/organization_id")
-                    debugFileLog.exception(e)
+                    mail_exception(exception=e)
         else:
             debugFileLog.error("To be deleted content %s does not exist" % file_src)
     except Exception as e:
         debugFileLog.exception("Unknown exception while deleting content")
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
 
 
 @receiver(pre_delete, sender=Content)

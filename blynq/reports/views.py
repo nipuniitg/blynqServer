@@ -3,7 +3,7 @@ import pytz
 
 from contentManagement.models import Content
 from customLibrary.views_lib import get_userdetails, generate_utc_datetime, get_ist_date_str, obj_to_json_response, \
-    debugFileLog, string_to_dict, string_to_date, date_to_string
+    debugFileLog, string_to_dict, string_to_date, date_to_string, mail_exception
 from playlistManagement.models import Playlist
 from reports.models import ScreenAnalytics, MediaAnalytics
 from screenManagement.models import Screen
@@ -147,7 +147,7 @@ def screen_reports(request):
         line_chart_data = {'date_str': date_str_list, 'time_active': time_active_list}
         json_dict = {'line_chart_data': line_chart_data, 'pie_chart_data': pie_chart_data, 'table_data': table_data}
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
     return obj_to_json_response(json_dict)
 
 
@@ -198,7 +198,7 @@ def playlist_reports(request):
         line_chart_data = {'date_str': date_str_list, 'time_played': time_played_list}
         json_dict = {'line_chart_data': line_chart_data, 'table_data': table_data}
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
     return obj_to_json_response(json_dict)
 
 
@@ -257,5 +257,5 @@ def media_reports(request):
         line_chart_data = {'date_str': date_str_list, 'time_played': time_played_list}
         json_dict = {'line_chart_data': line_chart_data, 'table_data': table_data}
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
     return obj_to_json_response(json_dict)

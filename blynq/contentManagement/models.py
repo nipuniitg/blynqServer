@@ -11,7 +11,7 @@ from easy_thumbnails.files import get_thumbnailer
 from authentication.models import UserDetails, Organization
 from blynq.settings import BASE_DIR, MEDIA_ROOT, USERCONTENT_DIR, DEFAULT_DISPLAY_TIME, MEDIA_HOST
 from customLibrary.custom_settings import CONTENT_THUMBNAILS
-from customLibrary.views_lib import debugFileLog, get_video_length, full_file_path
+from customLibrary.views_lib import debugFileLog, get_video_length, full_file_path, mail_exception
 
 
 class ContentType(models.Model):
@@ -79,7 +79,7 @@ class Content(models.Model):
                     self.organization.save()
                 except Exception as e:
                     debugFileLog.exception("Received exception while increasing the organization file usage size")
-                    debugFileLog.exception(e)
+                    mail_exception(exception=e)
             else:
                 debugFileLog.warning("The organization " + self.organization.organization_name +
                                      " total file size limit exceeded")
@@ -123,7 +123,7 @@ class Content(models.Model):
         except ContentType.MultipleObjectsReturned:
             content_type = ContentType.objects.filter(file_type=full_file_type)[0]
         except Exception as e:
-            debugFileLog.exception(e)
+            mail_exception(exception=e)
             raise NotSupportedError('%s is not supported at the moment' % full_file_type)
         self.content_type = content_type
         self.increment_size()

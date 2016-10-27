@@ -2,7 +2,7 @@ from django.db.models import Sum
 from django.db.models.signals import post_save, post_delete, pre_delete
 from django.dispatch import receiver
 
-from customLibrary.views_lib import debugFileLog
+from customLibrary.views_lib import debugFileLog, mail_exception
 from playlistManagement.models import PlaylistItems, Playlist
 
 
@@ -22,7 +22,7 @@ def playlist_items_changed(sender, instance, **kwargs):
             playlist.delete()
     except Exception as e:
         debugFileLog.exception('Failed to update the playlist total time for playlist_id %d' % instance.playlist_id)
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
 
 
 @receiver(post_save, sender=Playlist)
@@ -41,4 +41,4 @@ def post_save_playlist(sender, instance, **kwargs):
     except Exception as e:
         debugFileLog.exception("Error while updating the last_updated_time of the schedules "
                                "corresponding to playlist %s" % instance.playlist.playlist_title)
-        debugFileLog.exception(e)
+        mail_exception(exception=e)

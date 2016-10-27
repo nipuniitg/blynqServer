@@ -13,8 +13,7 @@ from authentication.models import Organization, UserDetails
 from customLibrary.custom_settings import CONTENT_ORGANIZATION_NAME
 from contentManagement.models import Content
 from contentManagement.views import process_media
-from customLibrary.views_lib import debugFileLog, get_ist_datetime, date_to_string, ajax_response
-
+from customLibrary.views_lib import debugFileLog, get_ist_datetime, date_to_string, ajax_response, mail_exception
 
 DOWNLOADED_PARTNER_DIRECTORY = '/home/django/partner/'
 
@@ -39,7 +38,7 @@ def process_file(file_path, parent_folder, user_details, organization):
             if delete_old:
                 os.remove(file_path)
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
         debugFileLog.exception('Exception while processing %s ' % file_path)
 
 
@@ -86,7 +85,7 @@ def push_content():
         process_directory(path=path, organization=organization, user_details=user_details, parent_folder=parent_folder)
     except Exception as e:
         debugFileLog.exception('Exception while calling push_content')
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
     print 'All the downloaded partner content has been uploaded successfully'
 
 
@@ -103,7 +102,7 @@ def generate_way2_url(category):
     try:
         category_url_part = '&catid=' + str(way2_categories[category])
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
         category_url_part = '&catid=0'
     return base_way2_url + category_url_part + ftime_url_part + ttime_url_part
 
@@ -170,6 +169,6 @@ def fetch_way2news():
                                    (result.status_code, result.reason))
             success = False
     except Exception as e:
-        debugFileLog.exception(e)
+        mail_exception(exception=e)
         success = False
     return ajax_response(success=success)
