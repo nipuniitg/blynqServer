@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import post_save, pre_delete, post_delete
 from django.dispatch import receiver
 
 from blynq.settings import DELETED_CONTENT_DIR, MEDIA_ROOT
@@ -59,9 +59,9 @@ def delete_actual_file(instance):
                     debugFileLog.error("Error while moving deleted content to media/deletedcontent/organization_id")
                     mail_exception(exception=e)
         else:
-            debugFileLog.error("To be deleted content %s does not exist" % file_src)
+            error = "To be deleted content %s does not exist" % file_src
+            mail_exception(error)
     except Exception as e:
-        debugFileLog.exception("Unknown exception while deleting content")
         mail_exception(exception=e)
 
 
@@ -77,5 +77,11 @@ def pre_delete_content(sender, instance, **kwargs):
             organization.save()
         except Exception as e:
             debugFileLog.exception("Exception while subtracting the deleted file size")
-        delete_actual_file(instance)
     save_relevant_playlists(content_id=instance.content_id)
+
+
+@receiver(post_delete, sender=Content)
+def post_delete_content(sender, instance, **kwargs):
+    debugFileLog.info("inside post_delete_content")
+    if instance.document:
+        delete_actual_file(instance)

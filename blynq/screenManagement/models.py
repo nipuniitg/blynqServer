@@ -180,7 +180,8 @@ class Screen(models.Model):
     screen_calendar = models.ForeignKey(Calendar, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __unicode__(self):
-        return self.screen_name
+        organization_name = self.owned_by.organization_name if self.owned_by else 'Null'
+        return self.screen_name + ' : ' + organization_name
 
     @staticmethod
     def get_user_relevant_objects(user_details):

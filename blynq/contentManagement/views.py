@@ -13,7 +13,7 @@ from contentManagement.serializers import default_content_serializer
 from blynq.settings import TEMP_DIR
 from customLibrary.custom_settings import COMPRESS_IMAGE, WIDGET_SCROLL_TIME
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, \
-    debugFileLog, full_file_path, mail_exception
+    debugFileLog, full_file_path, mail_exception, timeit
 from contentManagement.models import Content, ContentType
 
 
@@ -126,6 +126,7 @@ def video_conversion_required(file_path):
     #     subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
 
 
+@timeit
 def compress_video(file_path, parent_folder=None, user_details=None, organization=None, content_already_saved=False):
     delete_old = True
     conversion_successful = False
@@ -142,7 +143,7 @@ def compress_video(file_path, parent_folder=None, user_details=None, organizatio
         # for line in output.stdout:
         #     if re.match('[0-9]+$', line):
         #         resolution_width = int(line)
-        convert_cmd = 'ffmpeg -i "%s" -vcodec libx264 -vprofile high -preset medium -vf ' \
+        convert_cmd = 'ffmpeg -i "%s" -movflags faststart -vcodec libx264 -vprofile high -preset medium -vf ' \
                       '"scale=2*trunc(iw/2):-2" -threads  0 -acodec copy -strict -2 -b:a 128k "%s"' % (file_path, temp_file_path)
         p = subprocess.Popen(convert_cmd, shell=True, stdout=subprocess.PIPE)
         output, error = p.communicate()
