@@ -34,6 +34,8 @@ else:
     PREPEND_WWW = True
 
 
+ADMINS = [('Issue', 'issue@blynq.in')]
+
 # Application definition
 
 INSTALLED_APPS = (
