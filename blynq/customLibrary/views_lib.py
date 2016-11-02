@@ -16,6 +16,20 @@ from authentication.models import UserDetails
 from blynq.settings import MEDIA_ROOT, DEBUG
 
 
+def send_mail_blynq(to=['hello@blynq.in'], subject='', message=''):
+    try:
+        send_mail(subject=subject, message=message, from_email='django@blynq.in', recipient_list=to,
+                  fail_silently=False)
+    except Exception as e:
+        debugFileLog.error('Error while sending mail to ' + ','.join(to))
+
+
+def mail_exception(exception, to=['nipun@blynq.in'], subject='Recieved exception'):
+    exception = str(exception)
+    debugFileLog.exception(exception)
+    send_mail_blynq(to=to, subject=subject, message=exception)
+
+
 def ajax_response(success=False, errors=[], obj_dict=None):
     context_dic = {'success': success, 'errors': errors}
     if obj_dict:
@@ -69,20 +83,6 @@ def empty_list_for_none(obj):
         return obj
     else:
         return []
-
-
-def send_mail_blynq(to=['hello@blynq.in'], subject='', message=''):
-    try:
-        send_mail(subject=subject, message=message, from_email='django@blynq.in', recipient_list=to,
-                  fail_silently=False)
-    except Exception as e:
-        debugFileLog.error('Error while sending mail to ' + ','.join(to))
-
-
-def mail_exception(exception, to=['issue@blynq.in'], subject='Recieved exception'):
-    exception = str(exception)
-    debugFileLog.exception(exception)
-    send_mail_blynq(to=to, subject=subject, message=exception)
 
 
 def default_string_to_datetime(str, fmt='%d%m%Y%H%M%S'):

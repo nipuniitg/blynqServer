@@ -179,7 +179,7 @@ def fcm_register(request):
         success = True
     except Exception as e:
         debugFileLog.exception('Error while saving the fcm device to database')
-        mail_exception(exception=e)
+        # mail_exception(exception=e)
         success = False
     return ajax_response(success=success)
 

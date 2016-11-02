@@ -491,7 +491,6 @@ def upsert_widget(request):
         content_id = int(posted_data.get('content_id'))
         # TODO: Remove this hard-coding of widget/rss/text
         content_type, created = ContentType.objects.get_or_create(file_type='widget/rss/text')
-        new_widget = False
         if content_id == -1:
             content_id = None
         widget, created = Content.get_user_widgets(user_details=user_details).update_or_create(
