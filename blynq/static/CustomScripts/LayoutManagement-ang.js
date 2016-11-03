@@ -161,12 +161,17 @@ lApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints','
         lDF.getAspectRatios().then(function getAspectRatiosSuccess(data){
             $scope.aspectRatios = data;
             //layout obtained from stateParams
-            $scope.layout = sP.layout;
-            if($scope.layout == null){
-                var newLayout = new blueprints.Layout();
-                newLayout.layout_panes.push(new blueprints.LayoutPane(0));
-                $scope.layout = newLayout;
+            
+            if(sP.layout == null){
+                $scope.layout = new blueprints.Layout();
                 $scope.layout.aspect_ratio = $scope.aspectRatios[0];
+                $scope.layout.layout_panes.push(new blueprints.LayoutPane({ newPaneIndex : 0, layoutAspectRatio: $scope.layout.aspect_ratio}));
+            }else{
+                $scope.layout = sP.layout;
+                for(var i=0; i < sP.layout.layout_panes.length; i++){
+                    var extended = angular.extend($scope.layout.layout_panes[i], {layoutAspectRatio : $scope.layout.aspect_ratio});
+                    $scope.layout.layout_panes[i] = new blueprints.LayoutPane(extended);
+                }
             }
 
             setCanvasDimensions();
@@ -180,8 +185,6 @@ lApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints','
         },function reject(){
 
         })
-
-
 
     };
 
@@ -206,10 +209,9 @@ lApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints','
 
     lDIC.aspectRatioChanged = function(){
         //set layout
-        var newLayout = new blueprints.Layout();
-        newLayout.layout_panes.push(new blueprints.LayoutPane(0));
-        $scope.layout = newLayout;
+        $scope.layout = new blueprints.Layout();
         $scope.layout.aspect_ratio = angular.copy(lDIC.selected_aspect_ratio);
+        $scope.layout.layout_panes.push(new blueprints.LayoutPane({ newPaneIndex : 0, layoutAspectRatio: $scope.layout.aspect_ratio}));
 
         //set new layout defaults
         lDIC.resetLayoutBackup = angular.copy($scope.layout);
@@ -220,7 +222,7 @@ lApp.controller('layoutDesignIndexCtrl', ['$scope','$stateParams','blueprints','
     }
 
     lDIC.addPane = function(){
-        $scope.layout.layout_panes.push(new blueprints.LayoutPane($scope.layout.layout_panes.length));
+        $scope.layout.layout_panes.push(new blueprints.LayoutPane({ newPaneIndex : $scope.layout.layout_panes.length, layoutAspectRatio: $scope.layout.aspect_ratio}));
         $scope.activePaneIndex = $scope.layout.layout_panes.length-1;
         toastr.success('Pane added')
 
@@ -280,7 +282,7 @@ return{
     restrict : 'AE',
     scope : {
         activePaneIndex : '='
-        ,updateActivePaneIndex : '&updateActivePaneFn'
+        ,updateActivePaneFn : '&updateActivePaneFn'
         ,paneObj : '=pane'
         ,index : '='
     }
@@ -336,7 +338,9 @@ return{
         paneDiv.resizable(resizableConfig);
 
         paneDiv.bind('click',function(){
-            $scope.updateActivePaneIndex()($scope.index);
+            if('updateActivePaneFn' in attr){
+               $scope.updateActivePaneFn()($scope.index); 
+            }
         });
 
         var enableActivePaneProperties = function(){
@@ -361,6 +365,13 @@ return{
                 $scope.setActiveClass = false;
             }
         }, true);
+
+
+        $scope.$watchGroup(['paneObj.height', 'paneObj.width'], function(){
+            if(typeof $scope.paneObj.calculatePaneAspectRatio == 'function'){
+                $scope.paneObj.calculatePaneAspectRatio();
+            } 
+        });
 
 
 

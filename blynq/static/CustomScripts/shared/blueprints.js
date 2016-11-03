@@ -89,32 +89,6 @@
             this.content_id = contentFile.content_id;
             this.playlist_item_id = -1;
             this.display_time = contentFile.duration;
-//            this.setDuration = function(contentFile){
-//                var deferred = $q.defer();
-//                switch (this.content_type.split("/")[1]){
-//                    case 'video':
-//                        getDurationFn(contentFile, function(duration){
-//                            deferred.resolve(duration)
-//                        });
-//                        return deferred.promise
-//                        break;
-//                    case 'audio':
-//                        getDurationFn(contentFile, function(duration){
-//                            deferred.resolve(duration)
-//                        });
-//                        return deferred.promise
-//                        break;
-//                    case 'web' :
-//                        var duration = 150;
-//                        deferred.resolve(duration);
-//                        return deferred.promise
-//                        break;
-//                    default :
-//                        var duration = 15;
-//                        deferred.resolve(duration);
-//                        return deferred.promise
-//                }
-//            }
         }
 
         //layouts
@@ -125,16 +99,38 @@
             this.layout_panes=[];
         }
 
-        function LayoutPane(number){
-            var numberAvailable = (typeof number !== "undefined");
-            this.layout_pane_id = -1;
-            this.title = numberAvailable ? "Pane" + number : "Pane"
-            this.left_margin = 0;    //in percentage
-            this.top_margin = 0;    //in percentage
-            this.height = 20;       //in percentage
-            this.width = 25;        // in percentage
-            this.z_index = numberAvailable ? number : 0;
-        }
+        function LayoutPane(argObj){
+            var numberAvailable = (typeof argObj.newPaneIndex !== "undefined");
+            this.layout_pane_id = argObj.layout_pane_id ? argObj.layout_pane_id :  -1;
+            this.title = argObj.title ? argObj.title :  numberAvailable ? "Pane" + argObj.newPaneIndex : "Pane"
+            this.left_margin = argObj.left_margin ? argObj.left_margin : 0;    //in percentage
+            this.top_margin = argObj.top_margin ? argObj.top_margin : 0;    //in percentage
+            this.height = argObj.height ? argObj.height : 20;       //in percentage
+            this.width = argObj.height ? argObj.height : 25;        // in percentage
+            this.z_index = argObj.z_index ? argObj.z_index : numberAvailable ? argObj.newPaneIndex : 0;
+            this.aspect_ratio={};
+
+            this.calculatePaneAspectRatio = function(){
+                var gcd ;
+                if(argObj.layoutAspectRatio.orientation == 'LANDSCAPE'){
+                    gcd = this.getGCD(this.width*argObj.layoutAspectRatio.width_component, this.height*argObj.layoutAspectRatio.height_component);
+                    this.aspect_ratio.width = (this.width * argObj.layoutAspectRatio.width_component)/gcd;
+                    this.aspect_ratio.height = (this.height * argObj.layoutAspectRatio.height_component)/gcd;
+                }else{
+                    gcd = this.getGCD(this.width*argObj.layoutAspectRatio.height_component, this.height*argObj.layoutAspectRatio.width_component);
+                    this.aspect_ratio.width = (this.width * argObj.layoutAspectRatio.height_component)/gcd;
+                    this.aspect_ratio.height = (this.height * argObj.layoutAspectRatio.width_component)/gcd;
+                }
+            };
+
+            this.getGCD = function(a,b){
+                if(b == 0)
+                    return a
+                return this.getGCD(b, a%b)
+            }
+
+            this.calculatePaneAspectRatio();
+        };
 
 
         return{
