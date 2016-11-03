@@ -1,91 +1,4 @@
 <div style="overflow-y: scroll; height:92%">
-    <div ng-if="schedules.length>0" class="table-responsive fill">
-        <table class="table  table-hover table-advanced table-striped ">
-            <thead>
-            <tr>
-                <th>Edit</th>
-                <th>Delete</th>
-                <th class="fix">Title</th>
-                <th>FullScreen/Split Screen</th>
-                <th class="fix">Screens & Groups</th>
-                <th class="fix">Playlist</th>
-                <th class="fix">Timelines</th>
-            </tr>
-            <tr>
-                <th></th>
-                <th></th>
-                <th><input type="form-control" placeholder="search" ng-model="searchSchedules.schedule_title"></th>
-                <th></th>
-                <th><input type="form-control" placeholder="search"
-                           ng-model="searchSchedules.schedule_screens.screen_name">
-                </th>
-                <th><input type="form-control" placeholder="search"
-                           ng-model="searchSchedules.schedule_panes.schedule_playlists.playlist_title">
-                </th>
-                <!--<th><input type="form-control" placeholder="search" ng-model="searchSchedules.timeline"></th>-->
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="schedule in schedules | filter : searchSchedules ">
-                <td><a class="pointer" ng-click="editSchedule($index)"><i class="fa fa-pencil"></i></a></td>
-                <td><a class="pointer" confirm confirm confirm-type="delete" confirm-fn="deleteSchedule($index)">
-                    <i class="fa fa-trash-o"></i></a>
-                </td>
-                <td>{[ schedule.schedule_title ]}</td>
-                <td>
-                    <span ng-show="!schedule.is_split">Full Screen</span>
-                    <span ng-show="schedule.is_split">Split Screen-(Layout: {[schedule.layout.title]})</span>
-                </td>
-                <td>
-                    <div class="tagsinput">
-                        <span class="tag"
-                              ng-repeat="screen in schedule.schedule_screens">
-                            <span> {[screen.screen_name]} &nbsp;&nbsp;</span>
-                        </span>
-                        <span class="tag"
-                              ng-repeat="group in schedule.schedule_groups">
-                            <span> {[group.group_name]} &nbsp;&nbsp;</span>
-                        </span>
-                    </div>
-                </td>
-                <td>
-                    <fieldset ng-repeat="pane in schedule.schedule_panes" class="custom-field-set">
-                        <legend class="custom-field-set">
-                            <a data-toggle="collapse" data-target="#playlist_{[schedule.schedule_id]}_{[$index]}" href="#">
-                                {[ pane.layout_pane.title ]}
-                            </a>
-                        </legend>
-                        <div class="col collapse in" id="playlist_{[schedule.schedule_id]}_{[$index]}">
-                            <div class="tagsinput">
-                                <span class="tag"
-                                      ng-repeat="playlist in pane.schedule_playlists">
-                                    <span> {[playlist.playlist_title]} &nbsp;&nbsp;</span>
-                                </span>
-                                <span class="tag"
-                                  ng-repeat="widget in pane.schedule_widgets">
-                                    <span> {[widget.playlist_title]} &nbsp;&nbsp;</span>
-                                </span>
-                                <span class="tag" ng-if="pane.schedule_blynq_playlists.length>0">
-                                    <span> Blynq-Content &nbsp;&nbsp;</span>
-                                </span>
-                            </div>
-                        </div>
-                    </fieldset>
-                </td>
-                <td>
-                    <fieldset ng-repeat="pane in schedule.schedule_panes" class="custom-field-set">
-                        <legend class="custom-field-set">{[ pane.layout_pane.title ]}</legend>
-                        <div class="tagsinput">
-                        <span class="tag">
-                            <span> {[pane.timeline | timelineLabel]} &nbsp;&nbsp;</span>
-                        </span>
-                        </div>
-                    </fieldset>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
     <!-- no schedules message-->
     <div ng-if="schedules.length==0">
         <div class="row">
@@ -96,6 +9,124 @@
                         and
                         <a add-schedule refresh-schedules-fn="refreshSchedules()" class="pointer">schedule</a>
                     </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div ng-if="schedules.length>0" class="fill">
+        <div class="schedule-details" ng-repeat="schedule in schedules" 
+            style="padding: 5px; margin:5px; border: 1px solid grey;">
+            
+            <!-- screens and groups & Layout-->
+            <div class="row">
+                <div class="col-md-6 col-sm-12">
+                    <!-- Heading -->
+                    <h3><b>{[ schedule.schedule_title ]}</b></h3>
+
+                    <div class="schedule-info" style="padding: 10px;"">
+                        <form class="form-horizontal">
+                            
+                            <!-- screens and groups -->
+                            <div class="row" style="margin-bottom: 10px;">
+                                <div class="control-lable col-md-3">
+                                    Screens and Groups
+                                </div>
+                                <div class="tagsinput">
+                                    <span class="tag"
+                                          ng-repeat="screen in schedule.schedule_screens">
+                                        <span> {[screen.screen_name]} &nbsp;&nbsp;</span>
+                                    </span>
+                                    <span class="tag"
+                                          ng-repeat="group in schedule.schedule_groups">
+                                        <span> {[group.group_name]} &nbsp;&nbsp;</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- layout -->
+                            <div class="row" style="margin-bottom: 10px;">
+                                <div class="col-md-3 control-lable">
+                                    Layout Name
+                                </div>
+                                <div class="col-md-9">
+                                    {[ schedule.layout.title ]}
+                                </div>
+                            </div>
+
+                            <!-- edit and Delete -->
+                            <div class="row" style="margin-bottom: 10px;">
+                                <div class="col-md-12">
+                                    <button class="btn btn-primary" ng-click="editSchedule($index)" style="margin-right: 5px;">
+                                        <i class="fa fa-pencil"></i> Edit
+                                    </button>
+                                    <button class="btn btn-danger" confirm confirm confirm-type="delete"        confirm-fn="deleteSchedule($index)">
+                                        <i class="fa fa-trash-o"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                            
+                        </form>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <div class="schedule-layout" style="margin: 0 10px 10px 0;">
+                        <div class="layout-preview-wrapper pull-right">
+                            <pane-template ng-repeat="pane in schedule.layout.layout_panes"
+                                           index="$index"
+                                           pane="pane">
+                            </pane-template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="schedule-timeline-playlists" style="padding: 10px;">
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <!-- panes-->
+                                    <th> </th>
+                                    <th ng-repeat="pane in schedule.schedule_panes" 
+                                        style="text-align:center">
+                                        {[ pane.layout_pane.title ]}
+                                        <span style="margin-left: 10px;" ng-class="{'icon_vol-mute' : pane.mute_audio,    'icon_volume-high' : !pane.mute_audio }"></span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <!-- timeline-->
+                            <tr>
+                                <td> <h5><b>Timeline</b></h5> </td>
+                                <td ng-repeat="pane in schedule.schedule_panes">
+                                    <div class="tagsinput">
+                                    <span class="tag">
+                                        <span> {[pane.timeline | timelineLabel]} &nbsp;&nbsp;</span>
+                                    </span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- playlists -->
+                            <tr>
+                                <td> <h5><b>Playlists</b></h5> </td>
+                                <td ng-repeat="pane in schedule.schedule_panes">
+                                    <div class="tagsinput">
+                                        <span class="tag"
+                                              ng-repeat="playlist in pane.schedule_playlists">
+                                            <span> {[playlist.playlist_title]} &nbsp;&nbsp;</span>
+                                        </span>
+                                        <span class="tag"
+                                          ng-repeat="widget in pane.schedule_widgets">
+                                            <span> {[widget.playlist_title]} &nbsp;&nbsp;</span>
+                                        </span>
+                                        <span class="tag" ng-if="pane.schedule_blynq_playlists.length>0">
+                                            <span> Blynq-Content &nbsp;&nbsp;</span>
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
