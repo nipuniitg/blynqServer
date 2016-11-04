@@ -1347,10 +1347,6 @@ sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal','bluepr
         ,scope      :   {
             refreshSchedules : '&refreshSchedulesFn'
         }
-//        ,template:   '<a class="btn  btn-primary pull-right" ng-click="addSchedule()">\
-//                        <i class="fa fa-plus"></i> \
-//                        Add Schedule\
-//                        </a>'
         ,link : function($scope, elem){
                 var openModalPopup = function(index){
                     var newSchedule = new blueprints.Schedule();
@@ -1387,11 +1383,6 @@ sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal','bluepr
                             toastr.warning('schedule cancelled')
                         });
                     });
-
-
-
-
-
                 };
 
                 elem.on('click', function(){
@@ -1402,3 +1393,177 @@ sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal','bluepr
 }]);
 
 //*end Add schedule
+
+// preview
+
+sdApp.directive('previewSchedule',['$uibModal', function($uibModal){
+    return{
+        restrict : 'AE'
+        ,scope : {
+            schedule : '='
+        }
+        ,link : function($scope, $elem, attr){
+
+            var schedule;
+
+            $elem.bind('click', function(){
+                //prepare the schedule to pass it to the schedule- preview - viewer
+                schedule = angular.copy($scope.schedule);
+                mergeAllPlaylists();
+                openModalPopup();
+            });
+
+            var mergeAllPlaylists = function(){
+                for(var i=0; i< schedule.schedule_panes.length; i++){
+                    var allPlaylistItems = [];
+                    for(var j=0; j<schedule.schedule_panes[i].schedule_playlists.length; j++){
+                        allPlaylistItems =  allPlaylistItems.concat(schedule.schedule_panes[i].schedule_playlists[j].playlist_items);
+                    }
+                    schedule.schedule_panes[i].all_playlist_items = allPlaylistItems;
+                }
+            };
+
+            var openModalPopup = function(){
+                var modalInstance = $uibModal.open({
+                    animation: true
+                    ,windowTemplateUrl : '/static/templates/scheduleManagement/_preview_player_window.html'
+                    ,templateUrl: '/static/templates/scheduleManagement/_preview_player_modal.html'
+                    ,controller: 'previewPlayerCtrl'
+                    ,backdrop: 'static' //disables modal closing by click on the backdrop.
+                    ,resolve: {
+                        schedule: schedule
+                    }
+                });
+                modalInstance.result.then(function saved(){
+
+                }, function cancelled(){
+                    toastr.success('preview closed');
+                });
+            };
+
+        }
+    }
+}]);
+
+sdApp.controller('previewPlayerCtrl',['$scope','$uibModalInstance','schedule',
+    function($scope, $uibModalInstance, schedule){
+    var onLoad = function(){
+        $scope.schedule = schedule;
+    };
+
+    $scope.close = function(){
+        $uibModalInstance.close();
+    };
+
+    onLoad();
+
+}]);
+
+sdApp.directive('previewPlayerPane', ['$timeout',
+ function($timeout){
+    return{
+        restrict : 'E'
+        ,scope : {
+            schedulePane : '=schedulePane'
+        }
+        ,templateUrl : '/static/templates/scheduleManagement/_preview_player_pane.html'
+        ,link : function($scope, elem, attr){
+            var totalPlayableItems;
+            var timer = new Timer();
+
+            var onLoad = function(){
+                // $scope.defaultImageUrl = pPConfig.defaultImageUrl;
+                // $scope.loadingImageUrl = pPConfig.loadingImageUrl;
+                // $scope.audioGIFUrl     = pPConfig.audioGIFUrl    ;
+                totalPlayableItems = $scope.schedulePane.all_playlist_items.length;
+                if(totalPlayableItems >0){
+                    startNewPlaylistItem();
+                }
+                else{
+                    $scope.isMediaType.default= true;
+                }
+            }
+
+            var startNewPlaylistItem = function(){
+                //cancelTimeoutProm();
+                timer.stop();
+                //setIsLoading(false);
+
+                //set up and actions for new item
+                updatePlayingItemIndexAndDuration();
+                setTimeout();
+            };
+
+            var setTimeout = function () {
+                timer.start(startNewPlaylistItem, $scope.playingItemDuration);
+            };
+
+            var updatePlayingItemIndexAndDuration = function(){
+                if(angular.isDefined($scope.playingItemIndex)){
+                    if(($scope.playingItemIndex+1) < totalPlayableItems)
+                    {
+                        $scope.playingItemIndex += 1;
+                    }
+                    else{
+                        $scope.playingItemIndex =0;
+                    }                       
+                }else{
+                    $scope.playingItemIndex =0;
+                }
+                $scope.playingItemDuration =$scope.schedulePane.all_playlist_items[$scope.playingItemIndex].display_time *1000;
+                $scope.currentPlaylistItem = $scope.schedulePane.all_playlist_items[$scope.playingItemIndex];
+            };
+
+            function Timer(){
+                var timeoutPromise, start, remaining, callback
+
+                this.pause = function() {
+                    $timeout.cancel(timeoutPromise);
+                    remaining -= new Date() - start;
+                };
+
+                this.resume = function() {
+                    start = new Date();
+                    if(timeoutPromise != null){
+                        $timeout.cancel(timeoutPromise);
+                    }
+                    timeoutPromise = $timeout(callback, remaining);
+                };
+
+                this.start = function(callbackFn, delay){
+                    remaining = delay
+                    ,callback = callbackFn;
+
+                    this.resume();
+                };
+
+                this.stop = function(){
+                    $timeout.cancel(timeoutPromise);
+                };
+            };
+
+            onLoad();
+        }
+    }
+}]);
+
+sdApp.directive('muteDir', [ function(){
+    /*
+        MuteDir adds the attr 'muted' to elem based on the 
+        mute_audio boolean set by the users in a schedule.
+    */
+    return{
+        restrict : 'A'
+        ,link : function($scope, elem, attr){
+            if(attr['muteDir'] == 'true')
+            {
+                elem.attr('muted', '');
+            }
+            else if(attr['muteDir'] == 'false'){
+                elem.removeAttr('muted');
+            }
+        }
+    }
+}]);
+// end-preview
+

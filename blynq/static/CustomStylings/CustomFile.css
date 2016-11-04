@@ -687,11 +687,54 @@ input[type=number]::-webkit-outer-spin-button {
     height: 100%;
     width : 100%;
     text-align:center;
+    position: relative;
+}
+
+.media-wrapper.rss-text{
+    background: black;
+    color : white;
 }
 
 .media-content{
     object-fit: contain;
     height: 100%;
     width : 100%;
+}
+
+.media-content.img{
+    position: absolute;
+    top:0px;
+    left:0px;
+}
+
+.img-blur{
+    object-fit: fill;
+    filter: blur(10px);
+    position: relative;
+}
+
+.media-content.video{
+    object-fit: fill;
+}
+
+
+
+/* Preview */
+.preview-tv{
+    position: relative;
+    padding : 20px 20px 35px 20px;
+    background-image: -webkit-linear-gradient(-45deg, rgb(76, 76, 76) 0px, rgb(89, 89, 89) 12%, 
+        rgb(102, 102, 102) 25%, rgb(71, 71, 71) 39%, rgb(44, 44, 44) 50%, rgb(0, 0, 0) 50%, 
+        rgb(17, 17, 17) 60%, rgb(43, 43, 43) 76%, rgb(28, 28, 28) 91%, rgb(19, 19, 19) 100%);
+
+    background-image : --o-linear-gradient(-45deg, rgb(76, 76, 76) 0px, rgb(89, 89, 89) 12%,
+        rgb(102, 102, 102) 25%, rgb(71, 71, 71) 39%, rgb(44, 44, 44) 50%, rgb(0, 0, 0) 50%,
+        rgb(17, 17, 17) 60%, rgb(43, 43, 43) 76%, rgb(28, 28, 28) 91%, rgb(19, 19, 19) 100%);
+    background-image : -moz-linear-gradient(-45deg, rgb(76, 76, 76) 0px, rgb(89, 89, 89) 12%,
+        rgb(102, 102, 102) 25%, rgb(71, 71, 71) 39%, rgb(44, 44, 44) 50%, rgb(0, 0, 0) 50%,
+        rgb(17, 17, 17) 60%, rgb(43, 43, 43) 76%, rgb(28, 28, 28) 91%, rgb(19, 19, 19) 100%);
+    background-image : linear-gradient(-45deg, rgb(76, 76, 76) 0px, rgb(89, 89, 89) 12%,
+        rgb(102, 102, 102) 25%, rgb(71, 71, 71) 39%, rgb(44, 44, 44) 50%, rgb(0, 0, 0) 50%,
+        rgb(17, 17, 17) 60%, rgb(43, 43, 43) 76%, rgb(28, 28, 28) 91%, rgb(19, 19, 19) 100%);        
 }
 

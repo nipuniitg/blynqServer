@@ -1,0 +1,19 @@
+<!-- Ctrl : previewViewerCtrl -->
+<div class="preview-player stretch">
+	<div class="modal-header">
+        <button type="button" class="close" ng-click="close()" aria-hidden="true">
+        	<i class="fa fa-times"></i>
+        </button>
+        <h3 class="modal-title">Preview</h3>
+    </div>
+    <div class="modal-body" style="height: calc(100% - 52px); padding: 0px;">
+    	<div class="preview-tv stretch">
+    		<div class="preview-pane-wrapper stretch" style="position : relative;background: white;">
+    			<preview-player-pane  ng-repeat="schedulePane in schedule.schedule_panes"
+            		schedule-pane="schedulePane">
+        		</preview-player-pane>
+    		</div>
+    	</div>
+    </div>
+</div>
+

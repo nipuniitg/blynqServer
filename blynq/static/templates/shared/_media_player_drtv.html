@@ -4,8 +4,9 @@
 
     <!-- image-->
     <div ng-if="isMediaType.image" class="media-wrapper">
+        <img ng-if="showImageBlur" ng-src="{[ mediaFile.url | trusted]}" class="img-blur stretch">
         <img ng-src="{[ mediaFile.url | trusted]}"
-             class="media-content" >
+             class="media-content img" >
     </div>
 
     <!-- pdf -->
@@ -23,7 +24,8 @@
 
     <!-- video -->
     <div ng-if="isMediaType.video" class="media-wrapper">
-        <video controls autoplay class="media-content"
+        <video controls autoplay class="media-content video"
+                mute-dir="{[ muteAudio ]}"
                ng-src="{[mediaFile.url | trusted]}"
                 >
             <!--<source ng-src="{[file.url | trusted]}">-->
@@ -33,7 +35,7 @@
 
     <!-- audio -->
     <div ng-if="isMediaType.audio" class="media-wrapper">
-        <audio controls autoplay class="media-content"
+        <audio controls autoplay class="media-content" mute-dir="{[ muteAudio ]}"
                ng-src="{[mediaFile.url | trusted]}">
         <!--<source ng-src="{[file.url | trusted]}">-->
             Your browser does not support HTML5 video.

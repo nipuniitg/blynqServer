@@ -480,14 +480,22 @@ plApp.factory('youtubeFactory', [function(){
     };
 }]);
 
-plApp.directive('mediaPlayer', [function(){
+plApp.directive('mediaPlayer', ['$timeout', function($timeout){
     return{
         restrict:'E'
         ,templateUrl : '/static/templates/shared/_media_player_drtv.html'
         ,scope:{
             mediaFile : '='
+            ,muteAudio : '='
         }
-        ,link : function($scope, elem){
+        ,link : function($scope, elem, attr){
+
+            var onLoad = function(){
+                if(!('muteAudio' in attr)){
+                    $scope.muteAudio = false;
+                }
+                $scope.showImageBlur = ('schedulePreviewMode' in attr) ? true : false;
+            }
 
             $scope.$watch('mediaFile', function(){
                 setMediaType();
@@ -542,16 +550,18 @@ plApp.directive('mediaPlayer', [function(){
 
             var setUpRssTextMedia = function(){
                 //set font-size according to the div height
-			    	var $div = $('.media-player'+ ' .rss-text')
-			    	var divHeight = $div.height();
-			    	$div.css({
-						'font-size': (divHeight/2) + 'px',
-						'line-height': divHeight + 'px'
-					});
-            }
+                $timeout(function(){
+                    var $div = $('.media-player .rss-text');
+                    var divHeight = $div.height();
+                    $div.css({
+                        'font-size': (divHeight/2) + 'px',
+                        'line-height': divHeight + 'px'
+                    });
+                }, 300);
+			    
+            };
 
-
-
+            onLoad();
         }
     }
 }]);

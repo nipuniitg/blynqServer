@@ -57,10 +57,15 @@
                             <!-- edit and Delete -->
                             <div class="row" style="margin-bottom: 10px;">
                                 <div class="col-md-12">
-                                    <button class="btn btn-primary" ng-click="editSchedule($index)" style="margin-right: 5px;">
+                                    <button class="btn btn-info" preview-schedule 
+                                    schedule="schedule" style="margin:0 5px 5px 0;">
+                                        <i class="fa fa-eye"></i> Preview
+                                    </button>
+                                    <button class="btn btn-primary" ng-click="editSchedule($index)" style="margin:0 5px 5px 0;">
                                         <i class="fa fa-pencil"></i> Edit
                                     </button>
-                                    <button class="btn btn-danger" confirm confirm confirm-type="delete"        confirm-fn="deleteSchedule($index)">
+                                    <button class="btn btn-danger" confirm confirm-type="delete"        confirm-fn="deleteSchedule($index)" 
+                                            style="margin:0 5px 5px 0;">
                                         <i class="fa fa-trash-o"></i> Delete
                                     </button>
                                 </div>
