@@ -94,6 +94,7 @@ def update_user_details(request):
         user_details.save()
         success = True
     except Exception as e:
+        debugFileLog.error('Request body is ' + str(request.body))
         mail_exception(exception=e)
         errors = ['Improper User details']
         success = False
@@ -124,6 +125,7 @@ def change_password(request):
     except Exception as e:
         success = False
         errors = ['Password change unsuccessful']
+        debugFileLog.error('Request body is ' + str(request.body))
         mail_exception(exception=e)
     return ajax_response(success=success, errors=errors)
 
@@ -146,29 +148,35 @@ def divertToLandingPage(request):
 
 
 def request_quote(request):
-    posted_data = string_to_dict(request.body)
     success = False
     errors = []
-    if request.method == 'POST':
-        request_quote_form = RequestQuoteForm(data=posted_data)
-        if request_quote_form.is_valid():
-            try:
-                request_quote_form.save()
-                message = 'Name: ' + str(posted_data.get('name')) + '\n\n'
-                message += 'E-mail: ' + str(posted_data.get('email')) + '\n\n'
-                message += 'Mobile Number: ' + str(posted_data.get('mobile_number')) + '\n\n'
-                message += 'Number of Devices: ' + str(posted_data.get('num_of_devices')) + '\n\n'
-                message += 'Additional Details: ' + str(posted_data.get('additional_details')) + '\n\n'
-                send_mail_blynq(subject='[Auto-Generated] Quote Requested', message=message)
-                success = True
-            except Exception as e:
-                mail_exception(exception=e)
-                error = "Error while saving the requested Quote"
+    try:
+        posted_data = string_to_dict(request.body)
+        success = False
+        errors = []
+        if request.method == 'POST':
+            request_quote_form = RequestQuoteForm(data=posted_data)
+            if request_quote_form.is_valid():
+                try:
+                    request_quote_form.save()
+                    message = 'Name: ' + str(posted_data.get('name')) + '\n\n'
+                    message += 'E-mail: ' + str(posted_data.get('email')) + '\n\n'
+                    message += 'Mobile Number: ' + str(posted_data.get('mobile_number')) + '\n\n'
+                    message += 'Number of Devices: ' + str(posted_data.get('num_of_devices')) + '\n\n'
+                    message += 'Additional Details: ' + str(posted_data.get('additional_details')) + '\n\n'
+                    send_mail_blynq(subject='[Auto-Generated] Quote Requested', message=message)
+                    success = True
+                except Exception as e:
+                    mail_exception(exception=e)
+                    error = "Error while saving the requested Quote"
+                    errors.append(error)
+            else:
+                error = "Request Quote form data is not valid"
+                debugFileLog.exception(error)
                 errors.append(error)
-        else:
-            error = "Request Quote form data is not valid"
-            debugFileLog.exception(error)
-            errors.append(error)
+    except Exception as e:
+        debugFileLog.error('request body is ' + str(request.body))
+        mail_exception(e)
     return ajax_response(success=success, errors=errors)
 
 

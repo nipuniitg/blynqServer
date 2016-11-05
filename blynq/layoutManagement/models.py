@@ -1,11 +1,8 @@
 from django.core.validators import MaxValueValidator
 from django.db import models
-from django.db.models.signals import pre_delete, post_save
-from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 
 from authentication.models import Organization, UserDetails
-from customLibrary.views_lib import debugFileLog
 from screenManagement.models import AspectRatio
 
 

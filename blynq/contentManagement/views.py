@@ -59,9 +59,9 @@ def upsert_url(request):
         else:
             errors = ['Please enter a valid URL']
     except Exception as e:
-        debugFileLog.exception('Received exception')
+        debugFileLog.error('Request body is %s' % request.body)
         mail_exception(exception=e)
-        errors = str(e)
+        errors = 'Error while creating the new URL, a mail has already been sent to the support team.'
     return ajax_response(success=success, errors=errors)
 
 
@@ -113,6 +113,9 @@ def compress_image(file_path, parent_folder=None, user_details=None, organizatio
         conversion_successful = True
         delete_old = True
     except Exception as e:
+        debugFileLog.error('compress_image inputs are ' + 'file_path ' + str(file_path) + ' parent_folder ' +
+                           str(parent_folder) + ' user_details ' + str(user_details) +
+                           ' organization ' + str(organization) + 'content_already_saved ' + str(content_already_saved))
         mail_exception(exception=e)
         conversion_successful = False
         delete_old = False
@@ -130,10 +133,10 @@ def video_conversion_required(file_path):
 def compress_video(file_path, parent_folder=None, user_details=None, organization=None, content_already_saved=False):
     delete_old = True
     conversion_successful = False
-    filename = os.path.basename(file_path)
-    title, ext = os.path.splitext(filename)
-    temp_file_path = full_file_path(relative_path='temp/converted_' + title + '.mp4')
     try:
+        filename = os.path.basename(file_path)
+        title, ext = os.path.splitext(filename)
+        temp_file_path = full_file_path(relative_path='temp/converted_' + title + '.mp4')
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
         # resolution_width = 480
@@ -163,6 +166,9 @@ def compress_video(file_path, parent_folder=None, user_details=None, organizatio
             mail_exception(exception=e)
         return conversion_successful, delete_old
     except Exception as e:
+        debugFileLog.error('compress_image inputs are ' + 'file_path ' + str(file_path) + ' parent_folder ' +
+                           str(parent_folder) + ' user_details ' + str(user_details) +
+                           ' organization ' + str(organization) + 'content_already_saved ' + str(content_already_saved))
         mail_exception(exception=e)
         return conversion_successful, delete_old
 
@@ -224,8 +230,9 @@ def upload_content(request):
         success = success and conversion_success
     except Exception as e:
         success = False
+        debugFileLog.error('Request post is ' + str(request.POST))
         error_str = 'Error while uploading the file'
-        debugFileLog.exception(error_str)
+        debugFileLog.error(e)
         errors.append(error_str)
     return ajax_response(success=success, errors=errors)
 
@@ -233,27 +240,31 @@ def upload_content(request):
 @transaction.atomic
 @login_required
 def delete_content(request):
+    success = False
+    deleted_content_ids = []
     user_details = get_userdetails(request)
     # user_content = Content.objects.filter(Q(uploaded_by=user_details) | Q(organization=organization))
-    user_content = Content.get_user_filesystem(user_details=user_details)
-    posted_data = string_to_dict(request.body)
-    content_ids = posted_data.get('content_ids')
-    deleted_content_ids = []
-    sid = -1
     try:
-        with transaction.atomic():
-            for content_id in content_ids:
-                required_content = user_content.get(content_id=int(content_id))
-                required_content.delete()
-                sid = transaction.savepoint()
-                deleted_content_ids.append(content_id)
-            success = True
+        user_content = Content.get_user_filesystem(user_details=user_details)
+        posted_data = string_to_dict(request.body)
+        content_ids = posted_data.get('content_ids')
+        sid = -1
+        try:
+            with transaction.atomic():
+                for content_id in content_ids:
+                    required_content = user_content.get(content_id=int(content_id))
+                    required_content.delete()
+                    sid = transaction.savepoint()
+                    deleted_content_ids.append(content_id)
+                success = True
+        except Exception as e:
+            debugFileLog.error('Exception is')
+            debugFileLog.error(e)
+            success = False
+            if sid != -1:
+                transaction.savepoint_rollback(sid)
     except Exception as e:
-        debugFileLog.error('Exception is')
-        debugFileLog.error(e)
-        success = False
-        if sid != -1:
-            transaction.savepoint_rollback(sid)
+        debugFileLog.error('request body is ' + str(request.body))
     return ajax_response(success=success, errors='Invalid content',
                          obj_dict={'deleted_content_ids': deleted_content_ids})
 
@@ -282,6 +293,7 @@ def create_folder(request):
                                is_folder=True)
         success = True
     except Exception as e:
+        debugFileLog.error('request body is ' + str(request.body))
         mail_exception(exception=e)
         errors = 'Error with the submitted data in create folder'
     return ajax_response(success=success, errors=errors)
@@ -410,6 +422,7 @@ def update_content_title(request):
             content.save()
             success = True
         except Exception as e:
+            debugFileLog.error('request body is ' + str(request.body))
             mail_exception(exception=e)
             error = 'Error while saving the title to the database'
             errors.append(error)
@@ -444,7 +457,7 @@ def move_content(request):
             content.save()
         except Content.DoesNotExist:
             success = False
-            error = 'Error occured while moving the items. please refresh and try again.'
+            error = 'Error occurred while moving the items. please refresh and try again.'
     return ajax_response(success=success, errors=errors)
 
 
