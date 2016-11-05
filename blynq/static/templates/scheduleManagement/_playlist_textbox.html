@@ -3,7 +3,10 @@
         <div id="inpPlaylistsAndWidgets" class="tagsinput " style="height: 100%;" data-as-sortable=""
                                      data-ng-model="selectedPlaylists">
             <span class="tag" ng-repeat="playlist in selectedPlaylists" data-as-sortable-item>
-                <span data-as-sortable-item-handle> {[playlist.playlist_title]} &nbsp;&nbsp;</span>
+                <span data-as-sortable-item-handle> 
+                    <span content-slider slide-content="playlist.playlist_items" index="0">
+                        {[playlist.playlist_title]} &nbsp;&nbsp;</span>
+                    </span>
                 <a class="tagsinput-remove-link"
                    ng-click="removePlaylist($index)"></a>
             </span>

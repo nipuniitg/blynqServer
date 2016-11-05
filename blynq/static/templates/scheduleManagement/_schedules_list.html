@@ -117,7 +117,8 @@
                                 <td ng-repeat="pane in schedule.schedule_panes">
                                     <div class="tagsinput">
                                         <span class="tag"
-                                              ng-repeat="playlist in pane.schedule_playlists">
+                                              ng-repeat="playlist in pane.schedule_playlists"
+                                              content-slider slide-content="playlist.playlist_items" index="0">
                                             <span> {[playlist.playlist_title]} &nbsp;&nbsp;</span>
                                         </span>
                                         <span class="tag"

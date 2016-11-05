@@ -18,7 +18,7 @@
                   {
                       var onLoad = function(){
                         $scope.slideContent = resolvedObj.slideContent
-                        $scope.index = resolvedObj.index
+                        $scope.index = (typeof resolvedObj.index == 'number') ?  resolvedObj.index : 0;
                       }
 
                       onLoad();
