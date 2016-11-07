@@ -50,9 +50,10 @@ def get_userdetails(request):
 
 
 def string_to_dict(str):
-    json_acceptable_string = str.replace("'", "\"")
+    # apostrophe is not working if the below line is uncommented
+    # json_acceptable_string = str.replace("'", "\"")
     try:
-        obj = json.loads(json_acceptable_string)
+        obj = json.loads(str)
     except Exception as e:
         obj = {}
         debugFileLog.exception('Exception in string_to_dict for str: %s' % str)
