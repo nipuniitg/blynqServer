@@ -54,7 +54,8 @@ class ScreenTest(TestCase):
     def test_screen(self):
         screen = create_screen()
         self.assertTrue(isinstance(screen, Screen))
-        self.assertEqual(screen.__unicode__(), screen.screen_name)
+        unicode_str = screen.screen_name + ' : ' + screen.owned_by.organization_name
+        self.assertEqual(screen.__unicode__(), unicode_str)
         organization2 = create_organization(default_organization=False)
         new_userdetails = create_userdetails(default_userdetails=False, organization=organization2)
         screen2 = create_screen(default_screen=False, userdetails=new_userdetails)

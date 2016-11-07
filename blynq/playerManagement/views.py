@@ -124,6 +124,7 @@ def get_screen_data(request, nof_days=3):
     :param nof_days: optional argument mentioning the time interval for the events
     :return:
     """
+    campaigns_json = {'campaigns': [], 'is_modified': False}
     try:
         posted_data = string_to_dict(request.body)
         # the datetime format of last_received should be "%2d%2m%4Y%2H%2M%2S"
@@ -133,8 +134,12 @@ def get_screen_data(request, nof_days=3):
         last_received_datetime = default_string_to_datetime(last_received)
         start_time = timezone.now()
         end_time = start_time + datetime.timedelta(days=nof_days)
-        screen = Screen.objects.select_related('screen_data_modified').get(
-            unique_device_key__activation_key=unique_device_key)
+        try:
+            screen = Screen.objects.select_related('screen_data_modified').get(
+                unique_device_key__activation_key=unique_device_key)
+        except Exception as e:
+            debugFileLog.error(e)
+            return obj_to_json_response(campaigns_json)
         is_modified = True
         # Update the screen status saying that it is active
         screen.update_status()
@@ -156,7 +161,6 @@ def get_screen_data(request, nof_days=3):
         errors = "Error while fetching the occurences or invalid screen identifier"
         debugFileLog.exception(errors)
         mail_exception(exception=e)
-        campaigns_json = {'campaigns': [], 'is_modified': False}
     return obj_to_json_response(campaigns_json)
 
 
@@ -191,6 +195,7 @@ def media_stats(request):
         posted_data = string_to_dict(request.body)
         unique_device_key = posted_data.get('device_key')
         screen = Screen.objects.get(unique_device_key__activation_key=unique_device_key)
+        debugFileLog.info(' for screen %s with key %s' % (screen.screen_name, unique_device_key))
         media_stats_list = empty_list_for_none(posted_data.get('media_item_stats_list'))
         for stat in media_stats_list:
             try:
@@ -200,13 +205,16 @@ def media_stats(request):
                 time_played = stat.get('time_played')
                 time_played = int(time_played) if time_played else 0
                 date = stat.get('date')
+                if not date:
+                    continue
                 converted_date = default_string_to_datetime(date, fmt='%Y-%m-%d')
                 media_analytics = MediaAnalytics(screen=screen, content_id=content_id, playlist_id=playlist_id,
                                                  count=count, date=converted_date, time_played=time_played)
                 media_analytics.save()
             except Exception as e:
                 debugFileLog.exception('Improper media analytics data')
-                mail_exception(exception=e)
+                debugFileLog.error(e)
+                # mail_exception(exception=e)
         screen_stats = empty_list_for_none(posted_data.get('session_time_list'))
         for stat in screen_stats:
             try:
@@ -218,11 +226,12 @@ def media_stats(request):
                                                    session_end_time=session_end_time)
                 screen_analytics.save()
             except Exception as e:
-                mail_exception(exception=e)
+                debugFileLog.error(e)
+                # mail_exception(exception=e)
         success = True
     except Exception as e:
         success = False
-        mail_exception(exception=e)
+        # mail_exception(exception=e)
     return ajax_response(success=success)
 
 

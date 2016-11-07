@@ -21,8 +21,8 @@ class LayoutTest(TestCase):
         organization2 = create_organization(default_organization=False)
         new_userdetails = create_userdetails(default_userdetails=False, organization=organization2)
         new_layout = create_layout(default_layout=False, is_split=True, userdetails=new_userdetails)
-        user_layout = Layout.get_user_relevant_objects(user_details=new_userdetails)
-        self.assertEqual(list(user_layout), list([new_layout]))
+        user_layouts = Layout.get_user_relevant_objects(user_details=new_userdetails)
+        self.assertIn(new_layout, user_layouts)
         print 'test_layout_methods completed successfully'
 
 
@@ -52,7 +52,11 @@ class LayoutViewsTest(TestCase):
     def test_get_layouts(self):
         print 'test_get_layouts started'
         url = reverse('get_layouts')
-        verify_get_result(self, expected_result=[generate_layout_dict(self.layout1)], url=url, view_func=get_layouts)
+        expected_result = [generate_layout_dict(self.layout1)]
+        default_layouts = Layout.objects.filter(organization=self.layout1.organization, is_default=True)
+        for layout in default_layouts:
+            expected_result.append(generate_layout_dict(layout))
+        verify_get_result(self, expected_result=expected_result, url=url, view_func=get_layouts)
         print 'test_get_layouts completed successfully'
 
     def test_delete_layout(self):
