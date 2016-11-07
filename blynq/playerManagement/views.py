@@ -72,7 +72,8 @@ def device_key_active(request):
         screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key)
         if not screen_activation_key.verified:
             error = 'New device with device key %s is asking for activation. ' % activation_key
-            error += 'Check the verified boolean if the device is valid.'
+            error += 'Set the verified boolean if the device is valid.'
+            mail_exception(error)
             debugFileLog.warning(error)
             # elif screen_activation_key.in_use:
             #     error = 'Device activation key %s is already in use.' % activation_key
@@ -86,7 +87,7 @@ def device_key_active(request):
         error += 'Adding it, check the verified boolean if the device is valid.\n'
         debugFileLog.warning(error)
         try:
-            screen_activation_key = ScreenActivationKey(activation_key=activation_key, verified=True)
+            screen_activation_key = ScreenActivationKey(activation_key=activation_key)
             screen_activation_key.save()
         except Exception as e:
             db_error = 'Adding the above activation_key to the database failed with the exception {0} \n'.format(str(e))

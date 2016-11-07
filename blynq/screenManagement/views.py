@@ -173,6 +173,7 @@ def upsert_screen(request):
             # TODO: The above case only handles the PRIVATE businessType, add a check
             success = True
     except Exception as e:
+        debugFileLog.exception(str(request.body))
         mail_exception(exception=e)
         errors = ['Error while adding the screen details to database']
         success = False
