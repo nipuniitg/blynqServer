@@ -9,7 +9,7 @@ from contentManagement.models import Content
 from contentManagement.serializers import default_content_serializer
 from customLibrary.custom_settings import PLAYER_POLL_TIME
 from customLibrary.views_lib import debugFileLog, string_to_dict, default_string_to_datetime, obj_to_json_response, \
-    ajax_response, date_changed, timeit, mail_exception
+    ajax_response, date_changed, timeit, mail_exception, empty_list_for_none
 from playerManagement.helpers import screen_schedule_data
 from playerManagement.models import PlayerUpdate, LocalServer, PlayerLog
 from playlistManagement.models import PlaylistItems
@@ -191,7 +191,7 @@ def media_stats(request):
         posted_data = string_to_dict(request.body)
         unique_device_key = posted_data.get('device_key')
         screen = Screen.objects.get(unique_device_key__activation_key=unique_device_key)
-        media_stats_list = posted_data.get('media_item_stats_list')
+        media_stats_list = empty_list_for_none(posted_data.get('media_item_stats_list'))
         for stat in media_stats_list:
             try:
                 content_id = int(stat.get('content_id'))
@@ -207,7 +207,7 @@ def media_stats(request):
             except Exception as e:
                 debugFileLog.exception('Improper media analytics data')
                 mail_exception(exception=e)
-        screen_stats = posted_data.get('session_time_list')
+        screen_stats = empty_list_for_none(posted_data.get('session_time_list'))
         for stat in screen_stats:
             try:
                 start_time = stat.get('session_start_time')
