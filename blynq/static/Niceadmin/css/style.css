@@ -15,7 +15,7 @@ body {
     font-family: 'Lato', sans-serif;
     padding: 0px !important;
     margin: 0px !important;
-    font-size:14px !important;    
+    font-size:12px !important;    
 }
 h1,h2,h3,h4,h5{
     font-weight: 300;
@@ -1073,6 +1073,7 @@ div[data-role="editor-toolbar"] {
 }
 .panel .panel-heading {
   line-height: 34px;
+  font-size: 14px;
   padding: 0 15px;
   min-height: 34px;
   border-left: 1px solid #ccc;
