@@ -51,7 +51,7 @@
                     </a></li>
                     <li class="divider"></li>
                     <li role="menuitem"><a class="pointer" ng-click="addNewWidget()">
-                        <i class="glyphicon glyphicon-link"></i>
+                        <i class="fa fa-rss-square"></i>
                     <span uib-popover="{[popOverMessages.addWidget]}"
                           popover-trigger="mouseenter">Add RSS</span>
                     </a></li>
@@ -138,7 +138,8 @@
                                         <p style="width:88%;overflow:hidden" uib-popover="{[ widget.title ]}"
                                            popover-trigger="mouseenter">{[ widget.title ]}</p>
                                     </div>
-                                    <div class="item-container">
+                                    <div class="item-container" content-slider slide-content="widgets" 
+                                        index="{[$index]}">
                                         <img ng-src="{[ widget.thumbnail ]}">
                                     </div>
                                 </div>

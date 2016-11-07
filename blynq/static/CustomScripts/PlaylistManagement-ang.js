@@ -553,8 +553,9 @@ plApp.directive('mediaPlayer', ['$timeout', function($timeout){
                 $timeout(function(){
                     var $div = $('.media-player .rss-text');
                     var divHeight = $div.height();
+                    var fontSize = ((divHeight/2) > 100) ? 100 : (divHeight/2)
                     $div.css({
-                        'font-size': (divHeight/2) + 'px',
+                        'font-size': fontSize + 'px',
                         'line-height': divHeight + 'px'
                     });
                 }, 300);
