@@ -12,14 +12,23 @@
             </span>
 
             <span class="tag" ng-repeat="widget in selectedWidgets" data-as-sortable-item>
-                <span> {[widget.playlist_title]} &nbsp;&nbsp;</span>
+                <span data-as-sortable-item-handle>
+                    <span content-slider slide-content="widget.playlist_items" index="0"> 
+                        {[widget.playlist_title]} &nbsp;&nbsp;
+                    </span>
+                </span>
                 <a class="tagsinput-remove-link"
                    ng-click="removeWidget($index)"></a>
             </span>
 
             <!-- BlynQ content tag -->
-            <span class="tag" data-as-sortable-item ng-if="selectedBlynqPlaylists.length > 0">
-                <span data-as-sortable-item-handle> Blynq-Content &nbsp;&nbsp;</span>
+            <span class="tag" data-as-sortable-item 
+                ng-repeat="blynqPlaylist in selectedBlynqPlaylists.length > 0">
+                <span data-as-sortable-item-handle>
+                    <span content-slider slide-content="blynqPlaylist.playlist_items" index="0">
+                        Blynq-Content-{[ blynqPlaylist.playlist_title ]}
+                    </span>
+                 </span>
                 <a class="tagsinput-remove-link"
                    ng-click="removeBlynqContent()"></a>
             </span>

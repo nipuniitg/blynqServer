@@ -122,11 +122,16 @@
                                             <span> {[playlist.playlist_title]} &nbsp;&nbsp;</span>
                                         </span>
                                         <span class="tag"
-                                          ng-repeat="widget in pane.schedule_widgets">
+                                          ng-repeat="widget in pane.schedule_widgets"
+                                          content-slider slide-content="widget.playlist_items" index="0">
                                             <span> {[widget.playlist_title]} &nbsp;&nbsp;</span>
                                         </span>
-                                        <span class="tag" ng-if="pane.schedule_blynq_playlists.length>0">
-                                            <span> Blynq-Content &nbsp;&nbsp;</span>
+                                        <span class="tag" 
+                                            ng-repeat="blynqPlaylist in  pane.schedule_blynq_playlists"
+                                            content-slider slide-content="blynqPlaylist.playlist_items" index="0">
+                                            <span > 
+                                                Blynq-Content-{[ blynqPlaylist.playlist_title ]} &nbsp;&nbsp;
+                                            </span>
                                         </span>
                                     </div>
                                 </td>
