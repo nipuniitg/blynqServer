@@ -502,19 +502,28 @@ def upsert_widget(request):
         user_details = get_userdetails(request)
         posted_data = string_to_dict(request.body)
         content_id = int(posted_data.get('content_id'))
+        title = posted_data.get('title')
         # TODO: Remove this hard-coding of widget/rss/text
         content_type, created = ContentType.objects.get_or_create(file_type='widget/rss/text')
         if content_id == -1:
             content_id = None
         widget, created = Content.get_user_widgets(user_details=user_details).update_or_create(
             content_id=content_id, defaults=dict(
-                title=posted_data.get('title'), widget_text=posted_data.get('widget_text'), duration=WIDGET_SCROLL_TIME,
+                title=title, widget_text=posted_data.get('widget_text'), duration=WIDGET_SCROLL_TIME,
                 content_type_id=content_type.content_type_id, organization_id=user_details.organization.organization_id,
                 last_updated_by=user_details))
         if created:
             widget.uploaded_by = user_details
             widget.save()
             create_playlist_from_content(content=widget)
+        else:
+            # Update hidden playlist title
+            from playlistManagement.models import PlaylistItems
+            playlist_item = PlaylistItems.objects.select_related('playlist').filter(content=widget, playlist__user_visible=False)
+            if playlist_item.exists():
+                playlist = playlist_item[0].playlist
+                playlist.playlist_title=title
+                playlist.save()
         success = True
     except Exception as e:
         mail_exception(exception=e)
