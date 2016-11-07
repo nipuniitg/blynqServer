@@ -1419,6 +1419,12 @@ sdApp.directive('previewSchedule',['$uibModal', function($uibModal){
                     for(var j=0; j<schedule.schedule_panes[i].schedule_playlists.length; j++){
                         allPlaylistItems =  allPlaylistItems.concat(schedule.schedule_panes[i].schedule_playlists[j].playlist_items);
                     }
+                    for(var j=0; j<schedule.schedule_panes[i].schedule_blynq_playlists.length; j++){
+                        allPlaylistItems =  allPlaylistItems.concat(schedule.schedule_panes[i].schedule_blynq_playlists[j].playlist_items);
+                    }
+                    for(var j=0; j<schedule.schedule_panes[i].schedule_widgets.length; j++){
+                        allPlaylistItems =  allPlaylistItems.concat(schedule.schedule_panes[i].schedule_widgets[j].playlist_items);
+                    }
                     schedule.schedule_panes[i].all_playlist_items = allPlaylistItems;
                 }
             };
