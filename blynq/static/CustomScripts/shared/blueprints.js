@@ -106,7 +106,7 @@
             this.left_margin = argObj.left_margin ? argObj.left_margin : 0;    //in percentage
             this.top_margin = argObj.top_margin ? argObj.top_margin : 0;    //in percentage
             this.height = argObj.height ? argObj.height : 20;       //in percentage
-            this.width = argObj.height ? argObj.height : 25;        // in percentage
+            this.width = argObj.width ? argObj.width : 25;        // in percentage
             this.z_index = argObj.z_index ? argObj.z_index : numberAvailable ? argObj.newPaneIndex : 0;
             this.aspect_ratio={};
 
