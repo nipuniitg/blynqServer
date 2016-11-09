@@ -181,7 +181,7 @@ class Screen(models.Model):
 
     def __unicode__(self):
         organization_name = self.owned_by.organization_name if self.owned_by else 'Null'
-        return self.screen_name + ' : ' + organization_name
+        return self.screen_name + ' : ' + organization_name + ' : ' + self.current_status
 
     @staticmethod
     def get_user_relevant_objects(user_details):
