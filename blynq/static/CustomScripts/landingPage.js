@@ -75,7 +75,7 @@ lpApp.controller('lpController', ['$http','$scope','$timeout', function($http, $
 
     $scope.selectPlan = function(planType){
         resetForm();
-        $scope.requestQuoteFormDetails.additional_details = 'Hi, we would like to opt for '+planType+' plan. Your addition comments goes here.....'
+        $scope.requestQuoteFormDetails.additional_details = 'Hi, we would like to opt for '+planType+' plan. Your additional comments goes here.....'
     }
 
     onLoad();
