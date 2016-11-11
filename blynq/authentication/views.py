@@ -64,7 +64,7 @@ def login(request):
                 return ajax_response(success=success)
             else:
                 return ajax_response(success=success)
-    return render(request, 'authentication/login.html', context_dic)
+    return render(request, 'index.html', context_dic)
 
 
 def get_profile_details(request):
@@ -144,7 +144,7 @@ def divertToLandingPage(request):
     if request.user.is_authenticated():
         return HttpResponseRedirect(reverse('index_page', args=(request)))
     else:
-        return render(request, 'landing_page_content.html')
+        return render(request, 'index.html')
 
 
 def request_quote(request):

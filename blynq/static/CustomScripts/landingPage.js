@@ -78,28 +78,27 @@ lpApp.controller('formController', ['$http','$scope','$timeout', function($http,
 
 
 /* login Directive*/
-//lpApp.directive('loginDtv', ['$uibModal', function($uibModal){
-//    return{
-//        restrict : 'A',
-//        link : function(scope, elem){
-//            elem.bind('click', function(){
-//                var modalInstance = $uibModal.open({
-//                      animation: true
-//                      ,templateUrl: '/static/templates/authentication/_login_mdl.html'
-//                      ,size: 'md'
-//                      ,backdrop: 'static' //disables modal closing by click on the backdrop.
-//                      ,controller: 'loginCtrl'
-//                      ,controllerAs : 'loginCtrl'
-//                });
-//
-//            })
-//        }
-//    }
-//
-//}]);
+lpApp.directive('loginDtv', ['$uibModal', function($uibModal){
+   return{
+       restrict : 'A',
+       link : function(scope, elem){
+           elem.bind('click', function(){
+               var modalInstance = $uibModal.open({
+                     animation: true
+                     ,templateUrl: '/static/templates/authentication/_login_mdl.html'
+                     ,size: 'sm'
+                     ,backdrop: 'static' //disables modal closing by click on the backdrop.
+                     ,controller: 'loginCtrl'
+                     ,controllerAs : 'loginCtrl'
+               });
+           })
+       }
+   }
 
-lpApp.controller('loginCtrl', ['$scope','lpDataAccessFactory','$window',
-  function($scope,lpDataAccessFactory, $window){
+}]);
+
+lpApp.controller('loginCtrl', ['$scope','lpDataAccessFactory','$window','$uibModalInstance',
+  function($scope,lpDataAccessFactory, $window, $uibModalInstance){
       var loginCtrl = this;
       var resetCredentials = {
         username : null,
