@@ -57,7 +57,7 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
   </head>
-  <body itemscope itemtype="http://schema.org/Organization" ng-app="lpApp">
+  <body itemscope itemtype="http://schema.org/Organization" ng-app="lpApp" ng-controller="lpController">
     {% csrf_token %}
     <!-- BEGAIN PRELOADER -->
     <div id="preloader">
@@ -592,7 +592,7 @@
                     <li>Up to <strong>5 Sub-Users</strong></li>
                     <li><strong>30 GB</strong> Bandwidth</li>
                   </ul>
-                  <a href="#" class="price_btn">Select Plan</a>
+                  <a href="#contact" ng-click="selectPlan('Basic')" class="price_btn">Select Plan</a>
                 </div>
               </div>
               <!-- BEGAIN STANDARD PRICE TABLE -->
@@ -606,10 +606,10 @@
                   <ul class="price_features">
                     <li>Upto <strong>25 Screens</strong></li>                  
                     <li><strong> 30 GB</strong> Storage</li>
-                    <li>Up to <strong> 10 Users</strong></li>
+                    <li>Up to <strong> 10 Sub-Users</strong></li>
                     <li><strong> 100 GB</strong> Bandwidth</li>
                   </ul>
-                  <a href="#" class="price_btn">Select Plan</a>
+                  <a href="#contact" ng-click="selectPlan('Standard')" class="price_btn">Select Plan</a>
                 </div>
               </div>
               <!-- BEGAIN BUSINESS PRICE TABLE -->
@@ -626,7 +626,7 @@
                     <li>Up to <strong> 20 sub-Users</strong></li>
                     <li><strong>250 GB</strong> Bandwidth</li>
                   </ul>
-                  <a href="#" class="price_btn">Select Plan</a>
+                  <a href="#contact" ng-click="selectPlan('Business')" class="price_btn">Select Plan</a>
                 </div>
               </div>
               <!-- BEGAIN DELUX PRICE TABLE -->
@@ -634,16 +634,17 @@
                 <div class="single_price wow fadeInUp">
                   <h3>Enterprise</h3>
                   <div class="price">
-                    <h4>-</h4>
+                    <h3><a href="#contact" ng-click="selectPlan('Enterprise')"> Contact-us</h3>
                     <span>per month</span>
                   </div>
                   <ul class="price_features">
                     <li>-</li>                  
-                    <li><a href="#contact">Contact Us</a></li>
+                    <li>-</li>
                     <li>-</li>
                     <li>-</li>
                   </ul>
-                  <a href="#" class="price_btn">Select Plan</a>
+                  <a href="#contact" ng-click="selectPlan('Enterprise')" 
+                    class="price_btn">Select Plan</a>
                 </div>
               </div>
             </div>
@@ -906,7 +907,7 @@
           <div class="contact_content">
             <!-- BEGAIN CONTACT FORM -->
             <div class="col-lg-5 col-md-5 col-sm-5">
-              <div class="contact_form"  ng-controller="formController">
+              <div class="contact_form">
 
                 <form role="form" name="requestQuoteForm">
                   <!--NAME-->

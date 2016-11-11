@@ -33,7 +33,7 @@ lpApp.factory('lpDataAccessFactory',['$http',function($http){
 
 }]);
 
-lpApp.controller('formController', ['$http','$scope','$timeout', function($http, $scope, $timeout){
+lpApp.controller('lpController', ['$http','$scope','$timeout', function($http, $scope, $timeout){
     var defaultFormDetails = {
         name : ''
         ,email : ''
@@ -72,6 +72,11 @@ lpApp.controller('formController', ['$http','$scope','$timeout', function($http,
                 console.log(response.statusText);
             });
     };
+
+    $scope.selectPlan = function(planType){
+        resetForm();
+        $scope.requestQuoteFormDetails.additional_details = 'Hi, we would like to opt for '+planType+' plan. Your addition comments goes here.....'
+    }
 
     onLoad();
 }]);
