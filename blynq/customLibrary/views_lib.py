@@ -27,7 +27,8 @@ def send_mail_blynq(to=['hello@blynq.in'], subject='', message=''):
 def mail_exception(exception, to=['nipun@blynq.in'], subject='Recieved exception'):
     exception = str(exception)
     debugFileLog.exception(exception)
-    send_mail_blynq(to=to, subject=subject, message=exception)
+    if not DEBUG:
+        send_mail_blynq(to=to, subject=subject, message=exception)
 
 
 def ajax_response(success=False, errors=[], obj_dict=None):
