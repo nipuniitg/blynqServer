@@ -6,14 +6,21 @@
 				<div class="panel-heading">
 					Screens
 					<div class="pull-right">
-						<span class="action-icon">
-							<i class="fa fa-plus" ng-click="addNewScreen()"></i>
+						<span class="action-icon" ng-click="addNewScreen()"
+							uib-popover="Add Screen" popover-trigger="mouseenter"> 
+							<i class="fa fa-plus" ></i>
 						</span>
-						<span class="action-icon">
-							<i class="fa fa-pencil" ng-click="editScreenDetails()"></i>
+						<span class="action-icon" ng-click="editScreenDetails()"
+							uib-popover="Edit Screen" popover-trigger="mouseenter">
+							<i class="fa fa-pencil" ></i>
 						</span>
-						<span class="action-icon">
-							<i class="fa fa-refresh" ng-click="refreshScreens()"></i>
+						<span class="action-icon" ng-click="refreshScreens()"
+							uib-popover="Refresh" popover-trigger="mouseenter">
+							<i class="fa fa-refresh"></i>
+						</span>
+						<span class="action-icon" ng-click="openScreenDetailsDiv()"
+							uib-popover="Screen info" popover-trigger="mouseenter">
+							<i class="fa fa-info"></i>
 						</span>
 					</div>				
 				</div>

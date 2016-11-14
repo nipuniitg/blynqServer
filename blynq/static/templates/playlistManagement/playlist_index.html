@@ -1,15 +1,28 @@
-<section class="wrapper fixed-wrapper" ng-controller="plCtrl">
+<section class="wrapper fixed-wrapper playlists" ng-controller="plCtrl">
     <div class="row fill">
         <!-- List of all Playlists -->
         <div class="col-md-2 col-fluid fill">
             <div class="panel panel-default">
                 <div class="panel-heading ">
                     <div class="pull-left">Playlists</div>
-                    <div class="widget-icons pull-right">
-                        <a href="#" ng-click="addPlaylist()" class="wminimize">
-                            <i class="fa fa-plus"></i>AddPlaylist</a>
+                    <div class="pull-right">
+                        <span class="action-icon"  ng-click="addPlaylist()"
+                            uib-popover="Add Playlist"
+                            popover-trigger="mouseenter">
+                            <i class="fa fa-plus"></i>
+                        </span>
+                        <span class="action-icon" ng-click="editPlaylist()"
+                            uib-popover="Rename"
+                            popover-trigger="mouseenter">
+                            <i class="fa fa-pencil"></i>
+                        </span>
+                        <span class="action-icon"  confirm-fn="deletePlaylist()"
+                               confirm confirm-type="delete"
+                                uib-popover="Delete "
+                                popover-trigger="mouseenter">
+                            <i class="fa fa-trash"></i>
+                        </span>
                     </div>
-                    <div class="clearfix"></div>
                 </div>
                 <div class="item-search-row">
                     <div class="input-group">
@@ -24,9 +37,6 @@
                             ng-class="{active: $index === activePlaylistIndex }"
                             ng-click="clickedOnPlaylist($index)">
                             {[ playlist.playlist_title ]}
-                            <i class="pull-right fa fa-trash-o pointer" confirm-fn="deletePlaylist($index)"
-                               confirm confirm-type="delete" data-toggle="modal"></i>
-                            <i class="pull-right fa fa-pencil pointer" ng-click="editPlaylist($index)"></i>
                             </br>
                             <span style="font-size:11px">{[ playlist | playlistTotalTime ]}</span>
                         </li>
@@ -40,17 +50,28 @@
             <div class="panel panel-default">
                 <div class="panel-heading ">
                     <div class="pull-left">Playlist Items</div>
-                    <div class="widget-icons pull-right" ng-show="!playlistQueueEditMode">
-                        <a href="#" ng-click="editPlaylistItems()" class="wminimize"><i
-                                class="fa fa-pencil"></i>Edit</a>
+                    <!-- Action icons-->
+                    <div class="pull-right">
+                        <div ng-show="!playlistQueueEditMode">
+                            <span class="action-icon" ng-click="editPlaylistItems()"
+                                uib-popover="Edit"
+                                popover-trigger="mouseenter">
+                                <i class="fa fa-pencil"></i>
+                            </span>
+                        </div>
+                        <div ng-show="playlistQueueEditMode">
+                            <span class="action-icon" ng-click="savePlaylistQueueItems()"
+                                uib-popover="Save"
+                                popover-trigger="mouseenter">
+                                <i class="fa fa-check"></i>
+                            </span>
+                            <span class="action-icon" ng-click="cancelPlaylistQueueItemsEdit()"
+                                uib-popover="Cancel"
+                                popover-trigger="mouseenter">
+                                <i class="fa fa-times"></i>
+                            </span>
+                        </div>
                     </div>
-                    <div class="widget-icons pull-right" ng-show="playlistQueueEditMode">
-                        <a href="#" class="wminimize" ng-click="savePlaylistQueueItems()"><i
-                                class="fa fa-check"></i>Save</a>
-                        <a href="#" class="wminimize" ng-click="cancelPlaylistQueueItemsEdit()"><i
-                                class="fa fa-times"></i>Cancel</a>
-                    </div>
-                    <div class="clearfix"></div>
                 </div>
                 <div class="item-search-row">
                     <div class="input-group">
@@ -60,8 +81,7 @@
                     </div>
                 </div>
                 <div droppable add-content-function="addContentToPlaylistItems"
-                     add-folder-function="addFolderContentToPlaylistItems" class="listContainer"
-                    style="{[ playlistQueueEditMode ? 'top:119px;' : '']}">
+                     add-folder-function="addFolderContentToPlaylistItems" class="listContainer">
                     <ul id="ul-playlistQueue" class="list-group"
                         data-as-sortable=""
                         is-disabled="is_sortable_disabled"

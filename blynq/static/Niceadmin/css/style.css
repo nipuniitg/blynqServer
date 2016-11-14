@@ -1073,8 +1073,8 @@ div[data-role="editor-toolbar"] {
 }
 .panel .panel-heading {
   line-height: 34px;
-  font-size: 18px;
-  padding: 5px 15px;
+  font-size: 16px;
+  padding: 5px 10px;
   min-height: 50px;
   border-left: 1px solid #ccc;
   border-right: 1px solid #ccc;

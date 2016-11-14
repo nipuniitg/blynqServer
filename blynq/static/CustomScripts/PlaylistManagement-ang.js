@@ -201,7 +201,8 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
 
 
     //methods
-    $scope.deletePlaylist = function(index){
+    $scope.deletePlaylist = function(){
+        var index = $scope.activePlaylistIndex;
         dataAccessFactory.deletePlaylist($scope.playlists[index], function(data){
             if(data.success)
             {
@@ -223,7 +224,8 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
         openPlaylistTitleMdl(newPlaylistIndex);
     }
 
-    $scope.editPlaylist = function(index){
+    $scope.editPlaylist = function(){
+        var index = $scope.activePlaylistIndex;
         openPlaylistTitleMdl(index);
     }
 
