@@ -427,6 +427,7 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
     //private functions
     var onLoad = function(){
         $scope.activeScreenIndex = 0;
+        $scope.isScreenDetailsDivOpen = true;
         //Intialising default view of schedules as list view
         $scope.schedulesView = cAD.defaultSchedulesLayoutType();
 
@@ -468,6 +469,7 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
     $scope.clickedOnScreen = function(index){
         setActiveScreenIndex(index);
         $scope.refreshScreenSchedulesandEvents();
+        $scope.openScreenDetailsDiv();
     };
 
     $scope.refreshScreenSchedulesandEvents = function(){
@@ -496,8 +498,8 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
         openScreenDetailsMdl(newScreenIndex);
     }
 
-    $scope.editScreenDetails = function(index){
-        openScreenDetailsMdl(index);
+    $scope.editScreenDetails = function(){
+        openScreenDetailsMdl($scope.activeScreenIndex);
     }
 
     var openScreenDetailsMdl = function(index){
@@ -529,6 +531,17 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
             toastr.warning('Screen Update cancelled')
         })
     };
+
+    //open and close ScreenDetails
+
+    $scope.openScreenDetailsDiv = function(){
+        $scope.isScreenDetailsDivOpen =  true;
+    }
+
+    $scope.closeScreenDetailsDiv = function(){
+        $scope.isScreenDetailsDivOpen = false;
+    }
+
 }]);
 
 //upsertScreenDetails

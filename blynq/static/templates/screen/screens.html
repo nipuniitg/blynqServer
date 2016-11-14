@@ -1,139 +1,139 @@
-<section class="wrapper fixed-wrapper">
-    <div class="row fill">
-        <!-- List of all screens -->
-        <div class="col-md-6 col-fluid fill">
-            <section class="panel panel-default">
-                <header class="panel-heading">Screens
-                    <div class="widget-icons pull-right">
-                        <a class="btn  btn-primary" ng-click="addNewScreen()">
-                            <i class="fa fa-plus"></i>Add Screen</a>
-                        <a class="btn btn-primary" ng-click="refreshScreens()">
-                            <i class="fa fa-refresh"></i>
-                        </a>
-                    </div>
-                </header>
-                <div class="table-responsive fill" id="div_screens_list">
-                    <table class="table table-advanced ">
-                        <thead>
-                        <tr>
-                            <th>Edit</th>
-                            <th>Status</th>
-                            <th>Screen Name</th>
-                            <th>City</th>
-                            <th class="fix">Address</th>
-                            <th class="fix">Groups</th>
-                            <th class="fix">Last Online Time</th>
-                        </tr>
-                        <tr>
-                            <th></th>
-                            <th>
-                                <div class="btn-group" uib-dropdown>
-                                    <button type="button" class="btn btn-primary" uib-dropdown-toggle>
-                                        <i class="fa fa-adjust online-and-offline" ng-show="searchScreens.status==''"></i>
-                                        <i class="fa fa-circle online" ng-show="searchScreens.status=='Online'"></i>
-                                        <i class="fa fa-circle offline" ng-show="searchScreens.status=='Offline'"></i>
-                                        <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu" uib-dropdown-menu role="menu">
-                                        <li role="menuitem">
-                                            <a ng-click="searchScreens.status=''">
-                                                <i class="fa fa-adjust online-and-offline"></i>
-                                                <span>All</span>
-                                            </a>
-                                        </li>
-                                        <li class="divider"></li>
-                                        <li role="menuitem">
-                                            <a ng-click="searchScreens.status='Online'">
-                                                <i class="fa fa-circle online"></i>
-                                                <span>Online</span>
-                                            </a>
-                                        </li>
-                                        <li class="divider"></li>
-                                        <li role="menuitem">
-                                            <a ng-click="searchScreens.status='Offline'">
-                                                <i class="fa fa-circle offline"></i>
-                                                <span>Offline</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
+<section class="wrapper fixed-wrapper screens">
+	<div class="row fill">
+		<div class="col-md-12 col-fluid fill">
+			<div class="panel panel-default fill">
+				<!-- Screens over view Heading -->
+				<div class="panel-heading">
+					Screens
+					<div class="pull-right">
+						<span class="action-icon">
+							<i class="fa fa-plus" ng-click="addNewScreen()"></i>
+						</span>
+						<span class="action-icon">
+							<i class="fa fa-pencil" ng-click="editScreenDetails()"></i>
+						</span>
+						<span class="action-icon">
+							<i class="fa fa-refresh" ng-click="refreshScreens()"></i>
+						</span>
+					</div>				
+				</div>
 
-                            </th>
-                            <th><input type="form-control" ng-model="searchScreens.screen_name"
-                                       placeholder="search Name"></th>
-                            <th><input type="form-control" ng-model="searchScreens.city.city_name" placeholder="search">
-                            </th>
-                            <th><input type="form-control" ng-model="searchScreens.address" placeholder="search"></th>
-                            <th><input type="form-control" ng-model="searchScreens.groups.group_name"
-                                       placeholder="search"></th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <tbody style=" height: 230px;overflow-y: auto;width: 100%;">
-                        <tr class="pointer" ng-class="{'active' : activeScreenIndex == $index}"
-                            ng-repeat="screen in screens | filter: searchScreens"
-                            ng-click="clickedOnScreen($index)">
-                            <td><span ng-click="editScreenDetails($index)"><i class="fa fa-pencil pointer"></i>
-                            </span></td>
-                            <td><i class="fa fa-circle" set-screen-status-class="{[screen.status]}"></i></td>
-                            <td class="fix">{[ screen.screen_name ]}</td>
-                            <td class="">{[ screen.city.city_name]}</td>
-                            <td class="fix">{[ screen.address ]}</td>
-                            <td class="fix">
-                                <div class="tagsinput " style="height: 100%;">
-                                    <span class="tag" ng-repeat="group in screen.groups">
-                                    <span> {[group.group_name]} &nbsp;&nbsp;</span>
-                                        <!--<a class="tagsinput-remove-link"></a>-->
-                                    </span>
+				<div class="rest-height">
+					<div class="row fill">
+						<!-- Screens over view -->
+						<div class="fill screens-overview"  
+							ng-class="{'col-md-6' : isScreenDetailsDivOpen, 'col-md-12' : !isScreenDetailsDivOpen }">
+							<div class="screen-container-wrap" ng-class="{'active' : activeScreenIndex == $index}" ng-click="clickedOnScreen($index)"
+								ng-repeat="screen in screens | filter: searchScreens">
+								<div class="screen-container">
+									<i class="fa fa-circle" 
+										set-screen-status-class="{[screen.status]}"></i>
+									<span> {[ screen.screen_name ]} </span>
+									<span class="time"> {[ screen.last_active_time ]} </span>
+								</div>
+							</div>
+						</div>
 
-                                    </span>
-                                </div>
-                            </td>
-                            <td class="fix">
-                                {[ screen.last_active_time ]}
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </div>
-        <div class="col-md-6 col-fluid fill">
-            <section class="panel panel-default">
-                <header class="panel-heading">
-                    Schedules-Calendar
-                    <span class="pull-right">
-                        <div class="btn-group">
-                            <a class="btn btn-primary" ng-model="schedulesView" uib-btn-radio="'list'"
-                               uib-popover="{[ popOverMessages.listView ]}" popover-trigger="mouseenter">
-                                <i class="icon_table"></i>
-                            </a>
-                            <a class="btn btn-primary" ng-model="schedulesView" uib-btn-radio="'calendar'"
-                               uib-popover="{[ popOverMessages.calendarView ]}" popover-trigger="mouseenter">
-                                <i class="icon_calendar"></i>
-                            </a>
-                            <a add-schedule refresh-schedules-fn="refreshScreenSchedulesAndEvents()"
-                               class="btn  btn-primary pull-right">
-                                <i class="fa fa-plus"></i>
-                                Add Schedule
-                            </a>
-                        </div>
-                    </span>
-                </header>
-                <div class="row fill">
-                    <div class="col-md-12 fill">
-                        <schedules-list ng-show="schedulesView == 'list'"
-                                        schedules="screenSchedules"
-                                        refresh-schedules-fn="refreshScreenSchedules()">
-                        </schedules-list>
-                        <schedules-calendar ng-show="schedulesView == 'calendar'"
-                                            events="screenEvents"
-                                            refresh-events-fn="refreshScreenEvents">
-                        </schedules-calendar>
-                    </div>
-                </div>
+						<!-- Screen detailed view -->
+						<div class="col-md-6 fill" ng-show="isScreenDetailsDivOpen">
+							<div class="screen-details fill" >
+								<div class="row heading" >
+									<div class="col-md-8">
+										{[ screens[activeScreenIndex].screen_name]}
+									</div>
+									
+									<div class="col-md-4">
+										<button type="button" class="close pull-right" ng-click="closeScreenDetailsDiv()" aria-hidden="true"><i class="fa fa-times"></i></button>
+									</div>
+								</div>
+							
+								<!-- tabs-->
+								<div class="row tabs" ng-init="activeTab=0">
+									<div class="col-md-6 tab-heading" ng-click="activeTab=0"
+										ng-class="{'active' : (activeTab==0)}">
+										 Deatils
+									</div>
+									<div class="col-md-6 tab-heading" ng-click="activeTab=1"
+										ng-class="{'active' : (activeTab==1)}">
+										Schedules 
+									</div>
+								</div>
 
-            </section>
-        </div>
-    </div>
+								<!--screen Details-->
+								<div class="row details" ng-show="activeTab==0">
+									<div class="col-md-12">
+										<form class="form-horizontal">
+											<div class="form-group">
+												<label class="col-md-4">Last Online Time</label>
+												<label class="col-md-8">{[ screens[activeScreenIndex].last_active_time]}</label>
+											</div>
+											<div class="form-group">
+												<label class="col-md-4">City</label>
+												<label class="col-md-8">{[ screens[activeScreenIndex].city_name ]}
+												</label>
+											</div>
+											<div class="form-group">
+												<label class="col-md-4">Address</label>
+												<label class="col-md-8">{[ screens[activeScreenIndex].address ]}</label>
+											</div>
+											<div class="form-group">
+												<label class="col-md-4">Groups</label>
+												<label class="col-md-8">{[ screens[activeScreenIndex].city_name ]}</label>
+												<div class="col-md-8">
+													<div class="tagsinput " style="height: 100%;">
+					                                    <span class="tag" 
+					                                    	ng-repeat="group in screen[activeScreenIndex].groups">
+					                                    <span> {[group.group_name]} &nbsp;&nbsp;</span>
+					                                    </span>
+					                                    </span>
+					                                </div>
+												</div>
+											</div>
+										</form>
+									</div>
+								</div>
+
+								<!--Screen Schedules-->
+								<div class="row schedules" ng-show="activeTab==1">
+									<div class="col-md-12">
+
+										<!-- schedules menu-->
+										<div class="panel">
+											<div class="panel-heading">
+												<div class="btn-group pull-right">
+						                            <a class="btn btn-primary" ng-model="schedulesView" uib-btn-radio="'list'"
+						                               uib-popover="{[ popOverMessages.listView ]}" popover-trigger="mouseenter">
+						                                <i class="icon_table"></i>
+						                            </a>
+						                            <a class="btn btn-primary" ng-model="schedulesView" uib-btn-radio="'calendar'"
+						                               uib-popover="{[ popOverMessages.calendarView ]}" popover-trigger="mouseenter">
+						                                <i class="icon_calendar"></i>
+						                            </a>
+						                            <a add-schedule 
+						                            	refresh-schedules-fn="refreshScreenSchedulesAndEvents()"
+						                               	class="btn  btn-primary pull-right">
+						                                <i class="fa fa-plus"></i>
+						                                Add Schedule
+						                            </a>
+						                        </div>
+											</div>
+										</div>
+
+										<schedules-list ng-show="schedulesView == 'list'"
+											schedules="screenSchedules"
+                                    		refresh-schedules-fn="refreshScreenSchedules()">
+				                        </schedules-list>
+				                        <schedules-calendar ng-show="schedulesView == 'calendar'"
+				                                            events="screenEvents"
+				                                            refresh-events-fn="refreshScreenEvents">
+				                        </schedules-calendar>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>	
+		</div>
+	</div>
 </section>
