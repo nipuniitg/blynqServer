@@ -4,12 +4,12 @@
             <div class="panel panel-default fill">
                 <div class="panel-heading">
                     Screen Layouts
-                    <span class="pull-right">
-                        <a class="btn  btn-primary pull-right" ng-click="lIC.createNewLayout()">
+                    <div class="pull-right">
+                        <span class="action-icon" ng-click="lIC.createNewLayout()"
+                            uib-popover="Add New Layout" popover-trigger="mouseenter">
                             <i class="fa fa-plus"></i>
-                            Add Layout
-                        </a>
-                    </span>
+                        </span>
+                    </div>
                 </div>
                 <div class="panel-body rest-height">
                     <div class="layout-info-wrapper"

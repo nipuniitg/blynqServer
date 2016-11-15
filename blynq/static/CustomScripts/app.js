@@ -181,7 +181,7 @@ mainApp.config(['calendarConfig', '$uibTooltipProvider', function(calendarConfig
 
 
     $uibTooltipProvider.options({
-        placement : 'right'
+        placement : 'top'
         ,appendToBody : true
         //,trigger : ['mourseenter', 'click']
     });

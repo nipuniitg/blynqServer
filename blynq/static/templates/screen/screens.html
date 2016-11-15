@@ -76,7 +76,8 @@
 											</div>
 											<div class="form-group">
 												<label class="col-md-4">City</label>
-												<label class="col-md-8">{[ screens[activeScreenIndex].city_name ]}
+												<label class="col-md-8">
+													{[ screens[activeScreenIndex].city.city_name ]}
 												</label>
 											</div>
 											<div class="form-group">
@@ -89,7 +90,7 @@
 												<div class="col-md-8">
 													<div class="tagsinput " style="height: 100%;">
 					                                    <span class="tag" 
-					                                    	ng-repeat="group in screen[activeScreenIndex].groups">
+					                                    	ng-repeat="group in screens[activeScreenIndex].groups">
 					                                    <span> {[group.group_name]} &nbsp;&nbsp;</span>
 					                                    </span>
 					                                    </span>
@@ -107,7 +108,7 @@
 										<!-- schedules menu-->
 										<div class="panel">
 											<div class="panel-heading">
-												<div class="btn-group pull-right">
+												<div class="btn-group pull-left">
 						                            <a class="btn btn-primary" ng-model="schedulesView" uib-btn-radio="'list'"
 						                               uib-popover="{[ popOverMessages.listView ]}" popover-trigger="mouseenter">
 						                                <i class="icon_table"></i>
@@ -116,13 +117,13 @@
 						                               uib-popover="{[ popOverMessages.calendarView ]}" popover-trigger="mouseenter">
 						                                <i class="icon_calendar"></i>
 						                            </a>
-						                            <a add-schedule 
-						                            	refresh-schedules-fn="refreshScreenSchedulesAndEvents()"
-						                               	class="btn  btn-primary pull-right">
-						                                <i class="fa fa-plus"></i>
-						                                Add Schedule
-						                            </a>
 						                        </div>
+						                        <span class="action-icon pull-right" add-schedule 
+						                            	refresh-schedules-fn="refreshScreenSchedulesAndEvents()"
+					                            		uib-popover="Add Schedule" 
+					                            		popover-trigger="mouseenter">
+						                        	<i class="fa fa-plus"></i>
+						                        </span>
 											</div>
 										</div>
 

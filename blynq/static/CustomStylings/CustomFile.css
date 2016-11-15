@@ -291,7 +291,8 @@ cursor:pointer
     position : absolute;
     top: 53px;
     bottom:0px;
-    width:100%
+    width:100%;
+    padding-top : 15px;
 }
 
 .fixed-wrapper{
@@ -302,6 +303,7 @@ cursor:pointer
     left : 180px;
     right : 0px;
     padding-bottom: 0px;
+    padding-top : 0px;
 }
 
 .listContainer {

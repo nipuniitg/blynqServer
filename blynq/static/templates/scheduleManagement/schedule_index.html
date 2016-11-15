@@ -4,13 +4,13 @@
             <section class="panel panel-default">
                 <header class="panel-heading">
                     Schedules
-                    <span class="pull-right">
-                        <a add-schedule refresh-schedules-fn="refreshSchedules()"
-                            class="btn  btn-primary pull-right">
-                                <i class="fa fa-plus"></i>
-                                Add Schedule
-                        </a>
-                    </span>
+                    <div class="pull-right">
+                        <span class="action-icon" 
+                            add-schedule refresh-schedules-fn="refreshSchedules()"
+                            uib-popover="Add New Schedule" popover-trigger="mouseenter">
+                            <i class="fa fa-plus"></i>
+                        </span>
+                    </div>
                 </header>
                 <schedules-list schedules="schedules"
                                 refresh-schedules-fn="refreshSchedules()"
