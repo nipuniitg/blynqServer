@@ -32,21 +32,22 @@ def player_config(request):
 
 @csrf_exempt
 def player_update_available(request):
-    posted_data = string_to_dict(request.body)
-    unique_device_key = posted_data.get('device_key')
-    version_name = posted_data.get('version_name')
     player_json = {'is_update_available': False, 'url': None}
     try:
-        screen = ScreenActivationKey.objects.get(activation_key=unique_device_key, verified=True)
-        updates = PlayerUpdate.objects.order_by('-uploaded_time')
-        if updates:
-            full_filename = os.path.basename(updates[0].executable.name)
-            filename = os.path.splitext(full_filename)[0]
-            if filename != version_name:
-                player_json['is_update_available'] = True
-                player_json['url'] = MEDIA_HOST + updates[0].executable.url
+        posted_data = string_to_dict(request.body)
+        unique_device_key = posted_data.get('device_key')
+        version = int(posted_data.get('version'))
+        screen_activation_key = ScreenActivationKey.objects.get(activation_key=unique_device_key, verified=True)
+        screen = screen_activation_key.screen
+        if screen.update_app:
+            updates = PlayerUpdate.objects.all()
+            if updates.exists():
+                last_update = updates[0]
+                if last_update.version > version:
+                    player_json['is_update_available'] = True
+                    player_json['url'] = last_update.apk_url
     except ScreenActivationKey.DoesNotExist:
-        debugFileLog.exception('Screen activation key %s does not exist' % unique_device_key)
+        debugFileLog.exception('Screen activation key does not exist for request body' % request.body)
     except Exception as e:
         mail_exception(exception=e)
     return obj_to_json_response(player_json)

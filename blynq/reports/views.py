@@ -3,7 +3,7 @@ import pytz
 
 from contentManagement.models import Content
 from customLibrary.views_lib import get_userdetails, generate_utc_datetime, get_ist_date_str, obj_to_json_response, \
-    debugFileLog, string_to_dict, string_to_date, date_to_string, mail_exception
+    debugFileLog, string_to_dict, string_to_date, date_to_string, mail_exception, datetime_to_string, date_fmt
 from playlistManagement.models import Playlist
 from reports.models import ScreenAnalytics, MediaAnalytics
 from screenManagement.models import Screen
@@ -17,18 +17,15 @@ def date_range(start_date, end_date):
 
 
 def date_time_filters(filter_set):
-    start_date_str = filter_set.get('start_date')
-    start_time_str = filter_set.get('start_time')
-    start_time_str = start_time_str if start_time_str else "00:00"
-    start_datetime = generate_utc_datetime(start_date_str, start_time_str)
-    end_date_str = filter_set.get('end_date')
-    end_time_str = filter_set.get('end_time')
-    end_time_str = end_time_str if end_time_str else "23:59"
-    start_date_end_time = generate_utc_datetime(start_date_str, end_time_str)
-    time_difference = start_date_end_time - start_datetime
-    end_date_start_time = generate_utc_datetime(end_date_str, start_time_str)
-    end_date = end_date_start_time.date() + timedelta(days=1)
-    return start_datetime, end_date, time_difference
+    ist_start_date_str = filter_set.get('start_date')
+    ist_end_date_str = filter_set.get('end_date')
+    ist_start_time_str = filter_set.get('start_time')
+    ist_start_time_str = ist_start_time_str if ist_start_time_str else "00:00"
+    ist_end_time_str = filter_set.get('end_time')
+    ist_end_time_str = ist_end_time_str if ist_end_time_str else "23:59"
+    if not (ist_start_date_str and ist_end_date_str):
+        debugFileLog.error('empty start_date or end_date filter for screen reports')
+    return ist_start_date_str, ist_end_date_str, ist_start_time_str, ist_end_time_str
 
 
 def intersection_time(event1_start, event1_end, event2_start, event2_end):
@@ -44,16 +41,20 @@ def intersection_time(event1_start, event1_end, event2_start, event2_end):
     event1_end = event1_end.replace(tzinfo=pytz.utc).astimezone(pytz.utc)
     event2_start = event2_start.replace(tzinfo=pytz.utc).astimezone(pytz.utc)
     event2_end = event2_end.replace(tzinfo=pytz.utc).astimezone(pytz.utc)
-    delta = (event1_end - event1_start).seconds
-    new_delta = (event2_end - event2_start).seconds
-    if new_delta < delta:
-        delta = new_delta
-    new_delta = (event1_end - event2_start).seconds
-    if new_delta < delta:
-        delta = new_delta
-    new_delta = (event2_end - event1_start).seconds
-    if new_delta < delta:
-        delta = new_delta
+    if event1_start < event2_start:
+        if event1_end < event2_end:
+            if event1_end < event2_start:
+                delta = 0
+            else:
+                delta = (event1_end - event2_start).seconds
+        else:
+            delta = (event2_end - event2_start).seconds
+    elif event1_end < event2_end:
+        delta = (event1_end - event1_start).seconds
+    elif event1_start < event2_end:
+        delta = (event2_end - event1_start).seconds
+    else:
+        delta = 0
     return delta
 
 
@@ -107,22 +108,25 @@ def screen_reports(request):
         posted_data = string_to_dict(request.body)
         filter_set = posted_data.get('filterset')
         screen_ids = screen_filter(filter_set, user_details)
-        start_datetime, end_date, time_difference = date_time_filters(filter_set=filter_set)
-        total_days = (end_date - start_datetime.date()).days
-        total_time_requested = total_days * time_difference.seconds
-        if end_date < start_datetime.date():
+        ist_start_date_str, ist_end_date_str, ist_start_time_str, ist_end_time_str = date_time_filters(filter_set=filter_set)
+        ist_start_date = string_to_date(ist_start_date_str)
+        ist_end_date = string_to_date(ist_end_date_str)
+        if ist_end_date < ist_start_date:
             return obj_to_json_response(json_dict)
         all_screens_dict = {}
         total_time_active = 0
+        # Adjust end_date to include ist_end_date, as date_range excludes the right values
+        ist_end_date = ist_end_date + timedelta(days=1)
+        total_time_requested = (ist_end_date - ist_start_date).total_seconds()
         screen_objects = Screen.get_user_relevant_objects(user_details).filter(screen_id__in=screen_ids)
         for obj in screen_objects:
             all_screens_dict[str(obj.screen_id)] = {'screen_id': obj.screen_id, 'screen_name': obj.screen_name,
                                                     'time_active': 0, 'total_time_requested': total_time_requested}
-        for single_date in date_range(start_date=start_datetime.date(), end_date=end_date):
-            start = datetime.combine(single_date, start_datetime.time())
-            end = start + time_difference
-            date_str = get_ist_date_str(start)
-            date_str_list.append(date_str)
+        for single_date in date_range(start_date=ist_start_date, end_date=ist_end_date):
+            single_date_str = date_to_string(single_date)
+            start = generate_utc_datetime(single_date_str, ist_start_time_str)
+            end = generate_utc_datetime(single_date_str, ist_end_time_str)
+            date_str_list.append(single_date_str)
             screen_analytics = ScreenAnalytics.objects.filter(screen_id__in=screen_ids).exclude(
                 session_start_time__gte=end).exclude(session_end_time__lte=start).order_by('screen_id')
             date_active_time = 0    # active_time of all_screens in a single date

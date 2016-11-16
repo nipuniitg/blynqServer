@@ -175,6 +175,8 @@ class Screen(models.Model):
 
     fcm_device = models.ForeignKey(FcmDevice, null=True, blank=True, on_delete=models.SET_NULL)
 
+    update_app = models.BooleanField(default=False)
+
     # Each screen should have a separate calendar
     # Remove null=True for screen_calendar
     screen_calendar = models.ForeignKey(Calendar, on_delete=models.SET_NULL, null=True, blank=True)
