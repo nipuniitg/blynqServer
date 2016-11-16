@@ -23,4 +23,6 @@ blynq/logs
 blynq/static_root
 blynq/media
 blynq/dbs
+blynq/*.pyc
 blynq/*/*.pyc
+blynq/*/*/*.pyc
