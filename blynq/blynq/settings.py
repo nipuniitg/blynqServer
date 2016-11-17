@@ -252,5 +252,5 @@ INTERNET_ENABLED = True
 
 FCM_APIKEY = 'AIzaSyD0ecm7y8DC0tQ2ut62S4WgLL0GnrsQ_wc'
 FCM_SERVER_KEY = 'AIzaSyD0ecm7y8DC0tQ2ut62S4WgLL0GnrsQ_wc'
-FCM_DEVICE_MODEL = 'screenManagement.FcmDevice'
+FCM_DEVICE_MODEL = 'screenManagement.models.FcmDevice'
 FCM_MAX_RECIPIENTS = 100000
