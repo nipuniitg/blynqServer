@@ -10,24 +10,6 @@ from customLibrary.custom_settings import PERMANENTLY_DELETE_FILES
 from customLibrary.views_lib import debugFileLog, mail_exception
 
 
-def save_relevant_playlists(content_id):
-    debugFileLog.info('save_relevant_playlists')
-    try:
-        from playlistManagement.models import PlaylistItems
-        playlist_items = PlaylistItems.objects.filter(content_id=content_id)
-        for item in playlist_items:
-            item.playlist.save()
-    except Exception as e:
-        debugFileLog.exception("Exception while saving the playlist to update last_updated_time")
-        mail_exception(exception=e)
-
-
-@receiver(post_save, sender=Content)
-def post_save_content(sender, instance, **kwargs):
-    debugFileLog.info("inside post_save_content")
-    save_relevant_playlists(content_id=instance.content_id)
-
-
 def delete_actual_file(instance):
     try:
         debugFileLog.info("Inside delete_actual_file of %s" % instance.title)
@@ -65,19 +47,19 @@ def delete_actual_file(instance):
         mail_exception(exception=e)
 
 
+@receiver(post_save, sender=Content)
+def post_save_content(sender, instance, **kwargs):
+    debugFileLog.info("inside post_save_content")
+    instance.save_relevant_playlists()
+    instance.create_or_update_user_invisible_playlist()
+
+
 @receiver(pre_delete, sender=Content)
 def pre_delete_content(sender, instance, **kwargs):
     debugFileLog.info("inside pre_delete_content")
-    if instance.document:
-        try:
-            organization = instance.organization
-            organization.used_file_size = organization.used_file_size - instance.document.size
-            if organization.used_file_size < 0:
-                organization.used_file_size = 0
-            organization.save()
-        except Exception as e:
-            debugFileLog.exception("Exception while subtracting the deleted file size")
-    save_relevant_playlists(content_id=instance.content_id)
+    instance.decrement_size()
+    instance.delete_user_invisible_playlist()
+    instance.save_relevant_playlists()
 
 
 @receiver(post_delete, sender=Content)

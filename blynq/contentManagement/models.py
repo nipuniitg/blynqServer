@@ -10,7 +10,7 @@ from easy_thumbnails.files import get_thumbnailer
 
 from authentication.models import UserDetails, Organization
 from blynq.settings import BASE_DIR, MEDIA_ROOT, USERCONTENT_DIR, DEFAULT_DISPLAY_TIME, MEDIA_HOST
-from customLibrary.custom_settings import CONTENT_THUMBNAILS
+from customLibrary.custom_settings import CONTENT_THUMBNAILS, CONTENT_ORGANIZATION_NAME
 from customLibrary.views_lib import debugFileLog, get_video_length, full_file_path, mail_exception
 
 
@@ -84,6 +84,17 @@ class Content(models.Model):
                 debugFileLog.warning("The organization " + self.organization.organization_name +
                                      " total file size limit exceeded")
                 debugFileLog.error("Can't upload file")
+
+    def decrement_size(self):
+        if self.document:
+            try:
+                organization = self.organization
+                organization.used_file_size = organization.used_file_size - self.document.size
+                if organization.used_file_size < 0:
+                    organization.used_file_size = 0
+                organization.save()
+            except Exception as e:
+                debugFileLog.exception("Exception while subtracting the deleted file size")
 
     def save(self, *args, **kwargs):
         if self.is_folder:
@@ -259,6 +270,72 @@ class Content(models.Model):
     def get_user_filesystem(user_details):
         return Content.get_user_relevant_objects(user_details=user_details).exclude(
             content_type__file_type__icontains='widget')
+
+    def save_relevant_playlists(self):
+        debugFileLog.info('save_relevant_playlists')
+        try:
+            from playlistManagement.models import PlaylistItems
+            playlist_items = PlaylistItems.objects.filter(content_id=self.content_id)
+            for item in playlist_items:
+                item.playlist.save()
+        except Exception as e:
+            debugFileLog.exception("Exception while saving the playlist to update relevant schedules")
+            mail_exception(exception=e)
+
+    def delete_user_invisible_playlist(self):
+        try:
+            from playlistManagement.models import PlaylistItems
+            playlist_items = PlaylistItems.objects.select_related('playlist').filter(content_id=self.content_id,
+                                                                                     playlist__user_visible=False)
+            for item in playlist_items:
+                playlist = item.playlist
+                playlist.delete()
+        except Exception as e:
+            mail_exception(exception=e)
+
+    def get_playlist_type(self):
+        from playlistManagement.models import Playlist
+        if self.is_widget:
+            return Playlist.WIDGET
+        elif self.organization.organization_name == CONTENT_ORGANIZATION_NAME:
+            return Playlist.BLYNQ_TV
+        else:
+            return Playlist.CONTENT
+
+    def create_user_invisible_playlist(self):
+        try:
+            if self.is_folder:
+                return
+            from playlistManagement.models import Playlist, PlaylistItems
+            playlist_type = self.get_playlist_type()
+            playlist = Playlist(playlist_title=self.title, user_visible=False, playlist_type=playlist_type,
+                                created_by=self.uploaded_by, last_updated_by=self.last_updated_by,
+                                organization=self.organization)
+            playlist.save()
+            playlist_item = PlaylistItems(playlist=playlist, content=self, display_time=self.duration)
+            playlist_item.save()
+        except Exception as e:
+            mail_exception(exception=e)
+
+    def create_or_update_user_invisible_playlist(self):
+        try:
+            if self.is_folder:
+                return
+            from playlistManagement.models import PlaylistItems
+            playlist_item = PlaylistItems.objects.select_related('playlist').filter(content_id=self.content_id,
+                                                                                    playlist__user_visible=False)
+            if playlist_item.exists():
+                # Update user invisible playlist title
+                playlist = playlist_item[0].playlist
+                playlist.playlist_title = self.title
+                # Below line not required after initial merge
+                playlist.playlist_type = self.get_playlist_type()
+                playlist.save()
+            else:
+                self.create_user_invisible_playlist()
+        except Exception as e:
+            mail_exception(exception=e)
+
 
 # class Widget(models.Model):
 #     widget_id = models.AutoField(primary_key=True)

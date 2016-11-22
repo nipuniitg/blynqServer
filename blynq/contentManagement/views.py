@@ -447,7 +447,7 @@ def move_content(request):
         # assert parent_folder.is_folder == True
     except Content.DoesNotExist:
         success = False
-        error = 'You dont have permission to move the selected content. ' \
+        error = 'You do not have permission to move the selected content. ' \
                 'Please refresh and try again if you think, you should have permission'
         return ajax_response(success=success, errors=errors)
     for content_id in content_ids:
@@ -485,15 +485,6 @@ def delete_widget(request):
     return ajax_response(success=success, errors=errors)
 
 
-def create_playlist_from_content(content):
-    from playlistManagement.models import Playlist, PlaylistItems
-    playlist = Playlist(playlist_title=content.title, user_visible=False, created_by=content.uploaded_by,
-                        last_updated_by=content.last_updated_by, organization=content.organization)
-    playlist.save()
-    playlist_item = PlaylistItems(playlist=playlist, content=content, display_time=content.duration)
-    playlist_item.save()
-
-
 def upsert_widget(request):
     debugFileLog.info("Inside upsert widget")
     success = False
@@ -515,15 +506,6 @@ def upsert_widget(request):
         if created:
             widget.uploaded_by = user_details
             widget.save()
-            create_playlist_from_content(content=widget)
-        else:
-            # Update hidden playlist title
-            from playlistManagement.models import PlaylistItems
-            playlist_item = PlaylistItems.objects.select_related('playlist').filter(content=widget, playlist__user_visible=False)
-            if playlist_item.exists():
-                playlist = playlist_item[0].playlist
-                playlist.playlist_title=title
-                playlist.save()
         success = True
     except Exception as e:
         mail_exception(exception=e)

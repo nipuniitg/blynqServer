@@ -8,6 +8,8 @@ from customLibrary.custom_settings import CONTENT_ORGANIZATION_NAME
 
 
 # Create your models here.
+from customLibrary.views_lib import debugFileLog
+from customLibrary.views_lib import mail_exception
 
 
 class PlaylistItems(models.Model):
@@ -51,6 +53,15 @@ class Playlist(models.Model):
 
     class Meta:
         ordering = ['-last_updated_time']
+
+    USER_CREATED, WIDGET, CONTENT, BLYNQ_TV = 'user_created', 'widget', 'content', 'blynq_tv'
+    PLAYLIST_TYPE_CHOICES = (
+        (USER_CREATED, 'Playlist created by the User/organization'),
+        (WIDGET, 'Playlist automatically created from widget'),
+        (CONTENT, 'Playlist automatically created from uploaded content'),
+        (BLYNQ_TV, 'Playlist created by the BlynQ organization'),
+    )
+    playlist_type = models.CharField(max_length=20, choices=PLAYLIST_TYPE_CHOICES, default=PLAYLIST_TYPE_CHOICES[0][0])
 
     @staticmethod
     def get_user_visible_objects(user_details):
