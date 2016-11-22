@@ -4,7 +4,7 @@ from customLibrary.views_lib import mail_exception
 
 
 def default_content_serializer(query_set, fields=('title', 'document', 'content_type', 'content_id', 'is_folder',
-                                                  'duration')):
+                                                  'duration', 'playlist_id', 'playlist_item_id')):
     return ContentSerializer().serialize(query_set, fields=fields, use_natural_foreign_keys=True)
 
 
@@ -16,6 +16,10 @@ class ContentSerializer(Serializer):
             if 'document' in self.selected_fields:
                 self._current['url'] = obj.get_url()
                 del self._current['document']
+            if 'playlist_id' in self.selected_fields:
+                self._current['playlist_id'] = obj.playlist_id
+            if 'playlist_item_id' in self.selected_fields:
+                self._current['playlist_item_id'] = obj.playlist_item_id
             if obj.is_widget:
                 self._current['widget_text'] = obj.widget_text
             self.objects.append(self._current)
