@@ -79,15 +79,17 @@
                                     </div>
                                 </div>
                                 <div class="item-container-footer">
-                                        <span class="pull-right">
-                                            <a confirm confirm-fn="deleteSingleContent(folder.content_id)"
-                                               confirm-type="delete">
-                                                <i class="fa fa-trash-o pointer"></i>
-                                            </a>
-                                        </span>
-                                    <a ng-click="editContent(folder, $index)">
-                                        <i class="fa fa-pencil pointer"></i>
-                                    </a>
+                                    <span class="pull-right">
+                                        <a confirm confirm-fn="deleteSingleContent(folder.content_id)"
+                                           confirm-type="delete">
+                                            <i class="fa fa-trash-o pointer"></i>
+                                        </a>
+                                    </span>
+                                    <span class="pull-left">
+                                        <a ng-click="editContent(folder, $index)">
+                                            <i class="fa fa-pencil pointer"></i>
+                                        </a>
+                                    </span>
                                 </div>
                             </div>
                             <!-- Files -->
