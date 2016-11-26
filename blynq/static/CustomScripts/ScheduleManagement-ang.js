@@ -101,44 +101,7 @@ sdApp.directive('schedulesList',['$log','scheduleIndexFactory','$uibModal',
         }
         ,templateUrl:   '/static/templates/scheduleManagement/_schedules_list.html'
         ,link : function($scope){
-                var openModalPopup = function(index){
-                    var modalInstance = $uibModal.open({
-                      animation: true,
-                      templateUrl: '/static/templates/scheduleManagement/schedule_details.html',
-                      controller: 'scheduleDetailsCtrl',
-                      size: 'lg'
-                      ,backdrop: 'static' //disables modal closing by click on the backdrop.
-                      ,resolve: {
-                        schedule: function(){
-                            return angular.copy($scope.schedules[index]);
-                        }
-                      }
-                    });
-
-                    modalInstance.result.then(function saved(){
-                        $scope.refreshSchedules();
-                    }, function cancelled(){
-                        toastr.warning('schedule cancelled')
-                    })
-                };
-
-                $scope.editSchedule = function(index){
-                    openModalPopup(index);
-                };
-
-                $scope.deleteSchedule = function(index){
-                    sIF.deleteSchedule($scope.schedules[index].schedule_id, function(returnData){
-                        if(returnData.success){
-                            toastr.success('Deleted Schedule successfully');
-                            $scope.refreshSchedules();
-                        }
-                        else{
-                            toastr.warning(returnData.errors.join());
-                            toastr.warning('There was some error while deleting scheduling.Please refresh and try again.');
-                        }
-                    });
-                };
-
+                
                 /*define searchSchedules and groups.
                 Without below watch gives an error as those properties would be for undefined.*/
                 $scope.searchSchedules = {};
@@ -192,8 +155,9 @@ sdApp.directive('schedulesCalendar',['$log','scheduleIndexFactory','$uibModal',
                         clndrCtrl.editSchedule= function(schedule){
                             var modalInstance = $uibModal.open({
                               animation: true,
-                              templateUrl: '/static/templates/scheduleManagement/schedule_details.html',
-                              controller: 'scheduleDetailsCtrl',
+                              windowTemplateUrl : '/static/templates/scheduleManagement/_large_window_template.html',
+                              templateUrl: '/static/templates/scheduleManagement/upsert_schedule.html',
+                              controller: 'scheduleUpsertCtrl',
                               size: 'lg'
                               ,backdrop: 'static' //disables modal closing by click on the backdrop.
                               ,resolve: {
@@ -278,6 +242,64 @@ sdApp.directive('schedulesCalendar',['$log','scheduleIndexFactory','$uibModal',
         ,controllerAs : 'clndrCtrl'
     }
 }]);
+
+sdApp.directive('scheduleDetailsDrtv', ['$uibModal', function($uibModal){
+    /***************
+        This directive shows detailed view of one schedule.
+        That includes, Name, layout, Screens and Groups, Playlists, Timelines. 
+        It is used in schedule-lists and upsert schedule. 
+    *****************/
+    return{
+        restrict : 'E'
+        ,templateUrl : 'static/templates/scheduleManagement/_schedule_details_drtv.html'
+        ,scope :{
+            schedule : '='
+            ,showActions : '='
+            ,refreshSchedules : '&refreshSchedulesFn'
+        }
+        ,link : function($scope, elem, attr){
+                var openModalPopup = function(){
+                    var modalInstance = $uibModal.open({
+                      animation: true,
+                      windowTemplateUrl : '/static/templates/scheduleManagement/_large_window_template.html',
+                      templateUrl: '/static/templates/scheduleManagement/upsert_schedule.html',
+                      controller: 'scheduleUpsertCtrl',
+                      size: 'lg'
+                      ,backdrop: 'static' //disables modal closing by click on the backdrop.
+                      ,resolve: {
+                        schedule: function(){
+                            return angular.copy($scope.schedule);
+                        }
+                      }
+                    });
+
+                    modalInstance.result.then(function saved(){
+                        $scope.refreshSchedules();
+                    }, function cancelled(){
+                        toastr.warning('schedule cancelled')
+                    })
+                };
+
+                $scope.editSchedule = function(){
+                    openModalPopup();
+                };
+
+                $scope.deleteSchedule = function(){
+                    sIF.deleteSchedule($scope.schedule.schedule_id, function(returnData){
+                        if(returnData.success){
+                            toastr.success('Deleted Schedule successfully');
+                            $scope.refreshSchedules();
+                        }
+                        else{
+                            toastr.warning(returnData.errors.join());
+                            toastr.warning('There was some error while deleting scheduling.Please refresh and try again.');
+                        }
+                    });
+                };
+
+        }
+    }
+}]);
 //**end schedules-list and schedules-calendar
 
 
@@ -293,6 +315,7 @@ sdApp.factory('scheduleDetailsFactory', ['$log','$http','$q', function($log, $ht
         }
         for(i=0; i<allItemsLength; i++){
             var item = allItems[i];
+            var itemSelected = false;
             if(typeof(selectedItemsLength) !== 'undefined')
             {
                 for(l=0; l<selectedItemsLength; l++){
@@ -303,11 +326,12 @@ sdApp.factory('scheduleDetailsFactory', ['$log','$http','$q', function($log, $ht
                     item[schedule_key_id] = selectedItems[l][schedule_key_id];
                     selectedItemsLength -= 1;
                     selectedItems.splice(l,1);
+                    itemSelected = true;
                     break;
                 }
                 }
             }
-            if(!item['selected']){
+            if(!itemSelected){
                 item['selected'] = !1;
                 //set the new schedule_key_id(schedule_playlist_id, schedule_screen_id, schedule_group_id) as -1
                 item[schedule_key_id] = -1;
@@ -412,7 +436,7 @@ sdApp.factory('scheduleDetailsFactory', ['$log','$http','$q', function($log, $ht
     }
 }]);
 
-sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleDetailsFactory','constantsAndDefaults',
+sdApp.controller('scheduleUpsertCtrl', ['$scope','$uibModal','$log', 'scheduleDetailsFactory','constantsAndDefaults',
 '$uibModalInstance','schedule','blueprints',
  function($scope, $uibModal, $log, sDF,cAD, $uibModalInstance, schedule,blueprints){
 
@@ -420,28 +444,19 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
     var onLoad = function(){
         $scope.schedule = schedule;
         isNewSchedule = schedule.schedule_id == -1 ? !0 : !1;
-        sDF.getCustomLayouts().then(function(layouts){
-            $scope.layouts =angular.copy(layouts);
-        });
+        $scope.layouts = [];
         sDF.getDefaultLayouts().then(function(layouts){
-            $scope.fullScreenLayout = angular.copy(layouts[0]);
+            $scope.layouts.push(layouts[0]); 
+            // $scope.fullScreenLayout = angular.copy(layouts[0]);
+        });
+        sDF.getCustomLayouts().then(function(layouts){
+            $scope.layouts = $scope.layouts.concat(layouts);
         });
         $scope.title = isNewSchedule? 'Add Schedule' : 'Edit Schedule';
         $scope.activeTabIndex=0;
-    }
-    onLoad();
-
-    $scope.splitScreenToggled = function(){
-        if(!$scope.schedule.is_split) //if not split screen, keep only one pane.
-        {
-            //Keep selected_layout as  Full Screen Layout
-            $scope.schedule.layout = $scope.fullScreenLayout;
-        }
-        else //keep the default selected to one from the layouts
-        {
-            $scope.schedule.layout = $scope.layouts[0];
-        }
-    }
+        setStepEnableStatus();
+    };
+    
 
     /*when layout changes, the number of panes change. so remove existing panes and insert new.*/
     $scope.$watch('schedule.layout', function(newLayout,oldLayout){
@@ -451,37 +466,16 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
             for(i =0; i< totalPanes; i++){
                 $scope.schedule.schedule_panes.push(new blueprints.SchedulePane(newLayout.layout_panes[i]));
             }
-            //For one of the panes, select blynq Content by default
-            //not allowing blynq content for now.
-            if(false){
-                sDF.getDefaultBlynqPlaylists().then(function(allPlaylists){
-                    $scope.schedule.schedule_panes[0].schedule_blynq_playlists = angular.copy(allPlaylists);
-                })
-            }
 
-            $scope.activeTabIndex = 0;
+            $scope.active = 0;
         }
     });
 
-    //Todo : Need rewrite this function according to the split screen requirement
-    var validateSchedule = function(){
-        if($scope.schedule.schedule_playlists.length<1)
-        {
-            toastr.warning('Please select atleast one playlist');
-            return false
-        }
-        if($scope.schedule.schedule_screens.length < 1 && $scope.schedule.schedule_groups.length < 1 )
-        {
-            toastr.warning('Please select atleast one screen or group');
-            return false
-        }
-
-        if($scope.scheduleDetailsForm.$valid)
-        {
-            return true;
-        }
-        else{
-            toastr.warning('Plese fill all required fields');
+    var setStepEnableStatus =function(){
+        for(i=1;i<5;i++){
+            if(stepValidationFns[i]()){
+                $scope.stepsConfig[i].enableStep = true;
+            }
         }
     };
 
@@ -512,6 +506,159 @@ sdApp.controller('scheduleDetailsCtrl', ['$scope','$uibModal','$log', 'scheduleD
     $scope.cancel = function(){
         $uibModalInstance.dismiss();
     };
+
+    $scope.currentStep = 0;
+
+    $scope.stepsConfig = [
+        {
+            title : 'Basic Details'
+            ,showPreview : false
+            ,showPrevious : false
+            ,showSaveAndContinue : true
+            ,showFinish : false
+            ,enableStep : true
+
+        }
+        ,{
+            title : 'Layout'
+            ,showPreview : false
+            ,showPrevious : true
+            ,showSaveAndContinue : true
+            ,showFinish : false
+            ,enableStep : false
+        }
+        ,{
+            title : 'Screens / Groups'
+            ,showPreview : false
+            ,showPrevious : true
+            ,showSaveAndContinue : true
+            ,showFinish : false
+            ,enableStep : false
+        }
+        ,{
+            title : 'Files and Timeline'
+            ,showPreview : false
+            ,showPrevious : true
+            ,showSaveAndContinue : true
+            ,showFinish : false
+            ,enableStep : false
+        }
+        
+        ,{
+            title : 'Review'
+            ,showPreview : true
+            ,showPrevious : true
+            ,showSaveAndContinue : false
+            ,showFinish : true
+            ,enableStep : false
+        }
+    ];
+
+    var stepValidationFns = [
+        function(){
+            if($scope.scheduleDetailsForm.$valid){
+                return true;
+            }
+            return false;
+        }
+        ,function(){
+            if($scope.schedule.layout.layout_id > 0){
+                return true
+            }
+            return false;
+        }
+        ,function(){
+            if($scope.schedule.schedule_screens.length > 0 || $scope.schedule.schedule_groups.length>0){
+                return true
+            }
+            return false;
+        }
+        ,function(){
+            var valid = false;
+            for(var i=0; i<$scope.schedule.schedule_panes.length; i++){
+                if($scope.schedule.schedule_panes[i].schedule_playlists.length>0){
+                    valid=true;
+                }
+            }
+            return valid
+        }
+        ,function(){
+            return $scope.stepsConfig[0].enableStep && $scope.stepsConfig[1].enableStep && $scope.stepsConfig[2].enableStep && $scope.stepsConfig[3].enableStep;
+        }
+    ];
+
+    var stepErrorMessages = [
+        'Please give a valid name to the Campaign'
+        ,'Please select a layout'
+        ,'Select atleast one Screen or Group'
+        ,'Select atleast one file / playlist'
+    ];
+
+    $scope.goToStep = function(stepIndex){
+        if(stepIndex > $scope.currentStep){
+            while( $scope.nextStep() && $scope.currentStep != stepIndex ){
+                console.log($scope.currentStep);
+            }
+        }else{
+            $scope.currentStep = stepIndex;
+            setStepEnableStatus();
+        }
+    };
+
+    $scope.nextStep = function(){
+        var stepValid = false;
+        switch($scope.currentStep){
+            case 0:
+                if(stepValidationFns[0]()){
+                    $scope.currentStep += 1;
+                    stepValid = true;
+                }else{
+                    toastr.warning(stepErrorMessages[0]);
+                }
+                break;
+            case 1:
+                if(stepValidationFns[1]()){
+                    $scope.currentStep += 1;
+                    stepValid = true;
+                }else{
+                    toastr.warning(stepErrorMessages[1]);
+                }
+                break;
+            case 2:
+                if(stepValidationFns[2]()){
+                    $scope.currentStep += 1;
+                    stepValid = true;
+                }else{
+                    toastr.warning(stepErrorMessages[2]);
+                }
+                break;
+            case 3:
+                if(stepValidationFns[3]()){
+                    $scope.currentStep += 1;
+                    stepValid = true;
+                }else{
+                    toastr.warning(stepErrorMessages[3]);
+                }
+                break;
+        }
+        return stepValid
+    };
+
+    $scope.previousStep = function(){
+        $scope.currentStep += -1;
+        setStepEnableStatus();
+    };
+
+    $scope.selectLayout = function(index){
+        $scope.schedule.layout = angular.copy($scope.layouts[index]);
+    };
+
+    $scope.changePaneTab = function(index){
+        $scope.activeTabIndex = index;
+    }
+
+    onLoad();
+              
 }]);
 //**end schedule details material
 
@@ -750,25 +897,19 @@ sdApp.factory('timelineFactory', ['$log', function($log){
 
     }
 
-//        //var date = new Date(parseInt(datetime));
-//        var localeSpecificTime = datetime.toLocaleTimeString();
-//        return localeSpecificTime.replace(/:\d+ /, ' ');
-
-
-return{
-    getTimeline : getTimeline
-    ,getTimelineRecurrenceWise : getTimelineRecurrenceWise
-    ,getTimelineLabel : getTimelineLabel
-    ,getOnlyTime : getOnlyTime
-    ,getOnlyDate : getOnlyDate
-    ,getDateTimeFromDate : getDateTimeFromDate
-    ,getDateTimeFromTime : getDateTimeFromTime
-}
-
+    return{
+        getTimeline : getTimeline
+        ,getTimelineRecurrenceWise : getTimelineRecurrenceWise
+        ,getTimelineLabel : getTimelineLabel
+        ,getOnlyTime : getOnlyTime
+        ,getOnlyDate : getOnlyDate
+        ,getDateTimeFromDate : getDateTimeFromDate
+        ,getDateTimeFromTime : getDateTimeFromTime
+    }
 }]);
 
 sdApp.factory('timelineDescription',['$filter','timelineFactory', function(e, tLF){
-var t = {}
+    var t = {}
       , n = {
         DAILY: "DAILY",
         WEEKLY: "WEEKLY",
@@ -988,8 +1129,6 @@ sdApp.controller('timelineModalController',['$scope','$uibModalInstance','timeli
         $uibModalInstance.dismiss('cancel');
     };
 
-
-
 }]);
 
 sdApp.directive("largerThanDate", [function() {
@@ -1040,44 +1179,39 @@ sdApp.directive('distributionList', function(){
     }
 });
 
-sdApp.controller('distributionListController',['$scope', '$uibModal','$log',
- function($scope, $uibModal, $log){
-
-    $scope.openDistributionSelectorModal = function(){
-        var modalInstance = $uibModal.open({
-          animation: true,
-          templateUrl: '/static/templates/scheduleManagement/_distribution_selector_modal.html',
-          controller: 'distributionSelectorController',
-          size: 'lg'
-          ,backdrop: 'static' //disables modal closing by click on the backdrop.
-          ,resolve: {
-            selectedScreens: function(){
-                return angular.copy($scope.selectedScreens);
-            }
-            ,selectedGroups : function(){
-                return angular.copy($scope.selectedGroups)
-            }
-          }
-        });
-
-        modalInstance.result.then(function apply(selectedList){
-            $scope.selectedScreens= angular.copy(selectedList.screens);
-            $scope.selectedGroups = angular.copy(selectedList.groups);
-            $log.log($scope.selectedGroups);
-            $log.log($scope.selectedScreens);
-        }, function cancel(){
-            toastr.warning('cancelled');
-        })
-    };
+sdApp.controller('distributionListController',['$scope', '$uibModal','$log', 'distributionSelectorFactory',
+    'scheduleDetailsFactory',
+ function($scope, $uibModal, $log, dSF, sDF){
 
     $scope.removeScreen=function(index){
         $scope.selectedScreens.splice(index,1);
-        toastr.success('screen Removed')
+        toastr.success('Screen Removed');
+        $scope.allScreens = sDF.selectedBoolSetter($scope.allScreens, angular.copy($scope.selectedScreens), 'screen_id',
+             'schedule_screen_id');
     };
+
     $scope.removeGroup=function(index){
         $scope.selectedGroups.splice(index,1);
-        toastr.success('group Removed');
-    }
+        toastr.success('Group Removed');
+        $scope.allGroups = sDF.selectedBoolSetter($scope.allGroups, angular.copy($scope.selectedGroups), 'group_id',
+             'schedule_screen_id');
+    };
+
+    var onLoad = function(){
+        dSF.getScreensListWithSelectedBool(angular.copy($scope.selectedScreens), function(data){
+            $scope.allScreens = data;
+        });
+        dSF.getGroupsListWithSelectedBool(angular.copy($scope.selectedGroups), function(data){
+            $scope.allGroups = data;
+        });
+    };
+
+    $scope.refreshSelectedDistribution = function(){
+        $scope.selectedScreens = dSF.getSelectedItems(angular.copy($scope.allScreens));
+        $scope.selectedGroups = dSF.getSelectedItems(angular.copy($scope.allGroups));
+    };
+
+    onLoad();
 }]);
 
 sdApp.factory('distributionSelectorFactory', ['$log', '$http', '$q','scheduleDetailsFactory',
@@ -1143,181 +1277,154 @@ sdApp.factory('distributionSelectorFactory', ['$log', '$http', '$q','scheduleDet
 
 }]);
 
-sdApp.controller('distributionSelectorController',['$scope','$uibModalInstance', '$log','selectedScreens',
- 'selectedGroups','distributionSelectorFactory',
-  function($scope,$uibModalInstance, $log, selectedScreens, selectedGroups, dSF){
-
-//private methods
-var onLoad = function(){
-    dSF.getScreensListWithSelectedBool(selectedScreens, function(data){
-        $scope.allScreens = data;
-    });
-    dSF.getGroupsListWithSelectedBool(selectedGroups, function(data){
-        $scope.allGroups = data;
-    });
-};
-
-//public methods
-$scope.apply = function(){
-    var selectedScreens = dSF.getSelectedItems($scope.allScreens);
-    var selectedGroups = dSF.getSelectedItems($scope.allGroups);
-    var selectedItems = {
-        screens : selectedScreens,
-        groups : selectedGroups
-    };
-    $uibModalInstance.close(selectedItems);
-};
-$scope.cancel = function(){
-    $uibModalInstance.dismiss();
-}
-
-onLoad();
-
- }]);
 //**end-distribution list material
 
 
 //playlistsList material
 
-sdApp.directive('playlistTextbox',['$uibModal', function($uibModal){
+sdApp.directive('playlistEditorBoxDrtv',['$uibModal', function($uibModal){
     return{
-        restrict:'E'
+        restrict : 'E'
+        ,templateUrl : '/static/templates/scheduleManagement/_playlist_editor_box_drtv.html'
         ,scope : {
             selectedPlaylists : '='
-            ,selectedWidgets : '='
-            ,selectedBlynqPlaylists : '='
         }
-        ,templateUrl : '/static/templates/scheduleManagement/_playlist_textbox.html'
-        ,link : function($scope, elements,attr){
-            $scope.removePlaylist = function(index){
-                $scope.selectedPlaylists.splice(index,1);
-            };
-            $scope.removeWidget = function(index){
-                $scope.selectedWidgets.splice(index,1);
-            }
-            $scope.removeBlynqContent = function(index){
-                $scope.selectedBlynqPlaylists = [];
-            };
-            $scope.openPlaylistSelectorModal = function(){
+        ,link : function($scope, elem){
+
+            $scope.openSelectionLibrary = function(){
                 var modalInstance = $uibModal.open({
                   animation: true,
-                  templateUrl: '/static/templates/scheduleManagement/_playlist_selector_modal.html',
-                  controller: 'playlistSelectorController',
+                  templateUrl: '/static/templates/scheduleManagement/_selection_Library.html',
+                  controller: 'selectionLibraryCtrl',
                   size: 'lg'
                   ,backdrop: 'static' //disables modal closing by click on the backdrop.
                   ,resolve: {
-                    resolvedObj : function(){
-                        var resolvedObj = {};
-                        resolvedObj.selectedPlaylists = angular.copy($scope.selectedPlaylists);
-                        resolvedObj.selectedBlynqPlaylists = angular.copy($scope.selectedBlynqPlaylists);
-                        resolvedObj.selectedWidgets = angular.copy($scope.selectedWidgets);
-                        return resolvedObj
-                    }
-                    ,selectedWidgets: function(){
-                        return angular.copy($scope.selectedWidgets);
+                    selectedPlaylists : function(){
+                        return $scope.selectedPlaylists
                     }
                   }
                 });
-                modalInstance.result.then(function apply(appliedObjs){
-                    $scope.selectedPlaylists= appliedObjs.selectedPlaylists;
-                    $scope.selectedBlynqPlaylists = appliedObjs.selectedBlynqPlaylists;
-                    $scope.selectedWidgets = appliedObjs.selectedWidgets;
-                }, function cancel(){
-                    toastr.warning('cancelled');
-                });
-            };
+
+                modalInstance.result.then(function apply(){
+                        
+                    }, function cancel() {
+                        
+                    });
+            }
         }
-    };
-}]);
-
-sdApp.factory('playlistSelectorFactory', ['scheduleDetailsFactory','$http','plDataAccessFactory','$q',
- function(sDF, $http, pDF, $q){
-    //private functions
-
-    var getWidgetsJson = function(callback){
-        $http({
-             method : "GET",
-             url : '/api/playlist/getWidgetPlaylists'
-         }).then(function mySucces(response){
-                if(callback)
-                {
-                    callback(response.data);
-                }
-            }, function myError(response) {
-                console.log(response.statusText);
-            });
-    };
-
-    //public functions
-    var getPlaylistsListWithSelectedBool = function(selectedPlaylists, callback){
-        pDF.getPlaylists(function(allPlaylists){
-            var allPlaylistsWithSelectedBool = sDF.selectedBoolSetter(allPlaylists,selectedPlaylists, 'playlist_id'
-            ,'schedule_playlist_id');
-            callback(allPlaylistsWithSelectedBool);
-        })
-    };
-
-
-    var getWidgetsListWithSelectedBool = function(selectedWidgets, callback){
-        getWidgetsJson(function(allWidgets){
-            var allWidgetsWithSelectedBool = sDF.selectedBoolSetter(allWidgets, selectedWidgets, 'playlist_id'
-            , 'schedule_playlist_id');
-            callback(allWidgetsWithSelectedBool);
-        })
-        }
-
-    var getBlynqContentWithSelectedBool = function(selectedBlynqPlaylists){
-        var deferred = $q.defer();
-        sDF.getBlynqPlaylists().then(function(allBlynqPlaylists){
-            var allCategoriesWithSelectedBool = sDF.selectedBoolSetter(allBlynqPlaylists, selectedBlynqPlaylists, 'playlist_id'
-            ,'schedule_playlist_id');
-            deferred.resolve(allCategoriesWithSelectedBool);
-        });
-
-        return deferred.promise
-    };
-
-    var getSelectedItems = function(allItems){
-        var selectedItems = sDF.getSelectedItems(allItems);
-        return selectedItems;
-    }
-
-    return{
-        getPlaylistsListWithSelectedBool : getPlaylistsListWithSelectedBool
-        ,getWidgetsListWithSelectedBool : getWidgetsListWithSelectedBool
-        ,getSelectedItems : getSelectedItems
-        ,getBlynqContentWithSelectedBool : getBlynqContentWithSelectedBool
     }
 }]);
 
+sdApp.controller('selectionLibraryCtrl', ['$scope','$uibModalInstance','scheduleDetailsFactory',
+    'plDataAccessFactory','selectedPlaylists','constantsAndDefaults', 'ctFactory','blueprints',
+ function($scope, $uibModalInstance, sDF,plDF,selectedPlaylists, cAD, cTF, blueprints){
 
-sdApp.controller('playlistSelectorController', ['$scope', '$log','$uibModalInstance','resolvedObj',
-'playlistSelectorFactory', function($scope, $log, $uibModalInstance, resolvedObj, pSF){
     var onLoad = function(){
-        pSF.getPlaylistsListWithSelectedBool(resolvedObj.selectedPlaylists,function(data) {
-            $scope.allPlaylists = data;
-        });
-        pSF.getWidgetsListWithSelectedBool(resolvedObj.selectedWidgets, function(data) {
-            $scope.allWidgets = data;
+        //set the selected playlists,widgets, contents, blynq Plylists
+        $scope.selectedPlaylists = selectedPlaylists;
+
+        $scope.playlistTypes = cAD.getPlaylistTypes();
+
+        //get all playlists and blynq playlists
+        plDF.getPlaylists(function(allPlaylists){
+            $scope.userCreatedPlaylists = allPlaylists;
+            for(var i =0; i < $scope.userCreatedPlaylists.length; i++){
+                $scope.userCreatedPlaylists[i].playlist_type = $scope.playlistTypes.userCreatedPlaylist;
+            }
         });
 
-        pSF.getBlynqContentWithSelectedBool(resolvedObj.selectedBlynqPlaylists).then(function(data){
-            $scope.allBlynqPlaylists = data;
+        sDF.getBlynqPlaylists().then(function(blynqTVPlaylists){
+            $scope.blynqTVPlaylists = blynqTVPlaylists;
         });
     };
 
-    $scope.apply = function(){
-        var returnObj ={};
-        returnObj.selectedPlaylists = angular.copy(pSF.getSelectedItems($scope.allPlaylists));
-        returnObj.selectedBlynqPlaylists = angular.copy(pSF.getSelectedItems($scope.allBlynqPlaylists));
-        returnObj.selectedWidgets=angular.copy(pSF.getSelectedItems($scope.allWidgets));
-        $uibModalInstance.close(returnObj);
-    };
+    $scope.addToSelection  = function($index, type, fileObj){
+        switch (type) {
+            case $scope.playlistTypes.userCreatedPlaylist : 
+                $scope.selectedPlaylists.push(angular.copy($scope.userCreatedPlaylists[$index]));
+                $scope.selectedPlaylists[$scope.selectedPlaylists.length - 1].schedule_playlist_id = -1;
+                break;
+            case $scope.playlistTypes.blynqTVPlaylist :
+                $scope.selectedPlaylists.push(angular.copy($scope.userCreatedPlaylists[$index]));
+                $scope.selectedPlaylists[$scope.selectedPlaylists.length - 1].schedule_playlist_id = -1;
+                break;
+            case $scope.playlistTypes.contentPlaylist : 
+                $scope.selectedPlaylists.push(getCookedPlaylist(type, fileObj));
+                break;
+            case  $scope.playlistTypes.widgetPlaylist : 
+                $scope.selectedPlaylists.push(getCookedPlaylist(type, fileObj));
+                break;
+        }
+    }
+
+    var getCookedPlaylist = function(type, fileObj){
+        var obj = angular.copy(fileObj);
+        var playlist={
+            playlist_id : obj.playlist_id
+            ,playlist_title : obj.title
+            ,playlist_type : ''
+            ,playlist_items : []
+            ,schedule_playlist_id : -1
+        }
+
+        switch (type){
+            case $scope.playlistTypes.contentPlaylist : 
+                playlist.playlist_type = $scope.playlistTypes.contentPlaylist;
+                break;
+            case $scope.playlistTypes.widgetPlaylist : 
+                playlist.playlist_type = $scope.playlistTypes.widgetPlaylist;
+                break;
+        }
+
+        var playlistItem = new blueprints.PlaylistItem(obj);
+        playlistItem.playlist_item_id = obj.playlist_item_id;
+        playlist.playlist_items.push(playlistItem);
+        return playlist;
+
+    }
+
+    $scope.selectionComplete = function(){
+        $uibModalInstance.close($scope.selectedPlaylists);
+    }
+
     $scope.cancel = function(){
         $uibModalInstance.dismiss();
     }
 
     onLoad();
+}]);
+
+sdApp.directive('frameDrtv', ['constantsAndDefaults', function(cAD){
+    return{
+        restrict : 'E'
+        ,templateUrl : '/static/templates/scheduleManagement/_frame_drtv.html'
+        ,scope : {
+            list : '='
+            ,showCloseOption : '='
+            ,showDuration : '='
+        }
+        ,link : function($scope, elem, attr){
+            var onLoad = function(){
+                $scope.playlistTypes = cAD.getPlaylistTypes();
+            }
+
+            $scope.dragControlListeners = {
+                //accept: function (sourceItemHandleScope, destSortableScope) {return boolean}//override to determine drag is allowed or not. default is true.
+                //itemMoved: function (event) {//Do what you want},
+                //orderChanged: function(event) {//Do what you want},
+                //containment: '.frame'//optional param.
+                //clone: true //optional param for clone feature.
+                //allowDuplicates: false //optional param allows duplicates to be dropped.
+            };
+
+
+            $scope.removeItem = function(index){
+                $scope.list.splice(index);
+            }
+
+            onLoad();
+        }
+    }
 }]);
 
 //**end playlists List material
@@ -1339,9 +1446,9 @@ sdApp.factory('calendarFactory',[function(){
 
 
 //add schedule
-sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal','blueprints','scheduleDetailsFactory',
-    'playlistSelectorFactory','$q',
-    function($log, sIF, $uibModal,blueprints,sDF,pSF,$q){
+sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal','blueprints','scheduleDetailsFactory'
+    ,'$q',
+    function($log, sIF, $uibModal,blueprints,sDF,$q){
     return{
         restrict    :   'EA'
         ,scope      :   {
@@ -1352,23 +1459,18 @@ sdApp.directive('addSchedule',['$log','scheduleIndexFactory','$uibModal','bluepr
                     var newSchedule = new blueprints.Schedule();
 
                     var layoutsProm = sDF.getDefaultLayouts();
-                    if(false){
-                        var defaultBlynqPlaylistsProm =  sDF.getDefaultBlynqPlaylists();
-                    }
 
                     $q.all([
                         layoutsProm.then(function(layouts){
                             newSchedule.layout = angular.copy(layouts[0]);
                             newSchedule.schedule_panes.push(new blueprints.SchedulePane(layouts[0].layout_panes[0]));})
-//                      ,defaultBlynqPlaylistsProm.then(function(allPlaylists){
-//                          newSchedule.schedule_panes[0].schedule_blynq_playlists = angular.copy(allPlaylists);
-//                       });
                     ])
                     .then(function(){
                         var modalInstance = $uibModal.open({
                           animation: true,
-                          templateUrl: '/static/templates/scheduleManagement/schedule_details.html',
-                          controller: 'scheduleDetailsCtrl',
+                          windowTemplateUrl : '/static/templates/scheduleManagement/_large_window_template.html',
+                          templateUrl: '/static/templates/scheduleManagement/upsert_schedule.html',
+                          controller: 'scheduleUpsertCtrl',
                           size: 'lg'
                           ,backdrop: 'static' //disables modal closing by click on the backdrop.
                           ,resolve: {
@@ -1418,12 +1520,6 @@ sdApp.directive('previewSchedule',['$uibModal', function($uibModal){
                     var allPlaylistItems = [];
                     for(var j=0; j<schedule.schedule_panes[i].schedule_playlists.length; j++){
                         allPlaylistItems =  allPlaylistItems.concat(schedule.schedule_panes[i].schedule_playlists[j].playlist_items);
-                    }
-                    for(var j=0; j<schedule.schedule_panes[i].schedule_blynq_playlists.length; j++){
-                        allPlaylistItems =  allPlaylistItems.concat(schedule.schedule_panes[i].schedule_blynq_playlists[j].playlist_items);
-                    }
-                    for(var j=0; j<schedule.schedule_panes[i].schedule_widgets.length; j++){
-                        allPlaylistItems =  allPlaylistItems.concat(schedule.schedule_panes[i].schedule_widgets[j].playlist_items);
                     }
                     schedule.schedule_panes[i].all_playlist_items = allPlaylistItems;
                 }
@@ -1572,4 +1668,8 @@ sdApp.directive('muteDir', [ function(){
     }
 }]);
 // end-preview
+
+
+
+
 

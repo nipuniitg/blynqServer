@@ -1,0 +1,32 @@
+<div class="frame">
+	<div class="slider" data-as-sortable="dragControlListeners" data-ng-model="list">
+		<div class="slide" ng-repeat="item in list" data-as-sortable-item>
+			<div class="">
+				<span class="title">{[ item.playlist_title ]}</span>
+				<i class="fa fa-times close" ng-show="showCloseOption" ng-click="removeItem($index)"></i>
+			</div>
+			<div class="pic-part" data-as-sortable-item-handle>
+			
+				<img ng-src="{[item.playlist_items[0].thumbnail]}" 
+				ng-if="(item.playlist_type == playlistTypes.contentPlaylist || item.playlist_type == playlistTypes.widgetPlaylist)"/>
+
+				<div class="film-icon" 
+					ng-if="(item.playlist_type == playlistTypes.userCreatedPlaylist || 	item.playlist_type == playlistTypes.blynqTVPlaylist)">
+					<i class="fa fa-film"></i>
+				</div>
+					
+			</div>
+			<div class="col-md-12" style="padding: 0px;" ng-if="showDuration">
+				<div class="input-group" ng-if="(item.playlist_type == 
+					playlistTypes.contentPlaylist || item.playlist_type == playlistTypes.widgetPlaylist)">
+					<input type="number" class="form-control input-field input-sm" 
+						ng-model="	item.playlist_items[0].display_time" style="padding: 6px;" >
+					<span class="input-group-addon input-sm" style="padding: 6px;">secs</span>
+				</div>
+				<span class="input-group-addon input-sm" style="padding: 6px;border-radius: 4px;display: block;width:100%;border:1px solid #ccc"
+					ng-if="(item.playlist_type == playlistTypes.userCreatedPlaylist || item.playlist_type == playlistTypes.blynqTVPlaylist)">{[ item | playlistTotalTime ]}
+				</span>
+			</div>
+		</div>
+	</div>
+</div>

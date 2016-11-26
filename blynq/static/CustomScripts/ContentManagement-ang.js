@@ -1118,3 +1118,16 @@ plApp.filter('trusted', ['$sce', function ($sce) {
         return $sce.trustAsResourceUrl(url);
     };
 }]);
+
+plApp.directive('contentLibrary',['$q', function(){
+    return{
+        restrict : 'E'
+        ,templateUrl : '/static/templates/contentManagement/content_holder.html'
+        ,controller : 'ctCtrl'
+    }
+
+}]);
+
+
+
+

@@ -1,26 +1,70 @@
 <div class="row">
-    <div class="col-sm-12">
+    <div class="col-sm-6">
+
+
+        <h4> Selected Screens and Groups </h4>
+        <!--Selected Screens and Groups-->
         <div id="inpScreensAndGroups" class="tagsinput " style="height: 100%;">
-        <span class="tag" ng-repeat="screen in selectedScreens">
-            <span> {[screen.screen_name]} &nbsp;&nbsp;</span>
-            <a class="tagsinput-remove-link"
-               ng-click="removeScreen($index)"></a>
-        </span>
-        <span class="tag" ng-repeat="group in selectedGroups">
-            <span> {[group.group_name]} &nbsp;&nbsp;</span>
-            <a class="tagsinput-remove-link"
-               ng-click="removeGroup($index)"></a>
-        </span>
-            <div class="tagsinput-add-container">
-                <div class="tagsinput-add"
-                     ng-click="openDistributionSelectorModal()"></div>
-                <input value="" data-default=""
-                       style="color: rgb(102, 102, 102); width: 7px;">
+            <span class="tag" ng-repeat="screen in selectedScreens">
+                <span> {[screen.screen_name]} &nbsp;&nbsp;</span>
+                <a class="tagsinput-remove-link"
+                   ng-click="removeScreen($index)"></a>
+            </span>
+            <span class="tag" ng-repeat="group in selectedGroups">
+                <span> {[group.group_name]} &nbsp;&nbsp;</span>
+                <a class="tagsinput-remove-link"
+                   ng-click="removeGroup($index)"></a>
+            </span>
+
+            <div class="well" ng-show="!(selectedGroups.length > 0 || selectedScreens.length > 0)">
+                No screens are selected. Select from below.
             </div>
+
         </div>
+        <!-- <div class="help-block with-errors col-sm-offset-3 col-sm-9"
+             ng-show="selectedScreens.length<1 && selectedGroups.length <1">
+            select atleast one screen
+        </div>
+ -->
+
+        <h4> Select Screens and Groups </h4>
+        <!--All Screens and Groups-->
+        <div>
+            <uib-tabset active="active">
+                <uib-tab index="0" heading="Screens">
+                    <div class="panel">
+                        <div class="panel-body overflow-y" style="max-height: 300px; ">
+                            <div class="playlist-tile" 
+                                ng-repeat="screen in allScreens | filter : searchScreens">
+                                <div class="add-indicator">
+                                    <input type="checkbox" ng-model="screen.selected" ng-change="refreshSelectedDistribution()">
+                                </div>
+                                <div class="info">
+                                    <span> {[ screen.screen_name ]}</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </uib-tab>
+                <uib-tab index=1 heading="Groups">
+                    <div class="panel">
+                        <div class="panel-body overflow-y" style="max-height: 300px;">
+                            <div class="playlist-tile" ng-repeat="group in allGroups | filter : searchGroups">
+                                <div class="add-indicator">
+                                    <input type="checkbox" ng-model="group.selected" ng-change="refreshSelectedDistribution()">
+                                </div>
+                                <div class="info">
+                                    <span>{[ group.group_name ]}</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </uib-tab>
+            </uib-tabset>
+        </div>
+
     </div>
-    <div class="help-block with-errors col-sm-offset-3 col-sm-9"
-         ng-show="selectedScreens.length<1 && selectedGroups.length <1">
-        select atleast one screen
-    </div>
+
 </div>

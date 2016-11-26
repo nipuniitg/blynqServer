@@ -60,7 +60,7 @@
             </div>
             <uib-tabset active="active">
                 <uib-tab index="0" heading="Content">
-                    <div class="panel panel-default fill">
+                    <div class="panel fill">
                         <div class="panel-body fill overflow-y">
                             <!-- Folders -->
                             <div content-droppable class="item-container-wrap" ng-repeat="folder in folders"
@@ -95,9 +95,9 @@
                                  ng-repeat="file in files">
                                 <div class="div-draggable-wrap pointer" draggable data-index="{[$index]}"
                                      data-isfolder="{[file.is_folder]}" data-type="file">
-                                    <div class="item-container-header">
+                                    <div class="item-container-header" ng-click="addToSelection($index, 'content', file)">
                                         <p style="width:88%;overflow:hidden" uib-popover="{[ file.title ]}"
-                                           popover-trigger="mouseenter">{[ file.title ]}</p>
+                                           popover-trigger="mouseenter" >{[ file.title ]}</p>
                                         <input class="right-absolute" type="checkbox"
                                                ng-checked="checkedContent.indexOf(index) > -1"
                                                ng-click="toggleCheck('file', $index)"/>
@@ -112,29 +112,33 @@
                                     </div>
                                 </div>
                                 <div class="item-container-footer">
-                                    <div class=>
-                                        <span class="pull-right">
-                                            <a confirm-fn="deleteSingleContent(file.content_id)" confirm
-                                               confirm-type="delete">
-                                                <i class="fa fa-trash-o pointer"></i></a></span>
+                                    <span class="pull-right">
+                                        <a confirm-fn="deleteSingleContent(file.content_id)" confirm
+                                           confirm-type="delete">
+                                            <i class="fa fa-trash-o pointer"></i></a></span>
+                                    <span class="pull-left">
                                         <a ng-click="editContent(file, $index)">
                                             <i class="fa fa-pencil pointer"></i>
                                         </a>
-
-                                    </div>
+                                    </span>
+                                    <span>
+                                        <a ng-click="addToSelection($index, 'content', file)">
+                                            <i class="fa fa-plus"></i>
+                                        </a>
+                                    </span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </uib-tab>
                 <uib-tab index="1" heading="Widgets" active="tab.active">
-                    <div class="panel panel-default ">
-                        <div class="panel-body">
+                    <div class="panel fill">
+                        <div class="panel-body fill overflow-y">
                             <div class="item-container-wrap"
                                  ng-repeat="widget in widgets">
                                 <div class="div-draggable-wrap pointer" draggable
                                      data-type="widget" data-index="{[$index]}">
-                                    <div class="item-container-header">
+                                    <div class="item-container-header" ng-click="addToSelection($index, 'widget', widget)">
                                         <p style="width:88%;overflow:hidden" uib-popover="{[ widget.title ]}"
                                            popover-trigger="mouseenter">{[ widget.title ]}</p>
                                     </div>
@@ -144,14 +148,21 @@
                                     </div>
                                 </div>
                                 <div class="item-container-footer">
-                                    <div class=>
-                                <span class="pull-right">
-                                    <a confirm-fn="deleteWidget(widget.content_id)" confirm confirm-type="delete">
-                                        <i class="fa fa-trash-o pointer"></i></a></span>
+                                
+                                    <span class="pull-right">
+                                        <a confirm-fn="deleteWidget(widget.content_id)" confirm confirm-type="delete">
+                                            <i class="fa fa-trash-o pointer"></i></a>
+                                    </span>
+                                    <span class="pull-left">
                                         <a ng-click="editWidget($index)">
                                             <i class="fa fa-pencil pointer"></i>
+                                        </a>                                       
+                                    </span>
+                                    <span>
+                                        <a ng-click="addToSelection($index, 'widget', widget)">
+                                            <i class="fa fa-plus"></i>
                                         </a>
-                                    </div>
+                                    </span>
                                 </div>
                             </div>
                         </div>

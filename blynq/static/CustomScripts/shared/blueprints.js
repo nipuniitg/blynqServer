@@ -5,35 +5,17 @@
         function Schedule() {
             this.schedule_id = -1,
             this.schedule_title = '',
+            this.schedule_description = '',
             this.schedule_screens = [],
             this.schedule_groups = [],
-            this.is_split = false,
             this.layout = {},
             this.schedule_panes =[];
         };
-        //            schedule_playlists:[],
-//            timeline:{
-//                is_always   : !0
-//                ,start_date  : null
-//                ,end_recurring_period :null
-//                ,all_day     :!0
-//                ,start_time  :null
-//                ,end_time    :null
-//                ,frequency  :null
-//                ,interval   :null
-//                ,recurrence_absolute:null
-//                ,byweekno   :null
-//                ,byweekday  :null
-//                ,bymonthday :null
-//            }
 
-        //Todo : Below naming is inappropriate, as it is not pane but schedule Pane
         function SchedulePane(layout_pane){
             this.schedule_pane_id = -1;
             this.layout_pane = angular.copy(layout_pane);
             this.schedule_playlists = [];
-            this.schedule_widgets=[];
-            this.schedule_blynq_playlists=[];
             this.mute_audio = false;
             this.timeline ={
                 is_always   : !0
@@ -58,10 +40,9 @@
             ,screen_size : ''
             ,activation_key : ''
             ,resolution :''
-            ,city : {
-            }
-        ,groups : []
-    };
+            ,city : {}
+            ,groups : []
+        };
         var groupBlueprint = {
             group_id : -1,
             group_name : "",
@@ -85,6 +66,7 @@
             this.is_folder = false;
             this.title = contentFile.title;
             this.url = contentFile.url;
+            this.thumbnail = contentFile.thumbnail;
             this.content_type = contentFile.content_type;
             this.content_id = contentFile.content_id;
             this.playlist_item_id = -1;

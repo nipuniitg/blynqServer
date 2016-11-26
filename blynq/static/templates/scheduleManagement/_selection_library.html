@@ -1,0 +1,77 @@
+<div class="modal-header">
+	<button type="button" class="close" ng-click="cancel()" aria-hidden="true">
+		<i class="fa fa-times"></i>
+	</button>
+    <h3 class="modal-title">Selection Library</h3>
+</div>
+
+<div class="modal-body selection-library">
+	<!-- MyLibrary -->
+	<uib-tabset active="activeJustified" justified="true">
+
+		<uib-tab index="0" heading="Content Library">
+			<div class="library-rack">
+				<content-library></content-library>
+			</div>
+		</uib-tab>
+
+		<uib-tab index="1" heading="Playlists">
+			<div class="library-rack">
+
+				<div uib-alert class="alert-success">
+					Select from already saved playlists
+				</div>
+
+				<div class="playlist-tile" ng-if="userCreatedPlaylists.length>0" 
+					ng-repeat="playlist in userCreatedPlaylists">
+					<div class="add-indicator" ng-click="addToSelection($index, playlistTypes.userCreatedPlaylist)">
+						<i class="fa fa-plus"></i>
+					</div>
+					<div class="info" content-slider slide-content="playlist.playlist_items" index="0">
+						<span>{[ playlist.playlist_title ]}</span>
+					</div>
+				</div>
+			</div>
+		</uib-tab>
+
+		<uib-tab index="2" heading="Blynq TV">
+			<div class="library-rack">
+				<div uib-alert class="alert-success">
+					BlynQ offers engaging and interesting content(videos, images, gifs etc..,) of 
+					various categories. You may select categorys' playlists from below available.
+				</div>
+
+				<div class="playlist-tile" ng-if="blynqTVPlaylists.length>0" 
+					ng-repeat="playlist in blynqTVPlaylists">
+					<div class="add-indicator" 
+						ng-click="addToSelection($index, playlistTypes.blynqTVPlaylist)">
+		    				<i class="fa fa-plus"></i>
+		    			<div class="info" content-slider slide-content="playlist.playlist_items" index="0">
+		    				<span>{[ playlist.playlist_title ]}</span>
+		    			</div>
+		    		</div>
+				</div>
+			</div>
+		</uib-tab>
+
+	</uib-tabset>
+
+	<!-- Selected Content -->
+	<div class="row">
+		<div class="col-md-12">
+			<h4>Selected Files and Playlists</h4>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<frame-drtv list="selectedPlaylists"
+				show-close-option="true"
+				show-duration = "true">
+			</frame-drtv>
+		</div>
+	</div>
+</div>
+
+<div class="modal-footer">
+	<button class="btn btn-success" ng-click="selectionComplete()">Done</button>
+</div>

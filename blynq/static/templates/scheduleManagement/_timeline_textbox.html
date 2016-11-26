@@ -1,8 +1,10 @@
 <section>
 <!--<label class="control-label control-label-secondary add-left">-->
-    <label class="col-md-2">
+    <!-- <label class="col-md-2">
     <input ng-model="timeDefined" type="checkbox"
-           > Always</label>
+           > Always</label> -->
+    <label class="col-md-3"><input  type="radio" ng-model="timeDefined" ng-value="true"> Always run this campaign</label>
+    <label class="col-md-3"><input  type="radio" ng-model="timeDefined" ng-value="false"> Advanced Timeline</label>
 
 <div class="col-md-10 col-md-offset-2" ng-if="!timeDefined">
     <div id="timelineTextbox" class="tagsinput " style="height: 100%;">

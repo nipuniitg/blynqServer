@@ -50,6 +50,16 @@
             return screensRefreshInterval
         }
 
+        var getPlaylistTypes = function(){
+            var playlistTypes = {
+                userCreatedPlaylist : 'user_created'
+                ,blynqTVPlaylist  : 'blynq_tv'
+                ,contentPlaylist : 'content'
+                ,widgetPlaylist : 'widget'
+            }
+            return angular.copy(playlistTypes);
+        }
+
         return{
             defaultSchedulesLayoutType : defaultSchedulesLayoutType
             ,layouts : layouts
@@ -57,6 +67,7 @@
             ,getPaneDefaults : getPaneDefaults
             ,getAllFilesHomeFolder : getAllFilesHomeFolder
             ,getRefreshScreensInterval : getRefreshScreensInterval
+            ,getPlaylistTypes : getPlaylistTypes
         }
     }]);
 

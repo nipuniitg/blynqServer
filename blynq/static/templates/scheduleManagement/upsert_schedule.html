@@ -1,0 +1,203 @@
+<div>
+
+	<div class="modal-header">
+        <button type="button" class="close" confirm confirm-fn="cancel()" confirm-verbose="Yes" cancel-verbose="No" message="Are you sure, you want to cancel?" aria-hidden="true"><i class="fa fa-times"></i></button>
+        <h3 class="modal-title">{[title]} > {[stepsConfig[currentStep].title ]} </h3>
+    </div>
+
+    <div class="modal-body" style="max-height: 500px;overflow: auto;background: white">
+    	  <!-- Steps Progress-->
+		    <div class="row bs-wizard" style="border-bottom:0;">
+            
+            <div class="col-xs-offset-1 col-xs-2 bs-wizard-step"
+            	ng-class="{ 'complete' : (currentStep>0), 'active' : (currentStep ==0), 'disabled' : (currentStep < 0) }">
+              <div class="text-center bs-wizard-stepnum">Step 1</div>
+              <div class="progress"><div class="progress-bar"></div></div>
+              <a class="bs-wizard-dot" ng-click="goToStep(0)"></a>
+              <div class="bs-wizard-info text-center">{[ stepsConfig[0].title ]}</div>
+            </div>
+            
+            <div class="col-xs-2 bs-wizard-step" ng-class="{ 'complete' : (currentStep>1), 'active' : currentStep ==1, 'disabled' :(currentStep < 1 && !stepsConfig[1].enableStep), 'enabled' :(currentStep<1 && stepsConfig[1].enableStep) }">
+              <div class="text-center bs-wizard-stepnum">Step 2</div>
+              <div class="progress"><div class="progress-bar"></div></div>
+              <a class="bs-wizard-dot" ng-click="goToStep(1)"></a>
+              <div class="bs-wizard-info text-center">{[stepsConfig[1].title]}</div>
+            </div>
+            
+            <div class="col-xs-2 bs-wizard-step" ng-class="{ 'complete' : (currentStep>2), 'active' : currentStep ==2, 'disabled' :(currentStep < 2 && !stepsConfig[2].enableStep), 'enabled' :(currentStep<2 && stepsConfig[2].enableStep) }">
+              <div class="text-center bs-wizard-stepnum">Step 3</div>
+              <div class="progress"><div class="progress-bar"></div></div>
+              <a class="bs-wizard-dot" ng-click="goToStep(2)"></a>
+              <div class="bs-wizard-info text-center">{[ stepsConfig[2].title ]}</div>
+            </div>
+            
+            <div class="col-xs-2 bs-wizard-step" ng-class="{ 'complete' : (currentStep>3), 'active' : currentStep ==3, 'disabled' :(currentStep < 3 && !stepsConfig[3].enableStep), 'enabled' :(currentStep<3 && stepsConfig[3].enableStep) }">
+              <div class="text-center bs-wizard-stepnum">Step 4</div>
+              <div class="progress"><div class="progress-bar"></div></div>
+              <a class="bs-wizard-dot" ng-click="goToStep(3)"></a>
+              <div class="bs-wizard-info text-center">{[ stepsConfig[3].title ]}</div>
+            </div>
+
+            <div class="col-xs-2 bs-wizard-step" ng-class="{ 'complete' : (currentStep>4), 'active' : currentStep ==4, 'disabled' :(currentStep < 4 && !stepsConfig[4].enableStep), 'enabled' :(currentStep<4 && stepsConfig[4].enableStep) }">
+              <div class="text-center bs-wizard-stepnum">Step 5</div>
+              <div class="progress"><div class="progress-bar"></div></div>
+              <a class="bs-wizard-dot" ng-click="goToStep(4)"></a>
+              <div class="bs-wizard-info text-center">{[ stepsConfig[4].title ]}</div>
+            </div>
+        </div>
+
+        <!-- Step 1-->
+        <div class="row" ng-show="currentStep == 0">
+        	<div class="col-md-6">
+    				<form name="scheduleDetailsForm">
+    				  <div class="form-group">
+    				    <label>Name* </label>
+    				    <input type="text" class="form-control" name="scheduleName"
+    				    	ng-model="schedule.schedule_title" required>
+    				    <div class="error-message col-md-offset-1" style="color:red"
+    				    	ng-show="scheduleDetailsForm.scheduleName.$touched && scheduleDetailsForm.scheduleName.$invalid">
+    				    	This field is required 
+    				    </div>
+    				  </div>
+    				  <div class="form-group">
+    				    <label>Description</label>
+    				    <textarea rows="4" cols="50" class="form-control" placeholder="" ng-model="schedule.schedule_description">
+    				    </textarea>
+    				  </div>
+    				  <!-- <div class="checkbox">
+    				    <label ng-show="false">
+    				    	<input type="checkbox"> Create a folder in My-Library with this name
+    			    	</label>
+    			    	<label ng-show="true">
+    			    		<i class="fa fa-spin fa-refresh"></i>
+    			    		Creating Folder
+    			    	</label>
+    			    	<label ng-show="false">
+    			    		<i class="fa fa-check"></i>
+    		    			Folder Created
+    			    	</label>
+    				  </div> -->
+    				</form>
+        	</div>
+        </div>
+
+        <!-- Step 2-->
+        <div class="row " ng-show="currentStep == 1">
+        	<div class="col-md-12">
+        		<div class="layout-info-wrapper" ng-repeat="layout in layouts" ng-click="selectLayout($index)"
+        			ng-class="{'selected' : (schedule.layout.layout_id == 	layout.layout_id)}">
+                    <div class="layout-info-header">
+                        {[ layout.title]}
+                    </div>
+                    <div class="layout-preview-wrapper" style="height: 100px;width: 100px;">
+                        <div class="layout-preview">
+                            <pane-template ng-repeat="pane in layout.layout_panes"
+                                           index="$index"
+                                           pane="pane">
+                            </pane-template>
+                        </div>
+                    </div>
+                </div>
+        	</div>
+        </div>
+
+        <!-- Step 3-->
+        <div class="row screens-groups" ng-show="currentStep == 2">
+        	<div class="col-md-12">
+        		<distribution-list 
+        			selected-screens="schedule.schedule_screens"
+        			selected-groups="schedule.schedule_groups">
+        		</distribution-list>
+        	</div>
+        </div>
+
+        <!-- Step 4-->
+        <div class="row files-and-timeline" ng-show="currentStep == 3">
+          <!-- selected Layout -->
+          <div class="col-md-3 fill">
+            <div class="layout-preview-wrapper" style="height: 150px;width: 150px;margin:100px auto">
+                <div class="layout-preview">
+                    <pane-template ng-repeat="pane in schedule.layout.layout_panes"
+                                   index="$index" update-active-pane-fn="changePaneTab"
+                                   pane="pane">
+                    </pane-template>
+                </div>
+            </div>
+          </div>
+
+          <!-- Timeline and Playlists -->
+          <div class="col-md-9">
+            <uib-tabset active="activeTabIndex">
+            	<uib-tab ng-repeat="pane in schedule.schedule_panes track by $index" index="$index"
+                 	heading="{[ pane.layout_pane.title ]}">
+                 	<div class="panel">
+                 		<div class="panel-body">
+                     	<form class="form-horizontal">
+                     		<div class="form-group">
+	                            <div class="control-label col-md-2">Timeline*</div>
+	                            <timeline-textbox
+	                                    time-defined="schedule.schedule_panes[$index].timeline.is_always"
+	                                    start-date="schedule.schedule_panes[$index].timeline.start_date"
+	                                    end-date="schedule.schedule_panes[$index].timeline.end_recurring_period"
+	                                    all-day="schedule.schedule_panes[$index].timeline.all_day"
+	                                    start-time="schedule.schedule_panes[$index].timeline.start_time"
+	                                    end-time="schedule.schedule_panes[$index].timeline.end_time"
+	                                    recurrence-type="schedule.schedule_panes[$index].timeline.frequency"
+	                                    recurrence-frequency="schedule.schedule_panes[$index].timeline.interval"
+	                                    recurrence-absolute="schedule.schedule_panes[$index].timeline.recurrence_absolute"
+	                                    recurrence-day-of-month="schedule.schedule_panes[$index].timeline.bymonthday"
+	                                    recurrence-week-of-month="schedule.schedule_panes[$index].timeline.byweekno"
+	                                    recurrence-days-of-week="schedule.schedule_panes[$index].timeline.byweekday">
+	                            </timeline-textbox>
+	                        </div>
+	                        <div class="form-group">
+                                <div class="control-label col-md-2">
+                                    Mute Audio
+                                </div>
+                                <div class="col-md-10">
+                                    <input type="checkbox" name="muteAudio"
+                                           ng-model="schedule.schedule_panes[$index].mute_audio">
+                                </div>
+                            </div>
+                     	</form>
+                     	<playlist-editor-box-drtv selected-playlists="schedule.schedule_panes[$index].schedule_playlists">
+                     	</playlist-editor-box-drtv>
+                   	</div>
+                 	</div>
+                </uib-tab>
+            </uib-tabset>
+        	</div>
+          
+        </div>
+
+        <!-- Step 5-->
+        <div class="row review-campaign" ng-show="currentStep == 4">
+          <div class="col-md-12">
+            <h4>Review</h4>
+            <schedule-details-drtv schedule="schedule" show-actions="false">
+            </schedule-details-drtv>
+          </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+    	<button class="btn btn-primary pull-left" ng-click="previousStep()"
+    			ng-show="stepsConfig[currentStep].showPrevious">Previous Step
+		  </button>
+    	<div class="pull-right">
+    		<button class="btn btn-default" confirm confirm-fn="cancel()" confirm-verbose="Yes" message="Are you sure, you want to cancel?">Cancel</button>
+    		<button class="btn btn-info" preview-schedule schedule="schedule"
+    			ng-show="stepsConfig[currentStep].showPreview">Preview
+			</button>
+    		<button class="btn btn-primary" ng-click="nextStep()"
+    			ng-show="stepsConfig[currentStep].showSaveAndContinue">Next
+			</button>
+			<button class="btn btn-success" ng-click="saveSchedule()"
+				ng-show="stepsConfig[currentStep].showFinish">
+				Great, Finish now!!
+			</button>
+    	</div>
+    </div>
+
+</div>
+

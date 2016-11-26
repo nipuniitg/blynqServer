@@ -425,7 +425,7 @@ plApp.filter('playlistTotalTime', [function(){
         var minutes = Math.floor((totalSec - (hours * 3600)) / 60);
         var seconds = totalSec - (hours * 3600) - (minutes * 60);
 
-        var result = (hours < 10 ? "0" + hours : hours) + "-" + (minutes < 10 ? "0" + minutes : minutes) + "-" + (seconds  < 10 ? "0" + seconds : seconds);
+        var result = (hours < 10 ? "0" + hours : hours) + "h-" + (minutes < 10 ? "0" + minutes : minutes) + "m-" + (seconds  < 10 ? "0" + seconds : seconds)+"s";
 
         return result
     }

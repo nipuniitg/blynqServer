@@ -319,7 +319,6 @@ def upsert_schedule(request):
             schedule_title = posted_data.get('schedule_title')
             schedule_screens = posted_data.get('schedule_screens')
             schedule_groups = posted_data.get('schedule_groups')
-            is_split = posted_data.get('is_split')
             layout = posted_data.get('layout')
             schedule_panes = posted_data.get('schedule_panes')
             user_schedules = Schedule.get_user_relevant_objects(user_details=user_details)
@@ -327,14 +326,13 @@ def upsert_schedule(request):
             layout = Layout.objects.get(layout_id=layout_id)
             # upsert schedule
             if schedule_id == -1:
-                schedule = Schedule(schedule_title=schedule_title, created_by=user_details, is_split=is_split,
+                schedule = Schedule(schedule_title=schedule_title, created_by=user_details,
                                     layout=layout, last_updated_by=user_details,
                                     organization=user_details.organization)
                 schedule.save()
             else:
                 schedule = user_schedules.get(schedule_id=schedule_id)
                 schedule.schedule_title = schedule_title
-                schedule.is_split = is_split
                 schedule.layout = layout
                 schedule.last_updated_by = user_details
             # schedule.save()
