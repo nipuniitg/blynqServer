@@ -355,12 +355,12 @@ jQuery(function($){
 	/*  11. Google Map
 	/* ----------------------------------------------------------- */
 
-	  var zoom= $('#map_canvas').gmap('option', 'zoom');
+	  // var zoom= $('#map_canvas').gmap('option', 'zoom');
       
-      $('#map_canvas').gmap().bind('init', function(ev, map) {
-        $('#map_canvas').gmap('addMarker', {'position': '17.5197292,78.3967933,16z', 'bounds': true});
-        $('#map_canvas').gmap('option', 'zoom', 13);
-      });
+   //    $('#map_canvas').gmap().bind('init', function(ev, map) {
+   //      $('#map_canvas').gmap('addMarker', {'position': '17.5197292,78.3967933,16z', 'bounds': true});
+   //      $('#map_canvas').gmap('option', 'zoom', 13);
+   //    });
 
 
 	/* ----------------------------------------------------------- */
