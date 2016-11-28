@@ -51,14 +51,14 @@ def delete_actual_file(instance):
 def post_save_content(sender, instance, **kwargs):
     debugFileLog.info("inside post_save_content")
     instance.save_relevant_playlists()
-    instance.create_or_update_user_invisible_playlist()
+    instance.update_user_invisible_playlists()
 
 
 @receiver(pre_delete, sender=Content)
 def pre_delete_content(sender, instance, **kwargs):
     debugFileLog.info("inside pre_delete_content")
     instance.decrement_size()
-    instance.delete_user_invisible_playlist()
+    instance.delete_user_invisible_playlists()
     instance.save_relevant_playlists()
 
 

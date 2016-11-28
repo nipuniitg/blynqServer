@@ -282,42 +282,29 @@ class Content(models.Model):
             debugFileLog.exception("Exception while saving the playlist to update relevant schedules")
             mail_exception(exception=e)
 
-    def get_user_invisible_playlist_item(self):
+    def get_user_invisible_playlist_items(self):
         try:
-            self.playlist_item
+            self.playlist_items
         except AttributeError:
-            self.playlist_item = None
-        if self.playlist_item:
-            return self.playlist_item
+            self.playlist_items = []
+        if self.playlist_items:
+            return self.playlist_items
         else:
             from playlistManagement.models import PlaylistItems
             playlist_items = PlaylistItems.objects.select_related('playlist').filter(content_id=self.content_id,
-                                                                                    playlist__user_visible=False)
+                                                                                     playlist__user_visible=False)
             if playlist_items.exists():
-                return playlist_items[0]
+                return playlist_items
             else:
-                return None
+                return []
 
-    @property
-    def playlist_id(self):
-        # This indicates the playlist_id of user_invisible playlist which is created for every content except folder
-        playlist_item = self.get_user_invisible_playlist_item()
-        playlist_id = playlist_item.playlist_id if playlist_item else None
-        return playlist_id
-
-    @property
-    def playlist_item_id(self):
-        # This indicates playlist_item_id of user_invisible playlist which is created for every content except folder
-        playlist_item = self.get_user_invisible_playlist_item()
-        playlist_item_id = playlist_item.playlist_item_id if playlist_item else None
-        return playlist_item_id
-
-    def delete_user_invisible_playlist(self):
+    def delete_user_invisible_playlists(self):
         try:
-            playlist_item = self.get_user_invisible_playlist_item()
-            if playlist_item:
-                playlist = playlist_item.playlist
-                playlist.delete()
+            playlist_items = self.get_user_invisible_playlist_items()
+            if playlist_items:
+                for each_playlist_item in playlist_items:
+                    playlist = each_playlist_item.playlist
+                    playlist.delete()
         except Exception as e:
             mail_exception(exception=e)
 
@@ -345,20 +332,18 @@ class Content(models.Model):
         except Exception as e:
             mail_exception(exception=e)
 
-    def create_or_update_user_invisible_playlist(self):
+    def update_user_invisible_playlists(self):
         try:
             if self.is_folder:
                 return
-            playlist_item = self.get_user_invisible_playlist_item()
-            if playlist_item:
+            playlist_items = self.get_user_invisible_playlist_items()
+            for playlist_item in playlist_items:
                 # Update user invisible playlist title
                 playlist = playlist_item.playlist
                 playlist.playlist_title = self.title
                 # Below line not required after initial merge
                 playlist.playlist_type = self.get_playlist_type()
                 playlist.save()
-            else:
-                self.create_user_invisible_playlist()
         except Exception as e:
             mail_exception(exception=e)
 
