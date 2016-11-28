@@ -1,9 +1,7 @@
 from django.core.serializers.python import Serializer
-from customLibrary.custom_settings import CONTENT_ORGANIZATION_NAME
-from customLibrary.views_lib import get_ist_date_str, get_ist_time_str, debugFileLog, mail_exception, wrap_try_catch
+from customLibrary.views_lib import get_ist_date_str, get_ist_time_str, debugFileLog, mail_exception
 from playlistManagement.serializers import PlaylistSerializer
-from scheduleManagement.models import SchedulePlaylists, ScheduleScreens, SchedulePane
-from screenManagement.serializers import ScreenSerializer, GroupSerializer, default_screen_serializer
+from screenManagement.serializers import GroupSerializer, default_screen_serializer
 from layoutManagement.serializers import default_layout_serializer, default_layout_pane_serializer
 
 
@@ -137,6 +135,6 @@ class ScheduleSerializer(Serializer):
 
 
 def default_schedule_serializer(querySet):
-    return ScheduleSerializer().serialize(querySet, fields=('schedule_id', 'schedule_title',
+    return ScheduleSerializer().serialize(querySet, fields=('schedule_id', 'schedule_title', 'schedule_description',
                                                             'schedule_panes', 'is_split', 'layout',
                                                             'schedule_screens', 'schedule_groups'))

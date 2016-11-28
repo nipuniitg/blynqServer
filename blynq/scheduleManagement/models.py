@@ -77,6 +77,7 @@ class SchedulePane(models.Model):
 class Schedule(models.Model):
     schedule_id = models.AutoField(primary_key=True)
     schedule_title = models.CharField(max_length=100)
+    schedule_description = models.CharField(max_length=256, null=True, blank=True)
     screens = models.ManyToManyField(Screen, through=ScheduleScreens)
     is_split = models.BooleanField(default=False)
     layout = models.ForeignKey(Layout, on_delete=models.PROTECT, null=True)

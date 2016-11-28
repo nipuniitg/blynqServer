@@ -217,6 +217,9 @@ def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists
     for pos_index, item in enumerate(schedule_playlists):
         schedule_playlist_id = int(item.get('schedule_playlist_id'))
         playlist_id = int(item.get('playlist_id'))
+        playlist_type = item.get('playlist_type')
+        if playlist_type == Playlist.CONTENT:
+            Playlist.upsert_playlist(playlist_dict=item, user_details=user_details, user_visible=False)
         if blynq_playlists:
             playlist = Playlist.get_blynq_content_playlists().get(playlist_id=playlist_id)
         else:
@@ -317,6 +320,7 @@ def upsert_schedule(request):
             posted_data = string_to_dict(request.body)
             schedule_id = int(posted_data.get('schedule_id'))
             schedule_title = posted_data.get('schedule_title')
+            schedule_description = posted_data.get('schedule_description')
             schedule_screens = posted_data.get('schedule_screens')
             schedule_groups = posted_data.get('schedule_groups')
             layout = posted_data.get('layout')
@@ -326,13 +330,14 @@ def upsert_schedule(request):
             layout = Layout.objects.get(layout_id=layout_id)
             # upsert schedule
             if schedule_id == -1:
-                schedule = Schedule(schedule_title=schedule_title, created_by=user_details,
-                                    layout=layout, last_updated_by=user_details,
+                schedule = Schedule(schedule_title=schedule_title, schedule_description=schedule_description,
+                                    created_by=user_details, layout=layout, last_updated_by=user_details,
                                     organization=user_details.organization)
                 schedule.save()
             else:
                 schedule = user_schedules.get(schedule_id=schedule_id)
                 schedule.schedule_title = schedule_title
+                schedule.schedule_description = schedule_description
                 schedule.layout = layout
                 schedule.last_updated_by = user_details
             # schedule.save()
