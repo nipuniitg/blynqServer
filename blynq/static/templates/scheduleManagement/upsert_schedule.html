@@ -55,7 +55,7 @@
     				    <input type="text" class="form-control" name="scheduleName"
     				    	ng-model="schedule.schedule_title" required>
     				    <div class="error-message col-md-offset-1" style="color:red"
-    				    	ng-show="scheduleDetailsForm.scheduleName.$touched && scheduleDetailsForm.scheduleName.$invalid">
+    				    	ng-show="(formSubmitted || scheduleDetailsForm.scheduleName.$touched) && scheduleDetailsForm.scheduleName.$invalid ">
     				    	This field is required 
     				    </div>
     				  </div>
@@ -82,7 +82,17 @@
         </div>
 
         <!-- Step 2-->
-        <div class="row " ng-show="currentStep == 1">
+        <div class="row screens-groups" ng-show="currentStep == 1">
+          <div class="col-md-12">
+            <distribution-list 
+              selected-screens="schedule.schedule_screens"
+              selected-groups="schedule.schedule_groups">
+            </distribution-list>
+          </div>
+        </div>
+
+        <!-- Step 3-->
+        <div class="row " ng-show="currentStep == 2">
         	<div class="col-md-12">
         		<div class="layout-info-wrapper" ng-repeat="layout in layouts" ng-click="selectLayout($index)"
         			ng-class="{'selected' : (schedule.layout.layout_id == 	layout.layout_id)}">
@@ -98,16 +108,6 @@
                         </div>
                     </div>
                 </div>
-        	</div>
-        </div>
-
-        <!-- Step 3-->
-        <div class="row screens-groups" ng-show="currentStep == 2">
-        	<div class="col-md-12">
-        		<distribution-list 
-        			selected-screens="schedule.schedule_screens"
-        			selected-groups="schedule.schedule_groups">
-        		</distribution-list>
         	</div>
         </div>
 
@@ -167,7 +167,6 @@
                 </uib-tab>
             </uib-tabset>
         	</div>
-          
         </div>
 
         <!-- Step 5-->

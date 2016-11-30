@@ -455,6 +455,7 @@ sdApp.controller('scheduleUpsertCtrl', ['$scope','$uibModal','$log', 'scheduleDe
         $scope.title = isNewSchedule? 'Add Schedule' : 'Edit Schedule';
         $scope.activeTabIndex=0;
         setStepEnableStatus();
+        $scope.formSubmitted = false;
     };
     
 
@@ -520,7 +521,7 @@ sdApp.controller('scheduleUpsertCtrl', ['$scope','$uibModal','$log', 'scheduleDe
 
         }
         ,{
-            title : 'Layout'
+            title : 'Screens / Groups'
             ,showPreview : false
             ,showPrevious : true
             ,showSaveAndContinue : true
@@ -528,7 +529,7 @@ sdApp.controller('scheduleUpsertCtrl', ['$scope','$uibModal','$log', 'scheduleDe
             ,enableStep : false
         }
         ,{
-            title : 'Screens / Groups'
+            title : 'Layout'
             ,showPreview : false
             ,showPrevious : true
             ,showSaveAndContinue : true
@@ -543,7 +544,6 @@ sdApp.controller('scheduleUpsertCtrl', ['$scope','$uibModal','$log', 'scheduleDe
             ,showFinish : false
             ,enableStep : false
         }
-        
         ,{
             title : 'Review'
             ,showPreview : true
@@ -556,19 +556,20 @@ sdApp.controller('scheduleUpsertCtrl', ['$scope','$uibModal','$log', 'scheduleDe
 
     var stepValidationFns = [
         function(){
+            $scope.formSubmitted = true;
             if($scope.scheduleDetailsForm.$valid){
                 return true;
             }
             return false;
         }
         ,function(){
-            if($scope.schedule.layout.layout_id > 0){
+            if($scope.schedule.schedule_screens.length > 0 || $scope.schedule.schedule_groups.length>0){
                 return true
             }
             return false;
         }
         ,function(){
-            if($scope.schedule.schedule_screens.length > 0 || $scope.schedule.schedule_groups.length>0){
+            if($scope.schedule.layout.layout_id > 0){
                 return true
             }
             return false;
@@ -589,8 +590,8 @@ sdApp.controller('scheduleUpsertCtrl', ['$scope','$uibModal','$log', 'scheduleDe
 
     var stepErrorMessages = [
         'Please give a valid name to the Campaign'
-        ,'Please select a layout'
         ,'Select atleast one Screen or Group'
+        ,'Please select a layout'
         ,'Select atleast one file / playlist'
     ];
 
@@ -607,40 +608,13 @@ sdApp.controller('scheduleUpsertCtrl', ['$scope','$uibModal','$log', 'scheduleDe
 
     $scope.nextStep = function(){
         var stepValid = false;
-        switch($scope.currentStep){
-            case 0:
-                if(stepValidationFns[0]()){
-                    $scope.currentStep += 1;
-                    stepValid = true;
-                }else{
-                    toastr.warning(stepErrorMessages[0]);
-                }
-                break;
-            case 1:
-                if(stepValidationFns[1]()){
-                    $scope.currentStep += 1;
-                    stepValid = true;
-                }else{
-                    toastr.warning(stepErrorMessages[1]);
-                }
-                break;
-            case 2:
-                if(stepValidationFns[2]()){
-                    $scope.currentStep += 1;
-                    stepValid = true;
-                }else{
-                    toastr.warning(stepErrorMessages[2]);
-                }
-                break;
-            case 3:
-                if(stepValidationFns[3]()){
-                    $scope.currentStep += 1;
-                    stepValid = true;
-                }else{
-                    toastr.warning(stepErrorMessages[3]);
-                }
-                break;
+        if(stepValidationFns[$scope.currentStep]()){
+            $scope.currentStep += 1;
+            stepValid = true;
+        }else{
+            toastr.warning(stepErrorMessages[$scope.currentStep]);
         }
+
         return stepValid
     };
 
@@ -1360,12 +1334,12 @@ sdApp.controller('selectionLibraryCtrl', ['$scope','$uibModalInstance','schedule
     var getCookedPlaylist = function(type, fileObj){
         var obj = angular.copy(fileObj);
         var playlist={
-            playlist_id : obj.playlist_id
+            playlist_id : -1
             ,playlist_title : obj.title
             ,playlist_type : ''
             ,playlist_items : []
             ,schedule_playlist_id : -1
-        }
+        };
 
         switch (type){
             case $scope.playlistTypes.contentPlaylist : 
@@ -1377,7 +1351,6 @@ sdApp.controller('selectionLibraryCtrl', ['$scope','$uibModalInstance','schedule
         }
 
         var playlistItem = new blueprints.PlaylistItem(obj);
-        playlistItem.playlist_item_id = obj.playlist_item_id;
         playlist.playlist_items.push(playlistItem);
         return playlist;
 
