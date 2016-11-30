@@ -812,10 +812,12 @@ div.screen-container-wrap:hover{
 
 .screen-container-wrap.active, .screen-container-wrap.active:hover{
     outline: none;
-    border-color: #9ecaed;
-    -webkit-box-shadow: 0px 0px 6px 3px rgba(158,202,237,1);
-    -moz-box-shadow: 0px 0px 6px 3px rgba(158,202,237,1);
-    box-shadow: 0px 0px 6px 3px rgba(158,202,237,1);
+    border-color: #122846;
+    box-shadow: 0 0 10px 2px #122846;
+    -webkit-box-shadow: 0 0 10px 2px #122846;
+    -moz-box-shadow: 0 0 10px 2px #122846;
+    background: #265a88;
+    color : white;
 }
 
 .screen-container{
