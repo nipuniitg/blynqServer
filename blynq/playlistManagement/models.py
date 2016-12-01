@@ -83,12 +83,14 @@ class Playlist(models.Model):
     def upsert_playlist(playlist_dict, user_details, user_visible=True):
         playlist_id = int(playlist_dict.get('playlist_id'))
         playlist_title = playlist_dict.get('playlist_title')
+        playlist_type = playlist_dict.get('playlist_type')
         playlist_items = playlist_dict.get('playlist_items')
         user_playlists = Playlist.get_user_visible_objects(user_details=user_details)
 
         # upsert playlist
         if playlist_id == -1:
             playlist = Playlist(playlist_title=playlist_title, created_by=user_details, user_visible=user_visible,
+                                playlist_type=playlist_type,
                                 last_updated_by=user_details, organization=user_details.organization)
             playlist.save()
             playlist_id = playlist.playlist_id
