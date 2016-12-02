@@ -62,6 +62,7 @@ INSTALLED_APPS = (
     'scheduleManagement',
     'layoutManagement',
     'reports',
+    'paymentManagement',
     #'django_js_reverse',
 )
 

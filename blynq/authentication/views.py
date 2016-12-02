@@ -132,7 +132,9 @@ def change_password(request):
 
 @login_required
 def divert_to_index_page(request, **kwargs):
-    return render(request, 'masterLayout.html')
+    from paymentManagement.views import payment_warning_dict
+    context_dic = payment_warning_dict(request)
+    return render(request, 'masterLayout.html', context_dic)
 
 
 @login_required
