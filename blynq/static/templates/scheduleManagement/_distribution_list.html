@@ -16,8 +16,8 @@
                    ng-click="removeGroup($index)"></a>
             </span>
 
-            <div class="well" ng-show="!(selectedGroups.length > 0 || selectedScreens.length > 0)">
-                No screens are selected. Select from below.
+            <div class="alert alert-warning" ng-show="!(selectedGroups.length > 0 || selectedScreens.length > 0)">
+                No screens are selected. Select altleast one from below.
             </div>
 
         </div>

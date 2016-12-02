@@ -85,7 +85,7 @@ class Playlist(models.Model):
         playlist_title = playlist_dict.get('playlist_title')
         playlist_type = playlist_dict.get('playlist_type')
         playlist_items = playlist_dict.get('playlist_items')
-        user_playlists = Playlist.get_user_visible_objects(user_details=user_details)
+        user_playlists = Playlist.get_all_playlists(user_details=user_details)
 
         # upsert playlist
         if playlist_id == -1:

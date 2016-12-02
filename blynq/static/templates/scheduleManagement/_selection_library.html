@@ -23,7 +23,7 @@
 				</div>
 
 				<div class="playlist-tile" ng-if="userCreatedPlaylists.length>0" 
-					ng-repeat="playlist in userCreatedPlaylists">
+					style="cursor: pointer;" ng-repeat="playlist in userCreatedPlaylists">
 					<div class="add-indicator" ng-click="addToSelection($index, playlistTypes.userCreatedPlaylist)">
 						<i class="fa fa-plus"></i>
 					</div>

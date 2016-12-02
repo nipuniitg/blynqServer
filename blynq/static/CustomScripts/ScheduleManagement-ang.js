@@ -1159,14 +1159,12 @@ sdApp.controller('distributionListController',['$scope', '$uibModal','$log', 'di
 
     $scope.removeScreen=function(index){
         $scope.selectedScreens.splice(index,1);
-        toastr.success('Screen Removed');
         $scope.allScreens = sDF.selectedBoolSetter($scope.allScreens, angular.copy($scope.selectedScreens), 'screen_id',
              'schedule_screen_id');
     };
 
     $scope.removeGroup=function(index){
         $scope.selectedGroups.splice(index,1);
-        toastr.success('Group Removed');
         $scope.allGroups = sDF.selectedBoolSetter($scope.allGroups, angular.copy($scope.selectedGroups), 'group_id',
              'schedule_screen_id');
     };
