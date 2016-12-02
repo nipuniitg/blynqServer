@@ -254,6 +254,25 @@
         {% endif %}
     </section>
     <!--main content end-->
+
+    <!-- message -->
+        {% if show_warning %}
+            <div class="footer-message">
+                <div class="col-md-10">
+                    Your subscription ends by {{ due_date }}. Please renew by paying ₹ {{ due_amount }} rupees at the earliest to enjoy our services. 
+                    {{ additional_comments }}
+                    <br>
+                    Please ignore if already paid.
+                    Thank you!. 
+                </div>
+                <div class="col-md-2">  
+                    <a class="btn btn-lg btn-primary pull-right" target="_blank"
+                        href="{{ payment_link }}">Pay now</a>
+                </div>                
+            </div>
+        {% endif %}
+    <!-- message end -->
+
 </section>
 <!-- container section end -->
 <!-- javascripts -->
