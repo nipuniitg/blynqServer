@@ -1266,7 +1266,7 @@ sdApp.directive('playlistEditorBoxDrtv',['$uibModal', function($uibModal){
             $scope.openSelectionLibrary = function(){
                 var modalInstance = $uibModal.open({
                   animation: true,
-                  templateUrl: '/static/templates/scheduleManagement/_selection_Library.html',
+                  templateUrl: '/static/templates/scheduleManagement/_selection_library.html',
                   controller: 'selectionLibraryCtrl',
                   size: 'lg'
                   ,backdrop: 'static' //disables modal closing by click on the backdrop.
