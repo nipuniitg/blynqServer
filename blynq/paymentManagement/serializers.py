@@ -13,7 +13,7 @@ class PaymentDueMessageSerializer(Serializer):
     def end_object(self, obj):
         try:
             if 'due_date' in self.selected_fields:
-                self._current['due_date'] = obj.due_date.strftime('%d %B %Y')
+                self._current['due_date'] = obj.due_date.strftime('%d %b, %Y')
             self.objects.append(self._current)
         except Exception as e:
             mail_exception(exception=e)
