@@ -36,7 +36,8 @@
 									<i class="fa fa-circle" 
 										set-screen-status-class="{[screen.status]}"></i>
 									<span> {[ screen.screen_name ]} </span>
-									<span class="time"> {[ screen.last_active_time ]} </span>
+									<span class="time" ng-hide="screen.status == 'offline'"
+									uib-popover="last Online" popover-trigger="mouseenter"> {[ screen.last_active_time | timeSince]} </span>
 								</div>
 							</div>
 						</div>
@@ -111,7 +112,7 @@
 												<div class="btn-group pull-left">
 						                            <a class="btn btn-primary" ng-model="schedulesView" uib-btn-radio="'list'"
 						                               uib-popover="{[ popOverMessages.listView ]}" popover-trigger="mouseenter">
-						                                <i class="icon_table"></i>
+						                                <i class="fa fa-list"></i>
 						                            </a>
 						                            <a class="btn btn-primary" ng-model="schedulesView" uib-btn-radio="'calendar'"
 						                               uib-popover="{[ popOverMessages.calendarView ]}" popover-trigger="mouseenter">

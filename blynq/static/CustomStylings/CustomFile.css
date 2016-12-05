@@ -840,6 +840,7 @@ div.screen-container-wrap:hover{
     position: absolute;
     right : 4px;
     bottom: 10px;
+    font-style: italic;
 }
 
 /* Screen Deatils */

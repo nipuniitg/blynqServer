@@ -94,10 +94,10 @@
                             </div>
                             <!-- Files -->
                             <div class="item-container-wrap"
-                                 ng-repeat="file in files">
+                                ng-repeat="file in files">
                                 <div class="div-draggable-wrap pointer" draggable data-index="{[$index]}"
                                      data-isfolder="{[file.is_folder]}" data-type="file">
-                                    <div class="item-container-header" ng-click="addToSelection($index, 'content', file)">
+                                    <div class="item-container-header">
                                         <p style="width:88%;overflow:hidden" uib-popover="{[ file.title ]}"
                                            popover-trigger="mouseenter" >{[ file.title ]}</p>
                                         <input class="right-absolute" type="checkbox"
@@ -123,11 +123,11 @@
                                             <i class="fa fa-pencil pointer"></i>
                                         </a>
                                     </span>
-                                    <span>
-                                        <a ng-click="addToSelection($index, 'content', file)">
-                                            <i class="fa fa-plus"></i>
-                                        </a>
-                                    </span>
+                                    <a class="btn btn-primary btn-sm" style="padding: 2px 5px;font-size: 10px;width: 60%;" uib-popover="Add to Selection"
+                                        popover-trigger="mouseenter"
+                                        ng-show="context == 'upsertschedule'" ng-click="addToSelection($index, 'content', file)">
+                                        Add
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -140,7 +140,7 @@
                                  ng-repeat="widget in widgets">
                                 <div class="div-draggable-wrap pointer" draggable
                                      data-type="widget" data-index="{[$index]}">
-                                    <div class="item-container-header" ng-click="addToSelection($index, 'widget', widget)">
+                                    <div class="item-container-header">
                                         <p style="width:88%;overflow:hidden" uib-popover="{[ widget.title ]}"
                                            popover-trigger="mouseenter">{[ widget.title ]}</p>
                                     </div>
@@ -160,11 +160,11 @@
                                             <i class="fa fa-pencil pointer"></i>
                                         </a>                                       
                                     </span>
-                                    <span>
-                                        <a ng-click="addToSelection($index, 'widget', widget)">
-                                            <i class="fa fa-plus"></i>
-                                        </a>
-                                    </span>
+                                    <a class="btn btn-primary btn-sm" style="padding: 2px 5px;font-size: 10px; width: 60%;" uib-popover="Add to Selection"
+                                        popover-trigger="mouseenter"
+                                        ng-show="context == 'upsertschedule'" ng-click="addToSelection($index, 'widget', widget)">
+                                        Add
+                                    </a>
                                 </div>
                             </div>
                         </div>

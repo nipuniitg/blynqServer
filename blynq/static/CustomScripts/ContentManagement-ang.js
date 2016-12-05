@@ -1124,6 +1124,15 @@ plApp.directive('contentLibrary',['$q', function(){
         restrict : 'E'
         ,templateUrl : '/static/templates/contentManagement/content_holder.html'
         ,controller : 'ctCtrl'
+        ,link : {
+            pre : function($scope,elem, attrs){
+                //Based on below context(upsertschedule), the features changes slightly.
+                //like add to Selection Button
+                if(attrs.context){
+                    $scope.context = attrs.context;
+                }
+            }   
+        }
     }
 
 }]);
