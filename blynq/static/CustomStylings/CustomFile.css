@@ -959,7 +959,7 @@ div.screen-container-wrap:hover{
     height: 100%;
     font-size: 16px;
     text-align: center; 
-    background: #F7F7F7;
+    background: #aaa;
     padding: 5px;
     cursor: pointer;
 }

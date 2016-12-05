@@ -755,20 +755,20 @@ sagApp.filter('timeSince', function(){
         var seconds = Math.floor(((new Date().getTime()/1000) - date)),
         interval = Math.floor(seconds / 31536000);
 
-        if (interval > 1) return interval + "y ago";
+        if (interval > 1) return interval + "yrs ago";
 
         interval = Math.floor(seconds / 2592000);
-        if (interval > 1) return interval + "mon ago";
+        if (interval > 1) return interval + "mons ago";
 
         interval = Math.floor(seconds / 86400);
-        if (interval >= 1) return interval + "d ago";
+        if (interval >= 1) return interval + "days ago";
 
         interval = Math.floor(seconds / 3600);
-        if (interval >= 1) return interval + "h ago";
+        if (interval >= 1) return interval + "hrs ago";
 
         interval = Math.floor(seconds / 60);
-        if (interval > 1) return interval + "m ago";
+        if (interval > 1) return interval + "mins ago";
 
-        return Math.floor(seconds) + "s ago";
+        return Math.floor(seconds) + "secs ago";
     }
 })

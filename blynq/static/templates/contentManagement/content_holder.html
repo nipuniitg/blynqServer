@@ -70,7 +70,7 @@
                                     <div class="item-container-header">
                                         <p style="width:88%; overflow:hidden" uib-popover="{[ folder.title ]}"
                                            popover-trigger="mouseenter">{[ folder.title ]}</p>
-                                        <input type="checkbox" class="right-absolute" value="None" name="check"
+                                        <input type="checkbox" class="right-absolute" value="None" name="check" ng-hide="context == 'upsertschedule' "
                                                ng-checked="checkedFolders.indexOf(index) > -1"
                                                ng-click="toggleCheck('folder', $index)"/>
                                     </div>
@@ -101,6 +101,7 @@
                                         <p style="width:88%;overflow:hidden" uib-popover="{[ file.title ]}"
                                            popover-trigger="mouseenter" >{[ file.title ]}</p>
                                         <input class="right-absolute" type="checkbox"
+                                            ng-hide="context == 'upsertschedule' "
                                                ng-checked="checkedContent.indexOf(index) > -1"
                                                ng-click="toggleCheck('file', $index)"/>
                                     </div>
