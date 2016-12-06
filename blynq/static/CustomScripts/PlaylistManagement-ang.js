@@ -109,7 +109,8 @@ plApp.factory('plFactory',['plDataAccessFactory','blueprints', function(dataAcce
     var playlistBluePrint = {
         playlist_id: -1,
         playlist_title: "",
-        playlist_items: []
+        playlist_items: [],
+        playlist_type :'user_created'
     };
 
     var playlistItemBlueprint = {
