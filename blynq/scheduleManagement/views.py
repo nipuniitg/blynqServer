@@ -218,7 +218,7 @@ def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists
         schedule_playlist_id = int(item.get('schedule_playlist_id'))
         playlist_id = int(item.get('playlist_id'))
         playlist_type = item.get('playlist_type')
-        if playlist_type == Playlist.CONTENT:
+        if playlist_type == Playlist.CONTENT or playlist_type == Playlist.WIDGET:
             playlist = Playlist.upsert_playlist(playlist_dict=item, user_details=user_details, user_visible=False)
             playlist_id = playlist.playlist_id
         if blynq_playlists:
