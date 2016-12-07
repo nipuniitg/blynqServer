@@ -36,7 +36,7 @@
 									<i class="fa fa-circle" 
 										set-screen-status-class="{[screen.status]}"></i>
 									<span> {[ screen.screen_name ]} </span>
-									<span class="time" ng-hide="screen.status == 'offline'"
+									<span class="time" ng-show="screen.status == 'Offline'"
 									uib-popover="last Online" popover-trigger="mouseenter"> {[ screen.last_active_time | timeSince]} </span>
 								</div>
 							</div>
@@ -73,7 +73,8 @@
 										<form class="form-horizontal">
 											<div class="form-group">
 												<label class="col-md-4">Last Online Time</label>
-												<label class="col-md-8">{[ screens[activeScreenIndex].last_active_time]}</label>
+												<label class="col-md-8" ng-show="screens[activeScreenIndex].status == 'Offline'">{[ screens[activeScreenIndex].last_active_time]}</label>
+												<label ng-show="screens[activeScreenIndex].status != 'Offline'">Online now</label>
 											</div>
 											<div class="form-group">
 												<label class="col-md-4">City</label>

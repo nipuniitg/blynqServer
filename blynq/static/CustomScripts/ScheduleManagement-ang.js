@@ -243,7 +243,7 @@ sdApp.directive('schedulesCalendar',['$log','scheduleIndexFactory','$uibModal',
     }
 }]);
 
-sdApp.directive('scheduleDetailsDrtv', ['$uibModal', function($uibModal){
+sdApp.directive('scheduleDetailsDrtv', ['$uibModal','scheduleIndexFactory', function($uibModal, sIF){
     /***************
         This directive shows detailed view of one schedule.
         That includes, Name, layout, Screens and Groups, Playlists, Timelines. 
