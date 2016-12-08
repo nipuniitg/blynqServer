@@ -1,33 +1,10 @@
 CACHE MANIFEST
 #Below comment is used to edit the manifest so that all files reloads. (Date+That date version)
-# 2016-12-06
-#css
-/static/bower_components/bootstrap/dist/css/bootstrap.min.css
-/static/bower_components/bootstrap/dist/css/bootstrap-theme.css
-/static/bower_components/toastr/toastr.min.css
-/static/bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css
-/static/bower_components/ng-sortable/dist/ng-sortable.css
-/static/bower_components/angular-bootstrap-calendar/dist/css/angular-bootstrap-calendar.css
-#fonts
-/static/Niceadmin/css/elegant-icons-style.css
-/static/Niceadmin/css/font-awesome.min.css
-#js
-/static/bower_components/jquery/dist/jquery.js
-/static/bower_components/toastr/toastr.min.js
-/static/bower_components/jquery-ui/jquery-ui.min.js
-/static/bower_components/angular/angular.min.js
-/static/bower_components/ng-sortable/dist/ng-sortable.js
-/static/bower_components/angular-cookies/angular-cookies.min.js
-/static/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js
-/static/bower_components/angular-ui-router/release/angular-ui-router.min.js
-/static/bower_components/moment/moment.js
-/static/bower_components/angular-bootstrap-calendar/dist/js/angular-bootstrap-calendar-tpls.js
-/static/bower_components/chart.js/dist/Chart.min.js
-/static/bower_components/angular-chart.js/dist/angular-chart.min.js
-/static/bower_components/bootstrap/dist/js/bootstrap.min.js
-
+# 2016-12-08
+#manifest-removed
 
 NETWORK:
 *
 
+CACHE:
 FALLBACK:
