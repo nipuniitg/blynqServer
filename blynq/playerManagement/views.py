@@ -7,9 +7,9 @@ from django.views.decorators.csrf import csrf_exempt
 from blynq.settings import MEDIA_HOST, HOST_URL
 from contentManagement.models import Content
 from contentManagement.serializers import default_content_serializer
-from customLibrary.custom_settings import PLAYER_POLL_TIME
+from customLibrary.custom_settings import PLAYER_POLL_TIME, PLAYER_NOTIFY_MAIL
 from customLibrary.views_lib import debugFileLog, string_to_dict, default_string_to_datetime, obj_to_json_response, \
-    ajax_response, date_changed, timeit, mail_exception, empty_list_for_none
+    ajax_response, date_changed, timeit, mail_exception, empty_list_for_none, send_mail_blynq, empty_string_for_none
 from playerManagement.helpers import screen_schedule_data
 from playerManagement.models import PlayerUpdate, LocalServer, PlayerLog
 from playlistManagement.models import PlaylistItems
@@ -317,13 +317,28 @@ def screen_info(request):
     unique_device_key = ''
     try:
         posted_data = string_to_dict(request.body)
-        unique_device_key = posted_data.get('device_key')
-        screen = Screen.objects.filter(unique_device_key__activation_key=unique_device_key)
-        json_data = default_screen_serializer(screen, fields=('screen_name', 'address', 'screen_size',
-                                                              'aspect_ratio', 'resolution', 'last_active_time'))
-        if json_data and type(json_data) == list:
-            return obj_to_json_response(json_data[0])
+        device_key = posted_data.get('device_key')
+        screen_json = Screen.get_info(device_key=device_key)
+        return obj_to_json_response(screen_json)
     except Exception as e:
         debugFileLog.exception('Exception while fetching screen info for device key %s' % unique_device_key)
         mail_exception(exception=e)
     return obj_to_json_response({})
+
+
+@csrf_exempt
+def send_mail(request):
+    try:
+        posted_data = string_to_dict(request.body)
+        device_key = posted_data.get('device_key')
+        screen_json = Screen.get_info(device_key=device_key)
+        subject = empty_string_for_none(posted_data.get('subject'))
+        message = empty_string_for_none(posted_data.get('message'))
+        full_message = str(screen_json) + '  \n   ' + message
+        send_mail_blynq(to=PLAYER_NOTIFY_MAIL, subject=subject, message=full_message)
+        success = True
+    except Exception as e:
+        debugFileLog.error("Sending mail for player log failed")
+        debugFileLog.error(e)
+        success = False
+    return ajax_response(success=success)
