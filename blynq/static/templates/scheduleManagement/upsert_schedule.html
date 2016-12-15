@@ -138,10 +138,12 @@
 	                            <timeline-textbox
 	                                    time-defined="schedule.schedule_panes[$index].timeline.is_always"
 	                                    start-date="schedule.schedule_panes[$index].timeline.start_date"
-	                                    end-date="schedule.schedule_panes[$index].timeline.end_recurring_period"
+	                                    end-date="schedule.schedule_panes[$index].timeline.end_date"
 	                                    all-day="schedule.schedule_panes[$index].timeline.all_day"
 	                                    start-time="schedule.schedule_panes[$index].timeline.start_time"
 	                                    end-time="schedule.schedule_panes[$index].timeline.end_time"
+                                      is-repeat="schedule.schedule_panes[$index].timeline.is_repeat"
+                                      recurrence-end-date="schedule.schedule_panes[$index].timeline.end_recurring_period"
 	                                    recurrence-type="schedule.schedule_panes[$index].timeline.frequency"
 	                                    recurrence-frequency="schedule.schedule_panes[$index].timeline.interval"
 	                                    recurrence-absolute="schedule.schedule_panes[$index].timeline.recurrence_absolute"

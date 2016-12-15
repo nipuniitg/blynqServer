@@ -69,14 +69,17 @@ sdApp.factory('scheduleIndexFactory', ['$http', function($http){
 }]);
 
 sdApp.filter('timelineLabel', ['timelineFactory','timelineDescription', function(tF, tD) {
-    return function(timeline){
+    return function(tL){
+        var timeline = angular.copy(tL);
         var cookedTimeline = tF.getTimeline(
             timeline.is_always
             ,tF.getDateTimeFromDate(timeline.start_date)
-            ,tF.getDateTimeFromDate(timeline.end_recurring_period)
+            ,tF.getDateTimeFromDate(timeline.end_date)
             ,timeline.all_day
             ,tF.getDateTimeFromTime(timeline.start_time)
             ,tF.getDateTimeFromTime(timeline.end_time)
+            ,timeline.is_repeat
+            ,timeline.end_recurring_period
             ,timeline.frequency
             ,timeline.interval
             ,timeline.recurrence_absolute
@@ -647,6 +650,8 @@ return{
         ,allDay : '='
         ,startTime :'='
         ,endTime :'='
+        ,isRepeat : '='
+        ,recurrenceEndDate : '='
         ,recurrenceType    :'='
         ,recurrenceFrequency  :'='
         ,recurrenceAbsolute    :'='
@@ -680,8 +685,14 @@ sdApp.factory('timelineFactory', ['$log', function($log){
         YEARLY: "YEARLY"
     };
 
+    var recurrenceEndTypes = {
+            never : 'never'
+            ,onDate : 'onDate'
+        };
+
+
     //public methods
-    var getTimeline = function(timeDefined, startDate, endDate, allDay, startTime, endTime,
+    var getTimeline = function(timeDefined, startDate, endDate, allDay, startTime, endTime,isRepeat,recurrenceEndDate,
                                 recurrenceType,recurrenceFrequency, recurrenceAbsolute,
                                 recurrenceDayOfMonth, recurrenceWeekOfMonth, recurrenceDaysOfWeek)
                                 {
@@ -693,6 +704,8 @@ sdApp.factory('timelineFactory', ['$log', function($log){
             ,allDay                 :   allDay
             ,startTime              :   startTime ||  timeFunction(0,0)
             ,endTime                :   endTime   ||  timeFunction(23,59)
+            ,isRepeat               :   isRepeat
+            ,recurrenceEndDate      :   isRepeat ? (recurrenceEndDate) : null
             ,recurrenceType         :   recurrenceType || null
             ,recurrenceFrequency    :   recurrenceFrequency || 1
             ,recurrenceAbsolute     :   recurrenceAbsolute  || null
@@ -708,25 +721,25 @@ sdApp.factory('timelineFactory', ['$log', function($log){
     var getTimelineRecurrenceWise = function(n){
         var i = n
           , r = {
-            daily: {
-                recurrenceFrequency: 1
-            },
-            weekly: {
-                recurrenceFrequency: 1
-            },
-            monthly: {
-                recurrenceAbsolute: !1,
-                absolute: {
-                    recurrenceFrequency: 1,
-                    recurrenceDayOfMonth: 1
+                daily: {
+                    recurrenceFrequency: 1
                 },
-                relative: {
-                    recurrenceFrequency: 1,
-                    recurrenceWeekOfMonth: 0,
-                    recurrenceDayOfWeek: 0
+                weekly: {
+                    recurrenceFrequency: 1
+                },
+                monthly: {
+                    recurrenceAbsolute: !1,
+                    absolute: {
+                        recurrenceFrequency: 1,
+                        recurrenceDayOfMonth: 1
+                    },
+                    relative: {
+                        recurrenceFrequency: 1,
+                        recurrenceWeekOfMonth: 0,
+                        recurrenceDayOfWeek: 0
+                    }
                 }
             }
-        }
           , a = function() {
             if (i.recurrenceType === e.DAILY)
             {
@@ -754,12 +767,18 @@ sdApp.factory('timelineFactory', ['$log', function($log){
 
                 }
              }
-          }
-          , o = function() {
-            i.allDay && (i.startTime = timeFunction(8, 0),
-            i.endTime = timeFunction(17, 30)),
-            a()
-        };
+          };
+          o = function() {
+                i.allDay && (i.startTime = timeFunction(8, 0),
+                i.endTime = timeFunction(17, 30));
+                if(i.isRepeat){
+                    i.recurrenceEndType = i.recurrenceEndDate == null ? recurrenceEndTypes.never : recurrenceEndTypes.onDate;
+                }else{
+                    i.recurrenceEndType = recurrenceEndTypes.never;
+                }
+                i.recurrenceEndDate = new Date();
+                a();
+            };
         o();
         var s = function() {
             i.recurrenceType === e.DAILY ? i.recurrenceFrequency = r.daily.recurrenceFrequency : i.recurrenceType === e.WEEKLY ? (i.recurrenceFrequency = r.weekly.recurrenceFrequency,
@@ -779,52 +798,20 @@ sdApp.factory('timelineFactory', ['$log', function($log){
             i.recurrenceDayOfMonth = r.yearly.absolute.recurrenceDayOfMonth) : (i.recurrenceDayOfWeek = r.yearly.relative.recurrenceDayOfWeek,
             i.recurrenceWeekOfMonth = r.yearly.relative.recurrenceWeekOfMonth,
             i.recurrenceMonthOfYear = r.yearly.relative.recurrenceMonthOfYear))
-        }
-        ;
+        };
         this.save = function() {
             i.startTime = i.allDay ? null  : i.startTime,
-            i.endTime = i.allDay ? null  : i.endTime,
-            s()
+            i.endTime = i.allDay ? null  : i.endTime;
+            if(recurrenceEndTypes.never == i.recurrenceEndType){
+                i.recurrenceEndDate = null;
+            }
+            s();
         }
         ,
         this.recurrence = r,
         this.timeline = i
 
         return this;
-    };
-
-    var getTimelineLabel = function(timeline){
-      var t = {}
-      , n = {
-        DAILY: "Daily",
-        WEEKLY: "Weekly",
-        MONTHLY: "Monthly",
-        YEARLY: "Yearly"
-    }
-      , i = {
-        EVERY_DAY: "Every Day",
-        ALL_DAY: "All Day",
-        START: "Start",
-        END: "End",
-        TO: "to",
-        DAY: "Day",
-        OF: "Of",
-        EVERY: "Every"
-    }
-      , r = ["First", "Second", "Third", "Fourth", "Last"]
-      , a = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-      , o = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-      , s = function(t, n, i) {
-        var r = ""
-          , a = new Date(t);
-        return n ? (a.setMinutes(a.getMinutes() + a.getTimezoneOffset()),
-        r = e("date")(a, i)) : r = e("date")(a, i),
-        r
-    };
-
-
-
-
     };
 
     var getOnlyTime = function(datetime){
@@ -845,7 +832,7 @@ sdApp.factory('timelineFactory', ['$log', function($log){
             return (datetime.getFullYear() + '/' + (datetime.getMonth()+1)+'/'+ datetime.getDate())
         }
 
-    }
+    };
 
     var getDateTimeFromDate = function(dateString){
         if(dateString==null)
@@ -856,7 +843,7 @@ sdApp.factory('timelineFactory', ['$log', function($log){
             var newDate = new Date(dateString);
             return newDate
         }
-    }
+    };
 
     var getDateTimeFromTime = function(timeString){
         if(timeString == null){
@@ -868,17 +855,20 @@ sdApp.factory('timelineFactory', ['$log', function($log){
             dateTime.setMinutes(timeString.split(':')[1]);
             return dateTime;
         }
+    };
 
+    var getRecurrenceEndTypes = function(){
+        return angular.copy(recurrenceEndTypes);
     }
 
     return{
         getTimeline : getTimeline
-        ,getTimelineRecurrenceWise : getTimelineRecurrenceWise
-        ,getTimelineLabel : getTimelineLabel
+        ,getTimelineRecurrenceWise : getTimelineRecurrenceWise        
         ,getOnlyTime : getOnlyTime
         ,getOnlyDate : getOnlyDate
         ,getDateTimeFromDate : getDateTimeFromDate
         ,getDateTimeFromTime : getDateTimeFromTime
+        ,getRecurrenceEndTypes : getRecurrenceEndTypes
     }
 }]);
 
@@ -925,33 +915,36 @@ sdApp.factory('timelineDescription',['$filter','timelineFactory', function(e, tL
             //set Hours is to compare only the date part and to avoid time comparision
             if(e.startDate.setHours(0,0,0,0) == e.endDate.setHours(0,0,0,0)){
                 t = t+tLF.getOnlyDate(e.startDate) + ' ';
+                t = t + (e.allDay ? '' : tLF.getOnlyTime(e.startTime)) +  " ";
+                t = t + i.TO + "  "+ tLF.getOnlyDate(e.endDate) + "  ";
+                t = t + (e.allDay ? i.ALL_DAY : tLF.getOnlyTime(e.endTime)) +  " ";
             }
             else{
                 t = t+tLF.getOnlyDate(e.startDate) + ' ';
-                t = t + i.TO + " " + tLF.getOnlyDate(e.endDate) + " "
+                t = t + (e.allDay ? '' : tLF.getOnlyTime(e.startTime)) +  " ";
+                t = t + i.TO + "  "+ tLF.getOnlyDate(e.endDate) + "  ";
+                t = t + (e.allDay ? i.ALL_DAY : tLF.getOnlyTime(e.endTime));
             }
-            if(e.allDay){
-                t = t + i.ALL_DAY;
-            }else{
-                var c = "hh:mm a";
-                    t = t + tLF.getOnlyTime(e.startTime) + " ",
-                    e.endTime && (t = t + i.TO + " " + tLF.getOnlyTime(e.endTime) + " ")
+
+            //set Hours is to compare only the date part and to avoid time comparision
+            if (e.isRepeat) {
+                var u = 0;
+                if (t = t + " " + e.recurrenceType + " ",
+                e.recurrenceType === n.MONTHLY && (e.recurrenceAbsolute ? (t = t + i.DAY + " " + e.recurrenceDayOfMonth + " " + i.OF + " ",
+                u = e.recurrenceFrequency) : (t = t + r[e.recurrenceWeekOfMonth] + " " + a[e.recurrenceDayOfWeek] + " " + i.OF + " ",
+                u = e.recurrenceFrequency)),
+                t = t + i.EVERY + " ",
+                t = e.recurrenceType === n.YEARLY ? e.recurrenceAbsolute ? t + o[e.recurrenceMonthOfYear] + " " + e.recurrenceDayOfMonth + " " : t + r[e.recurrenceWeekOfMonth] + " " + a[e.recurrenceDayOfWeek] + " " + i.OF + " " + o[e.recurrenceMonthOfYear] + " " : t + e.recurrenceFrequency + " " + e.recurrenceType.substring(0, e.recurrenceType.length - 2).replace("I", "Y") + "(s) ",
+                e.recurrenceType === n.WEEKLY && e.recurrenceDaysOfWeek)
+                    for (var d = 0; d < e.recurrenceDaysOfWeek.length; d++)
+                        "Mon" === e.recurrenceDaysOfWeek[d] ? t = t + a[1] + " " : "Tue" === e.recurrenceDaysOfWeek[d] ? t = t + a[2] + " " : "Wed" === e.recurrenceDaysOfWeek[d] ? t = t + a[3] + " " : "Thu" === e.recurrenceDaysOfWeek[d] ? t = t + a[4] + " " : "Fri" === e.recurrenceDaysOfWeek[d] ? t = t + a[5] + " " : "Sat" === e.recurrenceDaysOfWeek[d] ? t = t + a[6] + " " : "Sun" === e.recurrenceDaysOfWeek[d] && (t = t + a[0] + " ")
+            
+                if(e.recurrenceEndDate != null){
+                    t = t+ " until " + tLF.getOnlyDate(e.recurrenceEndDate);
+                }
             }
         }
-        
-        //set Hours is to compare only the date part and to avoid time comparision
-        if (e.recurrenceType && e.startDate.setHours(0,0,0,0) != e.endDate.setHours(0,0,0,0)) {
-            var u = 0;
-            if (t = t + e.recurrenceType + " ",
-            e.recurrenceType === n.MONTHLY && (e.recurrenceAbsolute ? (t = t + i.DAY + " " + e.recurrenceDayOfMonth + " " + i.OF + " ",
-            u = e.recurrenceFrequency) : (t = t + r[e.recurrenceWeekOfMonth] + " " + a[e.recurrenceDayOfWeek] + " " + i.OF + " ",
-            u = e.recurrenceFrequency)),
-            t = t + i.EVERY + " ",
-            t = e.recurrenceType === n.YEARLY ? e.recurrenceAbsolute ? t + o[e.recurrenceMonthOfYear] + " " + e.recurrenceDayOfMonth + " " : t + r[e.recurrenceWeekOfMonth] + " " + a[e.recurrenceDayOfWeek] + " " + i.OF + " " + o[e.recurrenceMonthOfYear] + " " : t + e.recurrenceFrequency + " " + e.recurrenceType.substring(0, e.recurrenceType.length - 2).replace("i", "y") + "(s) ",
-            e.recurrenceType === n.WEEKLY && e.recurrenceDaysOfWeek)
-                for (var d = 0; d < e.recurrenceDaysOfWeek.length; d++)
-                    "Mon" === e.recurrenceDaysOfWeek[d] ? t = t + a[1] + " " : "Tue" === e.recurrenceDaysOfWeek[d] ? t = t + a[2] + " " : "Wed" === e.recurrenceDaysOfWeek[d] ? t = t + a[3] + " " : "Thu" === e.recurrenceDaysOfWeek[d] ? t = t + a[4] + " " : "Fri" === e.recurrenceDaysOfWeek[d] ? t = t + a[5] + " " : "Sat" === e.recurrenceDaysOfWeek[d] ? t = t + a[6] + " " : "Sun" === e.recurrenceDaysOfWeek[d] && (t = t + a[0] + " ")
-        }
+
         return t
     };
 
@@ -973,6 +966,8 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
             ,$scope.allDay
             ,timelineFactory.getDateTimeFromTime($scope.startTime)
             ,timelineFactory.getDateTimeFromTime($scope.endTime)
+            ,$scope.isRepeat
+            ,$scope.recurrenceEndDate
             ,$scope.recurrenceType
             ,$scope.recurrenceFrequency
             ,$scope.recurrenceAbsolute
@@ -980,7 +975,6 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
             ,$scope.recurrenceWeekOfMonth
             ,$scope.recurrenceDaysOfWeek
         );
-        updateTimeLabel();
         //$log.log($scope.timeline);
         updateTimelineObjects($scope.timeline);
     };
@@ -992,6 +986,8 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
             ,$scope.allDay = timeline.allDay
             ,$scope.startTime=timelineFactory.getOnlyTime(timeline.startTime)
             ,$scope.endTime=timelineFactory.getOnlyTime(timeline.endTime)
+            ,$scope.isRepeat = timeline.isRepeat
+            ,$scope.recurrenceEndDate = timeline.recurrenceEndDate
             ,$scope.recurrenceType=timeline.recurrenceType
             ,$scope.recurrenceFrequency=timeline.recurrenceFrequency
             ,$scope.recurrenceAbsolute=timeline.recurrenceAbsolute
@@ -1004,9 +1000,9 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
          $scope.label = timelineDescription.updateLabel($scope.timeline);
     }
 
-    $scope.$watch('timeDefined', function(newValue){
-        $scope.timeline.timeDefined = newValue;
-        updateTimeLabel()
+    $scope.$watch('timeline.timeDefined', function(newValue){
+        //$scope.timeline.timeDefined = newValue;
+        updateTimeLabel();
     });
 
     $scope.openTimelineModal=function(){
@@ -1024,11 +1020,11 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
         });
 
         modalInstance.result.then(function apply(timeline) {
-            $scope.timeline = timeline
+            $scope.timeline = timeline;
             updateTimelineObjects(timeline);
+            updateTimeLabel(timeline);
 
             toastr.success('timeline updated');
-            $scope.label = timelineDescription.updateLabel($scope.timeline);
 
             }, function cancel() {
                 toastr.warning('cancelled');
@@ -1040,9 +1036,10 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
 
 sdApp.controller('timelineModalController',['$scope','$uibModalInstance','timeline', '$log','timelineFactory',
  function($scope, $uibModalInstance, timeline, $log, timelineFactory){
-    var r = new timelineFactory.getTimelineRecurrenceWise(timeline);
+    var r = new timelineFactory.getTimelineRecurrenceWise(angular.copy(timeline));
     $scope.timeline=r.timeline;
     $scope.recurrence = r.recurrence;
+    $scope.recurrenceEndTypes = timelineFactory.getRecurrenceEndTypes();
 
     //date
     $scope.popUp1dateOptions = {
@@ -1061,26 +1058,40 @@ sdApp.controller('timelineModalController',['$scope','$uibModalInstance','timeli
             startingDay: 1
             ,showWeeks : false
         };
+    $scope.popUp3dateOptions = {
+            dateDisabled: false,
+            formatYear: 'yy',
+            maxDate: new Date(2020, 5, 22),
+            minDate: $scope.timeline.endDate,
+            startingDay: 1
+            ,showWeeks : false
+        };
     $scope.format = 'dd-MMMM-yyyy';
-    $scope.openDatepicker = function(datetype){
-        if(datetype == 'startDate' )
-        {
-            $scope.popUp1.opened = true;
-        }
-        else
-        {
-            $scope.popUp2.opened = true;
-            $log.log($scope.timeline.startDate);
-            $log.log($scope.popUp2dateOptions);
-
+    $scope.openDatepicker = function(popUpIndex){
+        switch(popUpIndex){
+            case 1 : 
+                $scope.popUp1.opened = true;
+                break;
+            case 2 : 
+                $scope.popUp2.opened = true;
+                break;
+            case 3 : 
+                $scope.popUp3.opened = true;
+                break;
         }
     }
 
     $scope.popUp1 = { opened : false };
     $scope.popUp2 = { opened : false };
+    $scope.popUp3 = { opened : false };
+
 
     $scope.$watch('timeline.startDate', function(newValue, oldValue){
         $scope.popUp2dateOptions.minDate = newValue;
+    });
+
+    $scope.$watch('timeline.endDate', function(newValue, oldValue){
+        $scope.popUp3dateOptions.minDate = newValue;
     });
 
     //time
@@ -1123,12 +1134,21 @@ sdApp.directive("largerThanDate", [function() {
 sdApp.directive("largerThanTime", [function() {
         return {
             require: "ngModel",
-            link: function(e, t, n, i) {
-                e.$watchGroup(["timeline.startTime", "timeline.endTime"], function(e) {
+            link: function(s, t, n, i) {
+                s.$watchGroup(["timeline.startTime", "timeline.endTime","timeline.startDate", "timeline.endDate","timeline.allDay"], function(e) {
+
                     var startTime = e[0] && new Date(e[0])
-                      , endTime = e[1] && new Date(e[1])
-                      , r = !(startTime && endTime && startTime >= endTime);
-                    i.$setValidity("largerThanTime", r)
+                      , endTime = e[1] && new Date(e[1]);
+                    if(s.timeline.allDay){
+                        i.$setValidity("largerThanTime", true)
+                    }else{
+                        if(s.timeline.startDate && s.timeline.endDate && s.timeline.startDate < s.timeline.endDate){
+                            i.$setValidity("largerThanTime", true);
+                        }else{
+                            r = !(startTime && endTime && startTime >= endTime);
+                            i.$setValidity("largerThanTime", r);
+                        }
+                    }
                 });
             }
         }

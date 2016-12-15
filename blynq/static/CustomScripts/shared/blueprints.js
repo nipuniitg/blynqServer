@@ -20,10 +20,12 @@
             this.timeline ={
                 is_always   : !0
                 ,start_date  : null
-                ,end_recurring_period :null
+                ,end_date    : null
                 ,all_day     :!0
                 ,start_time  :null
                 ,end_time    :null
+                ,is_repeat   : !1
+                ,end_recurring_period :null
                 ,frequency  :"DAILY"
                 ,interval   :null
                 ,recurrence_absolute:null

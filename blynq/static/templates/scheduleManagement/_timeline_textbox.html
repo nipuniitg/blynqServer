@@ -3,10 +3,10 @@
     <!-- <label class="col-md-2">
     <input ng-model="timeDefined" type="checkbox"
            > Always</label> -->
-    <label class="col-md-3"><input  type="radio" ng-model="timeDefined" ng-value="true"> Always run this campaign</label>
-    <label class="col-md-3"><input  type="radio" ng-model="timeDefined" ng-value="false"> Advanced Timeline</label>
+    <label class="col-md-3"><input  type="radio" ng-model="timeline.timeDefined" ng-value="true"> Always run this campaign</label>
+    <label class="col-md-3"><input  type="radio" ng-model="timeline.timeDefined" ng-value="false"> Advanced Timeline</label>
 
-<div class="col-md-10 col-md-offset-2" ng-if="!timeDefined">
+<div class="col-md-10 col-md-offset-2" ng-if="!timeline.timeDefined">
     <div id="timelineTextbox" class="tagsinput " style="height: 100%;">
         <span class="tag" ng-click="openTimelineModal()">
             <span> {[ label ]}  &nbsp;&nbsp;</span>
