@@ -58,6 +58,7 @@ class Organization(models.Model):
     contact = models.CharField(max_length=12, blank=True, null=True)
     total_file_size_limit = models.BigIntegerField(default=STORAGE_LIMIT_PER_ORGANIZATION)
     used_file_size = models.BigIntegerField(default=0)
+    total_screen_count = models.IntegerField(default=0)
 
     created_time = models.DateTimeField(auto_now_add=True, null=True)
     last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)

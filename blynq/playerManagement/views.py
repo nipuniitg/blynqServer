@@ -142,8 +142,8 @@ def get_screen_data(request, nof_days=3):
         except Exception as e:
             debugFileLog.error(e)
             return obj_to_json_response(campaigns_json)
-        is_modified = True
         # Update the screen status saying that it is active
+        # TODO: update_status might not required as there is already api/player/ping
         screen.update_status()
         if date_changed(last_received_datetime):
             is_modified = True
@@ -160,7 +160,7 @@ def get_screen_data(request, nof_days=3):
                     screen_data_json = screen_schedule_data(schedule_panes, start_time, end_time)
                     campaigns_json = {'campaigns': screen_data_json, 'is_modified': True}
     except Exception as e:
-        errors = "Error while fetching the occurences or invalid screen identifier"
+        errors = "Error while fetching the occurrences or invalid screen identifier"
         debugFileLog.exception(errors)
         mail_exception(exception=e)
     return obj_to_json_response(campaigns_json)

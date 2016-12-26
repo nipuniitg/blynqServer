@@ -125,7 +125,7 @@ def event_for_always(schedule):
 
 
 def event_dict_from_timeline(timeline, schedule):
-    debugFileLog.info("insisde event_dict_from_timeline")
+    debugFileLog.info("inside event_dict_from_timeline")
     is_always = timeline.get('is_always')
     all_day = timeline.get('all_day')
     recurrence_absolute = timeline.get('recurrence_absolute')

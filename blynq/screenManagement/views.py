@@ -110,6 +110,7 @@ def upsert_screen(request):
             if screen_id == -1:
                 activation_key = posted_data.get('activation_key')
                 try:
+                    # TODO: Instead of manually checking the 'verified' flag, use total_screen_count in Organization
                     screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key, in_use=False,
                                                                             verified=True)
                     screen = Screen(screen_name=posted_data.get('screen_name'), unique_device_key=screen_activation_key,
