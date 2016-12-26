@@ -239,6 +239,7 @@ class Screen(models.Model):
             debugFileLog.exception('Screen %s is_data_modified failed with exception %s ' % (self.screen_name, str(e)))
         return True
 
+    # def notify_player(self, **kwargs):
     def notify_player(self):
         debugFileLog.info("inside notify player")
         data_dict = {'schedules_updated': True, 'is_registered': True}
@@ -254,7 +255,11 @@ class Screen(models.Model):
         """
         try:
             if self.fcm_device:
+                # self.fcm_device.send_message(data=data_dict, **kwargs)
                 self.fcm_device.send_message(data=data_dict)
+                # Other options https://firebase.google.com/docs/cloud-messaging/concept-options
+                # For restart device, use data_dict{'restart_device': True}
+                # self.fcm_device.send_message(data=data_dict, time_to_live=0)
             else:
                 raise Exception('FCM details does not exist for the screen %s' % self.screen_name)
         except Exception as e:
