@@ -5,7 +5,7 @@ __author__ = 'nipun'
 
 
 def default_payment_due_serializer(query_set, fields=('show_warning', 'due_date', 'due_amount', 'payment_link',
-                                                      'additional_comments')):
+                                                      'suspend_access', 'additional_comments')):
     return PaymentDueMessageSerializer().serialize(query_set, fields=fields, use_natural_foreign_keys=True)
 
 
