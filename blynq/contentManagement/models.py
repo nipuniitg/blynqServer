@@ -122,6 +122,10 @@ class Content(models.Model):
             elif self.widget_text:
                 super(Content, self).save(*args, **kwargs)
                 return
+            elif self.content_type:
+                # This would be TV widget
+                super(Content, self).save(*args, **kwargs)
+                return
             debugFileLog.exception("file type does not exist, might be an url")
 
             def check_youtube_url(url):
