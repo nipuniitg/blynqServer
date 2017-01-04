@@ -80,7 +80,7 @@
                             <th ng-repeat="pane in schedule.schedule_panes" 
                                 style="text-align:center">
                                 {[ pane.layout_pane.title ]}
-                                <span style="margin-left: 10px;" ng-class="{'icon_vol-mute' : pane.mute_audio,    'icon_volume-high' : !pane.mute_audio }"></span>
+                                <span style="margin-left: 10px; display: none;" ng-class="{'icon_vol-mute' : pane.mute_audio,    'icon_volume-high' : !pane.mute_audio }"></span>
                             </th>
                         </tr>
                     </thead>
