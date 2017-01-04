@@ -1317,7 +1317,7 @@ sdApp.controller('selectionLibraryCtrl', ['$scope','$uibModalInstance','schedule
                 $scope.selectedPlaylists[$scope.selectedPlaylists.length - 1].schedule_playlist_id = -1;
                 break;
             case $scope.playlistTypes.blynqTVPlaylist :
-                $scope.selectedPlaylists.push(angular.copy($scope.userCreatedPlaylists[$index]));
+                $scope.selectedPlaylists.push(angular.copy($scope.blynqTVPlaylists[$index]));
                 $scope.selectedPlaylists[$scope.selectedPlaylists.length - 1].schedule_playlist_id = -1;
                 break;
             case $scope.playlistTypes.contentPlaylist : 
