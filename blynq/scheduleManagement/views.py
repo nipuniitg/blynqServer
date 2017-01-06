@@ -210,7 +210,7 @@ def upsert_schedule_groups(user_details, schedule, schedule_groups):
     return success, error, schedule
 
 
-def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists, blynq_playlists=False):
+def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists):
     debugFileLog.info("inside upsert_schedule_playlists")
     error = ''
     schedule_playlist_id_list = []
@@ -219,9 +219,9 @@ def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists
         playlist_id = int(item.get('playlist_id'))
         playlist_type = item.get('playlist_type')
         if playlist_type == Playlist.CONTENT or playlist_type == Playlist.WIDGET:
-            playlist = Playlist.upsert_playlist(playlist_dict=item, user_details=user_details, user_visible=False)
+            playlist = Playlist.upsert_playlist_from_dict(playlist_dict=item, user_details=user_details, user_visible=False)
             playlist_id = playlist.playlist_id
-        if blynq_playlists:
+        if playlist_type == Playlist.BLYNQ_TV:
             playlist = Playlist.get_blynq_content_playlists().get(playlist_id=playlist_id)
         else:
             playlist = Playlist.get_all_playlists(user_details).get(playlist_id=playlist_id)
@@ -238,12 +238,6 @@ def upsert_schedule_playlists(user_details, schedule_pane_id, schedule_playlists
     # Remove playlists not in playlist_schedules
     removed_playlist_schedules = SchedulePlaylists.objects.filter(schedule_pane_id=schedule_pane_id).exclude(
         schedule_playlist_id__in=schedule_playlist_id_list)
-    if blynq_playlists:
-        removed_playlist_schedules = removed_playlist_schedules.filter(
-            playlist__organization__organization_name=CONTENT_ORGANIZATION_NAME)
-    else:
-        removed_playlist_schedules = removed_playlist_schedules.exclude(
-            playlist__organization__organization_name=CONTENT_ORGANIZATION_NAME)
     if removed_playlist_schedules.exists():
         removed_playlist_schedules.delete()
     return True, error
@@ -294,9 +288,6 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
 
         upsert_schedule_playlists(user_details=user_details, schedule_pane_id=schedule_pane_id,
                                   schedule_playlists=schedule_playlists)
-        upsert_schedule_playlists(user_details=user_details, schedule_pane_id=schedule_pane_id,
-                                  schedule_playlists=schedule_blynq_playlists, blynq_playlists=True)
-
         schedule_pane_id_list.append(schedule_pane_id)
 
     # Remove Schedule Panes which are not in the post request
