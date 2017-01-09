@@ -2,7 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from authentication.models import Organization
-from customLibrary.views_lib import debugFileLog
+from customLibrary.views_lib import debugFileLog, mail_exception
 
 
 default_layout_list = [
@@ -40,19 +40,17 @@ default_layout_list = [
      "title": "3-Pane(Type-2)"}]
 
 
-@receiver(post_save, sender=Organization)
-def post_save_organization(sender, instance, **kwargs):
-    debugFileLog.info("inside post_save_organization")
+def create_default_layouts(organization):
     try:
         from layoutManagement.models import Layout, LayoutPane
-        organization_layouts = Layout.objects.filter(organization=instance, is_default=True)
+        organization_layouts = Layout.objects.filter(organization=organization, is_default=True)
         if organization_layouts.exists():
             return
         for layout in default_layout_list:
             title = layout.get('title')
             aspect_ratio_id = layout.get('aspect_ratio').get('aspect_ratio_id')
             try:
-                new_layout = Layout(title=title, aspect_ratio_id=aspect_ratio_id, is_default=True, organization=instance)
+                new_layout = Layout(title=title, aspect_ratio_id=aspect_ratio_id, is_default=True, organization=organization)
                 new_layout.save()
                 layout_panes = layout.get('layout_panes')
                 for each_pane in layout_panes:
@@ -62,5 +60,25 @@ def post_save_organization(sender, instance, **kwargs):
             except Exception as e:
                 debugFileLog.exception(e)
     except Exception as e:
-        debugFileLog.error('Error while creating default layout for organization')
         debugFileLog.exception(e)
+        mail_exception('Error while creating default layout for organization %s' % str(organization))
+
+
+def update_total_screen_count(organization):
+    try:
+        from screenManagement.models import Screen
+        screen_count = Screen.objects.filter(owned_by=organization).count()
+        if screen_count > organization.total_screen_count:
+            organization.total_screen_count = screen_count
+            organization.total_screen_count = screen_count
+            organization.save()
+    except Exception as e:
+        debugFileLog.exception(e)
+        mail_exception('Error while updating the screen count of the organization %s' % str(organization))
+
+
+@receiver(post_save, sender=Organization)
+def post_save_organization(sender, instance, **kwargs):
+    debugFileLog.info("inside post_save_organization")
+    create_default_layouts(instance)
+    update_total_screen_count(instance)

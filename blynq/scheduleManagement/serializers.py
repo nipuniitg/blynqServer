@@ -97,7 +97,7 @@ def get_schedule_timeline(schedule_pane):
             event_json['bymonthday'] = params.get('bymonthday')
             event_json['byweekno'] = params.get('byweekno')
             return event_json
-        debugFileLog.error("Event doesn't exist for the schedule")
+        debugFileLog.info("Event doesn't exist for the schedule")
     except Exception as e:
         mail_exception(exception=e)
     return default_timeline()

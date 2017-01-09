@@ -80,7 +80,7 @@ class Playlist(models.Model):
         return Playlist.objects.prefetch_related('playlist_items').filter(organization__organization_name=CONTENT_ORGANIZATION_NAME)
 
     @staticmethod
-    def upsert_playlist(playlist_dict, user_details, user_visible=True):
+    def upsert_playlist_from_dict(playlist_dict, user_details, user_visible=True):
         playlist_id = int(playlist_dict.get('playlist_id'))
         playlist_title = playlist_dict.get('playlist_title')
         playlist_type = playlist_dict.get('playlist_type')
@@ -112,7 +112,7 @@ class Playlist(models.Model):
                                                      display_time=display_time)
                 playlist_item_id = entry.playlist_item_id
             else:
-                entry = playlist.playlistitems_set.get(playlist_item_id=playlist_item_id)
+                entry = PlaylistItems.objects.get(playlist_item_id=playlist_item_id)
                 entry.position_index = pos_index
                 entry.display_time = display_time
                 entry.save()

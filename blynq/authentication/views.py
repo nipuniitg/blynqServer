@@ -134,7 +134,10 @@ def change_password(request):
 def divert_to_index_page(request, **kwargs):
     from paymentManagement.views import payment_warning_dict
     context_dic = payment_warning_dict(request)
-    return render(request, 'masterLayout.html', context_dic)
+    if context_dic.get('suspend_access'):
+        return render(request, 'payment_due.html', context_dic)
+    else:
+        return render(request, 'masterLayout.html', context_dic)
 
 
 @login_required

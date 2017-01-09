@@ -11,6 +11,7 @@ class PaymentDueMessage(models.Model):
     due_date = models.DateField(default=datetime.date.today)
     due_amount = models.FloatField(default=0)
     payment_link = models.CharField(max_length=200, blank=True, null=True)
+    suspend_access = models.BooleanField(default=False)
     additional_comments = models.CharField(max_length=250, blank=True, default='')
 
     def __unicode__(self):

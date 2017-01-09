@@ -17,6 +17,8 @@ from blynq.settings import MEDIA_ROOT, DEBUG
 
 
 def send_mail_blynq(to=['hello@blynq.in'], subject='', message=''):
+    if DEBUG:
+        return
     try:
         send_mail(subject=subject, message=message, from_email='django@blynq.in', recipient_list=to,
                   fail_silently=False)
@@ -27,8 +29,7 @@ def send_mail_blynq(to=['hello@blynq.in'], subject='', message=''):
 def mail_exception(exception, to=['nipun@blynq.in'], subject='Recieved exception'):
     exception = str(exception)
     debugFileLog.exception(exception)
-    if not DEBUG:
-        send_mail_blynq(to=to, subject=subject, message=exception)
+    send_mail_blynq(to=to, subject=subject, message=exception)
 
 
 def ajax_response(success=False, errors=[], obj_dict=None):
@@ -85,6 +86,13 @@ def empty_list_for_none(obj):
         return obj
     else:
         return []
+
+
+def empty_string_for_none(obj):
+    if obj:
+        return obj
+    else:
+        return ''
 
 
 def default_string_to_datetime(str, fmt='%d%m%Y%H%M%S'):

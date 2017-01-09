@@ -29,7 +29,7 @@ def upsert_playlist(request):
         with transaction.atomic():
             # Extract data from request.body
             posted_data = string_to_dict(request.body)
-            playlist = Playlist.upsert_playlist(playlist_dict=posted_data, user_details=user_details)
+            playlist = Playlist.upsert_playlist_from_dict(playlist_dict=posted_data, user_details=user_details)
             json_data = default_playlist_serializer([playlist])
             # assert len(json_data) > 0
             if len(json_data) > 0:
@@ -110,8 +110,7 @@ def get_widget_playlists(request):
 def get_blynq_playlists(request):
     user_details = get_userdetails(request)
     blynq_playlists = Playlist.get_blynq_content_playlists()
-    json_data = PlaylistSerializer().serialize(blynq_playlists,
-                                               fields=('playlist_id', 'playlist_title','playlist_items'))
+    json_data = default_playlist_serializer(blynq_playlists)
     return obj_to_json_response(json_data)
 
 

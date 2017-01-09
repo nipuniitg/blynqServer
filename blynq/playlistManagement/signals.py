@@ -10,6 +10,11 @@ from playlistManagement.models import PlaylistItems, Playlist
 @receiver(post_delete, sender=PlaylistItems)
 def playlist_items_changed(sender, instance, **kwargs):
     try:
+        instance
+    except Exception as e:
+        debugFileLog.info('instance object does not exist in playlist_items_changed')
+        return
+    try:
         playlist_total_time = 0
         total_time = PlaylistItems.objects.filter(playlist_id=instance.playlist_id).aggregate(Sum('display_time'))
         if total_time['display_time__sum']:
@@ -22,7 +27,7 @@ def playlist_items_changed(sender, instance, **kwargs):
             playlist.delete()
     except Exception as e:
         debugFileLog.exception('Failed to update the playlist total time for playlist_id %d' % instance.playlist_id)
-        mail_exception(exception=e)
+        # mail_exception(exception=e)
 
 
 @receiver(post_save, sender=Playlist)

@@ -6,7 +6,7 @@ from schedule.models import Calendar
 from fcm.models import AbstractDevice
 from authentication.models import Organization, UserDetails, City
 from customLibrary.custom_settings import PLAYER_INACTIVE_THRESHOLD
-from customLibrary.views_lib import debugFileLog
+from customLibrary.views_lib import debugFileLog, mail_exception
 
 # Create your models here.
 ORIENTATION_CHOICES = (
@@ -197,6 +197,20 @@ class Screen(models.Model):
         else:
             return 'Online'
 
+    @staticmethod
+    def get_info(device_key):
+        try:
+            from screenManagement.serializers import default_screen_serializer
+
+            screen = Screen.objects.get(unique_device_key__activation_key=device_key)
+            json_data = default_screen_serializer(screen, fields=('screen_name', 'address', 'screen_size', 'owned_by',
+                                                                  'aspect_ratio', 'resolution', 'last_active_time'))
+            if json_data and type(json_data) == list:
+                return json_data[0]
+        except Exception as e:
+            mail_exception(exception=e, subject='Received exception for device_key %s' % device_key)
+        return {}
+
     def update_status(self):
         self.last_active_time = timezone.now()
         self.save()
@@ -225,6 +239,7 @@ class Screen(models.Model):
             debugFileLog.exception('Screen %s is_data_modified failed with exception %s ' % (self.screen_name, str(e)))
         return True
 
+    # def notify_player(self, **kwargs):
     def notify_player(self):
         debugFileLog.info("inside notify player")
         data_dict = {'schedules_updated': True, 'is_registered': True}
@@ -240,7 +255,11 @@ class Screen(models.Model):
         """
         try:
             if self.fcm_device:
+                # self.fcm_device.send_message(data=data_dict, **kwargs)
                 self.fcm_device.send_message(data=data_dict)
+                # Other options https://firebase.google.com/docs/cloud-messaging/concept-options
+                # For restart device, use data_dict{'restart_device': True}
+                # self.fcm_device.send_message(data=data_dict, time_to_live=0)
             else:
                 raise Exception('FCM details does not exist for the screen %s' % self.screen_name)
         except Exception as e:
