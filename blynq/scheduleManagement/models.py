@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from schedule.models import Event
 
 from authentication.models import UserDetails, Organization
-from customLibrary.views_lib import debugFileLog, timeit
+from customLibrary.views_lib import debugFileLog, timeit, get_ist_date_str, get_ist_time_str, mail_exception
 from layoutManagement.models import LayoutPane, Layout
 from playlistManagement.models import Playlist
 from screenManagement.models import Screen, Group
@@ -72,6 +72,46 @@ class SchedulePane(models.Model):
     @property
     def get_schedule_playlists_manager(self):
         return self.scheduleplaylists_set.prefetch_related('playlist')
+
+    @staticmethod
+    def default_timeline():
+        return {'is_always': True, 'recurrence_absolute': False, 'all_day': True, 'is_repeat': False,
+                'start_date': None,
+                'end_recurring_period': None, 'start_time': None, 'end_time': None, 'frequency': None, 'interval': None,
+                'byweekday': None, 'bymonthday': None, 'byweekno': None}
+
+
+    def get_schedule_timeline(self):
+        try:
+            event_json = {}
+            event = self.event
+            if event:
+                event_json['is_always'] = self.is_always
+                event_json['recurrence_absolute'] = self.recurrence_absolute
+                event_json['all_day'] = self.all_day
+                event_json['is_repeat'] = self.is_repeat
+                event_json['start_date'] = get_ist_date_str(event.start) if event.start else None
+                event_json['end_date'] = get_ist_date_str(event.end) if event.end else None
+                if event.end_recurring_period:
+                    event_json['end_recurring_period'] = get_ist_date_str(utc_datetime=event.end_recurring_period)
+                else:
+                    event_json['end_recurring_period'] = None
+                event_json['start_time'] = get_ist_time_str(utc_datetime=event.start) if event.start else None
+                event_json['end_time'] = get_ist_time_str(utc_datetime=event.end) if event.end else None
+                rule = event.rule
+                params = rule.get_params() if rule else {}
+                event_json['frequency'] = rule.frequency if rule else None
+                event_json['interval'] = params.get('interval')
+                from scheduleManagement.views import weekday_string_to_index
+
+                event_json['byweekday'] = weekday_string_to_index(params.get('byweekday'), reverse=True)
+                event_json['bymonthday'] = params.get('bymonthday')
+                event_json['byweekno'] = params.get('byweekno')
+                return event_json
+            debugFileLog.info("Event doesn't exist for the schedule")
+        except Exception as e:
+            mail_exception(exception=e)
+        return SchedulePane.default_timeline()
 
 
 class Schedule(models.Model):
