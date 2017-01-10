@@ -79,13 +79,13 @@ sdApp.filter('timelineLabel', ['timelineFactory','timelineDescription', function
             ,tF.getDateTimeFromTime(timeline.start_time)
             ,tF.getDateTimeFromTime(timeline.end_time)
             ,timeline.is_repeat
-            ,timeline.end_recurring_period
+            ,tF.getDateTimeFromDate(timeline.end_recurring_period)
             ,timeline.frequency
             ,timeline.interval
             ,timeline.recurrence_absolute
             ,timeline.bymonthday
             ,timeline.byweekno
-            ,timeline.byweekday
+            ,timeline.byweekday 
         );
         return tD.updateLabel(cookedTimeline);
     };
@@ -773,10 +773,17 @@ sdApp.factory('timelineFactory', ['$log', function($log){
                 i.endTime = timeFunction(17, 30));
                 if(i.isRepeat){
                     i.recurrenceEndType = i.recurrenceEndDate == null ? recurrenceEndTypes.never : recurrenceEndTypes.onDate;
+                    if(i.recurrenceEndDate == null){
+                        i.recurrenceEndType = recurrenceEndTypes.never;
+                        i.recurrenceEndDate = new Date();
+                    }else{
+                        i.recurrenceEndType = recurrenceEndTypes.onDate;
+                    }
                 }else{
                     i.recurrenceEndType = recurrenceEndTypes.never;
+                    i.recurrenceEndDate = new Date();
                 }
-                i.recurrenceEndDate = new Date();
+                
                 a();
             };
         o();
@@ -967,7 +974,7 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
             ,timelineFactory.getDateTimeFromTime($scope.startTime)
             ,timelineFactory.getDateTimeFromTime($scope.endTime)
             ,$scope.isRepeat
-            ,$scope.recurrenceEndDate
+            ,timelineFactory.getDateTimeFromDate($scope.recurrenceEndDate)
             ,$scope.recurrenceType
             ,$scope.recurrenceFrequency
             ,$scope.recurrenceAbsolute
@@ -987,7 +994,7 @@ sdApp.controller('timelinetextboxController',['$scope', '$uibModal','$log','time
             ,$scope.startTime=timelineFactory.getOnlyTime(timeline.startTime)
             ,$scope.endTime=timelineFactory.getOnlyTime(timeline.endTime)
             ,$scope.isRepeat = timeline.isRepeat
-            ,$scope.recurrenceEndDate = timeline.recurrenceEndDate
+            ,$scope.recurrenceEndDate = timelineFactory.getOnlyDate(timeline.recurrenceEndDate)
             ,$scope.recurrenceType=timeline.recurrenceType
             ,$scope.recurrenceFrequency=timeline.recurrenceFrequency
             ,$scope.recurrenceAbsolute=timeline.recurrenceAbsolute
