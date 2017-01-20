@@ -390,7 +390,6 @@ img{
 .social {
   position: fixed;
   top: 200px;
-  font-family: 'Raleway', sans-serif;
   z-index: 10;
 }
 .social ul {
