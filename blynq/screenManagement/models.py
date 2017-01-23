@@ -6,7 +6,7 @@ from schedule.models import Calendar
 from fcm.models import AbstractDevice
 from authentication.models import Organization, UserDetails, City
 from customLibrary.custom_settings import PLAYER_INACTIVE_THRESHOLD
-from customLibrary.views_lib import debugFileLog, mail_exception
+from customLibrary.views_lib import debugFileLog, mail_exception, ajax_response
 
 # Create your models here.
 ORIENTATION_CHOICES = (
@@ -131,6 +131,28 @@ class GroupScreens(models.Model):
 
 class FcmDevice(AbstractDevice):
     fcm_device_id = models.AutoField(primary_key=True)
+
+    @staticmethod
+    def update_token(device_key, reg_id):
+        try:
+            fcm_device, created = FcmDevice.objects.update_or_create(dev_id=device_key,
+                                                                     defaults={'reg_id': reg_id, 'is_active': True})
+            try:
+                screen = Screen.objects.get(unique_device_key__activation_key=device_key)
+            except Exception as e:
+                debugFileLog.exception('Error while extracting screen object from device id %s' % device_key)
+                mail_exception(exception=e)
+                return ajax_response(success=False)
+            if created:
+                screen.fcm_device = fcm_device
+                screen.save()
+            success = True
+        except Exception as e:
+            debugFileLog.exception('Error while saving fcm registration token to database, device_key %s reg_id %s' %
+                                   (device_key, reg_id))
+            # mail_exception(exception=e)
+            success = False
+        return success
 
 
 class Screen(models.Model):

@@ -1,10 +1,9 @@
 import datetime
-import os
 
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
-from blynq.settings import MEDIA_HOST, HOST_URL
+from blynq.settings import HOST_URL
 from contentManagement.models import Content
 from contentManagement.serializers import default_content_serializer
 from customLibrary.custom_settings import PLAYER_POLL_TIME, PLAYER_NOTIFY_MAIL
@@ -16,7 +15,6 @@ from playlistManagement.models import PlaylistItems
 from reports.models import MediaAnalytics, ScreenAnalytics
 from scheduleManagement.models import ScheduleScreens, SchedulePlaylists, SchedulePane
 from screenManagement.models import ScreenActivationKey, Screen, FcmDevice
-from screenManagement.serializers import default_screen_serializer
 
 
 # Create your views here.
@@ -168,36 +166,31 @@ def get_screen_data(request, nof_days=3):
 
 @csrf_exempt
 def fcm_register(request):
-    try:
-        posted_data = string_to_dict(request.body)
-        reg_id = posted_data.get('reg_id')  # registration token
-        dev_id = posted_data.get('dev_id')
-        fcm_device, created = FcmDevice.objects.update_or_create(dev_id=dev_id,
-                                                                 defaults={'reg_id': reg_id, 'is_active': True})
-        try:
-            screen = Screen.objects.get(unique_device_key__activation_key=dev_id)
-        except Exception as e:
-            debugFileLog.exception('Error while extracting screen object from device id')
-            mail_exception(exception=e)
-            return ajax_response(success=False)
-        screen.fcm_device = fcm_device
-        screen.save()
-        success = True
-    except Exception as e:
-        debugFileLog.exception('Error while saving the fcm device to database')
-        # mail_exception(exception=e)
-        success = False
+    posted_data = string_to_dict(request.body)
+    reg_id = posted_data.get('reg_id')  # registration token
+    dev_id = posted_data.get('dev_id')
+    success = FcmDevice.update_token(device_key=dev_id, reg_id=reg_id)
     return ajax_response(success=success)
 
 
 @csrf_exempt
 def media_stats(request):
+    """
+    :param request:
+    :param request.body {'device_key': 1234567890, 'version_id': 4.12, 'reg_id': 'abcdefghijk',
+    'media_item_stats_list': [], 'session_time_list': []}
+    :return: success, fcm_success
+    """
     debugFileLog.info('Inside media stats player')
     try:
         posted_data = string_to_dict(request.body)
         unique_device_key = posted_data.get('device_key')
         screen = Screen.objects.get(unique_device_key__activation_key=unique_device_key)
         debugFileLog.info(' for screen %s with key %s' % (screen.screen_name, unique_device_key))
+        version_id = posted_data.get('version_id')
+        debugFileLog.info('device_key %s has app version %s' % (str(unique_device_key), str(version_id)))
+        reg_id = posted_data.get('reg_id')
+        fcm_success = FcmDevice.update_token(device_key=unique_device_key, reg_id=reg_id)
         media_stats_list = empty_list_for_none(posted_data.get('media_item_stats_list'))
         for stat in media_stats_list:
             try:
@@ -233,8 +226,9 @@ def media_stats(request):
         success = True
     except Exception as e:
         success = False
+        fcm_success = False
         # mail_exception(exception=e)
-    return ajax_response(success=success)
+    return ajax_response(success=success, obj_dict={'fcm_success': fcm_success})
 
 
 @csrf_exempt
