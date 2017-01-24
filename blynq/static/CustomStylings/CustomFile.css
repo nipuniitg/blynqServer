@@ -922,6 +922,7 @@ div.screen-container-wrap:hover{
     border : 1px solid grey;
     margin : 5px;
     padding: 5px;
+    overflow: auto;
 }
 
 .bs-wizard {border-bottom: solid 1px #e0e0e0; padding: 0 0 10px 0;}

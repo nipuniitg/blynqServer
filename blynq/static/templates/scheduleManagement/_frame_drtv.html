@@ -6,15 +6,15 @@
 				<i class="fa fa-times close" ng-show="showCloseOption" ng-click="removeItem($index)"></i>
 			</div>
 			<div class="pic-part" data-as-sortable-item-handle>
-			
-				<img ng-src="{[item.playlist_items[0].thumbnail]}" 
-				ng-if="(item.playlist_type == playlistTypes.contentPlaylist || item.playlist_type == playlistTypes.widgetPlaylist)"/>
+				<div class="stretch" content-slider slide-content="item.playlist_items" index="0">
+					<img ng-src="{[item.playlist_items[0].thumbnail]}" 
+					ng-if="(item.playlist_type == playlistTypes.contentPlaylist || item.playlist_type == playlistTypes.widgetPlaylist)"/>
 
-				<div class="film-icon" 
-					ng-if="(item.playlist_type == playlistTypes.userCreatedPlaylist || 	item.playlist_type == playlistTypes.blynqTVPlaylist)">
-					<i class="fa fa-film"></i>
+					<div class="film-icon" 
+						ng-if="(item.playlist_type == playlistTypes.userCreatedPlaylist || 	item.playlist_type == playlistTypes.blynqTVPlaylist)">
+						<i class="fa fa-film"></i>
+					</div>
 				</div>
-					
 			</div>
 			<div class="col-md-12" style="padding: 0px;" ng-if="showDuration">
 				<div class="input-group" ng-if="(item.playlist_type == 
