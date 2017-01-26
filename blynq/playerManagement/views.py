@@ -190,7 +190,8 @@ def media_stats(request):
         version_id = posted_data.get('version_id')
         debugFileLog.info('device_key %s has app version %s' % (str(unique_device_key), str(version_id)))
         reg_id = posted_data.get('reg_id')
-        fcm_success = FcmDevice.update_token(device_key=unique_device_key, reg_id=reg_id)
+        if reg_id:
+            fcm_success = FcmDevice.update_token(device_key=unique_device_key, reg_id=reg_id)
         media_stats_list = empty_list_for_none(posted_data.get('media_item_stats_list'))
         for stat in media_stats_list:
             try:
