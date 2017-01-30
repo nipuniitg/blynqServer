@@ -309,7 +309,7 @@ def update_status(request):
 @csrf_exempt
 def screen_info(request):
     debugFileLog.info('Inside screen info')
-    unique_device_key = ''
+    device_key = ''
     try:
         posted_data = string_to_dict(request.body)
         device_key = posted_data.get('device_key')

@@ -225,8 +225,8 @@ class Screen(models.Model):
             from screenManagement.serializers import default_screen_serializer
 
             screen = Screen.objects.get(unique_device_key__activation_key=device_key)
-            json_data = default_screen_serializer(screen, fields=('screen_name', 'address', 'screen_size', 'owned_by',
-                                                                  'aspect_ratio', 'resolution', 'last_active_time'))
+            json_data = default_screen_serializer([screen], fields=('screen_name', 'address', 'screen_size', 'owned_by',
+                                                                    'aspect_ratio', 'resolution', 'last_active_time'))
             if json_data and type(json_data) == list:
                 return json_data[0]
         except Exception as e:
