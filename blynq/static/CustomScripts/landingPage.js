@@ -78,6 +78,21 @@ lpApp.controller('lpController', ['$http','$scope','$timeout', function($http, $
         $scope.requestQuoteFormDetails.additional_details = 'Hi, we would like to opt for '+planType+' plan. Your additional comments goes here.....'
     }
 
+    $scope.becomepartner = function(partnerType){
+        resetForm();
+        var yourcomments = "Write your comments here."
+        switch (partnerType) {
+            case "advertiser" : 
+                $scope.requestQuoteFormDetails.additional_details = 'Hi, I would like to advertise on your network';
+                break;
+            case "contentpartner":
+                $scope.requestQuoteFormDetails.additional_details = 'Hi, I would like to become a content partner.';
+                break;
+            case "screenpartner" : 
+                $scope.requestQuoteFormDetails.additional_details = 'Hi, I have a great footfall around my screens. And I would like to generate revenue through it. ';
+                break;
+        }
+    }
     onLoad();
 }]);
 
