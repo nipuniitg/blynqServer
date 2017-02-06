@@ -12,7 +12,7 @@ sagApp.config(function($httpProvider) {
 });
 
 //Any methods which touches the dataBase goes here
-sagApp.factory('dataAccessFactory', ['$http', function($http){
+sagApp.factory('dataAccessFactory', ['$http', '$q', function($http, $q){
 
     var getAllScreens = function(callback){
         $http({
@@ -176,6 +176,22 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
         });
     }
 
+    var restartDevice = function(screen_id){
+        //This fetches default layouts --FullScreen
+        var deferred = $q.defer();
+        $http({
+            method : "POST",
+            url : "/api/screen/restartDevice",
+            data : { screen_id : screen_id}
+        }).then(function mySucces(response){
+            deferred.resolve(response.data);
+        }, function myError(response) {
+            console.log(response.statusText);
+            deferred.reject(response.Text)
+        });
+        return deferred.promise
+    };
+
     return{
         getAllScreens : getAllScreens
         ,getAllGroups : getAllGroups
@@ -187,6 +203,7 @@ sagApp.factory('dataAccessFactory', ['$http', function($http){
         ,getCityOptions : getCityOptions
         ,getScreenEvents : getScreenEvents
         ,getGroupEvents : getGroupEvents
+        ,restartDevice : restartDevice
     }
 
 }]);
@@ -540,6 +557,18 @@ sagApp.controller('screenCtrl',['screensFactory','dataAccessFactory', '$scope','
 
     $scope.closeScreenDetailsDiv = function(){
         $scope.isScreenDetailsDivOpen = false;
+    }
+
+    $scope.restartDevice = function(){
+        dataAccessFactory.restartDevice($scope.screens[$scope.activeScreenIndex].screen_id).then(function(data){
+            if(data.success){
+                toastr.success('Device will restart. Make sure the screen has internet connectiviy.');
+            }else{
+                toastr.warning(data.errors.join(','));
+            }
+        }, function(){
+            toastr.warning('Oops! Some error occurred. Check your internet connection and try again.');
+        });
     }
 
 }]);

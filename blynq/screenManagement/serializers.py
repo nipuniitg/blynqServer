@@ -4,7 +4,8 @@ from customLibrary.views_lib import datetime_to_string, get_ist_datetime, wrap_t
 from screenManagement.models import GroupScreens
 
 
-def default_screen_serializer(query_set, fields=('screen_id', 'screen_name', 'address', 'city', 'status', 'screen_size',
+def default_screen_serializer(query_set, fields=('screen_id', 'screen_name','app_version',
+                                                 'address', 'city', 'status', 'screen_size',
                                                  'aspect_ratio', 'resolution', 'last_active_time', 'groups')):
     return ScreenSerializer().serialize(query_set, fields=fields, use_natural_foreign_keys=True)
 
