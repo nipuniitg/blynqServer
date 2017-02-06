@@ -182,6 +182,7 @@ def media_stats(request):
     :return: success, fcm_success
     """
     debugFileLog.info('Inside media stats player')
+    fcm_success = False
     try:
         posted_data = string_to_dict(request.body)
         unique_device_key = posted_data.get('device_key')
@@ -189,6 +190,9 @@ def media_stats(request):
         debugFileLog.info(' for screen %s with key %s' % (screen.screen_name, unique_device_key))
         version_id = posted_data.get('version_id')
         debugFileLog.info('device_key %s has app version %s' % (str(unique_device_key), str(version_id)))
+        if version_id:
+            screen.app_version = int(version_id)
+            screen.save()
         reg_id = posted_data.get('reg_id')
         if reg_id:
             fcm_success = FcmDevice.update_token(device_key=unique_device_key, reg_id=reg_id)

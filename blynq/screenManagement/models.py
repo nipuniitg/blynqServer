@@ -193,6 +193,7 @@ class Screen(models.Model):
     business_type = models.CharField(max_length=20, choices=BUSINESS_TYPE_CHOICES, default=BUSINESS_TYPE_CHOICES[0][0])
 
     status = models.ForeignKey(ScreenStatus, on_delete=models.PROTECT, null=True)
+    app_version = models.IntegerField(null=True, blank=True, default=1)
     groups = models.ManyToManyField(Group, blank=True, through=GroupScreens)
 
     fcm_device = models.ForeignKey(FcmDevice, null=True, blank=True, on_delete=models.SET_NULL)
@@ -226,7 +227,8 @@ class Screen(models.Model):
 
             screen = Screen.objects.get(unique_device_key__activation_key=device_key)
             json_data = default_screen_serializer([screen], fields=('screen_name', 'address', 'screen_size', 'owned_by',
-                                                                    'aspect_ratio', 'resolution', 'last_active_time'))
+                                                                    'app_version', 'aspect_ratio', 'resolution',
+                                                                    'last_active_time'))
             if json_data and type(json_data) == list:
                 return json_data[0]
         except Exception as e:
