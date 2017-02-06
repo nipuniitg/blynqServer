@@ -264,19 +264,22 @@ class Screen(models.Model):
         return True
 
     # def notify_player(self, **kwargs):
-    def notify_player(self):
+    def notify_player(self, data_dict=None):
         debugFileLog.info("inside notify player")
-        data_dict = {'schedules_updated': True, 'is_registered': True}
+        if not data_dict:
+            data_dict = {'schedules_updated': True, 'is_registered': True}
         """
             Keys to notify player
             1.is_registered (one-time) -
             2.schedules_updated -
             3.player_updated (based on version no) -
             4.clear_player_cache
-            5.restart_player
-            6.send_logs { start_time, end_time}
-            7.send_stats { start_time, end_time}
+            5.restart_device
+            6.restart_player
+            7.send_logs { start_time, end_time}
+            8.send_stats { start_time, end_time}
         """
+        success = False
         try:
             if self.fcm_device:
                 # self.fcm_device.send_message(data=data_dict, **kwargs)
@@ -284,11 +287,20 @@ class Screen(models.Model):
                 # Other options https://firebase.google.com/docs/cloud-messaging/concept-options
                 # For restart device, use data_dict{'restart_device': True}
                 # self.fcm_device.send_message(data=data_dict, time_to_live=0)
+                success = True
             else:
                 raise Exception('FCM details does not exist for the screen %s' % self.screen_name)
         except Exception as e:
             debugFileLog.exception(e)
+        return success
 
+    def restart_device(self):
+        debugFileLog.info("restart device signal sent for screen_id: %d name: %s" % (self.screen_id, self.screen_name))
+        return self.notify_player(data_dict=dict(restart_device=True))
+
+    def restart_app(self):
+        debugFileLog.info("restart player signal sent for screen_id: %d name: %s" % (self.screen_id, self.screen_name))
+        return self.notify_player(data_dict=dict(restart_player=True))
 
 # Update the last_updated_time of a screen whenever any schedule or playlist or group or layout related to screen is
 # modified. This model instance will be used in the get_screen_data function in playerManagement/views.py

@@ -221,3 +221,39 @@ def group_index(request):
 def get_aspect_ratios(request):
     json_data = AspectRatioSerializer().serialize(AspectRatio.objects.all())
     return obj_to_json_response(json_data)
+
+
+def restart_device(request):
+    user_details = get_userdetails(request)
+    posted_data = string_to_dict(request.body)
+    success = False
+    try:
+        screen_id = posted_data.get('screen_id')
+        if screen_id:
+            screen = Screen.get_user_relevant_objects(user_details=user_details).get(screen_id=screen_id)
+            success = screen.restart_device()
+        else:
+            debugFileLog.error('screen_id is empty for restart_device')
+    except Exception as e:
+        debugFileLog.error('Exception received in restart device for request body %s' % str(request.body))
+        debugFileLog.exception(e)
+    errors = ['There is some issue with restart device, please refresh the page and try again'] if not success else []
+    return ajax_response(success=success, errors=errors)
+
+
+def restart_app(request):
+    user_details = get_userdetails(request)
+    posted_data = string_to_dict(request.body)
+    success = False
+    try:
+        screen_id = posted_data.get('screen_id')
+        if screen_id:
+            screen = Screen.get_user_relevant_objects(user_details=user_details).get(screen_id=screen_id)
+            success = screen.restart_app()
+        else:
+            debugFileLog.error('screen_id is empty for restart_device')
+    except Exception as e:
+        debugFileLog.error('Exception received in restart device for request body %s' % str(request.body))
+        debugFileLog.exception(e)
+    errors = ['There is some issue with restart player, please refresh the page and try again'] if not success else []
+    return ajax_response(success=success, errors=errors)

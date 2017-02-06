@@ -12,4 +12,6 @@ urlpatterns = [
     url(r'^deleteGroup', views.delete_group, name='delete_group'),
     url(r'^getCityOptionsJson', views.get_city_options, name='city_options'),
     url(r'^getAspectRatios', views.get_aspect_ratios, name='aspect_ratios'),
+    url(r'^restartDevice', views.restart_device, name='restart_device'),
+    url(r'^restartApp', views.restart_app, name='restart_app'),
 ]
