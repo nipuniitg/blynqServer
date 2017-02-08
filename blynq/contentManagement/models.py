@@ -353,7 +353,7 @@ class Content(models.Model):
 
 
 class FbWidget(models.Model):
-    content = models.ForeignKey(Content, on_delete=models.CASCADE)
+    content = models.OneToOneField(Content, on_delete=models.CASCADE)
     fb_page_url = models.CharField(max_length=250)
     no_of_posts = models.IntegerField(default=10)
     post_duration = models.IntegerField(default=15)
