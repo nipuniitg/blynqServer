@@ -115,6 +115,24 @@
         };
 
 
+        //widgets Blueprints
+        function fbWidget(){
+            this.content_id = -1
+            this.title = ''
+            this.fb_page_url = ''
+            this.no_of_posts;
+            this.post_duration;
+            this.content_type = 'widget/fb/page'
+        }
+
+        function rssWidget(){
+            this.content_id = -1
+            this.title = ''
+            this.widget_text = ''
+            this.content_type = 'widget/rss/text'
+        }
+
+
         return{
             Schedule : Schedule
             ,SchedulePane : SchedulePane
@@ -125,6 +143,8 @@
             ,PlaylistItem : PlaylistItem
             ,Layout : Layout
             ,LayoutPane : LayoutPane
+            ,fbWidget : fbWidget
+            ,rssWidget : rssWidget
         }
     }]);
 }());

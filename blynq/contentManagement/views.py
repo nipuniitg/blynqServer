@@ -1,6 +1,8 @@
 import mimetypes
 import os
 import subprocess
+import urllib2
+import json
 
 from django.contrib.auth.decorators import login_required
 from django.core.files import File
@@ -14,7 +16,7 @@ from blynq.settings import TEMP_DIR
 from customLibrary.custom_settings import COMPRESS_IMAGE, WIDGET_SCROLL_TIME
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, \
     debugFileLog, full_file_path, mail_exception, timeit
-from contentManagement.models import Content, ContentType
+from contentManagement.models import Content, ContentType, FbWidget
 
 
 # Create your views here.
@@ -512,3 +514,110 @@ def upsert_widget(request):
         mail_exception(exception=e)
         errors = ['Invalid widget details']
     return ajax_response(success=success, errors=errors)
+
+
+def upsert_fb_widget(request):
+    debugFileLog.info("Inside upsert fb widget")
+    success = False
+    errors = []
+    try:
+        user_details = get_userdetails(request)
+        posted_data = string_to_dict(request.body)
+        content_id = int(posted_data.get('content_id'))
+        title = posted_data.get('title')
+        # TODO: Remove this hard-coding of widget/fb/text
+        content_type, created = ContentType.objects.get_or_create(file_type='widget/fb/page')
+        if content_id == -1:
+            content_id = None
+        content, created = Content.get_user_widgets(user_details=user_details).update_or_create(
+            content_id=content_id, defaults=dict(
+                title=title, content_type_id=content_type.content_type_id, 
+                organization_id=user_details.organization.organization_id, last_updated_by=user_details,
+                ))
+        if created:
+            content.uploaded_by = user_details
+            content.save()
+            content_id = content.content_id
+        fb_widget, created = FbWidget.objects.update_or_create(content_id=content_id, defaults=dict(
+            fb_page_url=posted_data.get('fb_page_url'), no_of_posts=posted_data.get('no_of_posts'),
+            post_duration=int(posted_data.get('post_duration'))))
+        success = True
+    except Exception as e:
+        mail_exception(exception=e)
+        errors = ['Invalid widget details']
+    return ajax_response(success=success, errors=errors)
+
+
+def getFBWidget(request, content_id):
+    fb_widget = FbWidget.objects.get(content_id=content_id)
+    pageName = FbWidget.get_page_name(fb_widget.fb_page_url)
+    context_dic = {}
+    noOfPosts = fb_widget.no_of_posts
+    [pageExists, posts, postsIds] = checkIfPageExists(pageName, noOfPosts)
+    if pageExists :
+        context_dic['pageNameInURL'] = pageName
+        context_dic['pageName'] = getPageName(pageName)
+        context_dic['pagePicture'] = "https://graph.facebook.com/"+ pageName + "/picture"
+        context_dic['posts'] = posts
+        context_dic['postDuration'] = fb_widget.post_duration
+        context_dic['postsIds'] = ','.join(postsIds)
+        return render(request, 'widgets/socialMedia/facebook/facebookwidget.html', context_dic)
+    else : 
+        return error
+
+
+def check_fb_page_exists(request):
+    posted_data = string_to_dict(request.body)
+    fb_page_url = posted_data.get('fb_page_url')
+    page_name = FbWidget.get_page_name(fb_page_url)
+    [success, x, y] = checkIfPageExists(page_name)
+    return ajax_response(success=success)
+
+
+def checkIfPageExists(pageName, noOfPosts=1):
+    try:
+        graphapiurl = "https://graph.facebook.com/"
+        fbAccessToken = "access_token=583412958518077|yxWncaswG-JWQGQwI1MWc04icXY"
+        limitposts = "limit="+ str(noOfPosts) 
+        rawPosts = urllib2.urlopen(graphapiurl + pageName + "/posts" + '?' + limitposts + '&' + fbAccessToken).read()
+        rawPostsAfterJson = json.loads(rawPosts)
+        if 'error' in rawPostsAfterJson :
+            return [False, False, False]
+        else : 
+            [postsDetails, postsIds] = getPostDetails(rawPostsAfterJson, noOfPosts)
+            return [True, postsDetails, postsIds]
+    except Exception as e:
+        debugFileLog.error('Error while checking FB page exists')
+        debugFileLog.exception(e)
+        return [False, False, False]
+
+
+def getPostDetails(rawPostsAfterJson, noOfPosts):
+    graphapiurl = "https://graph.facebook.com/?ids="
+    fieldsRequired = "&fields=message,full_picture"
+    access_token = "&access_token=583412958518077|yxWncaswG-JWQGQwI1MWc04icXY"
+    postsIds = []
+    lengthOfAvailablePosts = len(rawPostsAfterJson['data'])
+    postsDetails=[]
+    if noOfPosts > lengthOfAvailablePosts:
+        noOfPosts = lengthOfAvailablePosts
+    for i in range(0, noOfPosts):
+        postsIds.append(rawPostsAfterJson['data'][i]['id'])
+    rawPostsDetails = urllib2.urlopen(graphapiurl + ','.join(postsIds)+fieldsRequired+access_token).read()
+    rawPostsDetailsAfterJson = json.loads(rawPostsDetails)
+    for i in range(0, noOfPosts):
+        post = {}
+        if 'message' in rawPostsDetailsAfterJson[postsIds[i]]:
+            post['message'] = rawPostsDetailsAfterJson[postsIds[i]]['message']
+        if 'full_picture' in rawPostsDetailsAfterJson[postsIds[i]]:
+            post['picture'] = rawPostsDetailsAfterJson[postsIds[i]]['full_picture']
+        if len(post) > 0 : 
+            postsDetails.append(post)
+    return [postsDetails, postsIds]
+
+
+def getPageName(pageName):
+    pageNameUrl = 'https://graph.facebook.com/'+pageName+'?access_token=583412958518077|yxWncaswG-JWQGQwI1MWc04icXY'    
+    pageName = json.loads(urllib2.urlopen(pageNameUrl).read())['name']
+    return pageName
+

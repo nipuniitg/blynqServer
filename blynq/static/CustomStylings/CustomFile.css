@@ -293,7 +293,7 @@ cursor:pointer
 
 .content-container{
     position : absolute;
-    top: 53px;
+    top: 0px;
     bottom:0px;
     width:100%;
     padding-top : 15px;

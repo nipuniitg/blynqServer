@@ -889,14 +889,16 @@ div[data-role="editor-toolbar"] {
   -webkit-border-radius: 0px;
   -moz-border-radius: 0px;
   border-radius: 0px;
-  height: 34px;
+  height: 40px;
   position: relative;  
   margin: 0 0 19px 0;
   overflow: hidden;
+  padding: 4px 15px;
 }
 .breadcrumb li {
   position: relative;
   margin-right: 0;
+  padding-top: 8px;
 }
 .breadcrumb li i {
   Font-size: 15px;

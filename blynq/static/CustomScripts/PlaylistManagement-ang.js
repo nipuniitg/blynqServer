@@ -511,6 +511,7 @@ plApp.directive('mediaPlayer', ['$timeout', function($timeout){
                 ,pdf : false
                 ,youtube : false
                 ,rssText : false
+                ,fb : false
                 ,iframe : false
                 ,default : false
             };
@@ -542,6 +543,9 @@ plApp.directive('mediaPlayer', ['$timeout', function($timeout){
                     case $scope.mediaFile.content_type.indexOf('widget/rss/text')>-1:
                         $scope.isMediaType.rssText = true;
                         setUpRssTextMedia();
+                        break;
+                    case  $scope.mediaFile.content_type.indexOf('fb/page')>-1:
+                        $scope.isMediaType.fb = true;
                         break;
                     case $scope.mediaFile.content_type.indexOf('url/web')>-1:
                         $scope.isMediaType.iframe = true;

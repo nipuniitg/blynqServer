@@ -60,6 +60,15 @@
             return angular.copy(playlistTypes);
         }
 
+        var getWidgetTypes = function(){
+            var widgetTypes = {
+                rss : 'rss'
+                ,hdmiIn : 'hdmiIn'
+                ,fb : 'fb'
+            }
+            return angular.copy(widgetTypes);
+        };
+
         return{
             defaultSchedulesLayoutType : defaultSchedulesLayoutType
             ,layouts : layouts
@@ -68,6 +77,7 @@
             ,getAllFilesHomeFolder : getAllFilesHomeFolder
             ,getRefreshScreensInterval : getRefreshScreensInterval
             ,getPlaylistTypes : getPlaylistTypes
+            ,getWidgetTypes : getWidgetTypes
         }
     }]);
 

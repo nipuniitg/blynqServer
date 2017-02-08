@@ -3,7 +3,7 @@
     $interpolateProvider.endSymbol(']}');
     });*/
 
-plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
+plApp.factory('ctDataAccessFactory',['$http','$window','$q', function($http,$window,$q){
 
     var getWidgets = function(callback) {
         var URL = 'api/content/getWidgets'
@@ -168,6 +168,38 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
                 console.log(response.statusText);
             });
     }
+    var upsertFbWidget = function(fbWidget){
+        var deferred = $q.defer();
+        $http({
+            method : "POST",
+            url : "/api/content/upsertFbWidget",
+            data : fbWidget
+        }).then(function mySucces(response) {
+            deferred.resolve(response.data);
+        }, function myError(response) {
+            console.log(response.statusText);
+            deferred.reject(response.Text)
+        });
+        return deferred.promise;
+    };
+
+    var checkFbPageExists = function(fbPageUrl){
+        var deferred = $q.defer();
+        var postData ={
+            fb_page_url : fbPageUrl
+        };
+        $http({
+            method : "POST",
+            url : "/api/content/checkFbPageExists"
+            ,data : postData
+        }).then(function mySucces(response) {
+            deferred.resolve(response.data);
+        }, function myError(response) {
+            console.log(response.statusText);
+            deferred.reject(response.Text)
+        });
+        return deferred.promise;
+    }
 
     var upsertUrl = function(content, parent_folder_id, callback ){
         var postData = {};
@@ -213,7 +245,9 @@ plApp.factory('ctDataAccessFactory',['$http','$window', function($http,$window){
         ,moveContent    :   moveContent
         ,upsertUrl  : upsertUrl
         ,upsertWidget: upsertWidget
+        ,upsertFbWidget : upsertFbWidget
         ,getValidContentTypes : getValidContentTypes
+        ,checkFbPageExists : checkFbPageExists
     }
 
 }]);
@@ -277,8 +311,8 @@ plApp.factory('ctFactory', ['ctDataAccessFactory', function(ctDataAccessFactory)
 
 }]);
 
-plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', '$uibModal','constantsAndDefaults',
-function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
+plApp.controller('ctCtrl',['$scope','ctFactory','ctDataAccessFactory', '$uibModal','constantsAndDefaults','blueprints',
+function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD, bp){
 
     //private functions
     var onLoad = function(){
@@ -615,83 +649,69 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
     // upsertWidget
     var newWidget = -1;
 
-    $scope.addNewWidget = function(){
-        openUpsertWidgetModal(newWidget)
-    }
+    $scope.availableWidgetTypes = cAD.getWidgetTypes();
+
+    $scope.addNewWidget = function(widgetType){
+        openUpsertWidgetModal(newWidget, widgetType);
+    };
 
     $scope.editWidget = function(index){
-        openUpsertWidgetModal(index)
-    }
+        var widgetType;
+        var availableWidgetTypes = cAD.getWidgetTypes();
+        switch(true){
+            case $scope.widgets[index].content_type.indexOf(availableWidgetTypes.rss)>-1:
+                widgetType = availableWidgetTypes.rss;
+                break;
+            case $scope.widgets[index].content_type.indexOf(availableWidgetTypes.fb)>-1:
+                widgetType = availableWidgetTypes.fb;
+                break;
+            case $scope.widgets[index].content_type.indexOf(availableWidgetTypes.hdmiIn)>-1:
+                widgetType = availableWidgetTypes.hdmiIn;
+                break;
+        }
+        openUpsertWidgetModal(index, widgetType);
+    };
 
-    var openUpsertWidgetModal = function(index){
+    var openUpsertWidgetModal = function(index, widgetType){
         var isNewWidget = index == newWidget ? !0 : !1;
+        var templateUrl,controllerFn;
+        var availableWidgetTypes = cAD.getWidgetTypes();
+        switch(widgetType){
+            case availableWidgetTypes.rss:
+                templateUrl = '/static/templates/contentManagement/_widget_mdl.html';
+                controllerFn = 'widgetCtrl';
+                break;
+            case availableWidgetTypes.fb: 
+                templateUrl = '/static/templates/contentManagement/_fb_mdl.html';
+                controllerFn = 'widgetCtrl';
+                break;
+        };
 
         var modalInstance = $uibModal.open({
             animation: true
-            , templateUrl: '/static/templates/contentManagement/_widget_mdl.html'
+            , templateUrl : templateUrl
             , size: 'md'
             ,resolve : {
                     widgetObj : function(){
                         if(isNewWidget)
                         {
-                            return {
-                                content_id : -1
-                                ,title : ''
-                                ,widget_text : ''
+                            var obj;
+                            switch(widgetType){
+                                case availableWidgetTypes.rss:
+                                    obj = new bp.rssWidget();
+                                    break;
+                                case availableWidgetTypes.fb: 
+                                    obj = new bp.fbWidget();
+                                    break;
                             }
+                            return obj;
                         }
                         else{
                             return angular.copy($scope.widgets[index]);
                         }
                     }
               }
-              ,controller : function($scope, $uibModalInstance,ctDataAccessFactory, widgetObj,$log){
-                    var isNewWidget;
-                    var onLoad = function(){
-                        $scope.widgetObj = widgetObj;
-                        isNewWidget = widgetObj.content_id == -1 ? !0 : !1
-                        if(isNewWidget){
-                            $scope.modalTitle = 'Add Widget';
-                            $scope.saveVerbose = 'Add';
-                        }
-                        else{
-                            $scope.modalTitle = 'Update Widget';
-                            $scope.saveVerbose = 'Update';
-                        }
-                    }
-                    onLoad();
-
-                    var validate = function(){
-                        if($scope.widgetUpsertForm.$valid){
-                            return !0
-                        }else{ return !1}
-                    }
-
-                    $scope.save = function(){
-                        if(validate()){
-                            ctDataAccessFactory.upsertWidget($scope.widgetObj, function(returnData){
-                                if(returnData.success){
-                                    if(isNewWidget){
-                                        toastr.success('Widget Added Successfully');
-                                    }else{
-                                        toastr.success('Widget updated Successfully');
-                                    }
-                                    $uibModalInstance.close();
-                                }else{
-                                    toastr.warning('Oops! some error occured while '+ (isNewWidget ? 'adding.':'updating.')
-                                    +'Please try after refreshing the page');
-                                    $log.log(returnData.errors);
-                                }
-                            })
-                        }else{
-                            toastr.warning('There are some error in the form. Please correct them');
-                        }
-                    }
-
-                    $scope.cancel = function(){
-                        $uibModalInstance.dismiss();
-                    }
-              }
+              ,controller : controllerFn
             });
 
         modalInstance.result.then(function saved(){
@@ -793,8 +813,101 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD){
         });
     }
 
+
     onLoad();
 }]);
+
+//ToDo : check if we need seperate controllers and upsert urls for each widget type. 
+plApp.controller('widgetCtrl',['$scope', '$uibModalInstance', 'ctDataAccessFactory','widgetObj','$log',
+    'constantsAndDefaults',
+ function($scope, $uibModalInstance,ctDataAccessFactory, widgetObj,$log, cAD){
+        var isNewWidget, widgetType, availableWidgetTypes = cAD.getWidgetTypes();
+        var onLoad = function(){
+            $scope.widgetObj = widgetObj;
+            isNewWidget = widgetObj.content_id == -1 ? !0 : !1
+            switch(true){
+                case widgetObj.content_type.indexOf(availableWidgetTypes.rss)>-1:
+                    widgetType = availableWidgetTypes.rss;
+                    break;
+                case widgetObj.content_type.indexOf(availableWidgetTypes.fb)>-1:
+                    widgetType = availableWidgetTypes.fb;
+                    break;
+                case widgetObj.content_type.indexOf(availableWidgetTypes.hdmiIn)>-1:
+                    widgetType = availableWidgetTypes.hdmiIn;
+                    break;
+            }        
+            if(isNewWidget){
+                $scope.modalTitle = 'Add' + widgetType;
+                $scope.saveVerbose = 'Add';
+            }
+            else{
+                $scope.modalTitle = 'Update' + widgetType;
+                $scope.saveVerbose = 'Update';
+            }
+        }
+        onLoad();
+
+        var validate = function(){
+            switch(widgetType){
+                case availableWidgetTypes.rss : 
+                    return $scope.widgetUpsertForm.$valid ? !0 : !1
+                case availableWidgetTypes.fb : 
+                    return $scope.fbUpsertForm.$valid ? !0 : !1
+            };  
+        };
+
+        $scope.save = function(){
+            if(validate()){
+                switch(widgetType){
+                    case availableWidgetTypes.rss : 
+                        ctDataAccessFactory.upsertWidget($scope.widgetObj,successFn);
+                    case availableWidgetTypes.fb : 
+                        ctDataAccessFactory.upsertFbWidget($scope.widgetObj).then(successFn);
+                }
+            }else{
+                toastr.warning('There are some error in the form. Please correct them');
+            }
+        };
+
+        var successFn = function(returnData){
+            if(returnData.success){
+                if(isNewWidget){
+                    toastr.success('Widget Added Successfully');
+                }else{
+                    toastr.success('Widget updated Successfully');
+                }
+                $uibModalInstance.close();
+            }else{
+                toastr.warning('Oops! some error occured while '+ (isNewWidget ? 'adding.':'updating.')
+                +'Please try after refreshing the page');
+                $log.log(returnData.errors);
+            }
+        };
+
+        $scope.cancel = function(){
+            $uibModalInstance.dismiss();
+        }
+  }] );
+
+plApp.directive('checkFbPageExistsDir', ['ctDataAccessFactory', function(ctDAF){
+    return {
+            restrict: 'A',
+            require: "ngModel",
+            link: function(e, t, n, i) {
+                e.$watch("widgetObj.fb_page_url",function(newURL, oldURL){
+                    if(newURL.length > 0){
+                        ctDAF.checkFbPageExists(newURL).then(function(returnData){
+                            if(returnData.success){
+                                i.$setValidity("checkFbPageExistsDir", !0);
+                            }else{
+                                i.$setValidity("checkFbPageExistsDir", !1);
+                            }
+                        });
+                    }
+                })
+            }
+        }
+}])
 
 plApp.controller('mdlContentMoveCtrl', ['content_ids','$scope','$uibModalInstance','ctDataAccessFactory',
  function(content_ids,$scope,$uibModalInstance, ctDAF){

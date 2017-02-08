@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+<head>
+	<title>facebook page</title>
+	<meta type="choice" name="priority" label="Priority: Image" value="image" help="When priority is set to 'text', images become smaller and may be removed to make more room for texts.">
+	<style type="text/css" media="screen">
+	  * {
+	    padding: 0;
+	    margin: 0;
+	    -webkit-margin-before: 0;
+	    -webkit-margin-after: 0;
+	    -webkit-box-sizing: border-box;
+	       -moz-box-sizing: border-box;
+	            box-sizing: border-box;
+	  }
+
+	  html {
+	    width: 100%;
+	    height: 100%;
+	  }
+
+	  body {
+	    width: 100%;
+	    height: 100%;
+	    font-family: Roboto, 'Helvetica Neue', Arial, Tahoma, sans-serif;
+	    overflow: hidden;
+	    background-color: #e8eaed;
+	    -webkit-transform-origin: 0 0;
+	            transform-origin: 0 0;
+	    pointer-events: none;
+	  }
+
+	  .header-social {
+	    width: 100%;
+	    height: 76px;
+	    height: 12%;
+	    min-height: 40px;
+	    max-height: 90px;
+	    overflow: hidden;
+	    padding-left: 15px;
+	    padding-right: 15px;
+	    background: #3a5a99;
+	    -webkit-box-shadow: 0px 3px 5px 0px rgba(20, 44, 90, 0.5);
+	            box-shadow: 0px 3px 5px 0px rgba(20, 44, 90, 0.5);
+	    /*padding: 8px 0;*/
+	    text-align: center;
+	    border-bottom: 1px solid #133783;
+	    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #4e69a2), color-stop(100%, #3b5998)); /* Chrome,Safari4+ */
+	    background:  linear-gradient(to bottom, #4e69a2 0%, #3b5998 100%); /* W3C */
+	    white-space: nowrap;
+	  }
+
+
+	  .page-path {
+	    display: inline-block;
+	    color: #FFFFFF;
+	    font-size: 50px;
+	    font-weight: normal;
+	    vertical-align: bottom;
+	    margin-left: 12px;
+	    overflow: hidden;
+	    text-overflow: ellipsis;
+	    white-space: nowrap;
+	    max-width: 85%;
+	  }
+
+	  .page-path span{
+	    position: absolute;
+	    max-height: 100%;
+	    bottom: 0px;
+	  }
+
+	  .page-container {
+	    width: 1206px;
+	    height: 100%;
+	    width: 100%;
+	    margin: 30px auto 0 auto;
+	    position: relative;
+	    background-color: #ffffff;
+	    border: 2px solid #e5e6e9;
+	    border-radius: 3px 3px 0 0;
+	    border-bottom: 0;
+	    color: #141823;
+	  }
+
+	  .posts-container {
+	    position: relative;
+	    height: 100%;
+	  }
+
+	  /*
+	    The .active animation deserves an explanation.
+	    Simply doing a cross-disolve results in a little bit of the background
+	    showing through when both the old container and the new are at 50% opacity.
+	    Therefore we must animate only one of them, the one that is going away AKA ":not(.active)".
+	    By making the new item instantaneously visible, but lower on the render stack, we don't see
+	    the bad cross-disolve but still get a nice animation.
+	  */
+	  .post-container {
+	    height: 100%;
+	    width: 100%;
+	    font-size: 0.2em;
+	    background-color: white;
+	    position: absolute;
+	  
+	    opacity: 0;
+	    -webkit-transition: opacity 0.3s linear;
+	            transition: opacity 0.3s linear;
+	  
+	  }
+
+	  .post-container.active {
+	    z-index: 0;
+	    opacity: 1;
+	    visibility: visible;
+	  }
+
+	  .avatar {
+	    position: absolute;
+	    z-index: 10;
+	    left: -20px;
+	    top: -20px;
+	    z-index: 9999;
+	  }
+
+	  .avatar > img {
+	    display: block;
+	    width: 96px;
+	  }
+
+	  .social-logo {
+	    position: relative;
+	    height: 100%;
+	  }
+
+	  .page-name {
+	    padding-left: 86px;
+	    font-size: 36px;
+	    display: table;
+	    line-height: 1.3em;
+	    color: #3b5998;
+	    height: auto;
+	    width: 100%;
+	    font-weight: bold;
+	    overflow: hidden;
+	    min-height: 1.6em;
+	  }
+
+	  .page-name-wrapper {
+	    width: 100%;
+	    height: 100%;
+	    display: table;
+	    padding: 5px 0px;
+	  }
+
+	  .page-name-inner {
+	    display: table-cell;
+	    vertical-align: middle;
+	  }
+
+	  .post-title {
+	    font-style: italic;
+	    font-weight: 500;
+	    font-size: 1.1em;
+	    line-height: 1em;
+	    padding: 25px 25px 0 25px;
+	  }
+
+	  .post-content {
+	    font-weight: 300;
+	    font-size: 0.9em;
+	    line-height: 100%;
+	    padding: 25px 50px;
+	    word-wrap: break-word;
+	  }
+
+	  .post-title + .post-content {
+	    padding: 5px 50px;
+	  }
+
+	  .image-only .post-content-wrapper {
+	    display: none;
+	  }
+
+	  .post-image-wrapper {
+	    float: right;
+	    max-width: 50%;
+	    max-height: 100%;
+	    margin: 11px 0px;
+	  }
+
+	  .prioritize-text .post-image-wrapper {
+	    max-width: 25%;
+	  }
+
+	  .image-only .post-image-wrapper {
+	    position: absolute;
+	    top: 0;
+	    left: 0;
+	    right: 0;
+	    bottom: 0;
+	    float: none;
+	    max-width: 100%;
+	  }
+
+	  .post-image {
+	    width: 100%;
+	    background-position: top right;
+	    background-size: contain;
+	    background-repeat: no-repeat;
+	  }
+
+	  .image-only .post-image {
+	    background-position: top center;
+	    height: 100%;
+	  }
+
+	  .post-image > img {
+	    visibility: hidden;
+	    max-height: 100%;
+	  }
+
+	  .post-image-standalone {
+	    display: block;
+	    max-width: 100%;
+	    max-height: 100%;
+	    margin: 0 auto;
+	  }
+
+	  @media all and (orientation: portrait) {
+	    .posts-container:not(.prioritize-text) .post-image-wrapper + .post-content-wrapper .post-title {
+	      padding-top: 0px;
+	    }
+
+	    .post-image-wrapper {
+	      float: none;
+	      max-width: 100% !important;
+	    }
+
+	    .post-image {
+	      background-position: top center;
+	    }
+
+	    .prioritize-text .post-container:not(.image-only) .post-image-wrapper {
+	      display: none;
+	    }
+
+	    .post-image > img {
+	      max-width: 70%;
+	    }
+
+	    .prioritize-text .post-image > img {
+	      max-width: 25%;
+	    }
+	  }
+
+	  @media only screen and (max-height: 360px) {
+	    .page-container {
+	      margin: 20px auto 0 auto !important;
+	    }
+
+	    .post-content {
+	      padding: 5px 50px 15px;
+	    }
+
+	    .prioritize-text .post-container:not(.image-only) .post-image {
+	      display: none;
+	    }
+
+	    .post-container:not(.image-only) .post-image-wrapper {
+	      margin-top: -66px;
+	      max-width: 20%;
+	    }
+
+	    .posts-container:not(.prioritize-text) .post-image-wrapper + .post-content-wrapper {
+	      padding-right: 20%;
+	    }
+
+	    .post-title {
+	      padding-top: 0px;
+	    }
+
+	    .post-content {
+	      padding-top: 0px;
+	    }
+
+	    .post-title + .post-content {
+	      padding-top: 5px;
+	    }
+
+	    .avatar > img {
+	      width: 66px;
+	      margin-left: 10px;
+	      margin-top: 10px;
+	    }
+	  }
+	</style>
+</head>
+<body>
+
+<input id="postduration" type="hidden" data-postduration="{{ postDuration }}">
+<input id="postsids" type="hidden" data-postsids="{{ postsIds }}">
+
+<div class="header-social">
+  <div class="social-logo">
+    <svg version="1.1" id="facebook-logo" xmlns="http://www.w3.org/2000/svg" 
+    	xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="60.9" height="60.9" viewBox="20 20 55 55" style="enable-background:new 20 20 55 55;" xml:space="preserve">
+	    <path id="White_3_" style="fill:#FFFFFF;" d="M71.961,20.045h-48.93c-1.677,0-3.035,1.358-3.035,3.036v48.929
+	      c0,1.674,1.358,3.034,3.035,3.034h26.342V53.748h-7.167v-8.302h7.167v-6.122c0-7.103,4.337-10.971,10.675-10.971
+	      c3.039,0,5.646,0.225,6.407,0.326v7.424l-4.395,0.002c-3.446,0-4.117,1.638-4.117,4.042v5.299h8.218l-1.069,8.302h-7.148v21.297
+	      h14.018c1.674,0,3.035-1.36,3.035-3.034V23.082C74.996,21.404,73.635,20.045,71.961,20.045z"></path>
+    </svg>
+    <h1 id="pagepath" class="page-path">{{ pageNameInURL }}</h1>
+  </div>
+</div>
+
+<div class="page-container">
+  
+  <div class="avatar">
+    <img src="{{ pagePicture }}" alt="Facebook Page Logo">
+  </div>
+  
+  <div class="page-name">
+    <div class="page-name-wrapper">
+      <div class="page-name-inner">
+        {{ pageName }}
+      </div>
+    </div>
+  </div>
+  
+  <div class="posts-container">
+    {% for post in posts %}
+    	{% if post.picture or post.message %}
+    	<div class="post-container {% if post.message %} has-content {% else%} image-only{% endif %}">
+      	  {% if post.picture %}	
+	      <div class="post-image-wrapper">
+	        <div class="post-image" style="background-image: url({{ post.picture }});">
+	          <img class="post-image" src="{{ post.picture }}" alt="Facebook Post Image">
+	        </div>
+	      </div>
+	      {% endif %}
+
+	      {% if post.message %}
+	      <div class="post-content-wrapper">
+	        <p class="post-content">{{ post.message }}</p>
+	      </div>
+	      {% endif %}
+    	</div>
+    	{% endif %}
+	{% endfor %}
+  </div>
+</div>
+
+<!-- Scripting -->
+<script type="text/javascript">
+  // shim for solving the bug that Android doesn't have the correct size when the load event is dispatched
+	(function() {
+	  var prevWidth = null, prevHeight = null, timer = null, didShow = false;
+	  function dispatch(name, width, height) {
+	    var customEvent = document.createEvent('HTMLEvents');
+	    customEvent.initEvent(name, true, false);
+	    if (width !== undefined) customEvent.clientWidth = width;
+	    if (height !== undefined) customEvent.clientHeight = height;
+	    document.dispatchEvent(customEvent);
+	  }
+	  function conditionalDispatch() {
+	    var width = window.innerWidth, height = window.innerHeight;
+	    if (width !== prevWidth || height !== prevHeight) {
+	      dispatch('measurechange', width, height);
+	      prevWidth = width; prevHeight = height;
+	    }
+	  }
+	  function debounceDispatch() {
+	    if (timer) window.clearTimeout(timer);
+	    timer = window.setTimeout(conditionalDispatch, 500);
+	  }
+	  function delayedDispatch() {
+	    try {
+	      !!signage.playAudio;
+	      window.setTimeout(function() { if (!didShow) dispatch('show'); }, 5000);
+	    } catch(e) {
+	      if (!navigator.userAgent.match('SmartHub; SMART-TV;')) {
+	        window.setTimeout(function() { dispatch('show'); }, 1000);
+	      }
+	    }
+	    window.setTimeout(conditionalDispatch, 0);
+	    window.setTimeout(conditionalDispatch, 250);
+	    window.setTimeout(conditionalDispatch, 1000);
+	    window.setTimeout(conditionalDispatch, 3000);
+	  }
+	  document.addEventListener('show', function() { didShow = true; }, false);
+	  window.addEventListener('DOMContentLoaded', conditionalDispatch, false);
+	  window.addEventListener('load', delayedDispatch, false);
+	  window.addEventListener('resize', debounceDispatch, false);
+	})();
+</script>
+<script type="text/javascript" charset="utf-8">
+
+  var items = document.querySelectorAll('.post-container');
+  var position = 0;
+  try {
+    position = parseInt(localStorage.getItem('' + location, 10)) || 0;
+  } catch (e) { }
+  items
+
+  if (position >= items.length) position = 0;
+
+  function displayItem() {
+  	console.log('changing the slide to '+ position);
+  	var items = document.querySelectorAll('.post-container');
+    items[position].classList.add('active');
+
+    for (var i = 0; i < items.length; i++) {
+      if (i !== position) items[i].classList.remove('active');
+    }
+
+    position = (position < items.length - 1)? position + 1 : 0;
+
+    try {
+      localStorage.setItem('' + location, position);
+    } catch (e) {
+    }
+  }
+
+
+  document.addEventListener('show', function() {
+    displayItem();
+    var eachPostDuration = parseInt(document.getElementById('postduration').dataset.postduration);
+    var duration = (eachPostDuration * 1000);
+      setTimeout( function() {
+        setInterval(displayItem, duration);
+      }, 600)
+  }, false);
+
+
+  // Enable animation after setup transition;
+  setTimeout(function() {
+    document.body.classList.add('animate');
+  }, 1000);
+
+  // To overcome some browser lack of CSS calc() support we must
+  // calculate sizes manually.
+  function resizeElements(width, height) {
+    "use strict";
+    var body = document.querySelector('body');
+    var el = document.querySelector('.page-container');
+    var target = document.querySelector('.posts-container');
+    var pageName = document.querySelector('.page-name');
+    var containers = document.querySelectorAll('.post-container');
+    var els = document.querySelectorAll('.post-content-wrapper');
+    el.style.width = (body.offsetWidth - 76) + 'px';
+    el.style.height = (body.offsetHeight - 106) + 'px';
+    target.style.height = (el.offsetHeight - pageName.offsetHeight) + 'px';
+    for (var i = 0; i < els.length; i++) {
+      var text = els[i];
+      // Set max height for text el
+      containers[i].style.maxHeight = target.style.height;
+    // Now we must adapt to the content of the feed
+      var width = target.offsetWidth;
+      var height = target.offsetHeight;
+      var factor = 50;
+      var content = 0;
+      var area = 0;
+      do {
+        var proportion = ((width > height) ? width : height) / factor;
+        text.style.fontSize = proportion + 'em';
+
+        content = parseFloat(window.getComputedStyle(text).height);
+        area = parseFloat(window.getComputedStyle(target).height) * 0.98;
+        if (width < height) {
+          if (height > 300) {
+            var image = text.previousElementSibling;
+            area = (image) ? (area - (image.offsetHeight * 1.05)) : (area * 0.95);
+          } else {
+            area = area * 0.90;
+          }
+        }
+        factor += 10;
+      } while (factor <= 2000 && content > area);
+    }
+  }
+
+  function resizeText(windowsWidth, windowsHeight) {
+
+    var headerSocial = document.querySelector('.header-social');
+    var mySVG = document.getElementById("facebook-logo");
+
+    mySVG.setAttribute("width",  headerSocial.offsetHeight*0.70 );
+    mySVG.setAttribute("height", headerSocial.offsetHeight*0.70 );
+    headerSocial.style.paddingTop = headerSocial.offsetHeight*0.15+'px';
+
+    minHeight = (headerSocial.offsetHeight * 0.65 < 52)? headerSocial.offsetHeight * 0.65 : 52;
+    minWidth = (windowsWidth * 0.075 < 52)? windowsWidth * 0.075 : 52;
+    minIndex = (minHeight < minWidth)? minHeight : minWidth;
+
+    document.querySelector('.page-path').style.fontSize =  minIndex.toFixed(2) + 'px';
+    document.querySelector('.page-name-inner').style.fontSize =  minIndex.toFixed(2) + 'px';
+  }
+
+  document.addEventListener('measurechange', function(event) {
+    resizeElements(event.clientWidth, event.clientHeight);
+    resizeText(event.clientWidth, event.clientHeight);
+  });
+
+  var images = document.querySelectorAll('img');
+  var loadedImages = 0;
+  for (var i = 0; i < images.length; i++) {
+    images[i].addEventListener('load', function() {
+      if (++loadedImages >= images.length) resizeElements(window.innerWidth, window.innerHeight);
+    });
+  }
+
+  // Fix a problem on Nexus 7 device, in which the screen scrolls by a few pixels even
+  // with overflow set to hidden.
+  window.addEventListener('touchstart', function(e) { e.preventDefault(); });
+</script>
+
+<script type="text/javascript" charset="utf-8">
+	var postsIds,graphApiUrl,fieldsRequired,limitPosts,accessToken,pagePath; 
+
+	var HttpClient = function() {
+	    this.get = function(aUrl, aCallback) {
+	        var anHttpRequest = new XMLHttpRequest();
+	        anHttpRequest.onreadystatechange = function() { 
+	            if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200){
+	                aCallback(anHttpRequest.responseText);}
+	        	}
+	        anHttpRequest.open( "GET", aUrl, true );            
+	        anHttpRequest.send( null );
+	    }
+	}
+
+	//Check if new posts are available. 
+	function checkForNewPosts(){
+		console.log('checking for new fb posts');
+		var postsUrl = graphApiUrl + pagePath + '/posts?'+ limitPosts+'&'+ accessToken;
+		var client = new HttpClient();
+		client.get(postsUrl,checkForAnyUpdates);
+
+		//testing with new ids
+		// var postsUrl = '/api/content/newPostsTest'
+		// var client = new HttpClient();
+		client.get(postsUrl,checkForAnyUpdates);
+	};
+
+	//check for any updates.
+	function checkForAnyUpdates(posts){
+		posts = JSON.parse(posts);
+		var newPostsIds = [];
+		//get postsIds 
+		for(var i=0; i< posts['data'].length; i++){
+			newPostsIds.push(posts['data'][i]['id']);
+		}
+		//check if newPostsIds match with previous.
+		if(postsIds.toString() !== newPostsIds.toString()){
+			console.log('New fb posts are available')
+			var latestPostsIds =[];
+			for(var i=0; i< newPostsIds.length; i++){
+				if( postsIds.indexOf( newPostsIds[i]) == -1){
+					latestPostsIds.push(newPostsIds[i]);
+				}
+			}
+			getPostsDetailsAndUpdate(latestPostsIds);
+		}else{
+			console.log('no new posts available')
+		}
+	};
+
+	function getPostsDetailsAndUpdate(latestPostsIds){
+		var postDetailsUrl = graphApiUrl +'?ids='+latestPostsIds.join(',')+'&'+fieldsRequired+'&'+accessToken;
+
+		var client = new HttpClient();
+		client.get(postDetailsUrl,function(latestPostsDetails){
+			latestPostsDetails = JSON.parse(latestPostsDetails);
+			var postsContainerDiv = document.getElementsByClassName('posts-container')[0];
+			for(var i=latestPostsIds.length-1; i > -1; i--){
+				//add new post
+				console.log(i);
+				var newPostElement = buildPostContatiner(latestPostsDetails[latestPostsIds[i]]);
+				postsContainerDiv.insertBefore(newPostElement, postsContainerDiv.firstChild);
+
+				//remove old post
+				var lastChild = postsContainerDiv.lastElementChild;
+				postsContainerDiv.removeChild(lastChild);
+
+				//update postsIds
+				console.log(postsIds)
+				postsIds.splice(postsIds.length - 1, 1);
+				console.log(postsIds)
+				postsIds.splice(0, 0, latestPostsIds[i]);
+				console.log(postsIds)
+
+				console.info("New posts updated");
+			}
+		});
+		console.log('width' + document.body.clientWidth + 'height' + document.body.clientHeight)
+	    resizeElements(document.body.clientWidth,  document.body.clientHeight );
+    	resizeText(document.body.clientWidth , document.body.clientHeight );
+	};
+
+
+	function buildPostContatiner(postDetails){
+		console.log('building the new post')
+		console.log(postDetails)
+
+		//post-image
+	    var imgTag = document.createElement('img');
+	    if(postDetails['full_picture']){
+	    	imgTag.src=postDetails['full_picture'];
+	    }
+	    imgTag.classList = 'post-image';
+
+	    var postImgDiv = document.createElement('div');
+	    postImgDiv.classList = 'post-image';
+	    if(postDetails['full_picture']){
+	    	postImgDiv.style.backgroundImage = 'url(' + postDetails['full_picture'] + ')';
+	    }
+	    postImgDiv.appendChild(imgTag);
+
+	    var postImgWrDiv = document.createElement('div');
+	    postImgWrDiv.classList = 'post-image-wrapper';
+	    postImgWrDiv.appendChild(postImgDiv);
+
+		//post-content
+		var postContentDiv = document.createElement('div');
+		postContentDiv.classList = 'post-content-wrapper';
+
+		var messageP = document.createElement('p');
+		if(postDetails['message']){
+			messageP.textContent = postDetails['message'];
+		}
+		messageP.classList = 'post-content';
+		postContentDiv.appendChild(messageP);
+
+	    //overallwrapper- postContainer
+	    var postContainerDiv = document.createElement('div');
+	    if(postDetails['message']){
+	    	postContainerDiv.classList = 'post-container has-content';
+	    }else{
+	    	postContainerDiv.classList = 'post-container image-only';
+	    }
+	    	    
+	    postContainerDiv.appendChild(postImgWrDiv);
+	    postContainerDiv.appendChild(postContentDiv);
+
+	    console.log(postContainerDiv);
+
+	    return postContainerDiv
+	}
+
+	var onLoad = function(){
+		console.log('on load started');
+		postsIds = (document.getElementById('postsids').dataset.postsids).split(',');
+		graphApiUrl = "https://graph.facebook.com/";
+		fieldsRequired = "fields=message,full_picture";
+		limitPosts = "limit=" + postsIds.length;
+		accessToken = "access_token=583412958518077|yxWncaswG-JWQGQwI1MWc04icXY";
+		pagePath = document.getElementById("pagepath").innerHTML;
+
+		//set interval for fetching new posts and updating
+		checkForNewPosts();
+		setTimeout(function(){
+			setInterval(checkForNewPosts, 30000);
+		}, 1000);
+	};
+	document.onLoad = onLoad();
+
+</script>
+
+</body>
+</html>

@@ -21,5 +21,6 @@ CONTENT_THUMBNAILS = {
     'folder': '/static/images/folder_icon.png',
     'url': '/static/images/url_icon.png',
     'audio': '/static/images/audio_icon.png',
-    'rss': '/static/images/rss_icon.png'
+    'rss': '/static/images/rss_icon.png',
+    'fb':'/static/images/fb_icon.png',
 }

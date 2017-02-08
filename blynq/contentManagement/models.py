@@ -216,6 +216,13 @@ class Content(models.Model):
             widget = 'widget' in self.content_type.file_type
         return widget
 
+    @property
+    def is_fb_widget(self):
+        fb_widget = False
+        if self.content_type and self.content_type.file_type:
+            fb_widget = 'widget/fb/page' in self.content_type.file_type
+        return fb_widget
+
     def thumbnail_relative_path(self):
         if self.is_folder:
             relative_path = CONTENT_THUMBNAILS['folder']
@@ -233,6 +240,8 @@ class Content(models.Model):
                 debugFileLog.exception(e)
                 # TODO: Add an image icon or Not found icon if the image is missing
                 relative_path = CONTENT_THUMBNAILS['url']
+        elif self.is_fb_widget:
+            relative_path = CONTENT_THUMBNAILS['fb']
         elif self.is_widget:
             # Right now only rss is supported in widgets. Change this as per type of widgets in the future
             relative_path = CONTENT_THUMBNAILS['rss']
@@ -254,6 +263,8 @@ class Content(models.Model):
             return MEDIA_HOST + self.document.url
         elif self.is_folder:
             return ''
+        elif self.is_fb_widget:
+            return MEDIA_HOST + '/api/content/getFbWidget/'
         elif self.is_widget:
             return ''
         else:
@@ -361,7 +372,7 @@ class FbWidget(models.Model):
     @staticmethod
     def get_page_name(fb_page_url):
         page_name = ''
-        fb_str = 'www.facebook.com/'
+        fb_str = 'facebook.com/'
         search_index = fb_page_url.find(fb_str)
         if search_index != -1:
             rem_page_name = fb_page_url[search_index + len(fb_str):]

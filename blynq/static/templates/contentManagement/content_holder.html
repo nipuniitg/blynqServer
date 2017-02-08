@@ -1,70 +1,52 @@
 <section class="fill">
-    <!-- Folder Path -->
-    <div class="row" style="padding-top:15px;">
-        <div class="col-md-12">
-            <ol class="breadcrumb">
-                <li ng-repeat="folder in folderPath" ng-click="navigateToFolder(folder.content_id)">
-                    <a href="">
-                        <i class="fa" ng-class="{'fa-folder-open' : $last, 'fa-folder': !$last}"></i>
-                        {[ folder.title ]}
-                    </a>
-                </li>
-            </ol>
-        </div>
-    </div>
     <!-- Content Library -->
     <div class="row content-container">
         <div class="col-md-12 fill overflow-y">
-            <div class="btn-group pull-right" style="margin-left:5px;" uib-dropdown is-open="status.isopen">
-                <button id="action-button" type="button" class="btn btn-danger" uib-dropdown-toggle
-                        ng-disabled="disabled">
-                    Action<span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
-                    <li role="menuitem"><a class="pointer" ng-click="moveContent()">Move to folder</a></li>
-                    <li class="divider"></li>
-                    <li role="menuitem"><a class="pointer" confirm confirm-type="delete"
-                                           confirm-fn="deleteMultipleContents()">Delete</a></li>
-                </ul>
-            </div>
-            <div class="btn-group pull-right" uib-dropdown is-open="">
-                <button id="add-button" type="button" class="btn btn-primary" uib-dropdown-toggle
-                        ng-disabled="disabled">
-                    Upload<span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
-                    <li role="menuitem"><a class="pointer" ng-click="upload()"><i class="icon_cloud-upload"></i>
-                    <span uib-popover="{[popOverMessages.uploadFile]}"
-                          popover-trigger="mouseenter">Upload Files</span>
-                    </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li role="menuitem"><a class="pointer" ng-click="createFolder()"><i
-                            class="icon_folder-add"></i>
-                        Add Folder
-                    </a></li>
-                    <li class="divider"></li>
-                    <li role="menuitem"><a class="pointer" ng-click="addNewURL()">
-                        <i class="glyphicon glyphicon-link"></i>
-                    <span uib-popover="{[popOverMessages.addURL]}"
-                          popover-trigger="mouseenter">Add URL</span>
-                    </a></li>
-                    <li class="divider"></li>
-                    <li role="menuitem"><a class="pointer" ng-click="addNewWidget()">
-                        <i class="fa fa-rss-square"></i>
-                    <span uib-popover="{[popOverMessages.addWidget]}"
-                          popover-trigger="mouseenter">Add RSS</span>
-                    </a></li>
-
-                </ul>
-            </div>
             <uib-tabset active="active">
                 <uib-tab index="0" heading="Content">
                     <div class="panel fill">
                         <div class="panel-body fill overflow-y">
+                            <!-- Folder Path -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <ol class="breadcrumb">
+                                        <li ng-repeat="folder in folderPath" ng-click="navigateToFolder(folder.content_id)">
+                                            <a href="">
+                                                <i class="fa" ng-class="{'fa-folder-open' : $last, 'fa-folder': !$last}"></i>
+                                                {[ folder.title ]}
+                                            </a>
+                                        </li>
+                                        <button class="btn btn-primary pull-right"
+                                        confirm confirm-type="delete"
+                                        confirm-fn="deleteMultipleContents()"
+                                        uib-popover="Delete" popover-trigger="mouseenter">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                        <button class="btn btn-primary pull-right" ng-click="addNewURL()"
+                                        uib-popover="{[popOverMessages.addURL]}"
+                                        popover-trigger="mouseenter">
+                                            <i class="glyphicon glyphicon-link"></i>
+                                        </button>
+                                        <button class="btn btn-primary pull-right" ng-click="moveContent()"
+                                        uib-popover="Move to Folder" popover-trigger="mouseenter">
+                                            <i class="fa fa-share"></i>
+                                        </button>
+                                        <button class="btn btn-primary pull-right" 
+                                        ng-click="createFolder()"
+                                        uib-popover="Add Folder" popover-trigger="mouseenter">
+                                            <i class="icon_folder-add"></i>
+                                        </button>
+                                        <button class="btn btn-primary pull-right"
+                                            ng-click="upload()">
+                                            Upload
+                                            <i class="fa fa-cloud-upload"></i>
+                                        </button>
+                                    </ol>
+                                </div>
+                            </div>
                             <!-- Folders -->
-                            <div content-droppable class="item-container-wrap" ng-repeat="folder in folders"
-                                 data-index="{[$index]}">
+                            <div content-droppable class="item-container-wrap" 
+                            ng-repeat="folder in folders" data-index="{[$index]}">
                                 <div class="div-draggable-wrap pointer" draggable data-index="{[$index]}"
                                      data-isFolder="{[folder.is_folder]}">
                                     <div class="item-container-header">
@@ -137,6 +119,25 @@
                 <uib-tab index="1" heading="Widgets" active="tab.active">
                     <div class="panel fill">
                         <div class="panel-body fill overflow-y">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <ol class="breadcrumb">
+                                        <button class="btn btn-primary pull-right"
+                                        uib-popover="Delete" popover-trigger="mouseenter">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                        <button class="btn btn-primary pull-right" ng-click="addNewWidget(availableWidgetTypes.fb)"
+                                        uib-popover="Add Facebook Page" popover-trigger="mouseenter">
+                                            <i class="fa fa-facebook"></i>
+                                        </button>
+                                        <button class="btn btn-primary pull-right" 
+                                        ng-click="addNewWidget(availableWidgetTypes.rss)"
+                                        uib-popover="Add Rss" popover-trigger="mouseenter">
+                                            <i class="fa fa-rss"></i>
+                                        </button>
+                                    </ol>
+                                </div>
+                            </div>
                             <div class="item-container-wrap"
                                  ng-repeat="widget in widgets">
                                 <div class="div-draggable-wrap pointer" draggable

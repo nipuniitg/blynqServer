@@ -1,0 +1,96 @@
+<!-- Modal-Upsert FB widget -->
+<!-- Modal content-->
+<div class="">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()" aria-hidden="true"><i class="fa fa-times"></i></button>
+        <h4 class="modal-title">{[modalTitle]}</h4>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal" name="fbUpsertForm">
+            <!-- Title -->
+            <div class="form-group">
+                <label class="col-md-2 control-label">Title*</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control"
+                           placeholder="title" ng-model="widgetObj.title"
+                           name="fbTitle" required>
+                </div>
+                <div class="col-md-offset-2 col-md-7 validation-error"
+                     ng-show="fbUpsertForm.fbTitle.$touched && fbUpsertForm.fbTitle.$error.required">
+                    This field is required.
+                </div>
+            </div>
+            <!-- Fb page url -->
+            <div class="form-group">
+                <label class="col-md-2 control-label">FaceBook Page URL*</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" check-fb-page-exists-dir
+                           placeholder="https://www.facebook.com/blynqtech" ng-model="widgetObj.fb_page_url"
+                           name="fburl" required>
+                </div>
+                <div class="col-md-offset-2 col-md-9">
+                    Should start with "https://www.facebook.com/Your_Page_Name". Example : https://www.facebook.com/blynqtech
+                </div>
+
+                <div class="col-md-offset-2 col-md-9 validation-error"
+                     ng-show="fbUpsertForm.fburl.$touched && fbUpsertForm.fburl.$error.required">
+                    This field is required. 
+                </div>
+                <div class="col-md-offset-2 col-md-9 validation-error" 
+                    ng-show="fbUpsertForm.fburl.$invalid && !fbUpsertForm.fburl.$error.required">
+                    Entered url is not valid. Please check again. 
+                </div>
+            </div>
+            <!-- no_of_posts -->
+            <div class="form-group">
+                <label class="col-md-2 control-label">Number of Posts*</label>
+                <div class="col-md-9">
+                    <input type="number" class="form-control" max="100" min="1"
+                           placeholder="10" ng-model="widgetObj.no_of_posts"
+                           name="noOfPosts" required>
+                </div>
+                <div class="col-md-offset-2 col-md-9">
+                    How many posts you want to loop through.(Max of 100 posts.)
+                </div>
+                <div class="col-md-offset-2 col-md-9 validation-error"
+                     ng-show="fbUpsertForm.noOfPosts.$touched && fbUpsertForm.noOfPosts.$error.required">
+                    This field is required.
+                </div>
+                <div class="col-md-offset-2 col-md-9 validation-error"
+                     ng-show="fbUpsertForm.noOfPosts.$touched && fbUpsertForm.noOfPosts.$invalid">
+                    Invalid input. Please enter a number between 1 and 100            
+                </div>
+            </div>
+            <!-- post_duration -->
+            <div class="form-group">
+                <label class="col-md-2 control-label">Duration of each post*</label>
+                <div class="col-md-9">
+                    <div class="input-group">
+                        <input type="Number" class="form-control" placeholder="15" ng-model="widgetObj.post_duration"
+                           name="postDuration" min="1" required>
+                      <span class="input-group-addon">seconds</span>
+                    </div>
+                </div>
+                <div class="col-md-offset-2 col-md-9">
+                     Mention how many seconds each post should be displayed.
+                </div>
+                <div class="col-md-offset-2 col-md-9 validation-error"
+                     ng-show="fbUpsertForm.postDuration.$touched && fbUpsertForm.postDuration.$error.required">
+                    This field is required.
+                </div>
+                <div class="col-md-offset-2 col-md-9 validation-error"
+                     ng-show="fbUpsertForm.postDuration.$touched && fbUpsertForm.postDuration.$invalid">
+                    Invalid input. Please enter a number greater than 0. 
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-success" ng-disabled="fbUpsertForm.$invalid"
+                 ng-click="save()">{[ saveVerbose ]}
+        </button>
+        <button type="button" class="btn btn-default"  ng-click="cancel()">
+            Cancel
+        </button>
+    </div>
+</div>
