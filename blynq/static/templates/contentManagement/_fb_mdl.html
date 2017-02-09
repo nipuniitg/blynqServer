@@ -29,7 +29,12 @@
                            name="fburl" required>
                 </div>
                 <div class="col-md-offset-2 col-md-9">
-                    Should start with "https://www.facebook.com/Your_Page_Name". Example : https://www.facebook.com/blynqtech
+                    Should start with "https://www.facebook.com/". <br/> 
+                    Example : https://www.facebook.com/blynqtech <br>
+                    Only Facebook pages' public posts are shown.
+                </div>
+                <div class="col-md-1" ng-show="chekingPageExistence">
+                    <i class="fa fa-pulse fa-spinner"></i>
                 </div>
 
                 <div class="col-md-offset-2 col-md-9 validation-error"
@@ -57,7 +62,7 @@
                     This field is required.
                 </div>
                 <div class="col-md-offset-2 col-md-9 validation-error"
-                     ng-show="fbUpsertForm.noOfPosts.$touched && fbUpsertForm.noOfPosts.$invalid">
+                     ng-show="!fbUpsertForm.noOfPosts.$error.required && fbUpsertForm.noOfPosts.$invalid">
                     Invalid input. Please enter a number between 1 and 100            
                 </div>
             </div>
@@ -79,7 +84,7 @@
                     This field is required.
                 </div>
                 <div class="col-md-offset-2 col-md-9 validation-error"
-                     ng-show="fbUpsertForm.postDuration.$touched && fbUpsertForm.postDuration.$invalid">
+                     ng-show="!fbUpsertForm.noOfPosts.$error.required && fbUpsertForm.postDuration.$invalid">
                     Invalid input. Please enter a number greater than 0. 
                 </div>
             </div>

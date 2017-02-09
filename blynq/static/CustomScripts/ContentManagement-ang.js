@@ -831,6 +831,7 @@ plApp.controller('widgetCtrl',['$scope', '$uibModalInstance', 'ctDataAccessFacto
                     break;
                 case widgetObj.content_type.indexOf(availableWidgetTypes.fb)>-1:
                     widgetType = availableWidgetTypes.fb;
+                    $scope.chekingPageExistence = false;
                     break;
                 case widgetObj.content_type.indexOf(availableWidgetTypes.hdmiIn)>-1:
                     widgetType = availableWidgetTypes.hdmiIn;
@@ -844,7 +845,7 @@ plApp.controller('widgetCtrl',['$scope', '$uibModalInstance', 'ctDataAccessFacto
                 $scope.modalTitle = 'Update' + widgetType;
                 $scope.saveVerbose = 'Update';
             }
-        }
+        };
         onLoad();
 
         var validate = function(){
@@ -896,12 +897,14 @@ plApp.directive('checkFbPageExistsDir', ['ctDataAccessFactory', function(ctDAF){
             link: function(e, t, n, i) {
                 e.$watch("widgetObj.fb_page_url",function(newURL, oldURL){
                     if(newURL.length > 0){
+                        e.chekingPageExistence = true;
                         ctDAF.checkFbPageExists(newURL).then(function(returnData){
                             if(returnData.success){
                                 i.$setValidity("checkFbPageExistsDir", !0);
                             }else{
                                 i.$setValidity("checkFbPageExistsDir", !1);
                             }
+                            e.chekingPageExistence = false;
                         });
                     }
                 })
