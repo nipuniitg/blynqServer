@@ -5,7 +5,7 @@ from django.db.models.signals import post_save, pre_delete, post_delete
 from django.dispatch import receiver
 
 from blynq.settings import DELETED_CONTENT_DIR, MEDIA_ROOT
-from contentManagement.models import Content
+from contentManagement.models import Content, FbWidget
 from customLibrary.custom_settings import PERMANENTLY_DELETE_FILES
 from customLibrary.views_lib import debugFileLog, mail_exception
 
@@ -67,3 +67,17 @@ def post_delete_content(sender, instance, **kwargs):
     debugFileLog.info("inside post_delete_content")
     if instance.document:
         delete_actual_file(instance)
+
+
+@receiver(post_save, sender=FbWidget)
+def post_fb_widget_save(sender, instance, **kwargs):
+    debugFileLog.info("inside post_fb_widget_save")
+    num_of_loops = 5
+    try:
+        relevant_content = instance.content
+        refresh_time = num_of_loops * instance.no_of_posts * instance.post_duration
+        relevant_content.duration = refresh_time
+        relevant_content.save()
+    except Exception as e:
+        debugFileLog.error("Error while updating the default duration of content for Fb widget %s" % str(instance.fb_page_url))
+        debugFileLog.exception(e)

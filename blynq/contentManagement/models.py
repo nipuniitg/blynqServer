@@ -379,6 +379,8 @@ class FbWidget(models.Model):
             page_name = rem_page_name.split('/')[0]
         return page_name
 
+    def __unicode__(self):
+        return self.fb_page_url
 
 # class Widget(models.Model):
 #     widget_id = models.AutoField(primary_key=True)
