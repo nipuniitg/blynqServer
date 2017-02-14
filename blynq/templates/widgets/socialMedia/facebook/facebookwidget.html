@@ -515,7 +515,7 @@
   // Fix a problem on Nexus 7 device, in which the screen scrolls by a few pixels even
   // with overflow set to hidden.
   window.addEventListener('touchstart', function(e) { e.preventDefault(); });
-</script>
+</script> 
 <!-- Posts update Scripting -->
 <script type="text/javascript" charset="utf-8">
 	var postsIds,graphApiUrl,fieldsRequired,limitPosts,accessToken,pagePath,checkForUpdatesDuration; 
@@ -674,9 +674,9 @@
 
 		//set interval for fetching new posts and updating
 		// checkForNewPosts();
-		setTimeout(function(){
-			setInterval(checkForNewPosts, checkForUpdatesDuration);
-		}, 1000);
+		// setTimeout(function(){
+		// 	setInterval(checkForNewPosts, checkForUpdatesDuration);
+		// }, 1000);
 	};
 	document.onLoad = onLoad();
 
