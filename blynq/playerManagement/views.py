@@ -153,7 +153,7 @@ def get_screen_data(request, nof_days=3):
             if schedule_ids_list:
                 schedule_panes = SchedulePane.objects.select_related(
                     'schedule', 'layout_pane', 'event').prefetch_related('playlists').filter(
-                    schedule_id__in=schedule_ids_list).order_by('-schedule__last_updated_time')
+                    schedule_id__in=schedule_ids_list).order_by('-schedule__last_updated_time', 'layout_pane__z_index')
                 if schedule_panes.exists():
                     screen_data_json = screen_schedule_data(schedule_panes, start_time, end_time)
                     campaigns_json = {'campaigns': screen_data_json, 'is_modified': True}
