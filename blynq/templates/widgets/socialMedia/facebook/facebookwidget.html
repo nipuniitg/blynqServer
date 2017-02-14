@@ -336,7 +336,7 @@
       	  {% if post.picture %}	
 	      <div class="post-image-wrapper">
 	        <div class="post-image" style="background-image: url({{ post.picture }});">
-	          <img class="post-image" src="{{ post.picture }}" alt="Facebook Post Image">
+	          <img src="{{ post.picture }}" alt="Facebook Post Image">
 	        </div>
 	      </div>
 	      {% endif %}
@@ -501,6 +501,7 @@
   document.addEventListener('measurechange', function(event) {
     resizeElements(event.clientWidth, event.clientHeight);
     resizeText(event.clientWidth, event.clientHeight);
+    console.log(event.clientWidth, event.clientHeight)
   });
 
   var images = document.querySelectorAll('img');
@@ -515,9 +516,9 @@
   // with overflow set to hidden.
   window.addEventListener('touchstart', function(e) { e.preventDefault(); });
 </script>
-
+<!-- Posts update Scripting -->
 <script type="text/javascript" charset="utf-8">
-	var postsIds,graphApiUrl,fieldsRequired,limitPosts,accessToken,pagePath; 
+	var postsIds,graphApiUrl,fieldsRequired,limitPosts,accessToken,pagePath,checkForUpdatesDuration; 
 
 	var HttpClient = function() {
 	    this.get = function(aUrl, aCallback) {
@@ -541,7 +542,7 @@
 		//testing with new ids
 		// var postsUrl = '/api/content/newPostsTest'
 		// var client = new HttpClient();
-		client.get(postsUrl,checkForAnyUpdates);
+		// client.get(postsUrl,checkForAnyUpdates);
 	};
 
 	//check for any updates.
@@ -578,31 +579,29 @@
 				//add new post
 				console.log(i);
 				var newPostElement = buildPostContatiner(latestPostsDetails[latestPostsIds[i]]);
-				postsContainerDiv.insertBefore(newPostElement, postsContainerDiv.firstChild);
+				postsContainerDiv.insertBefore(newPostElement, postsContainerDiv.firstElementChild);
 
 				//remove old post
 				var lastChild = postsContainerDiv.lastElementChild;
 				postsContainerDiv.removeChild(lastChild);
 
 				//update postsIds
-				console.log(postsIds)
+				// console.log(postsIds)
 				postsIds.splice(postsIds.length - 1, 1);
-				console.log(postsIds)
+				// console.log(postsIds)
 				postsIds.splice(0, 0, latestPostsIds[i]);
-				console.log(postsIds)
+				// console.log(postsIds)
 
 				console.info("New posts updated");
 			}
 		});
-		console.log('width' + document.body.clientWidth + 'height' + document.body.clientHeight)
-	    resizeElements(document.body.clientWidth,  document.body.clientHeight );
-    	resizeText(document.body.clientWidth , document.body.clientHeight );
+		resizePosts();
 	};
 
 
 	function buildPostContatiner(postDetails){
 		console.log('building the new post')
-		console.log(postDetails)
+		// console.log(postDetails)
 
 		//post-image
 	    var imgTag = document.createElement('img');
@@ -644,10 +643,24 @@
 	    postContainerDiv.appendChild(postImgWrDiv);
 	    postContainerDiv.appendChild(postContentDiv);
 
-	    console.log(postContainerDiv);
+	    // console.log(postContainerDiv);
 
 	    return postContainerDiv
-	}
+	};
+
+	function resizePosts(){
+		var width = document.body.clientWidth;
+		var height = document.body.clientHeight;
+
+	    var customEvent = document.createEvent('HTMLEvents');
+	    customEvent.initEvent('measurechange', true, false);
+	    customEvent.clientWidth = width;
+	    customEvent.clientHeight = height;
+	    setTimeout(function(){
+	    	document.dispatchEvent(customEvent);
+	    }, 1000)
+	    
+	};
 
 	var onLoad = function(){
 		console.log('on load started');
@@ -657,11 +670,12 @@
 		limitPosts = "limit=" + postsIds.length;
 		accessToken = "access_token=583412958518077|yxWncaswG-JWQGQwI1MWc04icXY";
 		pagePath = document.getElementById("pagepath").innerHTML;
+		checkForUpdatesDuration = 120000;
 
 		//set interval for fetching new posts and updating
-		checkForNewPosts();
+		// checkForNewPosts();
 		setTimeout(function(){
-			setInterval(checkForNewPosts, 30000);
+			setInterval(checkForNewPosts, checkForUpdatesDuration);
 		}, 1000);
 	};
 	document.onLoad = onLoad();
