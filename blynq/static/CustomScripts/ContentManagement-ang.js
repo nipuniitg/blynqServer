@@ -862,8 +862,10 @@ plApp.controller('widgetCtrl',['$scope', '$uibModalInstance', 'ctDataAccessFacto
                 switch(widgetType){
                     case availableWidgetTypes.rss : 
                         ctDataAccessFactory.upsertWidget($scope.widgetObj,successFn);
+                        break;
                     case availableWidgetTypes.fb : 
                         ctDataAccessFactory.upsertFbWidget($scope.widgetObj).then(successFn);
+                        break;
                 }
             }else{
                 toastr.warning('There are some error in the form. Please correct them');
