@@ -364,10 +364,13 @@ class Content(models.Model):
 
 
 class FbWidget(models.Model):
+    default_no_of_posts = 10
+    default_post_duration = 15
+
     content = models.OneToOneField(Content, on_delete=models.CASCADE)
     fb_page_url = models.CharField(max_length=250)
-    no_of_posts = models.IntegerField(default=10)
-    post_duration = models.IntegerField(default=15)
+    no_of_posts = models.IntegerField(default=default_no_of_posts)
+    post_duration = models.IntegerField(default=default_post_duration)
 
     @staticmethod
     def get_page_name(fb_page_url):

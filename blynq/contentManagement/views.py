@@ -15,7 +15,7 @@ from contentManagement.serializers import default_content_serializer
 from blynq.settings import TEMP_DIR
 from customLibrary.custom_settings import COMPRESS_IMAGE, WIDGET_SCROLL_TIME
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, \
-    debugFileLog, full_file_path, mail_exception, timeit
+    debugFileLog, full_file_path, mail_exception, timeit, empty_string_for_none
 from contentManagement.models import Content, ContentType, FbWidget
 
 
@@ -538,9 +538,14 @@ def upsert_fb_widget(request):
             content.uploaded_by = user_details
             content.save()
             content_id = content.content_id
+        fb_page_url = posted_data.get('fb_page_url')
+        if not fb_page_url:
+            return ajax_response(success=False, errors=['Invalid FB page url'])
+
+        no_of_posts = int(posted_data.get('no_of_posts')) if posted_data.get('no_of_posts') else FbWidget.default_no_of_posts
+        post_duration = int(posted_data.get('post_duration')) if posted_data.get('post_duration') else FbWidget.post_duration
         fb_widget, created = FbWidget.objects.update_or_create(content_id=content_id, defaults=dict(
-            fb_page_url=posted_data.get('fb_page_url'), no_of_posts=posted_data.get('no_of_posts'),
-            post_duration=int(posted_data.get('post_duration'))))
+            fb_page_url=fb_page_url, no_of_posts=no_of_posts, post_duration=post_duration))
         success = True
     except Exception as e:
         mail_exception(exception=e)
