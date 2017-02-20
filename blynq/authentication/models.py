@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from blynq.settings import STORAGE_LIMIT_PER_ORGANIZATION
 
 # See https://docs.djangoproject.com/en/1.8/ref/contrib/auth/ for User model details
+from customLibrary.views_lib import mail_exception, debugFileLog
 
 
 class City(models.Model):
@@ -90,6 +91,16 @@ class Role(models.Model):
 
     def natural_key(self):
         return self.role_name
+
+    @staticmethod
+    def default_role():
+        try:
+            role, created = Role.objects.get_or_create(role_name='manager')
+        except Exception as e:
+            debugFileLog.error('Unable to get or create manager role')
+            mail_exception(str(e))
+            role = None
+        return role
 
 
 # class models.User

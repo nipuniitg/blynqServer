@@ -1,4 +1,5 @@
 import datetime
+from django.contrib.auth.models import User
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
@@ -8,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 
 from authentication.forms import RequestQuoteForm
+from authentication.models import Organization, UserDetails, Role
 from blynq import settings
 from customLibrary.custom_settings import PLAYER_INACTIVE_THRESHOLD
 from customLibrary.views_lib import string_to_dict, ajax_response, get_userdetails, send_mail_blynq, obj_to_json_response, \
@@ -16,32 +18,55 @@ from scheduleManagement.models import Schedule
 from screenManagement.models import Screen
 
 
-# def register(request):
-#     if request.user.is_authenticated():
-#         return HttpResponseRedirect('homepage', request)
-#     registered = False
-#     context_dic = {}
-#     if request.method == 'POST':
-#         user_details_form = UserDetailsForm(data=request.POST)
-#         if user_details_form.is_valid():
-#             user_details = UserDetails.objects.create_user(username=user_details_form.cleaned_data['username'],
-#                                                            first_name=user_details_form.cleaned_data['first_name'],
-#                                                            last_name=user_details_form.cleaned_data['last_name'],
-#                                                            email=user_details_form.cleaned_data['email'],
-#                                                            password=user_details_form.cleaned_data['password'],
-#                                                            organization=user_details_form.cleaned_data['organization'],
-#                                                            mobile_number=user_details_form.cleaned_data['mobile_number'],
-#                                                            role=user_details_form.cleaned_data['role']
-#                                                            )
-#             registered = True
-#         else:
-#             print 'Error in User Details Form'
-#             print user_details_form.errors
-#     else:
-#         context_dic['user_details_form'] = UserDetailsForm()
-#
-#     context_dic['registered'] = registered
-#     return render(request,'authentication/register.html', context_dic)
+def create_organization(organization_name):
+    organization = None
+    if organization_name:
+        try:
+            organization = Organization.objects.create(organization_name=organization_name)
+        except Exception as e:
+            debugFileLog.error('Error while creating new organization %s during sign up' % str(organization_name))
+            mail_exception(str(e))
+    else:
+        mail_exception('Empty or Null organization name')
+    return organization
+
+
+def register(request):
+    context_dic = {'registered': False}
+    try:
+        if request.user.is_authenticated():
+            return HttpResponseRedirect('homepage', request)
+        if request.method == 'POST':
+            posted_data = string_to_dict(request.body)
+            username = posted_data.get('username')
+            if not username:
+                errors = ['Invalid username']
+            else:
+                try:
+                    user = User.objects.get(username=username)
+                    errors = ['Username already exists']
+                except Exception as e:
+                    user = User.objects.create_user(username=username, first_name=posted_data.get('first_name'),
+                                                    last_name=posted_data.get('last_name'), email=posted_data.get('email'),
+                                                    password=posted_data.get('password'))
+                    if user:
+                        organization_name = posted_data.get('organization_name')
+                        if not organization_name:
+                            organization_name = username
+                        new_organization = create_organization(organization_name=organization_name)
+                        try:
+                            user_details = UserDetails.objects.create(user=user, organization=new_organization,
+                                                                      role=Role.default_role(),
+                                                                      mobile_number=posted_data.get('mobile_number'))
+                            context_dic['registered'] = True
+                        except Exception as e:
+                            error = 'Unable to create UserDetails for username %s' % username
+                            mail_exception(error+str(e))
+    except Exception as e:
+        mail_exception('Some error while Sign Up' + str(e) + str(request.body))
+    if not context_dic['registered']:
+        context_dic['errors'] = 'Unable to process your sign up request. Our support team will contact you in sometime.'
+    return render(request,'authentication/register.html', context_dic)
 
 
 def login(request):
