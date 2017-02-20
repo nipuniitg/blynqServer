@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^changePassword', views.change_password, name='change_password'),
     url(r'^getUserDetails', views.get_profile_details, name='profile_details'),
     url(r'^updateUserDetails', views.update_user_details, name='update_user_details'),
+    url(r'^usernameAvailability', views.username_availability, name='username_availability'),
 ]

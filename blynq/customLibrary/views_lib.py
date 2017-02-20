@@ -12,7 +12,6 @@ from django.db import connection, reset_queries
 from django.http import JsonResponse, Http404
 from django.utils import timezone
 
-from authentication.models import UserDetails
 from blynq.settings import MEDIA_ROOT, DEBUG
 
 
@@ -42,6 +41,7 @@ def ajax_response(success=False, errors=[], obj_dict=None):
 
 def get_userdetails(request):
     try:
+        from authentication.models import UserDetails
         user_details = UserDetails.objects.get(user__username=request.user.username)
     except UserDetails.DoesNotExist:
         raise Http404("No UserDetails matches the given query. If you're logged in as django superuser please logout"

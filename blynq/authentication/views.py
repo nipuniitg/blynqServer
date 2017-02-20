@@ -69,6 +69,19 @@ def register(request):
     return render(request,'authentication/register.html', context_dic)
 
 
+def username_availability(request):
+    posted_data = string_to_dict(request.body)
+    username = posted_data.get('username')
+    if username:
+        try:
+            user = User.objects.get(username=username)
+            if user:
+                return ajax_response(success=False)
+        except Exception as e:
+            pass
+    return ajax_response(success=True)
+
+
 def login(request):
     context_dic ={}
     if request.user.is_authenticated():
