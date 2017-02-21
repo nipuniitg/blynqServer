@@ -65,7 +65,9 @@ def register(request):
                             mail_exception(error+str(e))
     except Exception as e:
         mail_exception('Some error while Sign Up' + str(e) + str(request.body))
-    if not context_dic['registered']:
+    if context_dic['registered']:
+        send_mail_blynq(subject="New User registered", message=str(request.body))
+    else:
         context_dic['errors'] = 'Unable to process your sign up request. Our support team will contact you in sometime.'
     return ajax_response(success=context_dic['registered'])
 
