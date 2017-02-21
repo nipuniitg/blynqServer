@@ -35,7 +35,7 @@ def player_update_available(request):
         posted_data = string_to_dict(request.body)
         unique_device_key = posted_data.get('device_key')
         version = int(posted_data.get('version'))
-        screen_activation_key = ScreenActivationKey.objects.get(activation_key=unique_device_key, verified=True)
+        screen_activation_key = ScreenActivationKey.objects.get(activation_key=unique_device_key)
         screen = screen_activation_key.screen
         if screen.update_app:
             updates = PlayerUpdate.objects.all()
@@ -69,15 +69,7 @@ def device_key_active(request):
         return ajax_response(success=success, errors=error)
     try:
         screen_activation_key = ScreenActivationKey.objects.get(activation_key=activation_key)
-        if not screen_activation_key.verified:
-            error = 'New device with device key %s is asking for activation. ' % activation_key
-            error += 'Set the verified boolean if the device is valid.'
-            mail_exception(error)
-            debugFileLog.warning(error)
-            # elif screen_activation_key.in_use:
-            #     error = 'Device activation key %s is already in use.' % activation_key
-            #     debugFileLog.warning(error)
-        elif screen_activation_key.in_use:
+        if screen_activation_key.in_use:
             success = True
         else:
             success = False

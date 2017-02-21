@@ -568,7 +568,7 @@ def getFBWidget(request, content_id):
         context_dic['postsIds'] = ','.join(postsIds)
         return render(request, 'widgets/socialMedia/facebook/facebookwidget.html', context_dic)
     else : 
-        return error
+        return ajax_response(success=False)
 
 
 def check_fb_page_exists(request):
