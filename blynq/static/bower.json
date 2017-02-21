@@ -28,7 +28,8 @@
     "toastr": "^2.1.2",
     "jquery": "2.2.4",
     "angular-chart.js": "^1.0.2",
-    "components-font-awesome": "^4.7.0"
+    "components-font-awesome": "^4.7.0",
+    "font-awesome": "fontawesome#^4.7.0"
   },
   "resolutions": {
     "angular": "1.5.7"

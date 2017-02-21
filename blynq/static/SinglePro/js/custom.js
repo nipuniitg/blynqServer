@@ -29,10 +29,10 @@ jQuery(function($){
 	/* ----------------------------------------------------------- */
 	/*  1. Superslides Slider
 	/* ----------------------------------------------------------- */
-	jQuery('#slides').superslides({
-      animation: 'slide',
-      play: '5000'
-    });
+	// jQuery('#slides').superslides({
+ //      animation: 'slide',
+ //      play: '5000'
+ //    });
 	
 	
 	/* ----------------------------------------------------------- */
@@ -40,14 +40,14 @@ jQuery(function($){
 	/* ----------------------------------------------------------- */
 
 	// For fixed top bar
-       $(window).scroll(function(){
-        if($(window).scrollTop() >100 /*or $(window).height()*/){
-            $(".navbar-fixed-top").addClass('past-main');   
-        }
-    else{    	
-      $(".navbar-fixed-top").removeClass('past-main');
-      }
-    });
+    //    $(window).scroll(function(){
+    //     if($(window).scrollTop() >100 /*or $(window).height()*/){
+    //         $(".navbar-fixed-top").addClass('past-main');   
+    //     }
+    // else{    	
+    //   $(".navbar-fixed-top").removeClass('past-main');
+    //   }
+    // });
 
 
 	/* ----------------------------------------------------------- */

@@ -16,6 +16,8 @@
     <title>BlynQ-Digital Signage with engaging content</title>
     <link rel="shortcut icon" href="{% static 'SinglePro/prospect_imgs/favicon.png' %}"/>
 
+    <base href="/">
+
 
     <!-- Mobile Specific Metas
     ================================================== -->
@@ -44,6 +46,11 @@
     <link id="orginal" href="{% static 'SinglePro/css/themes/default-theme.css'%}" rel="stylesheet">
     <!-- Main structure css file -->
     <link href="{% static 'SinglePro/style.css'%}" rel="stylesheet">
+    <link href="{% static 'SinglePro/style2.css'%}" rel="stylesheet">
+
+    <!-- toastr Notifications -->
+    <link rel="stylesheet" href="{% static 'bower_components/toastr/toastr.min.css' %}">
+
    
     <!-- Google fonts -->
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
@@ -57,7 +64,7 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
   </head>
-  <body itemscope itemtype="http://schema.org/Organization" ng-app="lpApp" ng-controller="lpController">
+  <body itemscope itemtype="http://schema.org/Organization" ng-app="mainApp">
     {% csrf_token %}
     <!-- BEGAIN PRELOADER -->
     <div id="preloader">
@@ -69,11 +76,9 @@
     <a class="scrollToTop" href="#"><i class="fa fa-angle-up"></i></a>
     <!-- END SCROLL TOP BUTTON -->
 
-    <!--=========== BEGIN HEADER SECTION ================-->
-    <header id="header">
-      <!-- BEGIN MENU -->
+    <!-- BEGIN MENU -->
       <div class="menu_area">
-        <nav class="navbar navbar-default navbar-fixed-top" role="navigation"> 
+        <nav class="navbar navbar-default navbar-fixed-top past-main" role="navigation"> 
           <div class="container">
           <div class="navbar-header">
             <!-- FOR MOBILE VIEW COLLAPSED BUTTON -->
@@ -96,104 +101,24 @@
           </div>
           <div id="navbar" class="navbar-collapse collapse">
             <ul id="top-menu" class="nav navbar-nav navbar-right main_nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="#about">Product</a></li>
-              <li><a href="#service">Features</a></li> 
-              <!-- <li><a href="#works">Works</a></li>  --> 
-              <li><a href="#pricing">Pricing</a></li> 
-              <!-- <li><a href="#blog">Blog</a></li> -->
-              <li><a href="#about-us">About-Us</a></li> 
-              <li><a href="#team">Team</a></li>              
-              <li><a href="#contact">Contact-Us</a></li>
-              <li><a href="#" id="login" login-dtv>Log-In</a></li>                           
+              <li ui-sref-active="active"><a href="home">Home</a></li>
+              <li ui-sref-active="active"><a ui-sref="features">Features</a></li>
+              <li ui-sref-active="active"><a ui-sref="useCases">UseCases</a></li> 
+              <li ui-sref-active="active"><a ui-sref="players">Players</a></li> 
+              <li ui-sref-active="active"><a ui-sref="pricing">Pricing</a></li>
+              <li ui-sref-active="active"><a ui-sref="faqs">FAQs/Tutorials</a></li>
+              <li ui-sref-active="active"><a href="#" id="signup" signup-dtv>Sign-Up</a></li>
+              <li ui-sref-active="active"><a href="#" id="login" login-dtv>Log-In</a></li>
             </ul>           
           </div><!--/.nav-collapse -->
           </div>     
         </nav>  
       </div>
-      <!-- END MENU -->
+    <!-- END MENU -->
 
-      <!-- BEGIN SLIDER AREA-->
-      <div class="slider_area">
-        <!-- BEGIN SLIDER-->          
-        <div id="slides">
-          <ul class="slides-container">
 
-            <!-- THE FIRST SLIDE-->
-            <li>
-              <!-- FIRST SLIDE OVERLAY -->
-              <div class="slider_overlay"></div> 
-              <!-- FIRST SLIDE MAIN IMAGE -->
-              <img src="{% static 'SinglePro/prospect_imgs/hotel-2.jpg'%}" alt="img">
-              <!-- FIRST SLIDE CAPTION-->
-              <div class="slider_caption">
-                <h2>Remotely manage all your TV screens.</h2>
-                <!-- <p>we are a group of experienced designers and developers</p> -->
-                <a href="#about" class="slider_btn">Know More</a>              
-              </div>
-            </li>
+      
 
-            <!-- THE SECOND SLIDE-->
-            <li>
-              <!-- SECOND SLIDE OVERLAY -->
-              <div class="slider_overlay"></div> 
-              <!-- SECOND SLIDE MAIN IMAGE -->
-              <img src="{% static 'SinglePro/prospect_imgs/reception-1.jpg'%}" alt="img">
-              <!-- SECOND SLIDE CAPTION-->
-              <div class="slider_caption">
-                <h2>Communicate smart with your audience</h2>
-                <!-- <p>we are a group of experienced designers and developers</p> -->
-                <a href="#about" class="slider_btn">Know More</a>
-              </div>
-            </li>
-
-            <!-- THE THIRD SLIDE-->
-            <li>
-              <!-- THIRD SLIDE OVERLAY -->
-              <div class="slider_overlay"></div> 
-              <!-- THIRD SLIDE MAIN IMAGE -->
-              <img src="{% static 'SinglePro/prospect_imgs/office-2.jpg'%}" alt="img">
-              <!-- THIRD SLIDE CAPTION-->
-              <div class="slider_caption">
-                <h2>Earn revenues through our advertisers.</h2>
-                <!-- <p>we are a group of experienced designers and developers</p> -->
-                <a href="#about" class="slider_btn">Know More</a>                 
-              </div>
-            </li>
-
-            <!-- THE Forth SLIDE-->
-            <li>
-              <!-- Forth SLIDE OVERLAY -->
-              <div class="slider_overlay"></div> 
-              <!-- Forth SLIDE MAIN IMAGE -->
-              <img src="{% static 'SinglePro/prospect_imgs/outlet-1.jpg'%}" alt="img">
-              <!-- Forth SLIDE CAPTION-->
-              <div class="slider_caption">
-                <h2>Entertain customers with live TV or with our handpicked content.</h2>
-                <!-- <p>we are a group of experienced designers and developers</p> -->
-                <a href="#about" class="slider_btn">Know More</a>                 
-              </div>
-            </li>
-          </ul>
-          <!-- BEGAIN SLIDER NAVIGATION -->
-          <nav class="slides-navigation">
-            <!-- PREV IN THE SLIDE -->
-            <a class="prev" href="#">
-              <span class="icon-wrap"></span>
-              <h3><strong>Prev</strong></h3>
-            </a>
-            <!-- NEXT IN THE SLIDE -->
-            <a class="next" href="#">
-              <span class="icon-wrap"></span>
-              <h3><strong>Next</strong></h3>
-            </a>
-          </nav>       
-        </div>
-        <!-- END SLIDER-->          
-      </div>
-      <!-- END SLIDER AREA -->
-    </header>
-    <!--=========== End HEADER SECTION ================--> 
 
     <!--=========== Social Links SECTION ================-->
     <nav class="social">
@@ -203,853 +128,14 @@
           <li><a href="https://www.facebook.com/BlynQ-239217156517438">Facebook <i class="fa fa-facebook"></i></a></li>
       </ul>
     </nav>
-
     <!--=========== End Social Links SECTION ================-->
 
-    <!--=========== BEGIN ABOUT PRODUCT SECTION ================-->
-    <section id="about">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12 col-md-12">
-            <div class="about_area">
-              <!-- START ABOUT HEADING -->
-              <div class="heading">
-                <h2 class="wow fadeInLeftBig">Product</h2>
-                <p>A powerful screen management cloud based platform to control 
-                  content on TV screens placed anywhere. 
-                </p>
-              </div>
-
-              <!-- START ABOUT CONTENT -->
-              <div class="about_content">
-                <div class="row">
-                  <div class="col-lg-6 col-md-6 col-sm-12">
-                    <div class="about_featured">
-                      <div class="panel-group" id="accordion">
-                        <!-- START SINGLE FEATURED ITEAM #1-->
-                        <div class="panel panel-default wow fadeInLeft">
-                          <div class="panel-heading">
-                            <h4 class="panel-title">
-                              <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
-                                 <span class="fa fa-check-square-o"></span>Product
-                              </a>
-                            </h4>
-                          </div>
-                          <div id="collapseOne" class="panel-collapse collapse in">
-                            <div class="panel-body">
-                             We provide a simple and easy to set up cloud based platform with clean and intuitive web interface for managing TV screens. This is a good fit for Business Owners looking for utilising their TV screen better for brand building and up-selling activities while entertaining the audience. ​
-                             All you need is a digital screen (TV) and a working internet connection.   
-                            </div>
-                          </div>
-                        </div>
-                        <!-- START SINGLE FEATURED ITEAM #2 -->
-                        <div class="panel panel-default wow fadeInLeft">
-                          <div class="panel-heading">
-                            <h4 class="panel-title">
-                              <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
-                                 <span class="fa fa-check-square-o"></span>HARDWARE
-                              </a>
-                            </h4>
-                          </div>
-                          <div id="collapseTwo" class="panel-collapse collapse">
-                            <div class="panel-body">
-                            Andriod TV box has to be connected to TV’s HDMI port. Click here to find Android TV boxes extensively tested by us and recommended.​It can be connected to a wireless internet connection or to a LAN (using USB to LAN adapter), for broadcasting your content anytime. 
-                            </div>
-                          </div>
-                        </div>
-                        <!-- START SINGLE FEATURED ITEAM #3 -->
-                        <div class="panel panel-default wow fadeInLeft">
-                          <div class="panel-heading">
-                            <h4 class="panel-title">
-                              <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
-                                <span class="fa fa-check-square-o"></span>Software-Components
-                              </a>
-                            </h4>
-                          </div>
-                          <div id="collapseThree" class="panel-collapse collapse">
-                            <div class="panel-body">
-                                Once the hardware is connected to TV, download our android player software here. BlynQ is compatible with all devices with Android 4.0 and above. BlynQ web portal can be accessed through mobile or desktop to smartly control any number of screens from a single location. No technical knowledge is required to administrate your TV screen network.
-                            </div>
-                          </div>
-                        </div>
-                        <!-- START SINGLE FEATURED ITEAM #4 -->
-                        <div class="panel panel-default wow fadeInLeft">
-                          <div class="panel-heading">
-                            <h4 class="panel-title">
-                              <a data-toggle="collapse" data-parent="#accordion" href="#collapseFour">
-                                <span class="fa fa-check-square-o"></span>Few Highlights
-                              </a>
-                            </h4>
-                          </div>
-                          <div id="collapseFour" class="panel-collapse collapse">
-                            <div class="panel-body">
-                             Changes done to any screens and content will be reflected immediately within seconds precision. Content is stored locally to use minimal internet data.​Our media player is optimised for nominal internet usage.   
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-lg-6 col-md-6 col-sm-12">
-                    <!-- <div class="about_slider">
-                      <div class="featured_slider">
-                        
-                        <div class="single_iteam">
-                          <a href="#"> <img src="img/feature_img1.jpg" alt="img"></a>    
-                        </div>
-                        
-                        <div class="single_iteam">
-                          <a href="#"> <img src="img/feature_img1.jpg" alt="img"></a>  
-                        </div>
-                        
-                        <div class="single_iteam">
-                          <a href="#"> <img src="img/feature_img1.jpg" alt="img"></a>
-                        </div>
-                        
-                        <div class="single_iteam">
-                          <a href="#"> <img src="img/feature_img1.jpg" alt="img"></a>
-                        </div>
-                        
-                        <div class="single_iteam">
-                          <a href="#"> <img src="img/feature_img1.jpg" alt="img"></a>
-                        </div>
-                      </div> -->
-                      <div class="about_video">
-                        <iframe src="https://www.youtube.com/embed/Vy4WnD30BTc?rel=0" frameborder="0" allowfullscreen></iframe>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>       
-      </div>
-       <!-- BEGAIN SKILLS  -->
-        <!-- <div class="row">
-          <div class="col-lg-12 col-md-12">
-            <div class="skills_area">
-              <div class="slider_overlay"></div>
-              <div class="container">               
-                <div class="skills">
-                 <div class="heading">
-                    <h3 class="wow fadeInDown">Our Skills</h3>               
-                  </div>
-                  
-                  <div class="col-lg-3 col-md-3 col-sm-3">
-                   <div class="single_skill wow fadeInUp">
-                     <div id="myStat" data-dimension="150" data-text="85%" data-info="" data-width="10" data-fontsize="25" data-percent="85" data-fgcolor="#999" data-bgcolor="#fff"  data-icon="fa-task"></div>
-                      <h4>Design</h4>                      
-                    </div>
-                  </div>
-                  
-                  <div class="col-lg-3 col-md-3 col-sm-3">
-                    <div class="single_skill wow fadeInUp">
-                      <div id="myStathalf2" data-dimension="150" data-text="90%" data-info="" data-width="10" data-fontsize="25" data-percent="90" data-fgcolor="#999" data-bgcolor="#fff"  data-icon="fa-task"></div>
-                      <h4>HTML/CSS</h4>
-                    </div>
-                  </div>
-                  
-                  <div class="col-lg-3 col-md-3 col-sm-3">                 
-                    <div class="single_skill wow fadeInUp">
-                      <div id="myStat2" data-dimension="150" data-text="65%" data-info="" data-width="10" data-fontsize="25" data-percent="65" data-fgcolor="#999" data-bgcolor="#fff"  data-icon="fa-task"></div>
-                      <h4>jQuery</h4>
-                    </div>
-                  </div>
-                  
-                  <div class="col-lg-3 col-md-3 col-sm-3">                 
-                    <div class="single_skill wow fadeInUp">
-                      <div id="myStat3" data-dimension="150" data-text="75%" data-info="" data-width="10" data-fontsize="25" data-percent="75" data-fgcolor="#999" data-bgcolor="#fff"  data-icon="fa-task"></div>
-                      <h4>WordPress</h4>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div> -->
-        <!-- END SKILLS  -->
+    <section ui-view>
+      
     </section>
-    <!--=========== END ABOUT PRODUCT SECTION ================-->
-
-
-    <!--=========== BEGIN SERVICE SECTION ================-->
-    <section id="service">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12 col-md-12">
-            <!-- BEGAIN SERVICE HEADING -->
-            <div class="heading">
-              <h2 class="wow fadeInLeftBig">Features</h2>
-              <p>Blynq makes it easier to the user by providing various features to effectively manage their screens.</p>
-            </div>
-          </div>          
-        </div>
-        <div class="row">
-          <div class="col-lg-12 col-md-12">
-            <!-- BEGAIN SERVICE  -->
-            <div class="service_area">
-              <div class="row">
-                <!-- Screen Partition  -->
-                <div class="col-lg-4 col-md-4 col-sm-4">
-                  <!-- BEGAIN SINGLE SERVICE -->
-                  <div class="single_service wow fadeInLeft">
-                    <div class="service_iconarea">
-                      <span class="fa fa-th-large service_icon"></span>
-                    </div>
-                    <h3 class="service_title">Layouts</h3>
-                    <p>Select from existing variety of layouts or customise your own layout to run multiple campaigns together on your screen.</p>
-                  </div>
-                </div>
-                <!-- Live TV  -->
-                <div class="col-lg-4 col-md-4 col-sm-4">
-                  <!-- BEGAIN SINGLE SERVICE -->
-                  <div class="single_service wow fadeInLeft">
-                    <div class="service_iconarea">
-                      <span class="fa fa-television service_icon"></span>
-                    </div>
-                    <h3 class="service_title">Live TV</h3>
-                    <p>Play live TV while promoting your products/services.</p>
-                  </div>
-                </div>
-                <!-- Dynamic Plyalists -->
-                <div class="col-lg-4 col-md-4 col-sm-4">
-                  <!-- BEGAIN SINGLE SERVICE -->
-                  <div class="single_service wow fadeInRight">
-                    <div class="service_iconarea">
-                      <span class="fa fa-film service_icon"></span>
-                    </div>
-                    <h3 class="service_title">Drag & Drop Playlists</h3>
-                    <p> Easily create playlists, set order and duration for each media with simple drag-and-drop interface.</p>
-                  </div>
-                </div>
-                <!-- Push-Instant change  -->
-                <div class="col-lg-4 col-md-4 col-sm-4">
-                  <!-- BEGAIN SINGLE SERVICE -->
-                  <div class="single_service wow fadeInRight">
-                    <div class="service_iconarea">
-                      <span class="fa fa-rocket service_icon"></span>
-                    </div>
-                    <h3 class="service_title">Instant Update</h3>
-                    <p>Real-time control of TV Screens. Updates to screens content will be pushed within a blink.</p>
-                  </div>
-                </div>  
-                <!--  Reports  -->
-                <div class="col-lg-4 col-md-4 col-sm-4">
-                  <!-- BEGAIN SINGLE SERVICE -->
-                  <div class="single_service wow fadeInRight">
-                   <div class="service_iconarea">
-                      <span class="fa fa-line-chart service_icon"></span>
-                    </div>
-                    <h3 class="service_title">Reports</h3>
-                    <p> Get a detailed real-time report for tracking active time of screens, which playlists and content are active in any given timeline.</p>
-                  </div>
-                </div>  
-                <!--  Real Time Monitor  -->
-                <div class="col-lg-4 col-md-4 col-sm-4">
-                  <!-- BEGAIN SINGLE SERVICE -->
-                  <div class="single_service wow fadeInRight">
-                   <div class="service_iconarea">
-                      <span class="fa fa-video-camera service_icon"></span>
-                    </div>
-                    <h3 class="service_title">Real Time monitor</h3>
-                    <p>Get live status of screens activity at any moment.</p>
-                  </div>
-                </div> 
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!--=========== END SERVICE SECTION ================-->
-
-    <!--=========== BEGAIN Content  SECTION ================-->
-    <section id="about-us">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12 col-md-12 col-sm-12">
-            <div class="heading">
-              <h2 class="wow fadeInLeftBig">Content</h2>
-              <p itemprop="description">
-                <span itemprop="name">Bored of TV channel content? We have got great collection of handpicked content from our content partners from different categories. Humor, Travel,Health, Science are to name few categories. <br>
-                You produce great content(video, images, gifs, blogs,) of any category and want to have a reach in public? <a href="#contact" ng-click="becomepartner('contentpartner')"> <b> Click here</b> </a> to become a content partner & showcase your content to 100’s of screens. 
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!--=========== END Content SECTION ================-->
-
-    <!--=========== BEGAIN Advertiser SECTION ================-->
-    <section id="clients">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12 col-md-12 col-sm-12">
-            <div class="heading">
-              <h2 class="wow fadeInLeftBig">Advertising</h2>
-              <p>
-                Do you have a great footfall at your premises? Now, monetize your screens by placing Ads from our advertiser network.<a href="#contact" ng-click="becomepartner('screenpartner')"> <b> Click here </b> </a> to become a part of our screen network.<br>
-                Want to be part of our advertising network and promote your brand across multiple great footfall locations? <a style="font-weight: strong" href="#contact" ng-click="becomepartner('advertiser')"><b> Click here </b></a> to become an Advertiser & promote your brand.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!--=========== END Advertiser SECTION ================-->
 
 
 
-    <!--=========== BEGAIN WORKS SECTION ================-->
-    <section id="works">
-      <!-- BEGAIN MILESTONE WORSK SECTION -->
-      <div class="row">
-        <div class="col-lg-12 col-md-12">
-          <div class="counter_section">
-            <!-- SKILLS COUNTER OVERLAY -->
-            <div class="slider_overlay"></div>
-            <div class="container">               
-              <div class="counter_area">
-               <div class="heading">
-                  <h3 class="wow fadeInLeft"> Milestone Reached</h3>             
-                </div>
-                <!-- START SINGLE COUNTER-->
-                <div class="col-lg-4 col-md-4 col-sm-4">
-                  <div class="counter wow fadeInUp">
-                    <i class="fa fa-television fa-2x"></i>
-                    <h2 class="count-title" id="count-number" data-to="150" data-speed="2000">150+</h2>
-                     <p class="count-text ">Screens</p>
-                  </div>
-                </div>
-                <!-- START SINGLE COUNTER-->
-                <div class="col-lg-4 col-md-4 col-sm-4">
-                  <div class="counter wow fadeInUp">
-                    <i class="fa fa-map-marker fa-2x"></i>
-                    <h2 class="count-title" id="count-number2" data-to="4" data-speed="2000">4</h2>
-                     <p class="count-text ">Cities</p>
-                  </div>
-                </div>
-                <!-- START SINGLE COUNTER-->
-                <div class="col-lg-4 col-md-4 col-sm-4">                 
-                   <div class="counter wow fadeInUp">
-                    <i class="fa fa-bullhorn fa-2x"></i>
-                    <h2 class="count-title" id="count-number3" data-to="1000" data-speed="2000">1000+</h2>
-                     <p class="count-text ">Campaigns Run</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- END MILESTONE WORSK SECTION -->
-
-      <!-- BEGAIN FORTFOLIO WORSK SECTION -->
-      <!-- <div class="row"> -->
-        <!-- <div class="portfolio_area"> -->
-          <!-- BEGAIN PORTFOLIO HEADER -->
-          <!-- <div class="row">
-            <div class="col-lg-12 col-md-12">
-             <div class="container">
-                <div class="heading">
-                  <h2 class="wow fadeInLeftBig">Latest Works</h2>
-                  <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text</p>
-                </div>
-              </div>
-            </div>
-          </div> -->
-          <!-- END PORTFOLIO HEADER -->
-
-          <!-- BEGAIN PORTFOLIO GALLERY -->
-          <!-- <div class="row">
-            <div class="portfolio_gallery">
-              <div id="elastic_grid_demo"></div>
-            </div>
-          </div> -->
-          <!-- END PORTFOLIO GALLERY -->
-        <!-- </div>          -->
-      <!-- </div>       -->
-      <!-- END FORTFOLIO WORSK SECTION -->
-    </section>
-    <!--=========== END WORKS SECTION ================-->
-
-
-    <!--=========== BEGAIN PRICING SECTION ================-->
-    <section id="pricing">
-      <div class="container">
-        <div class="row col-lg-12 col-md-12">
-          <!-- START ABOUT HEADING -->
-          <div class="heading">
-            <h2 class="wow fadeInLeftBig">Our Pricing</h2>
-            <p>We are focussed to offer valued service of best quality and immediate support to our customers at affordable costs.</p>
-          </div>
-        </div>
-        <div class="row col-lg-12 col-md-12">
-          <div class="pricing_area">
-            <div class="row">
-              <!-- BEGAIN BASIC PRICE TABLE -->
-              <div class="col-lg-3 col-md-3 col-sm-3">
-                <div class="single_price wow fadeInUp">
-                  <h3>Basic</h3>
-                  <div class="price">
-                    <h4>₹1200</h4>
-                    <span>per month per screen</span>
-                  </div>
-                  <ul class="price_features">
-                    <li>Upto <strong>10 Screens</strong></li>                  
-                    <li><strong>5 GB</strong> Storage</li>
-                    <li>Up to <strong>5 Sub-Users</strong></li>
-                    <li><strong>30 GB</strong> Bandwidth</li>
-                  </ul>
-                  <a href="#contact" ng-click="selectPlan('Basic')" class="price_btn">Select Plan</a>
-                </div>
-              </div>
-              <!-- BEGAIN STANDARD PRICE TABLE -->
-              <div class="col-lg-3 col-md-3 col-sm-3">
-                <div class="single_price wow fadeInUp">
-                  <h3>Standard</h3>
-                  <div class="price">
-                    <h4>₹1000</h4>
-                    <span>per month per screen</span>
-                  </div>
-                  <ul class="price_features">
-                    <li>Upto <strong>25 Screens</strong></li>                  
-                    <li><strong> 30 GB</strong> Storage</li>
-                    <li>Up to <strong> 10 Sub-Users</strong></li>
-                    <li><strong> 100 GB</strong> Bandwidth</li>
-                  </ul>
-                  <a href="#contact" ng-click="selectPlan('Standard')" class="price_btn">Select Plan</a>
-                </div>
-              </div>
-              <!-- BEGAIN BUSINESS PRICE TABLE -->
-              <div class="col-lg-3 col-md-3 col-sm-3">
-                <div class="single_price business_price wow fadeInUp">
-                  <h3>Business</h3>
-                  <div class="price">
-                    <h4>₹800</h4>
-                    <span>per month per screen</span>
-                  </div>
-                  <ul class="price_features">
-                    <li>Upto <strong>50 Screens</strong></li>                  
-                    <li><strong>70 GB</strong> Storage</li>
-                    <li>Up to <strong> 20 sub-Users</strong></li>
-                    <li><strong>250 GB</strong> Bandwidth</li>
-                  </ul>
-                  <a href="#contact" ng-click="selectPlan('Business')" class="price_btn">Select Plan</a>
-                </div>
-              </div>
-              <!-- BEGAIN DELUX PRICE TABLE -->
-              <div class="col-lg-3 col-md-3 col-sm-3">
-                <div class="single_price wow fadeInUp">
-                  <h3>Enterprise</h3>
-                  <div class="price">
-                    <h3><a href="#contact" ng-click="selectPlan('Enterprise')"> Contact-us</h3>
-                    <span>per month</span>
-                  </div>
-                  <ul class="price_features">
-                    <li>-</li>                  
-                    <li>-</li>
-                    <li>-</li>
-                    <li>-</li>
-                  </ul>
-                  <a href="#contact" ng-click="selectPlan('Enterprise')" 
-                    class="price_btn">Select Plan</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!--=========== END PRICING SECTION ================-->
-
-
-    <!--=========== BEGAIN BLOG SECTION ================-->
-<!--     <section id="blog">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12 col-md-12">
-            <div class="heading">
-              <h2 class="wow fadeInLeftBig">Latest News From Blog</h2>
-              <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. </p>
-            </div>
-          </div>
-          <div class="col-lg-12 col-md-12">
-            <div class="blog_content">
-              <div class="blog_slider">
-                
-                <div class="col-lg-4 col-md-4 col-sm-4">
-                  <div class="single_post wow fadeInUp">
-                    <div class="blog_img">
-                      <img src="{% static 'SinglePro/prospect_imgs/hotel-1.jpg'%}" alt="img">
-                    </div>
-                    <h3>Digital Signage Aids Business Developement</h3>
-                    <div class="post_commentbox">
-                      <a href="#"><i class="fa fa-user"></i>Jaydev</a>
-                      <span><i class="fa fa-calendar"></i>6:49 AM</span>
-                      <a href="#"><i class="fa fa-tags"></i>Technology</a>
-                    </div>
-                    <p>The digital signage phenomenon can be found in a assortment of segments across Commercial, Infrastructural, Industrial and Institutional. Retail, Corporate, Healthcare, Banking, Entertainment and Educational sectors are effectively integrating this technology into businesses for its efficient and cost effective means of communication with audience, customers, employees and teams.   </p>
-                    <a href="#" class="read_more">Read More <i class="fa fa-angle-double-right">  </i></a>                   
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section> -->
-    <!--=========== END BLOG SECTION ================-->
-
-
-    <!--=========== BEGAIN TESTIMONIAL SECTION ================-->
-<!--     <section id="testimonial">
-      <div class="container"> 
-        <div class="row">
-          <div class=" col-lg-7 col-md-7 col-sm-6">
-            
-            <div class="heading">
-              <h2 class="wow fadeInLeftBig">Satisfied Customers</h2>
-              <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. </p>
-            </div>
-          </div>
-          <div class=" col-lg-5 col-md-5 col-sm-6">
-            <div class="testimonial_customer">
-              
-              <ul class="testimonial_slider">
-                
-                <li>
-                  <div class="media testi_media">
-                    <a class="media-left testi_img" href="#">
-                      <img src="{% static 'SinglePro/img/team-1.jpg'%}" alt="img">
-                    </a>
-                    <div class="media-body">
-                      <h4 class="media-heading">Alin Brown</h4>
-                      <span>CEO</span>                      
-                    </div>
-                  </div>
-                  <div class="testi_content">
-                    <p>Message of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable</p>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>           
-        </div>
-      </div>
-    </section> -->
-    <!--=========== END TESTIMONIAL SECTION ================-->
-
-
-    <!--=========== BEGAIN CLIENTS SECTION ================-->
-    <section id="clients">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12 col-md-12 col-sm-12">
-            <!-- START BLOG HEADING -->
-            <div class="heading">
-              <h2 class="wow fadeInLeftBig">Our Best Clients</h2>
-              <p> </p>
-            </div>
-          </div>
-          <div class="col-lg-12 col-md-12 col-sm-12">
-            <div class="clients_content">
-              <div class="row">
-                <!-- BEGAIN CLIENTS SLIDER -->
-                <div class="clients_slider">
-                  <!-- BEGAIN SINGLE CLIENT SLIDE#1 -->
-                  <div class="col-lg-3 col-md-3 col-sm-3">
-                    <div class="single_client">
-                      <img src="{% static 'SinglePro/prospect_imgs/client_logos/heartcup_logo.png'%}" alt="clients Brand">
-                    </div>
-                  </div>
-                  <!-- BEGAIN SINGLE CLIENT SLIDE#2 -->
-                  <div class="col-lg-3 col-md-3 col-sm-3">
-                    <div class="single_client">
-                      <img src="{% static 'SinglePro/prospect_imgs/client_logos/globalhospitals_logo.gif'%}" alt="clients Brand">
-                    </div>
-                  </div>
-                  <!-- BEGAIN SINGLE CLIENT SLIDE#3 -->
-                  <div class="col-lg-3 col-md-3 col-sm-3">
-                    <div class="single_client">
-                      <img src="{% static 'SinglePro/prospect_imgs/client_logos/kingsdrivein_logo.jpg'%}" alt="clients Brand">
-                    </div>
-                  </div>
-                  <!-- BEGAIN SINGLE CLIENT SLIDE#4 -->
-                  <div class="col-lg-3 col-md-3 col-sm-3">
-                    <div class="single_client">
-                      <img src="{% static 'SinglePro/prospect_imgs/client_logos/oakridgehospitals_logo.jpg'%}" alt="clients Brand">
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!--=========== END CLIENTS SECTION ================-->
-
-    <!--=========== BEGAIN ABOUT US  SECTION ================-->
-    <section id="about-us">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12 col-md-12 col-sm-12">
-            <div class="heading">
-              <h2 class="wow fadeInLeftBig">About BlynQ</h2>
-              <p itemprop="description">
-                <span itemprop="name">BlynQ </span> is dedicated to become single largest platform for a) TV Screen owners – bring TV screens online to make the most of it. b) Content partners – deliver interesting content to TV screens, c) Advertisers – publish geo targeted ads to maximise the impact of a campaign with a push of a button. <br><br>
-
-                We have replaced 100s of physical boards, paper and plastic based posters & standees and pen-drive swamped offline content displays with intelligent digitised, internet-enabled and cloud featured solution. ​
-                Our mission at BlynQ is to use technology to replace paper based posters & standees and to enable displays with engaging and targeted content. Needless to mention, we are super easy to work with, available 24*7 for all customer queries. 
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!--=========== END ABOUT US SECTION ================-->
-
-    <!--=========== BEGAIN TEAM SECTION ================-->
-    <section id="team">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12 col-md-12">
-            <!-- BEGAIN ABOUT HEADING -->
-            <div class="heading">
-              <h2 class="wow fadeInLeftBig">Our Team</h2>            
-            </div>
-            <div class="team_area">
-              <!-- BEGAIN TEAM SLIDER -->
-              <div class="team_slider">  
-                <!-- BEGAIN SINGLE TEAM SLIDE#1 -->              
-                <div class="col-lg-3 col-md-3 col-sm-4">
-                  <div class="single_team wow fadeInUp">
-                    <div class="team_img">
-                      <img src="{% static 'SinglePro/prospect_imgs/tp_sastry.jpg'%}" alt="img">
-                    </div>
-                    <h5 class="">Sastry</h5>
-                    <span>Head, Business Development and Marketing</span>
-                    <p> He brings in a pioneering mix of Sales, Marketing and Business Development knowledge into the team. Graduate from IIT Guwahati and his experience at OYO rooms within various roles brings in invaluable wisdom to the team.</p>
-                    <div class="team_social">
-                      <!-- <a href="#"><i class="fa fa-facebook"></i></a>
-                      <a href="#"><i class="fa fa-twitter"></i></a>
-                      <a href="#"><i class="fa fa-google-plus"></i></a>
-                      <a href="#"><i class="fa fa-linkedin"></i></a> -->
-                    </div>
-                  </div>
-                </div>
-                <!-- BEGAIN SINGLE TEAM SLIDE#2 -->
-                <div class="col-lg-3 col-md-3 col-sm-4">
-                  <div class="single_team wow fadeInUp">
-                    <div class="team_img">
-                      <img src="{% static 'SinglePro/prospect_imgs/tp_nipun.jpg'%}" alt="img">
-                    </div>
-                    <h5>Nipun</h5>
-                    <span>Vice President, Technology</span>                        
-                    <p>Our Product Expeditor, a graduate from IIT Guwahati Computer Science Department and experienced Software Engineer, often serves as kickstarter for our innovations in technology space.He worked with Arista Networks before starting BlynQ.</p><br>
-                    <!-- <div class="team_social">
-                      <a href="#"><i class="fa fa-facebook"></i></a>
-                      <a href="#"><i class="fa fa-twitter"></i></a>
-                      <a href="#"><i class="fa fa-google-plus"></i></a>
-                      <a href="#"><i class="fa fa-linkedin"></i></a>
-                    </div> -->
-                  </div>
-                </div>
-                <!-- BEGAIN SINGLE TEAM SLIDE#3 -->
-                <div class="col-lg-3 col-md-3 col-sm-4">
-                  <div class="single_team wow fadeInUp">
-                    <div class="team_img">
-                      <img src="{% static 'SinglePro/prospect_imgs/tp_prasanth.jpg'%}" alt="img">
-                    </div>
-                    <h5>Prasanth</h5>
-                    <span>Chief Solutions Architect</span>                        
-                    <p>Evangelist in design, he structures our product and visual design, user experience and programming. Graduate from IIT Guwahati Electronics Department, Prasanth worked in design and development roles with Bank of America before starting BlynQ .</p><br>
-                    <div class="team_social">
-                      <!-- <a href="#"><i class="fa fa-facebook"></i></a>
-                      <a href="#"><i class="fa fa-twitter"></i></a>
-                      <a href="#"><i class="fa fa-google-plus"></i></a>
-                      <a href="#"><i class="fa fa-linkedin"></i></a> -->
-                    </div>
-                  </div>
-                </div>
-                <!-- BEGAIN SINGLE TEAM SLIDE#5 -->
-                <div class="col-lg-3 col-md-3 col-sm-4">
-                  <div class="single_team wow fadeInUp">
-                    <div class="team_img">
-                      <img src="{% static 'SinglePro/prospect_imgs/tp_jaydev.jpg'%}" alt="img">
-                    </div>
-                    <h5>Jaydev</h5>
-                    <span>Vice President, Product and Engineering</span>                        
-                    <p>A tech generalist and experienced engineer, he manages the product and Engineering at BlynQ. A graduate from IIT and a formerly Senior Associate of Morgan Stanley, contributes a unique mix of Business and Technology expertise into the team. </p>
-                    <div class="team_social">
-                      <!-- <a href="#"><i class="fa fa-facebook"></i></a>
-                      <a href="#"><i class="fa fa-twitter"></i></a>
-                      <a href="#"><i class="fa fa-google-plus"></i></a>
-                      <a href="#"><i class="fa fa-linkedin"></i></a> -->
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!--=========== END TEAM SECTION ================-->
-
-    <!--=========== BEGAIN CONTACT SECTION ================-->
-    <section id="contact">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12 col-md-12 col-sm-12">
-            <!-- START CONTACT HEADING -->
-            <div class="heading">
-              <h2 class="wow fadeInLeftBig">Contact Us</h2>
-              <p>Please feel free to contact us. We are just an email or a call away.</p>
-            </div>
-          </div>
-        </div>       
-        <div class="row">
-          <!-- BEGAIN CONTACT CONTENT -->
-          <div class="contact_content">
-            <!-- BEGAIN CONTACT FORM -->
-            <div class="col-lg-5 col-md-5 col-sm-5">
-              <div class="contact_form">
-
-                <form role="form" name="requestQuoteForm">
-                  <!--NAME-->
-                  <input class="form-control" type="text" placeholder="Name" 
-                    ng-model = "requestQuoteFormDetails.name" name="requestorName">
-                  <div class="col-md-6 error-field" 
-                    ng-show=" requestQuoteForm.requestorName.$touched &&
-                          requestQuoteForm.requestorName.$invalid">
-                    <span>This field is required.</span>
-                  </div>
-
-                  <!--EMAIL-->
-                  <input class="form-control" type="email" placeholder="Email" ng-model="requestQuoteFormDetails.email" name="requestorEmail">
-                  <div class="col-md-6 error-field" ng-show="requestQuoteForm.requestorEmail.$touched &&
-                          requestQuoteForm.requestorEmail.$invalid">
-                      <span>This field is required</span>
-                  </div>
-
-                  <!--MOBILE-->
-                  <input class="form-control" type="text" placeholder="Mobile Number" ng-model="requestQuoteFormDetails.mobile_number" name="requestorPhoneNumber">
-                  <div class="col-md-6 error-field" ng-show="requestQuoteForm.requestorPhoneNumber.$touched &&
-                          requestQuoteForm.requestorPhoneNumber.$invalid">
-                      <span>This field is required</span>
-                  </div>
-
-                  <!--TEXT AREA-->
-                  <textarea class="form-control" cols="30" rows="10" placeholder="Your Message"
-                  ng-model="requestQuoteFormDetails.additional_details"></textarea>
-                   <input class="submit_btn" type="submit" value="Send"
-                    ng-disabled="requestQuoteForm.$invalid" ng-click="submit()"> 
-                </form>
-
-                <!-- FOR CONTACT FORM MESSAGE -->
-                <div id="form-messages">
-                  <uib-alert type="success" ng-show="showSuccessAlert">
-                      Thanks for writing in. Our Team will contact you in 24 hours.
-                  </uib-alert>
-                  <uib-alert type="error" ng-show="showErrorAlert">
-                      There was some error while saving. Please try after sometime.
-                  </uib-alert>
-                </div>
-
-              </div>
-            </div>
-            <!-- BEGAIN CONTACT MAP -->
-            <div class="col-lg-7 col-md-7 col-sm-7">
-              <div class="contact_map">
-              <!-- BEGAIN GOOGLE MAP -->
-              <div id="map_canvas">
-                <img style="object-fit: fill; height: 100%; width:100%;" ng-src="{% static 'SinglePro/prospect_imgs/location_img.png' %}">
-              </div>
-              </div>
-            </div>           
-          </div>
-        </div>      
-      </div>             
-    </section>
-    <!--=========== END CONTACT SECTION ================-->
-
-    <!--=========== BEGAIN CONTACT FEATURE SECTION ================-->
-    <section id="contactFeature">
-      <!-- SKILLS COUNTER OVERLAY -->
-      <div class="slider_overlay"></div>
-      <div class="row">
-        <div class="col-lg-12 col-md-12">       
-          <div class="container">               
-              <div class="contact_feature">
-            <!-- BEGAIN CALL US FEATURE -->
-            <div class="col-lg-3 col-md-3 col-sm-6">
-              <div class="single_contact_feaured wow fadeInUp">
-                <i class="fa fa-phone"></i>
-                <h4>Call Us</h4>
-                <p>Landline: <span itemprop="telephone">040-4027 1088</span>
-                 <br> Mobile : +91-8122846970</p> 
-              </div>
-            </div>
-            <!-- BEGAIN CALL US FEATURE -->
-            <div class="col-lg-3 col-md-3 col-sm-6">
-              <div class="single_contact_feaured wow fadeInUp">
-                <i class="fa fa-envelope-o"></i>
-                <h4>Email Address</h4>
-                <p><span itemprop="email">hello(at)blynq.in</span></p><br>
-              </div>
-            </div>
-            <!-- BEGAIN CALL US FEATURE -->
-            <div class="col-lg-3 col-md-3 col-sm-6">
-              <div class="single_contact_feaured wow fadeInUp">
-                <i class="fa fa-map-marker"></i>
-                <h4>Office Location</h4>
-                <p itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
-                  <span itemprop="streetAddress">PlotNo.173, Level 3, CPG Building</span>
-                  <span itemprop="addressLocality">HiTech City,Hyderabad</span>
-                </p>
-              </div>
-            </div>
-            <!-- BEGAIN CALL US FEATURE -->
-            <div class="col-lg-3 col-md-3 col-sm-6">
-              <div class="single_contact_feaured wow fadeInUp">
-                <i class="fa fa-clock-o"></i>
-                <h4>Support</h4>
-                <p>24*7</p><br>
-              </div>
-            </div>
-          </div>
-          </div>         
-        </div>
-      </div>
-    </section>
-    <!--=========== END CONTACT FEATURE SECTION ================-->
-
-    <!--=========== BEGAIN SUBSCRIBE SECTION ================-->
-    <!-- <section id="subscribe">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12 col-md-12">
-            
-            <div class="heading">
-              <h2 class="wow fadeInLeftBig">Subscribe Us</h2>
-              <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. </p>
-            </div>
-            
-            <form class="subscribe_form">
-              <div class="subscrive_group wow fadeInUp">
-                <input class="form-control subscribe_mail" type="email" placeholder="Enter your email address">
-                <input class="subscr_btn" type="submit" value="Subscribe">
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </section> -->
-    <!--=========== END SUBSCRIBE SECTION ================-->
 
      <!--=========== BEGAIN FOOTER ================-->
      <footer id="footer">
@@ -1079,7 +165,8 @@
      ================================================== -->
   
      <!-- initialize jQuery Library -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> -->
+    <script src="{% static 'bower_components/jquery/dist/jquery.min.js'%}"></script> 
     <!-- Google map -->
     <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCHX73lCUJPWw9FV1uuZ-IKhEf-7kOv6-8"></script>
     <script src="{% static 'SinglePro/js/jquery.ui.map.js'%}"></script> -->
@@ -1101,12 +188,22 @@
 
     <!-- Custom js-->
     <script src="{% static 'SinglePro/js/custom.js'%}"></script>
+    <script src="{% static 'bower_components/toastr/toastr.min.js' %}"></script>
 
     <!-- Angular js-->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
-    <script src="{% static 'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js' %}"></script> 
-    <!-- Angular js-->
-    <script type="text/javascript" src="{% static 'CustomScripts/landingPage.js'%}"></script>
+    <script src="{% static 'bower_components/angular/angular.min.js' %}"></script>
+    <script src="{% static 'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js' %}"></script>
+
+    <!-- angular-ui-bootstrap -->
+    <script src="{% static 'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js' %}"></script>
+
+    <!-- angular-ui-router -->
+    <script src="{% static 'bower_components/angular-ui-router/release/angular-ui-router.min.js' %}"></script>
+ 
+    <!-- custom scripts js-->
+    <script type="text/javascript" src="{% static 'CustomScripts/landingPage/app.js'%}"></script>
+    <script type="text/javascript" src="{% static 'CustomScripts/landingPage/landingPage.js'%}"></script>
+    <script type="text/javascript" src="{% static 'CustomScripts/landingPage/useCases.js'%}"></script>
 
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

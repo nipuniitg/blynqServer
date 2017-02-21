@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '1ig8fo2929x)i=c7k$z0qe#@1n())0o2rt7*45^j^td5_duj$m'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 if DEBUG:
     ALLOWED_HOSTS = []
@@ -223,6 +223,7 @@ LOGGING = {
 # the deleted files are moved to /media/deletedcontent/organization.organization_id
 if DEBUG:
     HOST_URL = 'http://127.0.0.1:8000'
+    # HOST_URL = 'http://192.168.6.181:8000'
     USERCONTENT_DIR = 'test_usercontent'
     DELETED_CONTENT_DIR = 'test_deletedcontent'
     # Django debug toolbar configuration

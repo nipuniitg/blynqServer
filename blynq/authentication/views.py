@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.http import JsonResponse
 
 from authentication.forms import RequestQuoteForm
 from authentication.models import Organization, UserDetails, Role
@@ -57,7 +58,7 @@ def register(request):
                         try:
                             user_details = UserDetails.objects.create(user=user, organization=new_organization,
                                                                       role=Role.default_role(),
-                                                                      mobile_number=posted_data.get('mobile_number'))
+                                                                      mobile_number=str(posted_data.get('mobile_number')))
                             context_dic['registered'] = True
                         except Exception as e:
                             error = 'Unable to create UserDetails for username %s' % username
@@ -66,20 +67,23 @@ def register(request):
         mail_exception('Some error while Sign Up' + str(e) + str(request.body))
     if not context_dic['registered']:
         context_dic['errors'] = 'Unable to process your sign up request. Our support team will contact you in sometime.'
-    return render(request,'authentication/register.html', context_dic)
+    return ajax_response(success=context_dic['registered'])
 
 
 def username_availability(request):
     posted_data = string_to_dict(request.body)
+    context_dic = {'username_available': False}
     username = posted_data.get('username')
     if username:
         try:
             user = User.objects.get(username=username)
             if user:
-                return ajax_response(success=False)
+                context_dic['username_available'] = False
+            else:
+                context_dic['username_available'] = True
         except Exception as e:
-            pass
-    return ajax_response(success=True)
+            context_dic['username_available'] = True
+    return JsonResponse(context_dic, safe=False)
 
 
 def login(request):
