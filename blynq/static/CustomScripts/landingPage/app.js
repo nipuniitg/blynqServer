@@ -52,6 +52,12 @@ mainApp.config(function($locationProvider,$stateProvider, $urlRouterProvider) {
         // ,controller : 'layoutsIndexCtrl'
         // ,controllerAs : 'lIC'
     })
+    .state('faqs', {
+        url: "/faqs"
+        ,templateUrl:'/static/templates/landingPage/faqs.html'
+        // ,controller : 'layoutsIndexCtrl'
+        // ,controllerAs : 'lIC'
+    })
 });
 
 mainApp.factory("PrintToConsole", ["$rootScope", function ($rootScope) {

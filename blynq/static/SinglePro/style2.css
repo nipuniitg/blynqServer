@@ -13,6 +13,10 @@
   color : red;
 }
 
+.bg-grey{
+  background: none repeat scroll 0 0 #f8f8f8
+}
+
 
 /* new header*/
 header {
