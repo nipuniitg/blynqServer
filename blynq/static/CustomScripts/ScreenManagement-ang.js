@@ -357,6 +357,7 @@ function(groupsFactory, dataAccessFactory, $scope,$uibModal, cAD){
                 refreshGroups();
             }
             else{
+                toastr.error(responseData.errors.join(','));
                 toastr.warning('Oops!. There was some error while deleting group. Please refresh again and try.')
             }
         });
@@ -630,6 +631,7 @@ sagApp.controller('mdlUpsertScreenDetails', ['$scope','$uibModalInstance','scree
                 $uibModalInstance.close();
             }
             else{
+                toastr.error(returnData.errors.join(','));
                 toastr.warning('Oops! There was some error while updating the details. Please try again later.')
             }
         });
@@ -692,6 +694,7 @@ sagApp.controller('mdlUpsertGroupDetails',['$scope','$uibModalInstance', 'groupD
                 $uibModalInstance.close();
             }
             else{
+                toastr.error(data.error.join(','));
                 toastr.warning("There was some error while adding group. Please try again after sometime.");
             }
         });

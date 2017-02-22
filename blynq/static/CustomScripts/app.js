@@ -16,7 +16,7 @@ mainApp.config(function($httpProvider) {
 mainApp.config(function($locationProvider,$stateProvider, $urlRouterProvider) {
   //
   // For any unmatched url, redirect to /state1
-  $urlRouterProvider.otherwise("home");
+  $urlRouterProvider.otherwise("screen");
 
   //removes the hash for all the html5 supporting browsers. However for other, it comes
   $locationProvider.html5Mode(true).hashPrefix('!')

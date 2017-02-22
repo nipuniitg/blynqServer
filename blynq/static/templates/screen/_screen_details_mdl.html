@@ -19,19 +19,20 @@
                     <span>This field is required.</span>
                 </div>
             </div>
-            <div ng-if="showActivationKeyField">
-                <div class="form-group">
-                    <label for="activation_key" class="col-md-4">
-                        Activation Key*(Check your device)
-                    </label>
-                    <div class="col-md-6">
-                        <input type="text" placeholder="H8N9-23NK-2OIN-QELI" id="activation_key" name="activation_key"
-                               ng-model="screenDetails.activation_key" class="form-control" required>
-                    </div>
-                    <div class="col-md-6 col-md-offset-4" ng-show="screenDetailsForm.activation_key.$touched &&
-                                screenDetailsForm.activation_key.$invalid">
-                        <span>This field is required.</span>
-                    </div>
+            <div class="form-group" ng-if="showActivationKeyField">
+                <label for="activation_key" class="col-md-4">
+                    Activation Key*(Check your device)
+                </label>
+                <div class="col-md-6">
+                    <input type="text" placeholder="H8N9-23NK-2OIN-QELI" id="activation_key" name="activation_key"
+                           ng-model="screenDetails.activation_key" class="form-control" required>
+                </div>
+                <div class="col-md-6 col-md-offset-4">
+                    <span>HINT : Install blynq app on your android device and open the app. Activation key will be shown on your screen.</span>
+                </div>
+                <div class="col-md-6 col-md-offset-4" ng-show="screenDetailsForm.activation_key.$touched &&
+                            screenDetailsForm.activation_key.$invalid">
+                    <span>This field is required.</span>
                 </div>
             </div>
             <!--<div class="form-group">-->

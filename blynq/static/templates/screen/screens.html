@@ -28,7 +28,7 @@
 				<div class="rest-height">
 					<div class="row fill">
 						<!-- Screens over view -->
-						<div class="fill screens-overview"  
+						<div class="fill screens-overview" ng-if="screens.length>0"  
 							ng-class="{'col-md-6' : isScreenDetailsDivOpen, 'col-md-12' : !isScreenDetailsDivOpen }">
 							<div class="screen-container-wrap" ng-class="{'active' : activeScreenIndex == $index}" ng-click="clickedOnScreen($index)"
 								ng-repeat="screen in screens | filter: searchScreens">
@@ -41,9 +41,20 @@
 								</div>
 							</div>
 						</div>
+						<div class="fill screens-overview col-md-12" ng-if="screens.length==0">
+							<div class="row">
+					            <div class="col-md-offset-2 col-md-8">
+					                <div class="well" style="margin:10px">
+					                    <p>You don't have any screens.
+					                        <a ng-click="addNewScreen()">Add screen here.</a>
+					                    </p>
+					                </div>
+					            </div>
+					        </div>
+						</div>
 
 						<!-- Screen detailed view -->
-						<div class="col-md-6 fill" ng-show="isScreenDetailsDivOpen">
+						<div class="col-md-6 fill" ng-show="isScreenDetailsDivOpen && screens.length>0">
 							<div class="screen-details fill" >
 								<div class="row heading" >
 									<div class="col-md-8">
