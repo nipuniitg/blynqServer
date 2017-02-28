@@ -30,7 +30,7 @@ urlpatterns = [
     , url(r'^api/reports/', include(report_urls))
     , url(r'^admin', include(admin.site.urls))
     , url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT, })
-    , url(r'^.*', auth_views.divert_to_index_page)
+    , url(r'^.*', auth_views.divertToLandingPage, name='default_route')
 ]
 
 if settings.DEBUG:
