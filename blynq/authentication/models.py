@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import models
+from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext_lazy as _
 
 from blynq.settings import STORAGE_LIMIT_PER_ORGANIZATION
@@ -60,6 +61,9 @@ class Organization(models.Model):
     total_file_size_limit = models.BigIntegerField(default=STORAGE_LIMIT_PER_ORGANIZATION)
     used_file_size = models.BigIntegerField(default=0)
     total_screen_count = models.IntegerField(default=0)
+    secret_key = models.CharField(max_length=100, blank=True, null=True, unique=True)
+    use_blynq_banner = models.BooleanField(default=True)
+    parent = models.ForeignKey('Organization', null=True, blank=True)
 
     created_time = models.DateTimeField(auto_now_add=True, null=True)
     last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
@@ -70,6 +74,31 @@ class Organization(models.Model):
     def natural_key(self):
         return self.organization_name
 
+    def save(self, *args, **kwargs):
+        if not self.secret_key:
+            self.secret_key = get_random_string(length=24)
+        super(Organization, self).save(*args, **kwargs)
+
+    def get_or_create_userdetails(self):
+        try:
+            userdetails = self.userdetails_set.all()
+            if userdetails:
+                return userdetails[0]
+            else:
+                username = get_random_string(length=10)
+                while True:
+                    try:
+                        user = User.objects.get(username=username)
+                        username = get_random_string(length=10)
+                    except Exception as e:
+                        break
+                password = self.secret_key
+                user_details = UserDetails.create_user_details(username=username, password=password, organization=self)
+                return user_details
+        except Exception as e:
+            mail_exception(exception=e, subject='Received exception while getting userdetails for organization %s' % self.organization_name)
+            return None
+
 
 '''
 A User can have one of the below roles in increasing hierarchy
@@ -77,8 +106,6 @@ viewer - who has only view access to the content and the schedule. Only for moni
 scheduler - who can upload and schedule the content.
 manager - who can upload+schedule+ modify user roles for that company
 '''
-
-
 class Role(models.Model):
     role_id = models.AutoField(primary_key=True)
     role_name = models.CharField(max_length=50, unique=True)
@@ -133,6 +160,23 @@ class UserDetails(models.Model):
 
     def natural_key(self):
         return self.user.username
+
+    @staticmethod
+    def create_user_details(username, password, organization, *args, **kwargs):
+        user_details = None
+        if not organization:
+            return user_details
+        try:
+            user = User.objects.create_user(username=username, password=password, first_name='', last_name='', email='')
+            try:
+                user_details = UserDetails.objects.create(user=user, organization=organization, role=Role.default_role())
+            except Exception as e:
+                subject = 'Received error : User object created but not UserDetails for username %s' % username
+                mail_exception(exception=e, subject=subject)
+        except Exception as e:
+            subject = 'Received error: Error while creating user object username %s password %s ' % (username, password)
+            mail_exception(exception=e, subject=subject)
+        return user_details
 
 
 class RequestedQuote(models.Model):

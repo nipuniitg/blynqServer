@@ -1,6 +1,6 @@
 from django.core.serializers.python import Serializer
 
-from customLibrary.views_lib import datetime_to_string, get_ist_datetime, wrap_try_catch, mail_exception
+from customLibrary.views_lib import datetime_to_string, get_ist_datetime, mail_exception
 from screenManagement.models import GroupScreens
 
 

@@ -16,7 +16,7 @@ from scheduleManagement import schedule_urls
 urlpatterns = [
     url(r'^$', auth_views.divertToLandingPage, name='landing_page')
     , url(r'^/$', auth_views.divert_to_index_page, name='index_page')
-    , url(r'partner', RedirectView.as_view(url='https://drive.google.com/drive/folders/0B5h3qvbHUXJyOVFfZ05kQ29wRm8'))
+    , url(r'^partner$', RedirectView.as_view(url='https://drive.google.com/drive/folders/0B5h3qvbHUXJyOVFfZ05kQ29wRm8'))
     , url(r'^authentication/', include(authentication_urls))
     , url(r'fcm/', include('fcm.urls'))
     , url(r'^api/requestQuote', auth_views.request_quote, name='request_quote')

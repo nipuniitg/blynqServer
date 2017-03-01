@@ -85,6 +85,8 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'blynq.urls'
 
+X_FRAME_OPTIONS = 'ALLOW-FROM http://jsfiddle.net'
+
 TEMPLATE_PATH = os.path.join(BASE_DIR, 'templates')
 
 TEMPLATES = [

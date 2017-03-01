@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 from authentication.forms import RequestQuoteForm
 from authentication.models import Organization, UserDetails, Role
@@ -174,10 +175,87 @@ def change_password(request):
     return ajax_response(success=success, errors=errors)
 
 
+@csrf_exempt
+def create_new_client(request):
+    """
+    :param request: partner_key, client_name
+    :return:
+    """
+    success = False
+    errors = []
+    try:
+        posted_data = string_to_dict(request.body)
+        partner_key = posted_data.get('partner_key')
+        partner = Organization.objects.get(secret_key=partner_key)
+        client_name = posted_data.get('client_name')
+        if not client_name:
+            return ajax_response(success=False, errors=['Improper new organization name details'])
+        client_org = Organization.objects.create(organization_name=client_name, parent=partner, use_blynq_banner=False)
+        client_key = client_org.secret_key
+        # Comment above two lines and uncomment below two lines if the partner wants to generate own key for the client
+        # client_key = posted_data.get('client_key')
+        # client_org = Organization.objects.create(organization_name=client_name, parent=partner, client_key=client_key)
+        client_userdetails = client_org.get_or_create_userdetails()
+        if not client_userdetails:
+            mail_exception(exception='',
+                           subject='Not able to create userdetails for organization %s' % client_org.organization_name)
+            return ajax_response(success=success, errors=['Not able to create client user credentials'])
+        else:
+            return ajax_response(success=True, obj_dict={'client_key': client_key})
+    except (Organization.MultipleObjectsReturned, Organization.DoesNotExist) as e:
+        mail_exception(exception=e, subject='Received exception while creating new client for partner')
+        errors = ['Improper details, please contact support']
+    except Exception as e:
+        mail_exception(exception=e, subject='Received exception while creating new client for partner')
+        errors = ['There is an error processing your request, please contact support']
+    return ajax_response(success=success, errors=errors)
+
+
+@csrf_exempt
+def partner_login(request):
+    success = False
+    if request.method == 'GET':
+        try:
+            partner_key = request.GET['partner_key']
+            client_key = request.GET['client_key']
+            partner = Organization.objects.get(secret_key=partner_key)
+            client = Organization.objects.get(secret_key=client_key, parent=partner)
+            user_details = client.get_or_create_userdetails()
+            if not user_details:
+                return ajax_response(success=False)
+            user = authenticate(username=user_details.user.username, password=client_key)
+            if user:
+                debugFileLog.info("partner %s authentication successful for client %s " % (partner.organization_name,
+                                                                                           client.organization_name))
+                auth_login(request, user)
+                success = True
+                return ajax_response(success=success)
+            else:
+                debugFileLog.error(str(request.GET))
+                mail_exception(exception='Not able to automatically authenticate for partner')
+                return ajax_response(success=success)
+        except Exception as e:
+            mail_exception(exception=e, subject='Error with partner login %s' % str(request.GET))
+    else:
+        mail_exception(exception='Partner sending post request instead of get', subject='Error with partner login')
+    return ajax_response(success, errors=['Login failed, please try again or contact support'])
+
+
+def blynq_banner_usage(request):
+    use_blynq_banner = True
+    try:
+        user_details = get_userdetails(request)
+        use_blynq_banner = user_details.organization.use_blynq_banner
+    except Exception as e:
+        mail_exception(exception=e, subject='Received exception in fetch_blynq_banner')
+    return use_blynq_banner
+
+
 @login_required
 def divert_to_index_page(request, **kwargs):
     from paymentManagement.views import payment_warning_dict
     context_dic = payment_warning_dict(request)
+    context_dic['use_blynq_banner'] = blynq_banner_usage(request)
     if context_dic.get('suspend_access'):
         return render(request, 'payment_due.html', context_dic)
     else:

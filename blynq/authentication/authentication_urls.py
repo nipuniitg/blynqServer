@@ -3,6 +3,7 @@ from django.contrib.auth.views import logout
 from authentication import views
 
 urlpatterns = [
+    url(r'registerClient', views.create_new_client, name='register_client'),
     url(r'^register', views.register, name='auth_register'),
     url(r'^login', views.login, name='auth_login'),
     url(r'^logout', logout, {'next_page': 'auth_login' }, name='auth_logout'),
@@ -11,4 +12,5 @@ urlpatterns = [
     url(r'^getUserDetails', views.get_profile_details, name='profile_details'),
     url(r'^updateUserDetails', views.update_user_details, name='update_user_details'),
     url(r'^usernameAvailability', views.username_availability, name='username_availability'),
+    url(r'partnerLogin', views.partner_login, name='partner_login'),
 ]
