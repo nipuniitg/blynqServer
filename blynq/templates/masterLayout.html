@@ -128,9 +128,11 @@
 
         <!--logo start-->
         <div>
-            <a ui-sref="home" class="logo" style="height:60px;width:150px">
-            <img src="{%static 'SinglePro/prospect_imgs/website_logo.png'%}" style="max-height:100%;max-width:100%">
-        </a>
+            {% if use_blynq_banner %}
+                <a ui-sref="home" class="logo" style="height:60px;width:150px">
+                    <img src="{%static 'SinglePro/prospect_imgs/website_logo.png'%}" style="max-height:100%;max-width:100%">
+                </a>
+            {% endif %}
         </div>
         <!--logo end-->
 
