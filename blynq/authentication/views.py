@@ -229,7 +229,7 @@ def partner_login(request):
                                                                                            client.organization_name))
                 auth_login(request, user)
                 success = True
-                return ajax_response(success=success)
+                return divert_to_index_page(request)
             else:
                 debugFileLog.error(str(request.GET))
                 mail_exception(exception='Not able to automatically authenticate for partner')
