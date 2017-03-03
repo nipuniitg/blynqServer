@@ -1,7 +1,7 @@
 (function(){
     'use strict';
     var mainApp =  angular.module('mainApp', ['ui.router','sdApp', 'plApp','sagApp','hApp','lApp','uDApp',
-    'rApp','shApp','mwl.calendar','ui.bootstrap'])
+    'rApp','shApp','mwl.calendar','ui.bootstrap','colorpicker.module'])
     .config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('{[');
     $interpolateProvider.endSymbol(']}');

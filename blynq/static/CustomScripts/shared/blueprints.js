@@ -130,6 +130,8 @@
             this.title = ''
             this.widget_text = ''
             this.content_type = 'widget/rss/text'
+            this.background_color="#000"
+            this.font_color = "#fff"
         }
 
 

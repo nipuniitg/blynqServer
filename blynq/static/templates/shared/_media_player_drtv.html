@@ -52,7 +52,8 @@
     </div>
 
     <!-- widget/rss -->
-    <div ng-if="isMediaType.rssText" class="media-wrapper rss-text">
+    <div ng-if="isMediaType.rssText" class="media-wrapper rss-text" 
+        ng-style="{'background-color':mediaFile.background_color, 'color':mediaFile.font_color }">
         <marquee>
             {[ mediaFile.widget_text ]}
         </marquee>

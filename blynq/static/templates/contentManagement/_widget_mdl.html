@@ -20,7 +20,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-2 control-label">Widget Text/ URL*</label>
+                <label class="col-md-2 control-label">Widget Text*</label>
                 <div class="col-md-9">
                     <textarea type="text" placeholder="write rss text here" name="text"
                            ng-model="widgetObj.widget_text" class="form-control" required>
@@ -29,6 +29,51 @@
                 <div class="col-md-offset-2 col-md-9"
                      ng-show="widgetUpsertForm.text.$touched && widgetUpsertForm.text.$invalid">
                     This field is required.
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">Background Color*</label>
+                <div class="col-md-3">
+                    <input name="backgroundColor" class="form-control" colorpicker colorpicker-position="top" ng-model="widgetObj.background_color" type="text" required>
+                </div>
+                <div class="col-md-1" >
+                    <button class="btn" style="cursor: default;" ng-style="{'background-color':widgetObj.background_color}">&nbsp </button>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-default" ng-click="widgetObj.background_color='#000'" type="button">Reset to Black</button>
+                </div>
+                <div class="col-md-offset-2 col-md-9"
+                     ng-show="widgetUpsertForm.backgroundColor.$touched && widgetUpsertForm.backgroundColor.$invalid">
+                    This field is required.
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">Font Color*</label>
+                <div class="col-md-3">
+                    <input class="form-control" colorpicker colorpicker-position="top" ng-model="widgetObj.font_color" type="text"
+                    name="fontColor" required>
+                </div>
+                <div class="col-md-1" >
+                    <button class="btn" ng-style="{'color':widgetObj.font_color}"> &nbsp</button>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-default" ng-click="widgetObj.font_color = '#fff'" type="button">Reset to White</button>
+                </div>
+                <div class="col-md-offset-2 col-md-9"
+                     ng-show="widgetUpsertForm.fontColor.$touched && widgetUpsertForm.fontColor.$invalid">
+                    This field is required.
+                </div>            
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <div ng-style="{'background-color':widgetObj.background_color, 'color':widgetObj.font_color }" style="font-size: 24px;">
+                        <marquee ng-if="widgetObj.widget_text.length>0">
+                            {[ widgetObj.widget_text ]}
+                        </marquee>
+                        <marquee ng-if="widgetObj.widget_text.length==0">
+                            Enter some text for preview
+                        </marquee>
+                    </div>
                 </div>
             </div>
         </form>
