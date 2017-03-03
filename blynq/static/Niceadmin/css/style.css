@@ -534,6 +534,7 @@ a.logo {
     float: left;
     /*margin-top: 15px;*/
     text-transform: uppercase;
+    padding-top: 5px;
 }
 
 a.logo:hover, a.logo:focus {
