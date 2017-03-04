@@ -17,6 +17,7 @@ PERMANENTLY_DELETE_FILES = True
 
 CONTENT_THUMBNAILS = {
     'pdf': '/static/images/pdf_logo.png',
+    'image': '/static/images/image_icon.png',
     'video': '/static/images/video_icon.png',
     'folder': '/static/images/folder_icon.png',
     'url': '/static/images/url_icon.png',

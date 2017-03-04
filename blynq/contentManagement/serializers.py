@@ -25,7 +25,7 @@ class ContentSerializer(Serializer):
             except Exception as e:
                 debugFileLog.error('Error while accessing fbwidget')
                 debugFileLog.exception(e)
-            if obj.is_widget:
+            if obj.is_text_scroll_widget:
                 self._current['widget_text'] = obj.widget_text
             self.objects.append(self._current)
         except Exception as e:

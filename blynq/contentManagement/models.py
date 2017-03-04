@@ -1,5 +1,5 @@
 import mimetypes
-import os
+import os, re
 
 from django.core.exceptions import ValidationError
 from django.db import models, NotSupportedError
@@ -12,6 +12,11 @@ from authentication.models import UserDetails, Organization
 from blynq.settings import BASE_DIR, MEDIA_ROOT, USERCONTENT_DIR, DEFAULT_DISPLAY_TIME, MEDIA_HOST
 from customLibrary.custom_settings import CONTENT_THUMBNAILS, CONTENT_ORGANIZATION_NAME
 from customLibrary.views_lib import debugFileLog, get_video_length, full_file_path, mail_exception
+
+
+def is_youtube_url(url):
+    youtube_url_regex = '^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$'
+    return re.match(youtube_url_regex, url)
 
 
 class ContentType(models.Model):
@@ -96,51 +101,45 @@ class Content(models.Model):
             except Exception as e:
                 debugFileLog.exception("Exception while subtracting the deleted file size")
 
-    def save(self, *args, **kwargs):
-        if self.is_folder:
-            super(Content, self).save(*args, **kwargs)
+    def handle_content_type(self):
+        if self.content_type and not self.url:
             return
-        if self.document:
-            url = self.document.url
-            full_file_type = 'file/'
-        elif self.url:
-            url = self.url
-            full_file_type = 'url/'
+        # User might only change web url to youtube or wise versa
+        # content_type for other Content objects will remain the same
+        if self.url:
+            url = str(self.url)
+        elif self.document:
+            url = str(self.document.url)
+        elif not self.content_type:
+            mail_exception('Error content_type not set for widget %s' % str(self.content_id),
+                           subject='Error in handle_content_type')
+            return
         else:
-            url = ''
-            full_file_type = ''
-        file_type, encoding = mimetypes.guess_type(str(url))
+            return
+        file_type, encoding = mimetypes.guess_type(url)
         if file_type:
-            full_file_type = full_file_type + file_type
+            # Videos or images hosted on other servers should also be treated as files
+            full_file_type = 'file/' + file_type
+        elif is_youtube_url(url):
+            full_file_type = 'url/web/youtube'
         else:
-            full_file_type = None
+            full_file_type = 'url/web/other'
         try:
             content_type = ContentType.objects.get(file_type=full_file_type)
+            self.content_type = content_type
         except ContentType.DoesNotExist:
-            if self.document:
-                raise ValidationError(_('Invalid File extension'), code='invalid')
-            elif self.widget_text:
-                super(Content, self).save(*args, **kwargs)
-                return
-            elif self.content_type:
-                # This would be TV widget
-                super(Content, self).save(*args, **kwargs)
-                return
-            debugFileLog.exception("file type does not exist, might be an url")
-
-            def check_youtube_url(url):
-                import re
-                youtube_url_regex = '^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$'
-                return re.match(youtube_url_regex, url)
-            is_youtube = check_youtube_url(url)
-            file_type = 'url/web/youtube' if is_youtube else 'url/web/other'
-            content_type, created = ContentType.objects.get_or_create(file_type=file_type)
+            error = '%s is not supported at the moment' % url
+            mail_exception(error)
+            raise NotSupportedError(error)
         except ContentType.MultipleObjectsReturned:
-            content_type = ContentType.objects.filter(file_type=full_file_type)[0]
+            self.content_type = ContentType.objects.filter(file_type=full_file_type)[0]
         except Exception as e:
-            mail_exception(exception=e)
-            raise NotSupportedError('%s is not supported at the moment' % full_file_type)
-        self.content_type = content_type
+            error = '%s is not supported at the moment' % url
+            mail_exception(error)
+            raise NotSupportedError(error)
+
+    def save(self, *args, **kwargs):
+        self.handle_content_type()
         self.increment_size()
         # Now increment the used_file_size of the organization if the file is being saved for the first time
         if self.document:
@@ -217,6 +216,13 @@ class Content(models.Model):
         return widget
 
     @property
+    def is_text_scroll_widget(self):
+        widget = False
+        if self.content_type and self.content_type.file_type:
+            widget = 'widget/rss/text' in self.content_type.file_type
+        return widget
+
+    @property
     def is_fb_widget(self):
         fb_widget = False
         if self.content_type and self.content_type.file_type:
@@ -242,7 +248,7 @@ class Content(models.Model):
                 relative_path = CONTENT_THUMBNAILS['url']
         elif self.is_fb_widget:
             relative_path = CONTENT_THUMBNAILS['fb']
-        elif self.is_widget:
+        elif self.is_text_scroll_widget:
             # Right now only rss is supported in widgets. Change this as per type of widgets in the future
             relative_path = CONTENT_THUMBNAILS['rss']
         else:
@@ -265,7 +271,7 @@ class Content(models.Model):
             return ''
         elif self.is_fb_widget:
             return MEDIA_HOST + '/api/content/getFbWidget/'
-        elif self.is_widget:
+        elif self.is_text_scroll_widget:
             return ''
         else:
             return self.url

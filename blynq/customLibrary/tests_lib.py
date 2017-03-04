@@ -298,13 +298,13 @@ def generate_content_dict(content, include_is_folder=True):
             content_dict['is_folder'] = content.is_folder
         if content.document:
             content_dict['url'] = MEDIA_HOST + content.document.url
-        elif content.is_folder or content.is_widget:
+        elif content.is_folder or content.is_text_scroll_widget:
             content_dict['url'] = ''
         else:
             content_dict['url'] = content.url
         content_dict['thumbnail'] = content.thumbnail_url
         content_dict['duration'] = content.duration
-        if content.is_widget:
+        if content.is_text_scroll_widget:
             content_dict['widget_text'] = content.widget_text
     return content_dict
 
