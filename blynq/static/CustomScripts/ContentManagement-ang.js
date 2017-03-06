@@ -168,6 +168,7 @@ plApp.factory('ctDataAccessFactory',['$http','$window','$q', function($http,$win
                 console.log(response.statusText);
             });
     }
+
     var upsertFbWidget = function(fbWidget){
         var deferred = $q.defer();
         $http({
@@ -199,7 +200,22 @@ plApp.factory('ctDataAccessFactory',['$http','$window','$q', function($http,$win
             deferred.reject(response.Text)
         });
         return deferred.promise;
-    }
+    };
+
+    var upsertClockWidget = function(clockWidget){
+        var deferred = $q.defer();
+        $http({
+            method : "POST",
+            url : "/api/content/upsertClockWidget",
+            data : clockWidget
+        }).then(function mySucces(response) {
+            deferred.resolve(response.data);
+        }, function myError(response) {
+            console.log(response.statusText);
+            deferred.reject(response.Text)
+        });
+        return deferred.promise;
+    };
 
     var upsertUrl = function(content, parent_folder_id, callback ){
         var postData = {};
@@ -588,40 +604,15 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD, bp){
                     }
                     else{
                         toastr.warning(returnData.errors.join());
-                        toastr.warning('Oops! Some error occured while moving. Please try again later.')
+                        toastr.warning('Oops! Some error occured while moving. Please try again later.');
                     }
 
                 });
             }, function cancelled(){
-                toastr.warning('Move cancelled')
+                toastr.warning('Move cancelled');
             });
         }
     };
-
-
-    //view Content
-    $scope.viewContentInDetail = function(file){
-        var modalInstance = $uibModal.open({
-              animation: true
-              //,backdrop : false
-              ,templateUrl: '/static/templates/contentManagement/_content_view_mdl.html'
-              ,controller: 'mdlContentInDetailCtrl'
-              ,size: 'lg'
-              ,windowTemplateUrl : '/static/templates/shared/_mdl_window_template.html'
-              //,backdrop: 'static' //disables modal closing by click on the backdrop.
-              ,resolve : {
-                    file : function(){
-                        return file
-                    }
-              }
-            });
-
-        modalInstance.result.then(function ok(newParentId){
-
-        }, function cancelled(){
-
-        });
-    }
 
     //upload
     $scope.upload = function(){
@@ -685,6 +676,10 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD, bp){
                 templateUrl = '/static/templates/contentManagement/_fb_mdl.html';
                 controllerFn = 'widgetCtrl';
                 break;
+            case availableWidgetTypes.clock: 
+                templateUrl = '/static/templates/contentManagement/_clock_mdl.html';
+                controllerFn = 'widgetCtrl';
+                break;
         };
 
         var modalInstance = $uibModal.open({
@@ -703,6 +698,9 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD, bp){
                                 case availableWidgetTypes.fb: 
                                     obj = new bp.fbWidget();
                                     break;
+                                case availableWidgetTypes.clock: 
+                                    obj = new bp.clockWidget();
+                                    break;
                             }
                             return obj;
                         }
@@ -718,7 +716,6 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD, bp){
             $scope.refreshWidget();
         }, function cancelled(){
         });
-
     }
 
     //upsertURl
@@ -836,13 +833,16 @@ plApp.controller('widgetCtrl',['$scope', '$uibModalInstance', 'ctDataAccessFacto
                 case widgetObj.content_type.indexOf(availableWidgetTypes.hdmiIn)>-1:
                     widgetType = availableWidgetTypes.hdmiIn;
                     break;
+                case widgetObj.content_type.indexOf(availableWidgetTypes.clock)>-1:
+                    widgetType = availableWidgetTypes.clock;
+                    break;
             }        
             if(isNewWidget){
-                $scope.modalTitle = 'Add' + widgetType;
+                $scope.modalTitle = 'Add ' + widgetType;
                 $scope.saveVerbose = 'Add';
             }
             else{
-                $scope.modalTitle = 'Update' + widgetType;
+                $scope.modalTitle = 'Update ' + widgetType;
                 $scope.saveVerbose = 'Update';
             }
         };
@@ -967,17 +967,6 @@ plApp.controller('mdlContentMoveCtrl', ['content_ids','$scope','$uibModalInstanc
 
     onLoad();
  }]);
-
-plApp.controller('mdlContentInDetailCtrl',['$scope','file','$uibModalInstance',
- function($scope, file, $uibModalInstance){
-
-    var onLoad = function(){
-        $scope.file = file;
-    };
-
-    onLoad();
-
-}]);
 
 plApp.controller('mdlUploadContentCtrl', ['$scope','$uibModalInstance', 'parentScopeObj','$cookies','ctDataAccessFactory',
  function($scope,$uibModalInstance, parentScopeObj, $cookies, ctDAF){

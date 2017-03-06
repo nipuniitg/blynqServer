@@ -1,0 +1,82 @@
+<!-- Modal-Upsert FB widget -->
+<!-- Modal content-->
+<div class="">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()" aria-hidden="true"><i class="fa fa-times"></i></button>
+        <h4 class="modal-title">{[modalTitle]}</h4>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal" name="clockUpsertForm">
+            <!-- title -->
+            <div class="form-group">
+                <label class="col-md-2 control-label">Title*</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control"
+                           placeholder="title" ng-model="widgetObj.title"
+                           name="title" required>
+                </div>
+                <div class="col-md-offset-2 col-md-7 validation-error"
+                     ng-show="clockUpsertForm.title.$touched && clockUpsertForm.title.$error.required">
+                    This field is required.
+                </div>
+            </div>
+            <!-- show date -->
+            <div class="form-group">
+                <label class="col-md-2 control-label">Show Date</label>
+                <div class="col-md-9">
+                    <input type="checkbox" class="form-control" ng-model="widgetObj.show_date"
+                           required>
+                </div>
+            </div>
+            <!-- background color -->
+            <div class="form-group">
+                <label class="col-md-2 control-label">Background Color*</label>
+                <div class="col-md-3">
+                    <input name="backgroundColor" class="form-control" colorpicker colorpicker-position="top" ng-model="widgetObj.background_color" type="text" required>
+                </div>
+                <div class="col-md-1" >
+                    <button class="btn" style="cursor: default;" ng-style="{'background-color':widgetObj.background_color}">&nbsp </button>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-default" ng-click="widgetObj.background_color='#000'" type="button">Reset to Black</button>
+                </div>
+                <div class="col-md-offset-2 col-md-9"
+                     ng-show="widgetUpsertForm.backgroundColor.$touched && widgetUpsertForm.backgroundColor.$invalid">
+                    This field is required.
+                </div>
+            </div>
+            <!-- font color -->
+            <div class="form-group">
+                <label class="col-md-2 control-label">Font Color*</label>
+                <div class="col-md-3">
+                    <input class="form-control" colorpicker colorpicker-position="top" ng-model="widgetObj.font_color" type="text"
+                    name="fontColor" required>
+                </div>
+                <div class="col-md-1" >
+                    <button class="btn" ng-style="{'color':widgetObj.font_color}"> &nbsp</button>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-default" ng-click="widgetObj.font_color = '#fff'" type="button">Reset to White</button>
+                </div>
+                <div class="col-md-offset-2 col-md-9"
+                     ng-show="widgetUpsertForm.fontColor.$touched && widgetUpsertForm.fontColor.$invalid">
+                    This field is required.
+                </div>            
+            </div>
+            <!-- preview -->
+            <div class="form-group">
+                <div class="col-md-12">
+                    <media-player media-file="widgetObj"></media-player>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-success" ng-disabled="clockUpsertForm.$invalid"
+                 ng-click="save()">{[ saveVerbose ]}
+        </button>
+        <button type="button" class="btn btn-default"  ng-click="cancel()">
+            Cancel
+        </button>
+    </div>
+</div>

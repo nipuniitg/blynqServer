@@ -512,6 +512,7 @@ plApp.directive('mediaPlayer', ['$timeout', function($timeout){
                 ,youtube : false
                 ,rssText : false
                 ,fb : false
+                ,clock : false
                 ,iframe : false
                 ,default : false
             };
@@ -544,8 +545,12 @@ plApp.directive('mediaPlayer', ['$timeout', function($timeout){
                         $scope.isMediaType.rssText = true;
                         setUpRssTextMedia();
                         break;
-                    case  $scope.mediaFile.content_type.indexOf('fb/page')>-1:
+                    case  $scope.mediaFile.content_type.indexOf('widget/fb/page')>-1:
                         $scope.isMediaType.fb = true;
+                        break;
+                    case  $scope.mediaFile.content_type.indexOf('widget/clock/digital')>-1:
+                        $scope.isMediaType.clock = true;
+                        setUpClockWidget();
                         break;
                     case $scope.mediaFile.content_type.indexOf('url/web')>-1:
                         $scope.isMediaType.iframe = true;
@@ -566,7 +571,15 @@ plApp.directive('mediaPlayer', ['$timeout', function($timeout){
                         'line-height': divHeight + 'px'
                     });
                 }, 300);
-			    
+            };
+
+            var setUpClockWidget = function(){
+                if($scope.mediaFile.show_date){
+                   $scope.currentTime = moment().format('h:mm:ss a, MMMM Do YYYY');
+                }else{
+                   $scope.currentTime = moment().format('h:mm:ss a');
+                }
+                $timeout(setUpClockWidget, 500);
             };
 
             onLoad();

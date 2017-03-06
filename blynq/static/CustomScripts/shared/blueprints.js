@@ -134,6 +134,14 @@
             this.font_color = "#fff"
         }
 
+        function clockWidget(){
+            this.content_id = -1;
+            this.content_type = 'widget/clock/digital'
+            this.title = '';
+            this.show_date = true;
+            this.background_color = '#000';
+            this.font_color = '#fff';
+        }
 
         return{
             Schedule : Schedule
@@ -147,6 +155,7 @@
             ,LayoutPane : LayoutPane
             ,fbWidget : fbWidget
             ,rssWidget : rssWidget
+            ,clockWidget : clockWidget
         }
     }]);
 }());

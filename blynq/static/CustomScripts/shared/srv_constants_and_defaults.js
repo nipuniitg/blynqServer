@@ -65,6 +65,7 @@
                 rss : 'rss'
                 ,hdmiIn : 'hdmiIn'
                 ,fb : 'fb'
+                ,clock : 'clock'
             }
             return angular.copy(widgetTypes);
         };
