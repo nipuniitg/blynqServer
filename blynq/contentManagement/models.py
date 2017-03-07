@@ -391,6 +391,19 @@ class FbWidget(models.Model):
     def __unicode__(self):
         return self.fb_page_url
 
+
+class InstagramWidget(models.Model):
+    default_no_of_posts = 10
+    default_post_duration = 15
+
+    content = models.OneToOneField(Content, on_delete=models.CASCADE)
+    no_of_posts = models.IntegerField(default=default_no_of_posts)
+    post_duration = models.IntegerField(default=default_post_duration)
+
+    def __unicode__(self):
+        return self.content.title
+
+
 # class Widget(models.Model):
 #     widget_id = models.AutoField(primary_key=True)
 #     title = models.CharField(max_length=100)

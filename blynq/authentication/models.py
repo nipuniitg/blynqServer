@@ -179,6 +179,14 @@ class UserDetails(models.Model):
         return user_details
 
 
+class UserAccessTokens(models.Model):
+    user_details = models.OneToOneField(UserDetails, on_delete=models.CASCADE)
+    instagram_access_token = models.CharField(max_length=250, null=True, blank=True)
+
+    def __unicode__(self):
+        return self.user_details.user.username
+
+
 class RequestedQuote(models.Model):
     name = models.CharField(max_length=100)
     email = models.CharField(max_length=100)
