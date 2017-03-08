@@ -1,3 +1,5 @@
+from blynq.settings import DEBUG
+
 # Don't change the below name if you aren't sure.
 CONTENT_ORGANIZATION_NAME = 'Partner Content'
 
@@ -24,4 +26,15 @@ CONTENT_THUMBNAILS = {
     'audio': '/static/images/audio_icon.png',
     'rss': '/static/images/rss_icon.png',
     'fb':'/static/images/fb_icon.png',
+    'instagram' : '/static/images/instagram_icon.png'
 }
+
+#INSTAGRAM 
+if DEBUG:
+    INSTAGRAM_CLIENTID = 'ff65285a12b34085bbaad2cf17d95ac2'
+    CLIENT_SECRET = 'e118c806016d44a5a47b0381ed0e0b0b'
+    REDIRECT_URI = 'http://127.0.0.1:8000/authentication/instagramRedirect'
+else:
+    INSTAGRAM_CLIENTID = '124dcb38dcfd4230b7ab7ac19d0fec15'
+    CLIENT_SECRET = '450ed60a56ff47079a26271b08c132e8'
+    REDIRECT_URI = 'http://www.blynq.in/authentication/instagramRedirect'
