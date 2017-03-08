@@ -25,6 +25,14 @@ class ContentSerializer(Serializer):
             except Exception as e:
                 debugFileLog.error('Error while accessing fbwidget')
                 debugFileLog.exception(e)
+            try:
+                if obj.is_instagram_widget:
+                    self._current['url'] = obj.get_url() + str(obj.content_id)
+                    self._current['no_of_posts'] = obj.instagramwidget.no_of_posts
+                    self._current['post_duration'] = obj.instagramwidget.post_duration
+            except Exception as e:
+                debugFileLog.error('Error while accessing instagramwidget')
+                debugFileLog.exception(e)
             if obj.is_text_scroll_widget:
                 self._current['widget_text'] = obj.widget_text
             self.objects.append(self._current)

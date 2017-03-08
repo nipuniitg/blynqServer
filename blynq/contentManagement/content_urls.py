@@ -18,6 +18,8 @@ urlpatterns = [
      url(r'^upsertWidget', views.upsert_widget, name='upsert_widget'),
      url(r'^deleteWidget', views.delete_widget, name='delete_widget'),
      url(r'^upsertFbWidget', views.upsert_fb_widget, name='upsert_fb_widget'),
+     url(r'^upsertInstagramWidget', views.upsert_instagram_widget, name='upsert_instagram_widget'),
      url(r'^getFbWidget/(?P<content_id>\d+)', views.getFBWidget, name='get_name_widget'),
+     url(r'^getInstagramWidget/(?P<content_id>\d+)', views.getInstagramWidget, name='get_instagram_widget'),
      url(r'^checkFbPageExists', views.check_fb_page_exists, name="check_fb_page_exists"),
 ]

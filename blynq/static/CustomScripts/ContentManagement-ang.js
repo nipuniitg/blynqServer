@@ -217,6 +217,35 @@ plApp.factory('ctDataAccessFactory',['$http','$window','$q', function($http,$win
         return deferred.promise;
     };
 
+    var checkUserAccessTokenAvailable = function(){
+        var deferred = $q.defer();
+        $http({
+            method : "GET",
+            url : "/authentication/checkInstagramUserAccessTokenAvailable",
+        }).then(function mySucces(response) {
+            deferred.resolve(response.data);
+        }, function myError(response) {
+            console.log(response.statusText);
+            deferred.reject(response.Text)
+        });
+        return deferred.promise;
+    }
+
+    var upsertInstagramWidget = function(instagramWidget){
+        var deferred = $q.defer();
+        $http({
+            method : "POST",
+            url : "/api/content/upsertInstagramWidget",
+            data : instagramWidget
+        }).then(function mySucces(response) {
+            deferred.resolve(response.data);
+        }, function myError(response) {
+            console.log(response.statusText);
+            deferred.reject(response.Text)
+        });
+        return deferred.promise;
+    };
+
     var upsertUrl = function(content, parent_folder_id, callback ){
         var postData = {};
         postData.content = content;
@@ -262,6 +291,9 @@ plApp.factory('ctDataAccessFactory',['$http','$window','$q', function($http,$win
         ,upsertUrl  : upsertUrl
         ,upsertWidget: upsertWidget
         ,upsertFbWidget : upsertFbWidget
+        ,upsertClockWidget : upsertClockWidget
+        ,checkUserAccessTokenAvailable : checkUserAccessTokenAvailable
+        ,upsertInstagramWidget : upsertInstagramWidget
         ,getValidContentTypes : getValidContentTypes
         ,checkFbPageExists : checkFbPageExists
     }
@@ -656,6 +688,12 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD, bp){
             case $scope.widgets[index].content_type.indexOf(availableWidgetTypes.fb)>-1:
                 widgetType = availableWidgetTypes.fb;
                 break;
+            case $scope.widgets[index].content_type.indexOf(availableWidgetTypes.clock)>-1:
+                widgetType = availableWidgetTypes.clock;
+                break;
+            case $scope.widgets[index].content_type.indexOf(availableWidgetTypes.instagram)>-1:
+                widgetType = availableWidgetTypes.instagram;
+                break;
             case $scope.widgets[index].content_type.indexOf(availableWidgetTypes.hdmiIn)>-1:
                 widgetType = availableWidgetTypes.hdmiIn;
                 break;
@@ -680,6 +718,11 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD, bp){
                 templateUrl = '/static/templates/contentManagement/_clock_mdl.html';
                 controllerFn = 'widgetCtrl';
                 break;
+            case availableWidgetTypes.instagram: 
+                templateUrl = '/static/templates/contentManagement/_instagram_mdl.html';
+                controllerFn = 'instagramWidgetCtrl';
+                break;
+
         };
 
         var modalInstance = $uibModal.open({
@@ -700,6 +743,9 @@ function($scope, ctFactory, ctDataAccessFactory, $uibModal,cAD, bp){
                                     break;
                                 case availableWidgetTypes.clock: 
                                     obj = new bp.clockWidget();
+                                    break;
+                                case availableWidgetTypes.instagram: 
+                                    obj = new bp.instagramWidget();
                                     break;
                             }
                             return obj;
@@ -849,12 +895,7 @@ plApp.controller('widgetCtrl',['$scope', '$uibModalInstance', 'ctDataAccessFacto
         onLoad();
 
         var validate = function(){
-            switch(widgetType){
-                case availableWidgetTypes.rss : 
-                    return $scope.widgetUpsertForm.$valid ? !0 : !1
-                case availableWidgetTypes.fb : 
-                    return $scope.fbUpsertForm.$valid ? !0 : !1
-            };  
+            return $scope.widgetUpsertForm.$valid ? !0 : !1;
         };
 
         $scope.save = function(){
@@ -866,9 +907,12 @@ plApp.controller('widgetCtrl',['$scope', '$uibModalInstance', 'ctDataAccessFacto
                     case availableWidgetTypes.fb : 
                         ctDataAccessFactory.upsertFbWidget($scope.widgetObj).then(successFn);
                         break;
-                }
+                    case availableWidgetTypes.clock : 
+                        ctDataAccessFactory.upsertClockWidget($scope.widgetObj).then(successFn);
+                        break;
+                    }
             }else{
-                toastr.warning('There are some error in the form. Please correct them');
+                toastr.warning('There are some errors in the form. Please correct them.');
             }
         };
 
@@ -892,6 +936,66 @@ plApp.controller('widgetCtrl',['$scope', '$uibModalInstance', 'ctDataAccessFacto
         }
   }] );
 
+plApp.controller('instagramWidgetCtrl', ['$scope',  '$uibModalInstance', 'ctDataAccessFactory', 'widgetObj', 
+'constantsAndDefaults', '$window', function($scope, $uibModalInstance,ctDAF, widgetObj, cAD, $window){
+    var isNewWidget, widgetType, availableWidgetTypes = cAD.getWidgetTypes();
+    var instagramURI;
+    var onLoad = function(){
+        $scope.widgetObj = widgetObj;
+        isNewWidget = widgetObj.content_id == -1 ? !0 : !1
+        $scope.userAccessTokenAvailable = true;
+        if(isNewWidget){
+            $scope.modalTitle = 'Add ' + availableWidgetTypes.instagram;
+            $scope.saveVerbose = 'Add';
+        }
+        else{
+            $scope.modalTitle = 'Update ' + availableWidgetTypes.instagram;
+            $scope.saveVerbose = 'Update';
+        }
+        ctDAF.checkUserAccessTokenAvailable().then(function(data){
+            if(!data.success){
+                $scope.userAccessTokenAvailable = false;
+                instagramURI = data.instagram_uri;
+            };
+        });
+    };
+
+    $scope.setUpInstragramAccount = function() {
+        $window.open(instagramURI, '_blank');
+    }
+
+    $scope.save = function(){
+        if($scope.userAccessTokenAvailable){
+            if($scope.widgetUpsertForm.$valid){
+                ctDAF.upsertInstagramWidget(widgetObj).then(successFn, errorFn);
+            }
+        }else{
+            toastr.error('Please login to instagram account to add Instagram widget');
+        }
+    };
+
+    var successFn = function(data){
+        if(data.success){
+            if(isNewWidget){
+                toastr.success('Widget Added Successfully');
+            }else{
+                toastr.success('Widget updated Successfully');
+            }
+            $uibModalInstance.close();
+        }
+    };
+
+    var errorFn = function(data){
+        toastr.warning(data.errors.join(''));
+    };
+
+    $scope.cancel = $scope.cancel = function(){
+        $uibModalInstance.dismiss();
+    };
+            
+    onLoad();
+}]);
+
 plApp.directive('checkFbPageExistsDir', ['ctDataAccessFactory', function(ctDAF){
     return {
             restrict: 'A',
@@ -912,7 +1016,7 @@ plApp.directive('checkFbPageExistsDir', ['ctDataAccessFactory', function(ctDAF){
                 })
             }
         }
-}])
+}]);
 
 plApp.controller('mdlContentMoveCtrl', ['content_ids','$scope','$uibModalInstance','ctDataAccessFactory',
  function(content_ids,$scope,$uibModalInstance, ctDAF){

@@ -143,6 +143,14 @@
             this.font_color = '#fff';
         }
 
+        function instagramWidget(){
+            this.content_id = -1;
+            this.content_type = 'widget/instagram/profile'
+            this.title = '';
+            this.no_of_posts =10;
+            this.post_duration=15;
+        }
+
         return{
             Schedule : Schedule
             ,SchedulePane : SchedulePane
@@ -156,6 +164,7 @@
             ,fbWidget : fbWidget
             ,rssWidget : rssWidget
             ,clockWidget : clockWidget
+            ,instagramWidget : instagramWidget
         }
     }]);
 }());

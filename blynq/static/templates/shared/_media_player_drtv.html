@@ -70,6 +70,11 @@
         {[ currentTime ]}
     </div>
 
+    <!-- instagram page-->
+    <div ng-if="isMediaType.instagram" class="media-wrapper">
+        <iframe class="stretch" ng-src="{[ mediaFile.url | trusted]}"></iframe>
+    </div>
+
     <!-- url, that is not image, pdf, video. Hence, shown in iframe-->
     <div ng-if="isMediaType.iframe" class="media-wrapper">
         <iframe id="{[ 'iframe_'+ schedulePane.pane.layout_pane_id ]}" class="stretch"

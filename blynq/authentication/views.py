@@ -2,18 +2,19 @@ import datetime
 from django.contrib.auth.models import User
 
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.utils import timezone
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+import urllib, urllib2, json
 
 from authentication.forms import RequestQuoteForm
-from authentication.models import Organization, UserDetails, Role
+from authentication.models import Organization, UserDetails, Role, UserAccessTokens
 from blynq import settings
-from customLibrary.custom_settings import PLAYER_INACTIVE_THRESHOLD
+from customLibrary.custom_settings import PLAYER_INACTIVE_THRESHOLD, INSTAGRAM_CLIENTID, CLIENT_SECRET, REDIRECT_URI
 from customLibrary.views_lib import string_to_dict, ajax_response, get_userdetails, send_mail_blynq, obj_to_json_response, \
     debugFileLog, mail_exception
 from scheduleManagement.models import Schedule
@@ -330,6 +331,72 @@ def organization_homepage_summary(request):
         context_dic['used_storage'] = 0
         context_dic['total_storage'] = settings.STORAGE_LIMIT_PER_ORGANIZATION
     return obj_to_json_response(context_dic)
+
+
+def check_instagram_user_access_token_available(request):
+    try:
+        success = False
+        errors = []
+        context_dic={}
+        user_details = get_userdetails(request=request)
+        user_access_tokens = UserAccessTokens.objects.get(user_details=user_details)
+        print user_access_tokens
+        success = True if user_access_tokens.instagram_access_token else False
+    except Exception as e:
+        mail_exception(exception=e)
+        errors=['received exception while checking instagram user token']
+    if not success:
+        context_dic['instagram_uri'] = "https://api.instagram.com/oauth/authorize/"
+        context_dic['instagram_uri'] += "?client_id=%s&redirect_uri=%s&response_type=code" % (INSTAGRAM_CLIENTID, REDIRECT_URI)
+    return ajax_response(success=success, errors=errors, obj_dict=context_dic)
+
+
+def instagram_redirect(request):
+    try:
+        if 'code' in request.GET:
+            insta_data = get_instagram_access_token(code=request.GET.get('code'))
+            if not insta_data:
+                html = "<html><body> Authentication Failed while getting access token. Close the window now and refresh the page to try agiain.</body></html>"
+                return HttpResponse(html)
+            if 'access_token' in insta_data and 'user' in insta_data:
+                user_details = get_userdetails(request=request)
+                user_access_tokens, created = UserAccessTokens.objects.get_or_create(user_details=user_details)
+                import pdb;pdb.set_trace()
+                user_access_tokens.instagram_access_token = insta_data['access_token']
+                user_access_tokens.save()
+                html = "<html><body> Authentication Successfull. Close the window now and refresh the page to proceed.</body></html>"
+                return HttpResponse(html)
+            else:
+                html = "<html><body> Authentication Failed after step2. Close the window now and refresh the page to try agiain.</body></html>"
+                return HttpResponse(html)
+        elif 'error' in req.GET:
+            html = "<html><body> Authentication Failed after step1. Close the window now and refresh the page to try agiain.</body></html>"
+            return HttpResponse(html)
+    except Exception as e:
+        mail_exception(exception=e)
+
+
+def get_instagram_access_token(code):
+    try:
+        url = 'https://api.instagram.com/oauth/access_token'
+        values = {
+            'client_id': INSTAGRAM_CLIENTID,
+            'client_secret': CLIENT_SECRET,
+            'redirect_uri': REDIRECT_URI,
+            'code': code,
+            'grant_type':'authorization_code'
+        }
+        data = urllib.urlencode(values)
+        req = urllib2.Request(url, data)
+        response = urllib2.urlopen(req)
+        response_string = response.read()
+        return json.loads(response_string)
+    except Exception as e:
+        mail_exception(exception=e)
+        return None
+
+
+
 
 
 # def logout(request):

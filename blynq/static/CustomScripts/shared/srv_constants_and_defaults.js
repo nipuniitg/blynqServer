@@ -66,6 +66,7 @@
                 ,hdmiIn : 'hdmiIn'
                 ,fb : 'fb'
                 ,clock : 'clock'
+                ,instagram : 'instagram'
             }
             return angular.copy(widgetTypes);
         };

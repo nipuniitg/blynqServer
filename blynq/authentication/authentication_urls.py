@@ -13,4 +13,6 @@ urlpatterns = [
     url(r'^updateUserDetails', views.update_user_details, name='update_user_details'),
     url(r'^usernameAvailability', views.username_availability, name='username_availability'),
     url(r'partnerLogin', views.partner_login, name='partner_login'),
+    url(r'^checkInstagramUserAccessTokenAvailable', views.check_instagram_user_access_token_available, name="check_instagram_user_access_token_available"),
+    url(r'^instagramRedirect', views.instagram_redirect, name='instagram_redirect'),
 ]

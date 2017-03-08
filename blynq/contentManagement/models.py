@@ -229,6 +229,13 @@ class Content(models.Model):
             fb_widget = 'widget/fb/page' in self.content_type.file_type
         return fb_widget
 
+    @property
+    def is_instagram_widget(self):
+        instagram_widget = False
+        if self.content_type and self.content_type.file_type:
+            instagram_widget = 'widget/instagram/profile' in self.content_type.file_type
+        return instagram_widget
+
     def thumbnail_relative_path(self):
         if self.is_folder:
             relative_path = CONTENT_THUMBNAILS['folder']
@@ -248,6 +255,8 @@ class Content(models.Model):
                 relative_path = CONTENT_THUMBNAILS['url']
         elif self.is_fb_widget:
             relative_path = CONTENT_THUMBNAILS['fb']
+        elif self.is_instagram_widget:
+            relative_path = CONTENT_THUMBNAILS['instagram']
         elif self.is_text_scroll_widget:
             # Right now only rss is supported in widgets. Change this as per type of widgets in the future
             relative_path = CONTENT_THUMBNAILS['rss']
@@ -271,6 +280,8 @@ class Content(models.Model):
             return ''
         elif self.is_fb_widget:
             return MEDIA_HOST + '/api/content/getFbWidget/'
+        elif self.is_instagram_widget:
+            return MEDIA_HOST + '/api/content/getInstagramWidget/'
         elif self.is_text_scroll_widget:
             return ''
         else:

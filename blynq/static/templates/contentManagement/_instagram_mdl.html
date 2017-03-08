@@ -1,0 +1,84 @@
+<!-- Modal-Upsert instagram widget -->
+<!-- Modal content-->
+<div class="">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()" aria-hidden="true"><i class="fa fa-times"></i></button>
+        <h4 class="modal-title">{[modalTitle]}</h4>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal" name="widgetUpsertForm">
+            <div class="form-group" ng-if="!userAccessTokenAvailable" ng-click="setUpInstragramAccount()">
+                <div class="col-md-4">
+                    <button class="btn btn-primary">Setup Instagram account</button>
+                </div>
+                <div class="col-md-8">
+                    Please setup your instagram account before you could use it.
+                </div>
+            </div>
+            <!-- Widget  -->
+            <!-- Title -->
+            <div class="form-group">
+                <label class="col-md-2 control-label">Title*</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control"
+                           placeholder="title" ng-model="widgetObj.title"
+                           name="fbTitle" required>
+                </div>
+                <div class="col-md-offset-2 col-md-7 validation-error"
+                     ng-show="widgetUpsertForm.fbTitle.$touched && widgetUpsertForm.fbTitle.$error.required">
+                    This field is required.
+                </div>
+            </div>
+            <!-- no_of_posts -->
+            <div class="form-group">
+                <label class="col-md-2 control-label">Number of Posts*</label>
+                <div class="col-md-9">
+                    <input type="number" class="form-control" max="100" min="1"
+                           placeholder="10" ng-model="widgetObj.no_of_posts"
+                           name="noOfPosts" required>
+                </div>
+                <div class="col-md-offset-2 col-md-9">
+                    How many posts you want to loop through.(Max of 100 posts.)
+                </div>
+                <div class="col-md-offset-2 col-md-9 validation-error"
+                     ng-show="widgetUpsertForm.noOfPosts.$touched && widgetUpsertForm.noOfPosts.$error.required">
+                    This field is required.
+                </div>
+                <div class="col-md-offset-2 col-md-9 validation-error"
+                     ng-show="!widgetUpsertForm.noOfPosts.$error.required && widgetUpsertForm.noOfPosts.$invalid">
+                    Invalid input. Please enter a number between 1 and 100            
+                </div>
+            </div>
+            <!-- post_duration -->
+            <div class="form-group">
+                <label class="col-md-2 control-label">Duration of each post*</label>
+                <div class="col-md-9">
+                    <div class="input-group">
+                        <input type="Number" class="form-control" placeholder="15" ng-model="widgetObj.post_duration"
+                           name="postDuration" min="1" required>
+                      <span class="input-group-addon">seconds</span>
+                    </div>
+                </div>
+                <div class="col-md-offset-2 col-md-9">
+                     Mention how many seconds each post should be displayed.
+                </div>
+                <div class="col-md-offset-2 col-md-9 validation-error"
+                     ng-show="widgetUpsertForm.postDuration.$touched && widgetUpsertForm.postDuration.$error.required">
+                    This field is required.
+                </div>
+                <div class="col-md-offset-2 col-md-9 validation-error"
+                     ng-show="!widgetUpsertForm.postDuration.$error.required && widgetUpsertForm.postDuration.$invalid">
+                    Invalid input. Please enter a number greater than 0. 
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-success" ng-disabled="widgetUpsertForm.$invalid"
+                 ng-click="save()">{[ saveVerbose ]}
+        </button>
+        <button type="button" class="btn btn-default"  ng-click="cancel()">
+            Cancel
+        </button>
+    </div>
+</div>

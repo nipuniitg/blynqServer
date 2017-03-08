@@ -16,7 +16,8 @@ from blynq.settings import TEMP_DIR
 from customLibrary.custom_settings import COMPRESS_IMAGE, WIDGET_SCROLL_TIME
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, \
     debugFileLog, full_file_path, mail_exception, timeit, empty_string_for_none
-from contentManagement.models import Content, ContentType, FbWidget
+from contentManagement.models import Content, ContentType, FbWidget, InstagramWidget
+from authentication.models import UserAccessTokens
 
 
 # Create your views here.
@@ -516,6 +517,7 @@ def upsert_widget(request):
     return ajax_response(success=success, errors=errors)
 
 
+## FaceBook Widget
 def upsert_fb_widget(request):
     debugFileLog.info("Inside upsert fb widget")
     success = False
@@ -625,4 +627,84 @@ def getPageName(pageName):
     pageNameUrl = 'https://graph.facebook.com/'+pageName+'?access_token=583412958518077|yxWncaswG-JWQGQwI1MWc04icXY'    
     pageName = json.loads(urllib2.urlopen(pageNameUrl).read())['name']
     return pageName
+
+
+## Instagram Widget
+def upsert_instagram_widget(request):
+    debugFileLog.info("Inside upsert instagram widget")
+    success = False
+    errors = []
+    try:
+        user_details = get_userdetails(request)
+        posted_data = string_to_dict(request.body)
+        content_id = int(posted_data.get('content_id'))
+        title = posted_data.get('title')
+        # TODO: Remove this hard-coding of widget/fb/text
+        content_type, created = ContentType.objects.get_or_create(file_type='widget/instagram/profile')
+        if content_id == -1:
+            content_id = None
+        content, created = Content.get_user_widgets(user_details=user_details).update_or_create(
+            content_id=content_id, defaults=dict(
+                title=title, content_type_id=content_type.content_type_id, 
+                organization_id=user_details.organization.organization_id, last_updated_by=user_details,
+                ))
+        if created:
+            content.uploaded_by = user_details
+            content.save()
+            content_id = content.content_id
+
+        no_of_posts = int(posted_data.get('no_of_posts')) if posted_data.get('no_of_posts') else InstagramWidget.default_no_of_posts
+        post_duration = int(posted_data.get('post_duration')) if posted_data.get('post_duration') else InstagramWidget.post_duration
+        instagram_widget, created = InstagramWidget.objects.update_or_create(content_id=content_id, defaults=dict(
+            no_of_posts=no_of_posts, post_duration=post_duration))
+        success = True
+    except Exception as e:
+        mail_exception(exception=e)
+        errors = ['Invalid widget details']
+    return ajax_response(success=success, errors=errors)
+
+
+def getInstagramWidget(request, content_id):
+    try:
+        posts=[]
+        posts, rawPostsAfterJson = get_instagram_posts(request, content_id)
+        instagram_widget = InstagramWidget.objects.get(content_id=content_id)
+        context_dic={}
+        context_dic['posts'] = posts
+        context_dic['postDuration'] = instagram_widget.post_duration
+        context_dic['username'] = rawPostsAfterJson['data'][0]['user']['username']
+        context_dic['profilePicture'] = rawPostsAfterJson['data'][0]['user']['profile_picture']
+        return render(request, 'widgets/socialMedia/instagram/instagramwidget.html', context_dic)
+    except Exception as e:
+        mail_exception(exception=e)
+        errors = ['Invalid Instagram details']
+
+
+def get_instagram_posts(request, content_id):
+    try:
+        user_details = get_userdetails(request=request)
+        user_access_tokens = UserAccessTokens.objects.get(user_details=user_details)
+        instagram_access_token = user_access_tokens.instagram_access_token
+        instagram_widget = InstagramWidget.objects.get(content_id=content_id)
+        no_of_posts = instagram_widget.no_of_posts
+        url = 'https://api.instagram.com/v1/users/self/media/recent/?access_token='+instagram_access_token
+        url = url+'&count='+str(no_of_posts)
+        rawPosts = urllib2.urlopen(url).read()
+        rawPostsAfterJson = json.loads(rawPosts)
+        no_of_posts = int(no_of_posts)
+        if no_of_posts > len(rawPostsAfterJson['data']):
+            no_of_posts = len(rawPostsAfterJson['data'])
+        posts=[]
+        for i in range(0, no_of_posts):
+            post = {}
+            if 'text' in rawPostsAfterJson['data'][i]['caption']:
+                post['message'] = rawPostsAfterJson['data'][i]['caption']['text']
+            if 'standard_resolution' in rawPostsAfterJson['data'][i]['images']:
+                post['picture'] = rawPostsAfterJson['data'][i]['images']['standard_resolution']['url']
+            posts.append(post)
+        return posts, rawPostsAfterJson
+    except Exception as e:
+        mail_exception(exception=e)
+        errors = ['Error occured while fetching Instagram posts']
+
 

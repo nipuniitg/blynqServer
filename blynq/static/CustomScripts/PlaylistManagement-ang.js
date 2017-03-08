@@ -513,6 +513,7 @@ plApp.directive('mediaPlayer', ['$timeout', function($timeout){
                 ,rssText : false
                 ,fb : false
                 ,clock : false
+                ,instagram : false
                 ,iframe : false
                 ,default : false
             };
@@ -551,6 +552,9 @@ plApp.directive('mediaPlayer', ['$timeout', function($timeout){
                     case  $scope.mediaFile.content_type.indexOf('widget/clock/digital')>-1:
                         $scope.isMediaType.clock = true;
                         setUpClockWidget();
+                        break;
+                    case  $scope.mediaFile.content_type.indexOf('widget/instagram/profile')>-1:
+                        $scope.isMediaType.instagram = true;
                         break;
                     case $scope.mediaFile.content_type.indexOf('url/web')>-1:
                         $scope.isMediaType.iframe = true;
