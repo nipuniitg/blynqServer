@@ -6,7 +6,7 @@
         <h4 class="modal-title">{[modalTitle]}</h4>
     </div>
     <div class="modal-body">
-        <form class="form-horizontal" name="clockUpsertForm">
+        <form class="form-horizontal" name="widgetUpsertForm">
             <!-- title -->
             <div class="form-group">
                 <label class="col-md-2 control-label">Title*</label>
@@ -16,7 +16,7 @@
                            name="title" required>
                 </div>
                 <div class="col-md-offset-2 col-md-7 validation-error"
-                     ng-show="clockUpsertForm.title.$touched && clockUpsertForm.title.$error.required">
+                     ng-show="widgetUpsertForm.title.$touched && widgetUpsertForm.title.$error.required">
                     This field is required.
                 </div>
             </div>
@@ -72,7 +72,7 @@
         </form>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-success" ng-disabled="clockUpsertForm.$invalid"
+        <button type="button" class="btn btn-success" ng-disabled="widgetUpsertForm.$invalid"
                  ng-click="save()">{[ saveVerbose ]}
         </button>
         <button type="button" class="btn btn-default"  ng-click="cancel()">

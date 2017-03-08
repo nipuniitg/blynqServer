@@ -6,7 +6,7 @@
         <h4 class="modal-title">{[modalTitle]}</h4>
     </div>
     <div class="modal-body">
-        <form class="form-horizontal" name="fbUpsertForm">
+        <form class="form-horizontal" name="widgetUpsertForm">
             <!-- Title -->
             <div class="form-group">
                 <label class="col-md-2 control-label">Title*</label>
@@ -16,7 +16,7 @@
                            name="fbTitle" required>
                 </div>
                 <div class="col-md-offset-2 col-md-7 validation-error"
-                     ng-show="fbUpsertForm.fbTitle.$touched && fbUpsertForm.fbTitle.$error.required">
+                     ng-show="widgetUpsertForm.fbTitle.$touched && widgetUpsertForm.fbTitle.$error.required">
                     This field is required.
                 </div>
             </div>
@@ -38,11 +38,11 @@
                 </div>
 
                 <div class="col-md-offset-2 col-md-9 validation-error"
-                     ng-show="fbUpsertForm.fburl.$touched && fbUpsertForm.fburl.$error.required">
+                     ng-show="widgetUpsertForm.fburl.$touched && widgetUpsertForm.fburl.$error.required">
                     This field is required. 
                 </div>
                 <div class="col-md-offset-2 col-md-9 validation-error" 
-                    ng-show="fbUpsertForm.fburl.$invalid && !fbUpsertForm.fburl.$error.required">
+                    ng-show="widgetUpsertForm.fburl.$invalid && !widgetUpsertForm.fburl.$error.required">
                     Entered url is not valid. Please check again. 
                 </div>
             </div>
@@ -58,11 +58,11 @@
                     How many posts you want to loop through.(Max of 100 posts.)
                 </div>
                 <div class="col-md-offset-2 col-md-9 validation-error"
-                     ng-show="fbUpsertForm.noOfPosts.$touched && fbUpsertForm.noOfPosts.$error.required">
+                     ng-show="widgetUpsertForm.noOfPosts.$touched && widgetUpsertForm.noOfPosts.$error.required">
                     This field is required.
                 </div>
                 <div class="col-md-offset-2 col-md-9 validation-error"
-                     ng-show="!fbUpsertForm.noOfPosts.$error.required && fbUpsertForm.noOfPosts.$invalid">
+                     ng-show="!widgetUpsertForm.noOfPosts.$error.required && widgetUpsertForm.noOfPosts.$invalid">
                     Invalid input. Please enter a number between 1 and 100            
                 </div>
             </div>
@@ -80,18 +80,18 @@
                      Mention how many seconds each post should be displayed.
                 </div>
                 <div class="col-md-offset-2 col-md-9 validation-error"
-                     ng-show="fbUpsertForm.postDuration.$touched && fbUpsertForm.postDuration.$error.required">
+                     ng-show="widgetUpsertForm.postDuration.$touched && widgetUpsertForm.postDuration.$error.required">
                     This field is required.
                 </div>
                 <div class="col-md-offset-2 col-md-9 validation-error"
-                     ng-show="!fbUpsertForm.noOfPosts.$error.required && fbUpsertForm.postDuration.$invalid">
+                     ng-show="!widgetUpsertForm.postDuration.$error.required && widgetUpsertForm.postDuration.$invalid">
                     Invalid input. Please enter a number greater than 0. 
                 </div>
             </div>
         </form>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-success" ng-disabled="fbUpsertForm.$invalid"
+        <button type="button" class="btn btn-success" ng-disabled="widgetUpsertForm.$invalid"
                  ng-click="save()">{[ saveVerbose ]}
         </button>
         <button type="button" class="btn btn-default"  ng-click="cancel()">

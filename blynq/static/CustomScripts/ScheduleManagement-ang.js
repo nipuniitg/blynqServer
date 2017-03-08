@@ -1349,6 +1349,12 @@ sdApp.controller('selectionLibraryCtrl', ['$scope','$uibModalInstance','schedule
         }
 
         var playlistItem = new blueprints.PlaylistItem(obj);
+        var objKeys = Object.keys(obj);
+        for(var i=0; i< objKeys.length; i++){
+            if(!(objKeys[i] in playlistItem)){
+                playlistItem[objKeys[i]] = obj[objKeys[i]];
+            }
+        }
         playlist.playlist_items.push(playlistItem);
         return playlist;
 
