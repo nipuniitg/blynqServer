@@ -380,6 +380,26 @@ class Content(models.Model):
             mail_exception(exception=e)
 
 
+class ScrollTextWidget(models.Model):
+    content = models.OneToOneField(Content, on_delete=models.CASCADE)
+    widget_text = models.TextField(null=True, blank=True)
+    background_color = models.CharField(max_length=7, default='#000', null=True, blank=True)
+    font_color = models.CharField(max_length=7, default='#fff', null=True, blank=True)
+
+    def __unicode__(self):
+        return self.content.title
+
+
+class RssUrlWidget(models.Model):
+    content = models.OneToOneField(Content, on_delete=models.CASCADE)
+    rss_url = models.CharField(max_length=250)
+    background_color = models.CharField(max_length=7, default='#000', null=True, blank=True)
+    font_color = models.CharField(max_length=7, default='#fff', null=True, blank=True)
+
+    def __unicode__(self):
+        return self.content.title
+
+
 class FbWidget(models.Model):
     default_no_of_posts = 10
     default_post_duration = 15
