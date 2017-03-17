@@ -490,6 +490,7 @@ plApp.directive('mediaPlayer', ['$timeout', function($timeout){
         ,scope:{
             mediaFile : '='
             ,muteAudio : '='
+            ,mediaDuration : '='
         }
         ,link : function($scope, elem, attr){
 
@@ -498,6 +499,7 @@ plApp.directive('mediaPlayer', ['$timeout', function($timeout){
                     $scope.muteAudio = false;
                 }
                 $scope.showImageBlur = ('schedulePreviewMode' in attr) ? true : false;
+                $scope.schedulePreviewMode = ('schedulePreviewMode' in attr) ? true : false;
             }
 
             $scope.$watch('mediaFile', function(){

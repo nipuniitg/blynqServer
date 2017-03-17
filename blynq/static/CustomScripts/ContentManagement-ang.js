@@ -1302,11 +1302,41 @@ return{
 }
 }]);
 
-plApp.directive('pdfSection', ['PDFViewerService', function(pdf){
+plApp.directive('pdfSection', ['PDFViewerService','$timeout', function(pdf, $timeout){
     return{
         restrict : 'E'
         ,link   : function($scope, elem, attr){
-            $scope.viewer = pdf.Instance("viewer");
+            var pdfTotalDuration;
+            var pdfPageDuration;
+            $scope.showPDFNavigation = true;
+            var pageTimerPromise;
+
+            var onLoad = function(){
+                $scope.viewer = pdf.Instance("viewer");
+                if($scope.schedulePreviewMode){
+                    $scope.showPDFNavigation = false;
+                    $scope.pageLoaded = schedulePreviewPageLoadFn;
+                }else{
+                    $scope.pageLoaded = justPreviewPageLoadFn;
+                }
+            };
+
+            var justPreviewPageLoadFn = function(curPage, totalPages) {
+                $scope.currentPage = curPage;
+                $scope.totalPages = totalPages;
+            };
+
+            var schedulePreviewPageLoadFn = function(curPage, totalPages){
+                pdfPageDuration = Math.ceil($scope.mediaDuration/(1000*totalPages));
+                if(pageTimerPromise){
+                    $timeout.cancel(pageTimerPromise);
+                }
+                pageTimerPromise =  $timeout(function(){
+                    $scope.nextPage();
+                }, pdfPageDuration*1000);
+                $scope.currentPage = curPage;
+                $scope.totalPages = totalPages;
+            };
 
             $scope.nextPage = function() {
                 $scope.viewer.nextPage();
@@ -1316,10 +1346,7 @@ plApp.directive('pdfSection', ['PDFViewerService', function(pdf){
                 $scope.viewer.prevPage();
             };
 
-            $scope.pageLoaded = function(curPage, totalPages) {
-                $scope.currentPage = curPage;
-                $scope.totalPages = totalPages;
-            };
+            onLoad();
         }
     }
 }]);

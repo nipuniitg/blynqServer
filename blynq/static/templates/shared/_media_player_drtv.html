@@ -12,11 +12,13 @@
     <!-- pdf -->
     <div ng-if="isMediaType.pdf" class="media-wrapper">
         <pdf-section class="media-content" >
-            <button ng-click="prevPage()">&lt;</button>
-            <button ng-click="nextPage()">&gt;</button>
-            <span>{[currentPage]}/{[totalPages]}</span>
-            <br>
-            <br>
+            <div ng-if="showPDFNavigation">
+                <button ng-click="prevPage()">&lt;</button>
+                <button ng-click="nextPage()">&gt;</button>
+                <span>{[currentPage]}/{[totalPages]}</span>
+                <br>
+                <br>
+            </div>
             <pdfviewer src="{[ mediaFile.url | trusted ]}"
                        on-page-load='pageLoaded(page,total)' id="viewer"></pdfviewer>
         </pdf-section>

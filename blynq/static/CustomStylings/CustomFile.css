@@ -1102,7 +1102,13 @@ div.screen-container-wrap:hover{
     opacity: .8;
 }
 
+/*--------------------*/
+/* pdf view */
+/*--------------------*/
 
+pdfviewer > canvas{
+    height: 100%;
+}
 
 
 
