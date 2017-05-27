@@ -77,8 +77,18 @@ def update_total_screen_count(organization):
         mail_exception('Error while updating the screen count of the organization %s' % str(organization))
 
 
+def create_tv_widget(organization):
+    try:
+        from contentManagement.models import Content, ContentType
+        tv_type, created = ContentType.objects.get_or_create(file_type='widget/tv/prijector')
+        content, created = Content.objects.get_or_create(title='TV DTH', content_type=tv_type, organization=organization)
+    except Exception as e:
+        debugFileLog.error(e)
+
+
 @receiver(post_save, sender=Organization)
 def post_save_organization(sender, instance, **kwargs):
     debugFileLog.info("inside post_save_organization")
     create_default_layouts(instance)
+    create_tv_widget(instance)
     update_total_screen_count(instance)
