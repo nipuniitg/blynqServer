@@ -14,6 +14,7 @@ class City(models.Model):
     city_id = models.AutoField(primary_key=True)
     city_name = models.CharField(max_length=50, unique=True)
     state = models.CharField(max_length=50)
+    country = models.CharField(max_length=50, default='India')
 
     last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
 
