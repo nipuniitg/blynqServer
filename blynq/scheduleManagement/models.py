@@ -56,6 +56,7 @@ class SchedulePane(models.Model):
     layout_pane = models.ForeignKey(LayoutPane, on_delete=models.PROTECT, null=True, blank=True)
     playlists = models.ManyToManyField(Playlist, through=SchedulePlaylists)
     mute_audio = models.BooleanField(default=False)
+    randomize_playlist_items = models.BooleanField(default=False)
     is_always = models.BooleanField(default=True)
     all_day = models.BooleanField(default=True)
     recurrence_absolute = models.BooleanField(default=False)

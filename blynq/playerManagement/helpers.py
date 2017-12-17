@@ -94,6 +94,7 @@ def event_json_from_occurrences(existing_occurrences):
                          'playlists': playlists_json,
                          'pane': layout_pane_dict,
                          'mute_audio': schedule_pane.mute_audio,
+                         'randomize_playlist_items': False,
                          'last_updated_time': schedule.last_updated_time,
                          'start_time': occur.start,
                          'end_time': occur.end}

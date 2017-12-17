@@ -256,6 +256,7 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
         layout_pane = item.get('layout_pane')
         layout_pane_id = int(layout_pane.get('layout_pane_id'))
         mute_audio = item.get('mute_audio')
+        randomize_playlist_items = item.get('randomize_playlist_items') if item.get('randomize_playlist_items') else False
         timeline = item.get('timeline')
         is_always = timeline.get('is_always')
         all_day = timeline.get('all_day')
@@ -270,6 +271,7 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
             event = None
         if schedule_pane_id == -1:
             schedule_pane = SchedulePane(schedule=schedule, layout_pane_id=layout_pane_id, mute_audio=mute_audio,
+                                         randomize_playlist_items=randomize_playlist_items,
                                          is_always=is_always, all_day=all_day, recurrence_absolute=recurrence_absolute,
                                          event=event)
             schedule_pane.save()
@@ -281,6 +283,7 @@ def upsert_schedule_panes(user_details, schedule, schedule_panes, layout):
             schedule_pane.is_always = is_always
             schedule_pane.all_day = all_day
             schedule_pane.mute_audio = mute_audio
+            schedule_pane.randomize_playlist_items = randomize_playlist_items
             schedule_pane.recurrence_absolute = recurrence_absolute
             # Not deleting the event, to have the history of events
             schedule_pane.event = event
