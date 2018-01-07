@@ -64,6 +64,7 @@ class Organization(models.Model):
     secret_key = models.CharField(max_length=100, blank=True, null=True, unique=True)
     use_blynq_banner = models.BooleanField(default=True)
     parent = models.ForeignKey('Organization', null=True, blank=True)
+    enable_reports = models.BooleanField(default=False)
 
     created_time = models.DateTimeField(auto_now_add=True, null=True)
     last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)

@@ -188,6 +188,9 @@ def media_stats(request):
         reg_id = posted_data.get('reg_id')
         if reg_id:
             fcm_success = FcmDevice.update_token(device_key=unique_device_key, reg_id=reg_id)
+        # Only save the reports for Selected clients
+        if not screen.owned_by.enable_reports:
+            return ajax_response(success=True, obj_dict={'fcm_success': fcm_success})
         media_stats_list = empty_list_for_none(posted_data.get('media_item_stats_list'))
         for stat in media_stats_list:
             try:
