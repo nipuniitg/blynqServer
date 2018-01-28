@@ -188,8 +188,11 @@ def upload_content(request):
         if total_files <= 0:
             error_str = 'Error in the total files received'
             debugFileLog.error(error_str)
-            return ajax_response(success=success, errors=errors)
+            return ajax_response(success=success, errors=[error_str])
         for i in range(total_files):
+            if user_details.organization.usage_exceeded():
+                return ajax_response(success=False, errors=[
+                    "You already exceeded your usage limits, please contact support@blynq.in to upgrade your plan"])
             key = 'file' + str(i)
             document = request.FILES[key]
             title = os.path.splitext(document.name)[0]
