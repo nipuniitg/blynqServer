@@ -35,7 +35,9 @@
 								<div class="screen-container">
 									<i class="fa fa-circle" 
 										set-screen-status-class="{[screen.status]}"></i>
-									<span> {[ screen.screen_name ]} </span>
+									<div class="screen-title" uib-popover="{[ screen.screen_name ]}" popover-trigger="mouseenter">
+                                        {[ screen.screen_name ]}
+                                    </div>
 									<span class="time" ng-show="screen.status == 'Offline'"
 									uib-popover="last Online" popover-trigger="mouseenter"> {[ screen.last_active_time | timeSince]} </span>
 								</div>
