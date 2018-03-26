@@ -17,6 +17,7 @@
             this.layout_pane = angular.copy(layout_pane);
             this.schedule_playlists = [];
             this.mute_audio = false;
+            this.randomize_playlist_items = false;
             this.timeline ={
                 is_always   : !0
                 ,start_date  : null

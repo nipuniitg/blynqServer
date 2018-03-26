@@ -159,6 +159,15 @@
                                            ng-model="schedule.schedule_panes[$index].mute_audio">
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <div class="control-label col-md-2">
+                                    Randomize playlist order
+                                </div>
+                                <div class="col-md-10">
+                                    <input type="checkbox" name="randomizePlaylist"
+                                           ng-model="schedule.schedule_panes[$index].randomize_playlist_items">
+                                </div>
+                            </div>
                      	</form>
                      	<playlist-editor-box-drtv selected-playlists="schedule.schedule_panes[$index].schedule_playlists">
                      	</playlist-editor-box-drtv>

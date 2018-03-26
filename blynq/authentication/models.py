@@ -65,6 +65,7 @@ class Organization(models.Model):
     secret_key = models.CharField(max_length=100, blank=True, null=True, unique=True)
     use_blynq_banner = models.BooleanField(default=True)
     parent = models.ForeignKey('Organization', null=True, blank=True)
+    enable_reports = models.BooleanField(default=False)
 
     created_time = models.DateTimeField(auto_now_add=True, null=True)
     last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
@@ -100,6 +101,28 @@ class Organization(models.Model):
             mail_exception(exception=e, subject='Received exception while getting userdetails for organization %s' % self.organization_name)
             return None
 
+    def recalculate_usage(self, size_per_screen=536870912):
+        org_contents = self.content_set.all()
+        used_size = 0
+        for content in org_contents:
+            try:
+                if content.document:
+                    used_size += content.document.size
+            except:
+                pass
+        self.used_file_size = used_size
+        self.total_screen_count = self.screen_set.all().count()
+        self.total_file_size_limit = ( self.total_screen_count + 1 ) * size_per_screen
+        try:
+            self.save()
+        except Exception as e:
+            debugFileLog.error( "Error while saving organization usage on server", str(e))
+
+    def usage_exceeded(self):
+        if self.used_file_size > self.total_file_size_limit:
+            return True
+        else:
+            return False
 
 '''
 A User can have one of the below roles in increasing hierarchy
