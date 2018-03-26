@@ -78,17 +78,12 @@ class Content(models.Model):
     def increment_size(self):
         # Now increment the used_file_size of the organization if the file is being saved for the first time
         if self.document and self.pk is None:
-            if self.organization.used_file_size + self.document.size <= self.organization.total_file_size_limit:
+            try:
                 self.organization.used_file_size = self.organization.used_file_size + self.document.size
-                try:
-                    self.organization.save()
-                except Exception as e:
-                    debugFileLog.exception("Received exception while increasing the organization file usage size")
-                    mail_exception(exception=e)
-            else:
-                debugFileLog.warning("The organization " + self.organization.organization_name +
-                                     " total file size limit exceeded")
-                debugFileLog.error("Can't upload file")
+                self.organization.save()
+            except Exception as e:
+                debugFileLog.exception("Received exception while increasing the organization file usage size")
+                mail_exception(exception=e)
 
     def decrement_size(self):
         if self.document:

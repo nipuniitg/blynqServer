@@ -127,7 +127,8 @@ class ScheduleSerializer(Serializer):
                 schedule_panes = obj.get_schedule_pane_manager.all()
                 json_data = SchedulePaneSerializer().serialize(schedule_panes,
                                                                fields=('schedule_pane_id', 'schedule_playlists',
-                                                                       'layout_pane', 'timeline', 'mute_audio'))
+                                                                       'layout_pane', 'timeline', 'mute_audio',
+                                                                       'randomize_playlist_items'))
                 self._current['schedule_panes'] = json_data
             self.objects.append(self._current)
         except Exception as e:

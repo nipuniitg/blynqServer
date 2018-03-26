@@ -843,6 +843,12 @@ div.screen-container-wrap:hover{
     font-style: italic;
 }
 
+.screen-container .screen-title{
+    max-height: 40px;
+    overflow: hidden;
+    word-wrap: break-word;
+}
+
 /* Screen Deatils */
 .screen-details{
     padding: 15px;
