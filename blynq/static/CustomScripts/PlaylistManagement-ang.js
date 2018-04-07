@@ -167,6 +167,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
         //playlist queue
         $scope.activePlaylistItemIndex= null;
         $scope.activePlaylistItem = null;
+        $scope.isQueueUpdateRequested = false; //for showing a loading icon.
 
         //bool values
         $scope.playlistQueueEditMode = false;
@@ -258,14 +259,16 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
                     var isNewPlaylist = playlistObj.playlist_id == -1 ? !0 : !1;
                     var onLoad = function(){
                         $scope.playlist = playlistObj;
-                        $scope.mdlVerbose = isNewPlaylist ? 'Add' : 'Update'
+                        $scope.mdlVerbose = isNewPlaylist ? 'Add' : 'Update';
+                        $scope.isPlaylistUpsertRequested = false;
                     };
 
                     onLoad();
 
                     $scope.upsertPlaylist = function(){
-                        console.log($scope.playlist)
+                        $scope.isPlaylistUpsertRequested = true;
                         plDataAccessFactory.upsertPlaylist($scope.playlist, function(returnData){
+                            $scope.isPlaylistUpsertRequested = false;
                             if(returnData.success){
                                 if(isNewPlaylist){
                                     toastr.success('Playlist added successfully');
@@ -337,7 +340,9 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
 
     $scope.savePlaylistQueueItems = function(){
         var playlistIndex = getActivePlaylistIndex()
+        $scope.isQueueUpdateRequested = true;
         dataAccessFactory.upsertPlaylist($scope.activePlaylistObj, function(data){
+            $scope.isQueueUpdateRequested = false;
             if(data.success)
             {
                 toastr.success('Playlist saved successfully');

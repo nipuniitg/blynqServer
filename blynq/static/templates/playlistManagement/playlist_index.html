@@ -62,16 +62,26 @@
                             </span>
                         </div>
                         <div ng-show="playlistQueueEditMode">
-                            <span class="action-icon" ng-click="savePlaylistQueueItems()"
-                                uib-popover="Save"
-                                popover-trigger="mouseenter">
-                                <i class="fa fa-check"></i>
-                            </span>
-                            <span class="action-icon" ng-click="cancelPlaylistQueueItemsEdit()"
-                                uib-popover="Cancel"
-                                popover-trigger="mouseenter">
-                                <i class="fa fa-times"></i>
-                            </span>
+                            <div ng-if="isQueueUpdateRequested">
+                                <span class="action-icon"
+                                    style="background:#122846">
+                                    <i class="fa fa-spinner fa-pulse" style="background:none">
+                                    </i>
+                                </span>
+                            </div>
+                            <div ng-if="!isQueueUpdateRequested">
+                                <span class="action-icon" ng-click="savePlaylistQueueItems()"
+                                    uib-popover="Save"
+                                    popover-trigger="mouseenter">
+                                    <i class="fa fa-check"></i>
+                                </span>
+                                <span class="action-icon" ng-click="cancelPlaylistQueueItemsEdit()"
+                                    uib-popover="Cancel"
+                                    popover-trigger="mouseenter">
+                                    <i class="fa fa-times"></i>
+                                </span>
+                            </div>
+                            
                         </div>
                     </div>
                 </div>

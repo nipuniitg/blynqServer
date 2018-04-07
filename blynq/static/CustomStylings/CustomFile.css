@@ -1108,7 +1108,9 @@ div.screen-container-wrap:hover{
     opacity: .8;
 }
 
-
+.loading {
+    margin-left: 5px;
+}
 
 
 

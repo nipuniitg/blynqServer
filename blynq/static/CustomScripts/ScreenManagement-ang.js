@@ -587,6 +587,9 @@ sagApp.controller('mdlUpsertScreenDetails', ['$scope','$uibModalInstance','scree
         dAF.getCityOptions(function(returnData){
             $scope.cityOptions = returnData;
         });
+
+        //loading variable
+        $scope.isScreenUpsertRequested = false;
     };
 
     $scope.validateActivationKey = function(){
@@ -619,8 +622,9 @@ sagApp.controller('mdlUpsertScreenDetails', ['$scope','$uibModalInstance','scree
     };
 
     $scope.upsertScreen = function(){
-        console.log($scope.screenDetails)
+        $scope.isScreenUpsertRequested = true;
         dAF.upsertScreen($scope.screenDetails, function(returnData){
+            $scope.isScreenUpsertRequested = false;
             if(returnData.success){
                 if(isNewScreen){
                     toastr.success('Screen added successfully');
@@ -651,7 +655,8 @@ sagApp.controller('mdlUpsertGroupDetails',['$scope','$uibModalInstance', 'groupD
 
     var onLoad= function(){
         $scope.groupDetails = groupDetailsObj;
-        $scope.saveButtonVerbose = (isNewGroup) ? 'Add' : 'Update'
+        $scope.saveButtonVerbose = (isNewGroup) ? 'Add' : 'Update';
+        $scope.isGroupUpsertRequested = false;
     };
 
     $scope.openScreenSelectorModal = function(){
@@ -680,8 +685,9 @@ sagApp.controller('mdlUpsertGroupDetails',['$scope','$uibModalInstance', 'groupD
     }
 
     $scope.upsertGroup = function(){
-        console.log()
+        $scope.isGroupUpsertRequested = true;
         dAF.upsertGroup($scope.groupDetails, function successFN(data){
+            $scope.isGroupUpsertRequested = false;
             if(data.success)
             {
                 if(isNewGroup)

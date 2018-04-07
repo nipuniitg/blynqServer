@@ -194,16 +194,20 @@
 		  </button>
     	<div class="pull-right">
     		<button class="btn btn-default" confirm confirm-fn="cancel()" confirm-verbose="Yes" message="Are you sure, you want to cancel?">Cancel</button>
-    		<button class="btn btn-info" preview-schedule schedule="schedule"
-    			ng-show="stepsConfig[currentStep].showPreview">Preview
-			</button>
+        <button class="btn btn-info" preview-schedule schedule="schedule"
+            ng-show="stepsConfig[currentStep].showPreview">Preview
+        </button>
     		<button class="btn btn-primary" ng-click="nextStep()"
     			ng-show="stepsConfig[currentStep].showSaveAndContinue">Next
-			</button>
-			<button class="btn btn-success" ng-click="saveSchedule()"
-				ng-show="stepsConfig[currentStep].showFinish">
-				Great, Finish now!!
-			</button>
+			  </button>
+        <button class="btn btn-success" ng-click="saveSchedule()"
+          ng-disabled="isScheduleUpsertRequested"
+          ng-show="stepsConfig[currentStep].showFinish">
+          Great, Finish now!!
+        </button>
+        <span ng-show="stepsConfig[currentStep].showFinish && isScheduleUpsertRequested">
+          <i class="fa fa-spinner fa-pulse" class="loading"></i>
+        </span>
     	</div>
     </div>
 
