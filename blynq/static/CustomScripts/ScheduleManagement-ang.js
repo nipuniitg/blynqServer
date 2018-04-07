@@ -456,6 +456,8 @@ sdApp.controller('scheduleUpsertCtrl', ['$scope','$uibModal','$log', 'scheduleDe
         $scope.activeTabIndex=0;
         setStepEnableStatus();
         $scope.formSubmitted = false;
+
+        $scope.isScheduleUpsertRequested = false;
     };
     
 
@@ -482,8 +484,10 @@ sdApp.controller('scheduleUpsertCtrl', ['$scope','$uibModal','$log', 'scheduleDe
 
     $scope.saveSchedule= function(){
         $log.log($scope.schedule);
+        $scope.isScheduleUpsertRequested = true;
         //if(validateSchedule()){
-            sDF.upsertScheduleDetails($scope.schedule, function(data){
+        sDF.upsertScheduleDetails($scope.schedule, function(data){
+            $scope.isScheduleUpsertRequested = false;
             if(data.success)
             {
                 if(isNewSchedule)
