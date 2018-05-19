@@ -21,15 +21,16 @@ def organization_monthly(organization_name="Remedo"):
         writer = csv.writer(f, delimiter=",")
         new_all_data = {}
         for data in sc_data:
-            key = ( data[ 0 ], str( data[ 1 ].date() ) )
+            key = (data[0], str(data[1].year), str(data[1].month))
             if key not in new_all_data:
                 new_all_data[ key ] = 0
-            new_all_data[ key ] += ( data[ 2 ] - data[ 1 ] ).seconds
+            new_all_data[key] += (data[2] - data[1]).seconds
 
         for key in new_all_data:
             row = []
-            row.append( key[0] )
-            row.append( key[1] )
+            row.append(key[0])
+            row.append(key[1])
+            row.append(key[2])
             seconds = new_all_data[key]
             min, sec = divmod( seconds, 60)
             hr, min = divmod( min, 60)
