@@ -7,6 +7,7 @@ from customLibrary.views_lib import get_userdetails, generate_utc_datetime, get_
 from playlistManagement.models import Playlist
 from reports.models import ScreenAnalytics, MediaAnalytics
 from screenManagement.models import Screen
+from generate_reports import organization_monthly
 
 # Create your views here.
 
@@ -263,3 +264,7 @@ def media_reports(request):
     except Exception as e:
         mail_exception(exception=e)
     return obj_to_json_response(json_dict)
+
+
+def refresh_report(request, organization_name):
+    return obj_to_json_response({"Organization": organization_name, "url": organization_monthly(organization_name)})

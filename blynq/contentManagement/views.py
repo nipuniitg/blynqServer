@@ -628,4 +628,3 @@ def getPageName(pageName):
     pageNameUrl = 'https://graph.facebook.com/'+pageName+'?access_token=583412958518077|yxWncaswG-JWQGQwI1MWc04icXY'    
     pageName = json.loads(urllib2.urlopen(pageNameUrl).read())['name']
     return pageName
-
