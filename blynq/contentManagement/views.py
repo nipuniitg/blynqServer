@@ -473,7 +473,7 @@ def move_content(request):
 def create_and_download_zip(request):
     user_details = get_userdetails(request)
     try:
-        user_folder = "user%d" % user_details.user.id
+        user_folder = "user%d" % user_details.id
         usercontent_dir = os.path.join(MEDIA_ROOT, USERCONTENT_DIR)
         user_directory = os.path.join(usercontent_dir, user_folder)
         zip_subdir = user_details.user.username
