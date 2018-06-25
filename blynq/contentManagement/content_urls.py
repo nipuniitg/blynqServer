@@ -20,4 +20,5 @@ urlpatterns = [
      url(r'^upsertFbWidget', views.upsert_fb_widget, name='upsert_fb_widget'),
      url(r'^getFbWidget/(?P<content_id>\d+)', views.getFBWidget, name='get_name_widget'),
      url(r'^checkFbPageExists', views.check_fb_page_exists, name="check_fb_page_exists"),
+     url(r'^downloadZip', views.create_and_download_zip, name='download_zip'),
 ]
