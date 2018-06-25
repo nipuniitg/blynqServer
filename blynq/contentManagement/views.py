@@ -486,12 +486,17 @@ def create_and_download_zip(request):
         # The zip compressor
         zf = zipfile.ZipFile(s, "w")
 
-        for root, dirs, files in os.walk(user_directory):
-            for file in files:
-                zf.write(os.path.join(root, file), os.path.join(zip_subdir, file))
+        for fname in os.listdir(user_directory):
+            # Calculate path for file in zip
+            zip_path = os.path.join(zip_subdir, fname)
+
+            fpath = os.path.join(user_directory, fname)
+            # Add file, at correct path
+            zf.write(fpath, zip_path)
+
         zf.close()
         # Grab ZIP file from in-memory, make response with correct MIME-type
-        resp = HttpResponse(s.getvalue(), mimetype="application/x-zip-compressed")
+        resp = HttpResponse(s.getvalue(), content_type="application/zip")
         # ..and correct content-disposition
         resp['Content-Disposition'] = 'attachment; filename=%s' % zip_filename
         return resp
