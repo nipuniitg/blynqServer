@@ -2,24 +2,14 @@ from django.contrib import admin
 from django.apps import apps
 from django.contrib.admin.sites import AlreadyRegistered
 from reversion.admin import VersionAdmin
-from screenManagement.models import Group, Screen, GroupScreens
-
-
-class GroupAdmin(VersionAdmin):
-    pass
+from screenManagement.models import Screen
 
 
 class ScreenAdmin(VersionAdmin):
     pass
 
 
-class GroupScreensAdmin(VersionAdmin):
-    pass
-
-
-admin.site.register(Group, GroupAdmin)
 admin.site.register(Screen, ScreenAdmin)
-admin.site.register(GroupScreens, GroupScreensAdmin)
 
 
 # Register all the models in the screenManagement app
