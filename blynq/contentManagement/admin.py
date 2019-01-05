@@ -5,11 +5,11 @@ from reversion.admin import VersionAdmin
 from contentManagement.models import Content
 
 
-class ContentAdmin(VersionAdmin):
-    pass
+# class ContentAdmin(VersionAdmin):
+#     pass
 
 
-admin.site.register(Content, ContentAdmin)
+# admin.site.register(Content, ContentAdmin)
 
 
 # Register all the models in the contentManagement app

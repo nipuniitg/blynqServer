@@ -5,11 +5,11 @@ from reversion.admin import VersionAdmin
 from screenManagement.models import Screen
 
 
-class ScreenAdmin(VersionAdmin):
-    pass
+# class ScreenAdmin(VersionAdmin):
+#     pass
 
 
-admin.site.register(Screen, ScreenAdmin)
+# admin.site.register(Screen, ScreenAdmin)
 
 
 # Register all the models in the screenManagement app
