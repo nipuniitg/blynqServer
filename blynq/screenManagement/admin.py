@@ -8,7 +8,7 @@ from screenManagement.models import Screen
 class ScreenAdmin(admin.ModelAdmin):
     list_display = ('screen_name', 'owned_by', 'current_status', 'last_active_time', 'app_version',
                     'get_unique_schedules_count', 'city', 'unique_device_key', )
-    list_filter = ('owned_by', 'city')
+    list_filter = (('owned_by', admin.RelatedOnlyFieldListFilter), 'city')
     search_fields = ('screen_name', 'unique_device_key__activation_key',)
     ordering = ('-last_active_time', 'owned_by', 'app_version')
 

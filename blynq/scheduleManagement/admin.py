@@ -6,7 +6,7 @@ from scheduleManagement.models import Schedule
 
 class ScheduleAdmin(admin.ModelAdmin):
     list_display = ('schedule_title', 'organization', 'layout', 'get_schedule_screens', 'last_updated_time',)
-    list_filter = ('organization',)
+    list_filter = (('organization', admin.RelatedOnlyFieldListFilter),)
     ordering = ('-last_updated_time',)
     search_fields = ('schedule_title',)
 
