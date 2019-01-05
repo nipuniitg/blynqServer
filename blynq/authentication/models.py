@@ -66,6 +66,7 @@ class Organization(models.Model):
     use_blynq_banner = models.BooleanField(default=True)
     parent = models.ForeignKey('Organization', null=True, blank=True)
     enable_reports = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     created_time = models.DateTimeField(auto_now_add=True, null=True)
     last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
@@ -129,7 +130,7 @@ class Organization(models.Model):
 
     def get_screen_count(self):
         return self.screen_set.count()
-    get_screen_count.short_description = 'Screens'
+    get_screen_count.short_description = 'Current Screens'
 
     def get_content_count(self):
         return self.content_set.filter(is_folder=False).count()
@@ -161,6 +162,9 @@ class Organization(models.Model):
             pass
         return ''
     get_latest_activity_time.short_description = 'Last Activity'
+
+    def get_users(self):
+        return self.userdetails_set.all()
 
 
 '''

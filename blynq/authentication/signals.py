@@ -66,10 +66,8 @@ def create_default_layouts(organization):
 
 def update_total_screen_count(organization):
     try:
-        from screenManagement.models import Screen
-        screen_count = Screen.objects.filter(owned_by=organization).count()
+        screen_count = organization.get_screen_count()
         if screen_count > organization.total_screen_count:
-            organization.total_screen_count = screen_count
             organization.total_screen_count = screen_count
             organization.save()
     except Exception as e:
@@ -77,8 +75,20 @@ def update_total_screen_count(organization):
         mail_exception('Error while updating the screen count of the organization %s' % str(organization))
 
 
+def sync_users_active(organization):
+    try:
+        org_users = organization.get_users()
+        for userdetails in org_users:
+            if userdetails.user.is_active != organization.is_active:
+                userdetails.user.is_active = organization.is_active
+                userdetails.user.save()
+    except Exception as e:
+        debugFileLog.exception(e)
+
+
 @receiver(post_save, sender=Organization)
 def post_save_organization(sender, instance, **kwargs):
     debugFileLog.info("inside post_save_organization")
     create_default_layouts(instance)
     update_total_screen_count(instance)
+    sync_users_active(instance)

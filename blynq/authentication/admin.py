@@ -25,10 +25,14 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
 
-class OrganizationAdmin(VersionAdmin):
-    list_display = ('organization_name', 'get_screen_count', 'get_latest_activity_time', 'get_file_usage', 'get_content_count', 'get_schedules_count',
+class OrganizationAdmin(admin.ModelAdmin):
+    list_display = ('organization_name', 'total_screen_count', 'get_screen_count', 'get_latest_activity_time', 'get_file_usage', 'get_content_count', 'get_schedules_count',
                     'get_playlists_count', 'get_last_login_time')
-    ordering = ('organization_name',)
+    ordering = ('-total_screen_count', 'organization_name',)
+
+    def get_queryset(self, request):
+        qs = super(OrganizationAdmin, self).get_queryset(request)
+        return qs.filter(is_active=True)
 
 admin.site.register(Organization, OrganizationAdmin)
 
