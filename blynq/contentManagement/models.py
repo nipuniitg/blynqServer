@@ -182,6 +182,15 @@ class Content(models.Model):
         else:
             return False
 
+    def get_size(self):
+        try:
+            if self.document is not None:
+                return round(self.document.size/1024.0/1024.0, 2)
+        except:
+            pass
+        return 0
+    get_size.short_description = 'Size in MB'
+
     @property
     def file_path(self):
         if self.document:
@@ -264,6 +273,7 @@ class Content(models.Model):
             return ''
         else:
             return self.url
+    get_url.short_description = 'URL'
 
     @staticmethod
     def get_user_relevant_objects(user_details):

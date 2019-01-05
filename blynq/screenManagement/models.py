@@ -302,6 +302,11 @@ class Screen(models.Model):
         debugFileLog.info("restart player signal sent for screen_id: %d name: %s" % (self.screen_id, self.screen_name))
         return self.notify_player(data_dict=dict(restart_player=True))
 
+    def get_unique_schedules_count(self):
+        return self.schedulescreens_screen_id.values('schedule__schedule_id').distinct().count()
+    get_unique_schedules_count.short_description = 'Schedules'
+
+
 # Update the last_updated_time of a screen whenever any schedule or playlist or group or layout related to screen is
 # modified. This model instance will be used in the get_screen_data function in playerManagement/views.py
 class ScreenDataModified(models.Model):
