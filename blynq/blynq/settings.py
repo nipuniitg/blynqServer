@@ -30,7 +30,8 @@ DEBUG = False
 if DEBUG:
     ALLOWED_HOSTS = []
 else:
-    ALLOWED_HOSTS = ['http://www.blynq.in', 'http://blynq.in', 'www.blynq.in', 'blynq.in']
+    ALLOWED_HOSTS = ['http://www.blynq.in', 'http://blynq.in', 'www.blynq.in', 'blynq.in', 'https://www.blynq.in',
+                     'https://blynq.in']
     PREPEND_WWW = True
 
 

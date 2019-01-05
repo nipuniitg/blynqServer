@@ -1,30 +1,17 @@
 from django.contrib import admin
 from django.apps import apps
 from django.contrib.admin.sites import AlreadyRegistered
-from reversion.admin import VersionAdmin
-from scheduleManagement.models import Schedule, SchedulePlaylists, SchedulePane, ScheduleScreens
+from scheduleManagement.models import Schedule
 
 
-class ScheduleAdmin(VersionAdmin):
-    pass
+class ScheduleAdmin(admin.ModelAdmin):
+    list_display = ('schedule_title', 'organization', 'layout', 'get_schedule_screens', 'last_updated_time',)
+    list_filter = (('organization', admin.RelatedOnlyFieldListFilter),)
+    ordering = ('-last_updated_time',)
+    search_fields = ('schedule_title',)
 
-
-class SchedulePlaylistsAdmin(VersionAdmin):
-    pass
-
-
-class ScheduleScreensAdmin(VersionAdmin):
-    pass
-
-
-class SchedulePaneAdmin(VersionAdmin):
-    pass
 
 admin.site.register(Schedule, ScheduleAdmin)
-admin.site.register(SchedulePlaylists, SchedulePlaylistsAdmin)
-admin.site.register(SchedulePane, SchedulePaneAdmin)
-admin.site.register(ScheduleScreens, ScheduleScreensAdmin)
-
 
 # Register all the models in the scheduleManagement app
 app = apps.get_app_config('scheduleManagement')
@@ -34,5 +21,3 @@ for model_name, model in app.models.items():
         admin.site.register(model)
     except AlreadyRegistered:
         pass
-
-from reversion.models import Version

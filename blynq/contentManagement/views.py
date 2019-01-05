@@ -3,16 +3,19 @@ import os
 import subprocess
 import urllib2
 import json
+import StringIO
+import zipfile
 
 from django.contrib.auth.decorators import login_required
 from django.core.files import File
 from django.db import transaction
+from django.http import HttpResponse
 from django.shortcuts import render
 
 from PIL import Image
 
 from contentManagement.serializers import default_content_serializer
-from blynq.settings import TEMP_DIR
+from blynq.settings import TEMP_DIR, MEDIA_ROOT, USERCONTENT_DIR
 from customLibrary.custom_settings import COMPRESS_IMAGE, WIDGET_SCROLL_TIME
 from customLibrary.views_lib import ajax_response, get_userdetails, string_to_dict, obj_to_json_response, \
     debugFileLog, full_file_path, mail_exception, timeit, empty_string_for_none
@@ -466,6 +469,43 @@ def move_content(request):
     return ajax_response(success=success, errors=errors)
 
 
+@login_required
+def create_and_download_zip(request):
+    user_details = get_userdetails(request)
+    try:
+        user_folder = "user%d" % user_details.id
+        usercontent_dir = os.path.join(MEDIA_ROOT, USERCONTENT_DIR)
+        user_directory = os.path.join(usercontent_dir, user_folder)
+        zip_subdir = user_details.user.username
+        zip_filename = "%s.zip" % zip_subdir
+        # zip_fullname = os.path.join(usercontent_dir, zip_filename)
+
+        # Open StringIO to grab in-memory ZIP contents
+        s = StringIO.StringIO()
+
+        # The zip compressor
+        zf = zipfile.ZipFile(s, "w")
+
+        for fname in os.listdir(user_directory):
+            # Calculate path for file in zip
+            zip_path = os.path.join(zip_subdir, fname)
+
+            fpath = os.path.join(user_directory, fname)
+            # Add file, at correct path
+            zf.write(fpath, zip_path)
+
+        zf.close()
+        # Grab ZIP file from in-memory, make response with correct MIME-type
+        resp = HttpResponse(s.getvalue(), content_type="application/zip")
+        # ..and correct content-disposition
+        resp['Content-Disposition'] = 'attachment; filename=%s' % zip_filename
+        return resp
+    except Exception as e:
+        debugFileLog.exception(str(e))
+        return ajax_response(success=False,
+                             errors=["There is some error while creating a zip to download. Please contact support"])
+
+
 def get_widgets(request):
     user_details = get_userdetails(request)
     widgets = Content.get_user_widgets(user_details=user_details)
@@ -628,4 +668,3 @@ def getPageName(pageName):
     pageNameUrl = 'https://graph.facebook.com/'+pageName+'?access_token=583412958518077|yxWncaswG-JWQGQwI1MWc04icXY'    
     pageName = json.loads(urllib2.urlopen(pageNameUrl).read())['name']
     return pageName
-

@@ -133,3 +133,11 @@ class Schedule(models.Model):
                 screen.data_modified()
             else:
                 debugFileLog.error('Got null for screen attribute in schedule %s' % self.schedule_title)
+
+    def get_schedule_screens(self):
+        try:
+            return self.screens.all().values_list('screen_name', flat=True)
+        except:
+            pass
+        return 'Invalid'
+    get_schedule_screens.short_description = 'Screens'

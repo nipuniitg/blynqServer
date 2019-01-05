@@ -5,8 +5,11 @@ from reversion.admin import VersionAdmin
 from contentManagement.models import Content
 
 
-class ContentAdmin(VersionAdmin):
-    pass
+class ContentAdmin(admin.ModelAdmin):
+    list_display = ('title', 'organization', 'content_type', 'get_size', 'last_updated_time', 'get_url', 'duration')
+    list_filter = (('organization', admin.RelatedOnlyFieldListFilter), )
+    ordering = ('-last_updated_time', 'organization')
+    search_fields = ('title', 'content_type__file_type', 'organization__organization_name')
 
 
 admin.site.register(Content, ContentAdmin)

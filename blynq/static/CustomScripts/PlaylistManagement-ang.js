@@ -154,18 +154,20 @@ return{
 }]);
 
 plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAccessFactory',
-'$uibModal','blueprints','$q',
- function(plFactory,ctFactory, $scope, $window, dataAccessFactory,$uibModal,blueprints, $q){
+'$uibModal','blueprints','$q', 'lodash',
+ function(plFactory,ctFactory, $scope, $window, dataAccessFactory,$uibModal,blueprints, $q, _){
 
     var onLoad = function(){
         //playlist
         $scope.playlists =null;
         $scope.activePlaylistIndex = 0;
+        $scope.activePlaylistId;
         $scope.activePlaylistObj = null;
 
         //playlist queue
         $scope.activePlaylistItemIndex= null;
         $scope.activePlaylistItem = null;
+        $scope.isQueueUpdateRequested = false; //for showing a loading icon.
 
         //bool values
         $scope.playlistQueueEditMode = false;
@@ -181,14 +183,33 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
     var  refreshPlaylists = function(){
         dataAccessFactory.getPlaylists(function(data){
             $scope.playlists = data;
-            updateActivePlaylist(0);
+            updateActivePlaylist();
         });
     }
 
-    var updateActivePlaylist = function(index){
+    var getActivePlaylistIndex = function() {
+        if(!_.isEmpty($scope.playlists) && !_.isUndefined($scope.activePlaylistId)) {
+            for(var i=0; i<$scope.playlists.length; i++) {
+                if($scope.activePlaylistId == $scope.playlists[i].playlist_id) {
+                    return i
+                }
+            }
+        }
+        return 0;
+    }
+
+    var updateActivePlaylist = function(playlistId){
+        if(_.isUndefined(playlistId)) {
+            $scope.activePlaylistId = $scope.playlists[0].playlist_id
+        } else {
+            $scope.activePlaylistId = playlistId;
+        }
+
+        var index = getActivePlaylistIndex();
         $scope.activePlaylistObj = angular.copy($scope.playlists[index]);
-        $scope.activePlaylistIndex = index;
         $scope.showQueueItemDetails = false;
+
+        $scope.activePlaylistItemIndex = null;
     }
 
     var enableSortable = function(){
@@ -199,17 +220,15 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
         $scope.is_sortable_disabled = !0;
     }
 
-
-
     //methods
     $scope.deletePlaylist = function(){
-        var index = $scope.activePlaylistIndex;
+        var index = getActivePlaylistIndex();
         dataAccessFactory.deletePlaylist($scope.playlists[index], function(data){
             if(data.success)
             {
                 toastr.success('Playlist deleted successfully');
                 $scope.playlists.splice(index, 1);
-                updateActivePlaylist(0);
+                updateActivePlaylist();
             }
             else
             {
@@ -226,7 +245,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
     }
 
     $scope.editPlaylist = function(){
-        var index = $scope.activePlaylistIndex;
+        var index = getActivePlaylistIndex();
         openPlaylistTitleMdl(index);
     }
 
@@ -240,14 +259,16 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
                     var isNewPlaylist = playlistObj.playlist_id == -1 ? !0 : !1;
                     var onLoad = function(){
                         $scope.playlist = playlistObj;
-                        $scope.mdlVerbose = isNewPlaylist ? 'Add' : 'Update'
+                        $scope.mdlVerbose = isNewPlaylist ? 'Add' : 'Update';
+                        $scope.isPlaylistUpsertRequested = false;
                     };
 
                     onLoad();
 
                     $scope.upsertPlaylist = function(){
-                        console.log($scope.playlist)
+                        $scope.isPlaylistUpsertRequested = true;
                         plDataAccessFactory.upsertPlaylist($scope.playlist, function(returnData){
+                            $scope.isPlaylistUpsertRequested = false;
                             if(returnData.success){
                                 if(isNewPlaylist){
                                     toastr.success('Playlist added successfully');
@@ -286,12 +307,12 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
         modalInstance.result.then(function saved(upsertedPlaylist){
             if(isNewPlaylist){
                 $scope.playlists.push(angular.copy(upsertedPlaylist));
-                updateActivePlaylist($scope.playlists.length-1);
+                updateActivePlaylist(upsertedPlaylist.playlist_id);
                 enableSortable();
             }
             else{
-                $scope.playlists[$scope.activePlaylistIndex].playlist_title = upsertedPlaylist.playlist_title;
-                updateActivePlaylist($scope.activePlaylistIndex);
+                $scope.playlists[index].playlist_title = upsertedPlaylist.playlist_title; 
+                updateActivePlaylist($scope.activePlaylistId);
             }
             $scope.playlistQueueEditMode = true;
         }, function cancelled(){
@@ -303,8 +324,8 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
     //---- add / edit plyalist
 
 
-    $scope.clickedOnPlaylist= function(index){
-        updateActivePlaylist(index);
+    $scope.clickedOnPlaylist= function(playlistId){
+        updateActivePlaylist(playlistId);
         $scope.playlistQueueEditMode = false;
     };
 
@@ -318,13 +339,16 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
     };
 
     $scope.savePlaylistQueueItems = function(){
+        var playlistIndex = getActivePlaylistIndex()
+        $scope.isQueueUpdateRequested = true;
         dataAccessFactory.upsertPlaylist($scope.activePlaylistObj, function(data){
+            $scope.isQueueUpdateRequested = false;
             if(data.success)
             {
                 toastr.success('Playlist saved successfully');
                 $scope.playlistQueueEditMode = false;
-                $scope.playlists[$scope.activePlaylistIndex] = data.playlist;
-                $scope.activePlaylistObj = angular.copy($scope.playlists[$scope.activePlaylistIndex]);
+                $scope.playlists[playlistIndex] = data.playlist;
+                $scope.activePlaylistObj = angular.copy($scope.playlists[playlistIndex]);
                 $scope.activePlaylistItem = angular.copy($scope.activePlaylistObj.playlist_items[$scope.activePlaylistItemIndex]);
                 disableSortable();
             }
@@ -338,7 +362,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
     $scope.cancelPlaylistQueueItemsEdit = function(){
         $scope.playlistQueueEditMode = false;
         disableSortable();
-        updateActivePlaylist($scope.activePlaylistIndex);
+        updateActivePlaylist($scope.activePlaylistId);
     };
 
     //----Add Contents To activePlaylistObj
@@ -380,10 +404,12 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
 
 
     //Related to queue item details methods
+
     $scope.clickedOnQueueItem = function(index){
+        
         $scope.showQueueItemDetails = true;
+        $scope.activePlaylistItemIndex = index; //$scope.getQueueItemActualIndex(queueItem);
         $scope.activePlaylistItem = angular.copy($scope.activePlaylistObj.playlist_items[index]);
-        $scope.activePlaylistItemIndex = index;
     };
 
     $scope.reomveQueueItem = function(index){
@@ -406,10 +432,7 @@ plApp.controller('plCtrl', ['plFactory','ctFactory','$scope','$window','plDataAc
         }else{
             toastr.warning('Some errors are there in the input fields. Resolve them and try again');
         }
-
     };
-
-
 
     onLoad();
 

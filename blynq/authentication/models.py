@@ -1,3 +1,4 @@
+from datetime import timedelta, datetime
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import models
@@ -66,6 +67,7 @@ class Organization(models.Model):
     use_blynq_banner = models.BooleanField(default=True)
     parent = models.ForeignKey('Organization', null=True, blank=True)
     enable_reports = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     created_time = models.DateTimeField(auto_now_add=True, null=True)
     last_updated_time = models.DateTimeField(_('updated time'), auto_now=True, null=True, blank=True)
@@ -101,7 +103,7 @@ class Organization(models.Model):
             mail_exception(exception=e, subject='Received exception while getting userdetails for organization %s' % self.organization_name)
             return None
 
-    def recalculate_usage(self, size_per_screen=536870912):
+    def get_file_usage(self):
         org_contents = self.content_set.all()
         used_size = 0
         for content in org_contents:
@@ -110,8 +112,11 @@ class Organization(models.Model):
                     used_size += content.document.size
             except:
                 pass
-        self.used_file_size = used_size
-        self.total_screen_count = self.screen_set.all().count()
+        return round(used_size/1024.0/1024.0/1024.0, 2)
+    get_file_usage.short_description = 'File Uploads (GB)'
+
+    def recalculate_usage(self, size_per_screen=536870912):
+        self.total_screen_count = self.get_screen_count()
         self.total_file_size_limit = ( self.total_screen_count + 1 ) * size_per_screen
         try:
             self.save()
@@ -123,6 +128,45 @@ class Organization(models.Model):
             return True
         else:
             return False
+
+    def get_screen_count(self):
+        return self.screen_set.count()
+    get_screen_count.short_description = 'Current Screens'
+
+    def get_content_count(self):
+        return self.content_set.filter(is_folder=False).count()
+    get_content_count.short_description = 'Contents'
+
+    def get_schedules_count(self):
+        return self.schedule_set.count()
+    get_schedules_count.short_description = 'Schedules'
+
+    def get_playlists_count(self):
+        return self.playlist_set.filter(user_visible=True).count()
+    get_playlists_count.short_description = 'Playlists'
+
+    def get_last_login_time(self):
+        try:
+            return self.userdetails_set.order_by('-user__last_login')[0].user.last_login
+        except:
+            return ''
+    get_last_login_time.short_description = 'Last Login'
+
+    def get_latest_activity_time(self):
+        # base_date = datetime.now() - timedelta(days=10000)
+        # latest_activity = base_date
+        try:
+            latest_schedule_time = self.schedule_set.order_by('-last_updated_time')[0].last_updated_time
+            if latest_schedule_time is not None:
+                return latest_schedule_time
+        except:
+            pass
+        return ''
+    get_latest_activity_time.short_description = 'Last Activity'
+
+    def get_users(self):
+        return self.userdetails_set.all()
+
 
 '''
 A User can have one of the below roles in increasing hierarchy

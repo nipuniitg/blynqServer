@@ -118,7 +118,12 @@
     <div class="modal-footer">
         <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
         <button type="button" class="btn btn-success" ng-click="upsertScreen()"
-                ng-disabled="screenDetailsForm.$invalid">{[ saveButtonVerbose ]}
+                ng-disabled="screenDetailsForm.$invalid || isScreenUpsertRequested">
+                {[ saveButtonVerbose ]}
         </button>
+        <span ng-if="isScreenUpsertRequested" class="loading">
+            <i class="fa fa-spinner fa-pulse">
+            </i>
+        </span>
     </div>
 </div>

@@ -2,24 +2,18 @@ from django.contrib import admin
 from django.apps import apps
 from django.contrib.admin.sites import AlreadyRegistered
 from reversion.admin import VersionAdmin
-from screenManagement.models import Group, Screen, GroupScreens
+from screenManagement.models import Screen
 
 
-class GroupAdmin(VersionAdmin):
-    pass
+class ScreenAdmin(admin.ModelAdmin):
+    list_display = ('screen_name', 'owned_by', 'current_status', 'last_active_time', 'app_version',
+                    'get_unique_schedules_count', 'city', 'unique_device_key', )
+    list_filter = (('owned_by', admin.RelatedOnlyFieldListFilter), 'city')
+    search_fields = ('screen_name', 'unique_device_key__activation_key',)
+    ordering = ('-last_active_time', 'owned_by', 'app_version')
 
 
-class ScreenAdmin(VersionAdmin):
-    pass
-
-
-class GroupScreensAdmin(VersionAdmin):
-    pass
-
-
-admin.site.register(Group, GroupAdmin)
 admin.site.register(Screen, ScreenAdmin)
-admin.site.register(GroupScreens, GroupScreensAdmin)
 
 
 # Register all the models in the screenManagement app

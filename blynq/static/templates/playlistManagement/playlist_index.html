@@ -16,7 +16,9 @@
                             popover-trigger="mouseenter">
                             <i class="fa fa-pencil"></i>
                         </span>
-                        <span class="action-icon"  confirm-fn="deletePlaylist()"
+                        <span class="action-icon"  
+                            ng-if="activePlaylistId > 0"
+                            confirm-fn="deletePlaylist()"
                                confirm confirm-type="delete"
                                 uib-popover="Delete "
                                 popover-trigger="mouseenter">
@@ -34,8 +36,8 @@
                 <div class="listContainer">
                     <ul class="list-group ">
                         <li ng-repeat="playlist in playlists | filter: searchPlaylists" class="list-group-item pointer"
-                            ng-class="{active: $index === activePlaylistIndex }"
-                            ng-click="clickedOnPlaylist($index)">
+                            ng-class="{active: playlist.playlist_id === activePlaylistId }"
+                            ng-click="clickedOnPlaylist(playlist.playlist_id)">
                             {[ playlist.playlist_title ]}
                             </br>
                             <span style="font-size:11px">{[ playlist | playlistTotalTime ]}</span>
@@ -60,27 +62,41 @@
                             </span>
                         </div>
                         <div ng-show="playlistQueueEditMode">
-                            <span class="action-icon" ng-click="savePlaylistQueueItems()"
-                                uib-popover="Save"
-                                popover-trigger="mouseenter">
-                                <i class="fa fa-check"></i>
-                            </span>
-                            <span class="action-icon" ng-click="cancelPlaylistQueueItemsEdit()"
-                                uib-popover="Cancel"
-                                popover-trigger="mouseenter">
-                                <i class="fa fa-times"></i>
-                            </span>
+                            <div ng-if="isQueueUpdateRequested">
+                                <span class="action-icon"
+                                    style="background:#122846">
+                                    <i class="fa fa-spinner fa-pulse" style="background:none">
+                                    </i>
+                                </span>
+                            </div>
+                            <div ng-if="!isQueueUpdateRequested">
+                                <span class="action-icon" ng-click="savePlaylistQueueItems()"
+                                    uib-popover="Save"
+                                    popover-trigger="mouseenter">
+                                    <i class="fa fa-check"></i>
+                                </span>
+                                <span class="action-icon" ng-click="cancelPlaylistQueueItemsEdit()"
+                                    uib-popover="Cancel"
+                                    popover-trigger="mouseenter">
+                                    <i class="fa fa-times"></i>
+                                </span>
+                            </div>
+                            
                         </div>
                     </div>
                 </div>
-                <div class="item-search-row">
+                <!-- Commented the search functionality for now. Uncomment when the 
+                bug(Search and click on an item shows different data) is resolved.  -->
+                <!-- <div class="item-search-row">
                     <div class="input-group">
                         <input class="form-control" placeholder="Search" type="text"
                                ng-model="searchActivePlaylistObj.title">
                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
                     </div>
-                </div>
+                </div> -->
+                <!-- Remove the style when the search playlist items bug is resolved -->
                 <div droppable add-content-function="addContentToPlaylistItems"
+                    style="top: 50px;"
                      add-folder-function="addFolderContentToPlaylistItems" class="listContainer">
                     <ul id="ul-playlistQueue" class="list-group"
                         data-as-sortable=""
