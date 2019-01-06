@@ -4,6 +4,8 @@ CONTENT_ORGANIZATION_NAME = 'Partner Content'
 PLAYER_UPDATES_DIR = 'player_updates'
 PLAYER_LOG_DIR = 'player_logs'
 
+INVOICE_UPLOAD_DIR = 'invoices'
+
 PLAYER_POLL_TIME = 65  # Time difference in seconds between successive polls of the player
 PLAYER_INACTIVE_THRESHOLD = PLAYER_POLL_TIME + 1    # Wait this time (in seconds) to change status of screen as inactive
 
