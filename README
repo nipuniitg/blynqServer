@@ -1,11 +1,15 @@
-Creating README files to differentiate the branches.
-NOTE : Delete all the README files before merging to the parent branch.
+Four IITians started BlynQ on a mission to organize the outdoor marketing space. We built a Digital Signage platform from scratch to market. 
+Few big hospital chains used our platform as a SAAS solution and were happy about the product.
+Here's a short video about the product : https://www.youtube.com/watch?v=A7MlJAq5tas
 
-This branch should contain the list of features this version will include:
-Branch Name : blynq-dev-v1
-Created By : nipun
-Date : 10-11-2015
-List of Features:
-1. Upload images and display like google drive.
-2. Select images and Select screens and submit
-3. Show the selected images on the screen.
+But, we couldn't generate the revenue that we anticipated for. 
+So now, we're open sourcing the code for the UI and the backend server.
+
+The Technology Stack include:
+1. Django + Python
+2. MySql
+3. Angular
+
+
+If you're venturing into digital signage or marketing, and would like to use this software, please reach out to nipun425@gmail.com for any queries.
+TV player side software is not included in this repo and you can receive it by paying a nominal fee.
